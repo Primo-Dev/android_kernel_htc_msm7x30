@@ -2826,14 +2826,14 @@ err:
 }
 #endif /* DHD_BCM_WIFI_HDMI */
 
-#define BCM4330B1_STA_FW_PATH "/system/etc/firmware/fw_bcm4330_b1.bin"
-#define BCM4330B1_APSTA_FW_PATH "/system/etc/firmware/fw_bcm4330_apsta_b1.bin"
-#define BCM4330B1_P2P_FW_PATH "/system/etc/firmware/fw_bcm4330_p2p_b1.bin"
-#define BCM4330B1_MFG_FW_PATH "/system/etc/firmware/bcm_mfg.bin"
-#define BCM4330B2_STA_FW_PATH "/system/etc/firmware/fw_bcm4330_b2.bin"
-#define BCM4330B2_APSTA_FW_PATH "/system/etc/firmware/fw_bcm4330_apsta_b2.bin"
-#define BCM4330B2_P2P_FW_PATH "/system/etc/firmware/fw_bcm4330_p2p_b2.bin"
-#define BCM4330B2_MFG_FW_PATH "/system/etc/firmware/bcm_mfg2.bin"
+#define BCM4330B1_STA_FW_PATH "/system/vendor/firmware/fw_bcmdhd.bin"
+#define BCM4330B1_APSTA_FW_PATH "/system/vendor/firmware/fw_bcmdhd_apsta.bin"
+#define BCM4330B1_P2P_FW_PATH "/system/vendor/firmware/fw_bcmdhd_p2p.bin"
+#define BCM4330B1_MFG_FW_PATH "/system/vendor/firmware/fw_bcmdhd_mfg.bin"
+#define BCM4330B2_STA_FW_PATH "/system/vendor/firmware/fw_bcmdhd.bin"
+#define BCM4330B2_APSTA_FW_PATH "/system/vendor/firmware/fw_bcmdhd_apsta.bin"
+#define BCM4330B2_P2P_FW_PATH "/system/vendor/firmware/fw_bcmdhd_p2p.bin"
+#define BCM4330B2_MFG_FW_PATH "/system/vendor/firmware/fw_bcmdhd_mfg.bin"
 
 static int
 dhd_open(struct net_device *net)
