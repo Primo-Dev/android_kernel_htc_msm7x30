@@ -257,6 +257,7 @@ static struct power_supply htc_power_supplies[] = {
 	},
 };
 
+static void maxim_batt_INI_param_check(void);
 static int update_batt_info(void);
 static void usb_status_notifier_func(int online);
 static struct t_usb_status_notifier usb_status_notifier = {
@@ -2280,13 +2281,11 @@ static int update_batt_info(void)
 			ret = -1;
 		}
 #endif
-#if 1
 		/* Update batt_into to SMEM for sharing with modem side */
 		if (htc_update_batt_info_smem(&htc_batt_info.rep) < 0) {
 			BATT_ERR("%s: smem update failed!!!", __func__);
 			ret = -1;
 		}
-#endif
 		break;
 	default:
 		return -EINVAL;
@@ -2530,8 +2529,9 @@ EXPORT_SYMBOL(max8957_fg_alert_handler);
 static void maxim8957_program_alarm(struct maxim8957_alarm *di, int seconds)
 {
 	ktime_t low_interval = ktime_set(seconds, 0);
-	ktime_t slack = ktime_set(20, 0);
+	ktime_t slack = ktime_set(1, 0);
 	ktime_t next;
+	unsigned long now = get_seconds();
 
 	di->last_poll = alarm_get_elapsed_realtime();
 	next = ktime_add(di->last_poll, low_interval);
@@ -2539,6 +2539,9 @@ static void maxim8957_program_alarm(struct maxim8957_alarm *di, int seconds)
 	BATT_LOG("%s -> seconds: %d", __func__,seconds);
 	delta_time_sec = seconds;
 	alarm_start_range(&di->alarm, next, ktime_add(next, slack));
+
+	BATT_LOG("%s: last_poll=%lld + %d s = %lld; now = %ld",
+		__func__, ktime_to_ns(di->last_poll), seconds, ktime_to_ns(next), now);
 }
 
 static void maxim8957_battery_alarm_handler(struct alarm *alarm)
@@ -2859,7 +2862,10 @@ static int htc_battery_max8957_probe(struct platform_device *pdev)
 
 	maxim8957_alarm_ptr = di; /* save di to global */
 
+	maxim_batt_INI_param_check();
+
 	schedule_delayed_work(&di->level_update_work, msecs_to_jiffies(5000));
+
 	return 0;
 
 	fail_workqueue : fail_register : kfree(di);
@@ -2956,7 +2962,8 @@ static void get_maxim_batt_INI_info(void)
 	struct max8957_chip *max8957_chip = NULL;
 	u16 val_FullCAP, val_TGAIN, val_TOFF, val_QRtable00, val_DesignCap, val_CONFIG = 0;
 	u16 val_ICHGTerm, val_QRtable10, val_FullCAPNom, val_LearnCFG, val_SHFTCFG, val_MiscCFG = 0;
-	u16 val_QRtable20, val_RCOMP0, val_TempCo, val_V_empty, val_QRtable30 = 0;
+	u16 val_QRtable20, val_RCOMP0, val_TempCo, val_V_empty, val_QRtable30, val_TempNom = 0;
+	u16 val_Lock_I, val_Lock_II, val_MaskSOC = 0;
 
 	max8957_chip = dev_get_drvdata(max8957_fg->dev->parent);
 
@@ -2977,16 +2984,73 @@ static void get_maxim_batt_INI_info(void)
 	max8957_read(max8957_chip, MAX8957_FG_TempCo, (u8 *)&val_TempCo, 2);
 	max8957_read(max8957_chip, MAX8957_FG_V_empty, (u8 *)&val_V_empty, 2);
 	max8957_read(max8957_chip, MAX8957_FG_QRtable30, (u8 *)&val_QRtable30, 2);
+	max8957_read(max8957_chip, MAX8957_FG_TempNom, (u8 *)&val_TempNom, 2);
+	max8957_read(max8957_chip, MAX8957_FG_LOCK_I, (u8 *)&val_Lock_I, 2);
+	max8957_read(max8957_chip, MAX8957_FG_LOCK_II, (u8 *)&val_Lock_II, 2);
+	max8957_read(max8957_chip, MAX8957_FG_MaskSOC, (u8 *)&val_MaskSOC, 2);
 
 	if (htc_batt_debug_mask & HTC_BATT_DEBUG_A2M_RPC)
 		BATT_LOG("FullCAP=0x%x, QR_00=0x%x, D_CAP=0x%x, CNFG=0x%x, "
 			"I_Term=0x%x, QR_10=0x%x, F_CAP_N=0x%x, L_CFG=0x%x, S_CFG=0x%x, "
 			"M_CFG=0x%x, TGAIN=0x%x, TOFF=0x%x, QR_20=0x%x, RCOM_0=0x%x, Tmp_C=0x%x, "
-			"V_emp=0x%x, QR_30=0x%x ",
+			"V_emp=0x%x, QR_30=0x%x, TempNom=0x%x, LockI=0x%x, LockII=0x%x, MaskSOC=0x%x",
 			val_FullCAP, val_QRtable00, val_DesignCap, val_CONFIG,
 			val_ICHGTerm, val_QRtable10, val_FullCAPNom, val_LearnCFG,
 			val_SHFTCFG, val_MiscCFG, val_TGAIN, val_TOFF, val_QRtable20,
-			val_RCOMP0, val_TempCo, val_V_empty, val_QRtable30);
+			val_RCOMP0, val_TempCo, val_V_empty, val_QRtable30, val_TempNom,
+			val_Lock_I, val_Lock_II, val_MaskSOC);
+}
+
+static void maxim_batt_INI_param_check(void)
+{
+	u16 tmp[48] = {0};
+	int i;
+	bool lock = TRUE;
+	u16 val_TempNom, val_Msk_SOC, val_LockI, val_LockII = 0;
+	u16 reg_gauge_lock, reg_val_TempNom, reg_MskSOC = 0;
+
+	struct max8957_chip *max8957_chip = NULL;
+
+	max8957_chip = dev_get_drvdata(max8957_fg->dev->parent);
+
+	max8957_read(max8957_chip, MAX8957_FG_TempNom, (u8 *)&val_TempNom, 2);
+
+	if(val_TempNom != 0x1400) {
+		reg_val_TempNom = 0x1400;
+		max8957_write(max8957_chip, MAX8957_FG_TempNom , (u8 *)&reg_val_TempNom, 2);	// Write TempNom
+		BATT_ERR("Gauge TempNom is incorrect ->0x%x", val_TempNom);
+		}
+	else
+		BATT_LOG("Gauge TempNom is correct ->0x%x", val_TempNom);
+
+	max8957_read(max8957_chip, MAX8957_FG_LOCK_I, (u8 *)&val_LockI, 2);
+	max8957_read(max8957_chip, MAX8957_FG_LOCK_II, (u8 *)&val_LockII, 2);
+
+	max8957_read(max8957_chip, MAX8957_FG_OCV, (u8*)&tmp, 48 * 2);	// Verify the Model Access if locked
+
+	for(i = 0; i < 48; i++) {
+		if (tmp[i] != 0)
+			lock = FALSE;
+		}
+
+	if(lock == FALSE) {
+		BATT_ERR("Gauge model is unlocked-> 0x%x, 0x%x, 0x%x", val_LockI, val_LockII, tmp[2]);
+		reg_gauge_lock = 0x0000;
+		max8957_write(max8957_chip, MAX8957_FG_LOCK_I , (u8 *)&reg_gauge_lock, 2);	// Lock Model Access
+		max8957_write(max8957_chip, MAX8957_FG_LOCK_II , (u8 *)&reg_gauge_lock, 2);
+		}
+	else
+		BATT_LOG("Gauge model is locked-> 0x%x, 0x%x, 0x%x", val_LockI, val_LockII, tmp[2]);
+
+	max8957_read(max8957_chip, MAX8957_FG_MaskSOC, (u8 *)&val_Msk_SOC, 2);
+
+	if(val_Msk_SOC != 0x5A00) {
+		reg_MskSOC = 0x5A00;
+		max8957_write(max8957_chip, MAX8957_FG_MaskSOC , (u8 *)&reg_MskSOC, 2);	//Write MaskSOC
+		BATT_ERR("Gauge MaskSOC is incorrect-> 0x%x", val_Msk_SOC);
+		}
+	else
+		BATT_LOG("Gauge MaskSOC is correct-> 0x%x", val_Msk_SOC);
 }
 
 static void maxim8957_battery_work(struct work_struct *work)
