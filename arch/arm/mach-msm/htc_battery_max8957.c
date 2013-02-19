@@ -2991,27 +2991,30 @@ static void get_maxim_batt_INI_info(void)
 
 static void maxim8957_battery_work(struct work_struct *work)
 {
-	struct maxim8957_alarm *di = container_of(work,
-		struct maxim8957_alarm, level_update_work.work);
-
+	struct maxim8957_alarm *di = container_of(work, struct maxim8957_alarm, level_update_work.work);
+	printk("This is right after struct for di");
 	htc_battery_level_update_work_func();
-
+	printk("This is right after battery level update");
 	maxim_batt_INI_reload_flag_update();
-
+	printk("This is right after batt_ini_reload_flag_update");
 	get_maxim_batt_INI_info();
-
+	printk("This is right after batt_ini_info()");
 	maxim_change_INI_func();
-
+	printk("This is right after change_ini_func");
 	last_poll_ktime = ktime_get_real();
-
+	printk("This is right after last_poll_ktime");
 	wake_unlock(&di->work_wake_lock);
-
-	if (di->slow_poll)
+	printk("This is right after wake_unlock");
+	if (di->slow_poll) {
 		maxim8957_program_alarm(di, SLOW_POLL);
-	else if (htc_batt_info.rep.charging_source > 0)
+		printk("This is right after maxim8957_program_alarm(di, SLOW_POLL)");
+	} else if (htc_batt_info.rep.charging_source > 0) {
 		maxim8957_program_alarm(di, VBUS_POLL);
-	else
+		printk("This is right after htc_batt_info.rep.charging_source");
+	} else {
 		maxim8957_program_alarm(di, FAST_POLL);
+		printk("This is right after maxim8957_program_alarm(di, FAST_POLL)");
+	}
 }
 
 static int htc_batt_suspend(struct device *dev)
