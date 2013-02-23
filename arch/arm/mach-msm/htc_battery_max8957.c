@@ -2936,37 +2936,27 @@ static void maxim_change_INI_func(void)
 
 static int maxim_batt_INI_reload_flag_update(void)
 {
-	printk("entered function");
 	if (htc_batt_info.rep.full_bat < 1100 || htc_batt_info.rep.full_bat > 1700) {
-	printk("passed first if");
 		if (isFirstTime && htc_batt_info.rep.full_bat == 0) {
-			printk("passed is first time if");
 			return 1;
 			}
 
 		mutex_lock(&htc_batt_info.lock);
-		printk("mutex lock of batt info");
-		smem_batt_info->INI_flag = 11223355;
-		printk("set smem_batt_info with ini flag"));
+		/* This causes the OTA radio to reboot with a NPE on VMUSA
+		 smem_batt_info->INI_flag = 11223355;
+		 */
 		htc_batt_info.rep.INI_flag = 1;
-		printk("htc_batt info rep flag =1");
-		BATT_LOG("To force re-load batt maxim INI param -> INI_flag:%d\n.", smem_batt_info->INI_flag);
 		mutex_unlock(&htc_batt_info.lock);
-		printk("mutex unlock of battinfo");
 	}
 	else {
-		printk("enter else");
 		mutex_lock(&htc_batt_info.lock);
-		printk("after mutex lock in else");
+		/* This causes the OTA radio to reboot with NPE on VMUSA
 		smem_batt_info->INI_flag = 88888888;
-		printk("set ini flag");
+		 */
 		htc_batt_info.rep.INI_flag = 0;
-		printk("batt info rep ini flag 0");
 		mutex_unlock(&htc_batt_info.lock);
-		printk("mutex unlock");
 	}
 	return 1;
-		printk("end of function");
 }
 
 static void get_maxim_batt_INI_info(void)
@@ -3068,28 +3058,18 @@ static void maxim_batt_INI_param_check(void)
 static void maxim8957_battery_work(struct work_struct *work)
 {
 	struct maxim8957_alarm *di = container_of(work, struct maxim8957_alarm, level_update_work.work);
-	printk("This is right after struct for di");
 	htc_battery_level_update_work_func();
-	printk("This is right after battery level update");
 	maxim_batt_INI_reload_flag_update();
-	printk("This is right after batt_ini_reload_flag_update");
 	get_maxim_batt_INI_info();
-	printk("This is right after batt_ini_info()");
 	maxim_change_INI_func();
-	printk("This is right after change_ini_func");
 	last_poll_ktime = ktime_get_real();
-	printk("This is right after last_poll_ktime");
 	wake_unlock(&di->work_wake_lock);
-	printk("This is right after wake_unlock");
 	if (di->slow_poll) {
 		maxim8957_program_alarm(di, SLOW_POLL);
-		printk("This is right after maxim8957_program_alarm(di, SLOW_POLL)");
 	} else if (htc_batt_info.rep.charging_source > 0) {
 		maxim8957_program_alarm(di, VBUS_POLL);
-		printk("This is right after htc_batt_info.rep.charging_source");
 	} else {
 		maxim8957_program_alarm(di, FAST_POLL);
-		printk("This is right after maxim8957_program_alarm(di, FAST_POLL)");
 	}
 }
 
