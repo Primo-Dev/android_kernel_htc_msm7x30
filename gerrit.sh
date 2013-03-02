@@ -10,8 +10,8 @@
 ##################################################
 
 clear #Clears the terminal window
-project=$1 #$1 = The first data in the command line after ./gerrit.sh
-branch=$2 #$2 = The second data in the command line after ./gerrit.sh
+project="android_kernel_htc_msm7x30"
+branch=$1 #$2 = The second data in the command line after ./gerrit.sh
 name="Simon Sickle Gerrit"
 url="http://review.simonsickle.com/"
 if [ -f ~/.ssh/ssg_username ] #Checks if username file exists
@@ -31,12 +31,7 @@ echo "Your username is ${un}. To change this, execute 'rm -rf ~/.ssh/tbr_usernam
 echo "BE SURE YOUR SSH KEYS ARE MATCHED WITH GERRIT IN YOUR SETTINGS"
 fi #End username check "if"
 
-if [ -z "$1" ] #Checks if $1 is empty
-then
-echo "Project name not given. Next time, please use the format './gerrit <project> <branch>'";
-read -p "Project name (case-sensitive): " project #Sets the variable $project from what the user enters
-fi
-if [ -z "$2" ] #Checks if $2 is empty
+if [ -z "$1" ] #Checks if $2 is empty
 then
 echo "Branch wname not given. Next time, please use the format './gerrit <project> <branch>'"
 read -p "Branch name (case-sensitive): " branch #Sets the variable $branch from what the user enters
