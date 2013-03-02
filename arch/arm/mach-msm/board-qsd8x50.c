@@ -14,9 +14,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <linux/gpio.h>
+
 #include <linux/kernel.h>
 #include <linux/irq.h>
+#include <linux/gpio.h>
 #include <linux/platform_device.h>
 #include <linux/delay.h>
 #include <linux/usb/msm_hsusb.h>
@@ -31,14 +32,16 @@
 #include <mach/board.h>
 #include <mach/irqs.h>
 #include <mach/sirc.h>
+#include <mach/gpio.h>
 #include <mach/vreg.h>
-#include <linux/platform_data/mmc-msm_sdcc.h>
+#include <mach/mmc.h>
 
 #include "devices.h"
-#include "common.h"
 
-static const resource_size_t qsd8x50_surf_smc91x_base __initconst = 0x70000300;
-static const unsigned        qsd8x50_surf_smc91x_gpio __initconst = 156;
+extern struct sys_timer msm_timer;
+
+static const resource_size_t qsd8x50_surf_smc91x_base __initdata = 0x70000300;
+static const unsigned        qsd8x50_surf_smc91x_gpio __initdata = 156;
 
 /* Leave smc91x resources empty here, as we'll fill them in
  * at run-time: they vary from board to board, and the true
@@ -189,25 +192,18 @@ static void __init qsd8x50_init(void)
 	qsd8x50_init_mmc();
 }
 
-static void __init qsd8x50_init_late(void)
-{
-	smd_debugfs_init();
-}
-
 MACHINE_START(QSD8X50_SURF, "QCT QSD8X50 SURF")
-	.atag_offset = 0x100,
+	.boot_params = PLAT_PHYS_OFFSET + 0x100,
 	.map_io = qsd8x50_map_io,
 	.init_irq = qsd8x50_init_irq,
 	.init_machine = qsd8x50_init,
-	.init_late = qsd8x50_init_late,
-	.timer = &qsd8x50_timer,
+	.timer = &msm_timer,
 MACHINE_END
 
 MACHINE_START(QSD8X50A_ST1_5, "QCT QSD8X50A ST1.5")
-	.atag_offset = 0x100,
+	.boot_params = PLAT_PHYS_OFFSET + 0x100,
 	.map_io = qsd8x50_map_io,
 	.init_irq = qsd8x50_init_irq,
 	.init_machine = qsd8x50_init,
-	.init_late = qsd8x50_init_late,
-	.timer = &qsd8x50_timer,
+	.timer = &msm_timer,
 MACHINE_END

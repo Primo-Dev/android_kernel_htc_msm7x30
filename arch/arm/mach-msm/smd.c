@@ -30,6 +30,7 @@
 #include <linux/delay.h>
 
 #include <mach/msm_smd.h>
+#include <mach/system.h>
 
 #include "smd_private.h"
 #include "proc_comm.h"
@@ -37,6 +38,8 @@
 #if defined(CONFIG_ARCH_QSD8X50)
 #define CONFIG_QDSP6 1
 #endif
+
+void (*msm_hw_reset_hook)(void);
 
 #define MODULE_NAME "msm_smd"
 
@@ -49,14 +52,13 @@ static int msm_smd_debug_mask;
 
 struct shared_info {
 	int ready;
-	void __iomem *state;
+	unsigned state;
 };
 
 static unsigned dummy_state[SMSM_STATE_COUNT];
 
 static struct shared_info smd_info = {
-	/* FIXME: not a real __iomem pointer */
-	.state = &dummy_state,
+	.state = (unsigned) &dummy_state,
 };
 
 module_param_named(debug_mask, msm_smd_debug_mask,
@@ -98,6 +100,10 @@ static void handle_modem_crash(void)
 {
 	pr_err("ARM9 has CRASHED\n");
 	smd_diag();
+
+	/* hard reboot if possible */
+	if (msm_hw_reset_hook)
+		msm_hw_reset_hook();
 
 	/* in this case the modem or watchdog should reboot us */
 	for (;;)
@@ -790,22 +796,22 @@ void *smem_alloc(unsigned id, unsigned size)
 	return smem_find(id, size);
 }
 
-void __iomem *smem_item(unsigned id, unsigned *size)
+void *smem_item(unsigned id, unsigned *size)
 {
 	struct smem_shared *shared = (void *) MSM_SHARED_RAM_BASE;
 	struct smem_heap_entry *toc = shared->heap_toc;
 
 	if (id >= SMEM_NUM_ITEMS)
-		return NULL;
+		return 0;
 
 	if (toc[id].allocated) {
 		*size = toc[id].size;
-		return (MSM_SHARED_RAM_BASE + toc[id].offset);
+		return (void *) (MSM_SHARED_RAM_BASE + toc[id].offset);
 	} else {
 		*size = 0;
 	}
 
-	return NULL;
+	return 0;
 }
 
 void *smem_find(unsigned id, unsigned size_in)
@@ -851,7 +857,7 @@ static irqreturn_t smsm_irq_handler(int irq, void *data)
 int smsm_change_state(enum smsm_state_item item,
 		      uint32_t clear_mask, uint32_t set_mask)
 {
-	void __iomem *addr = smd_info.state + item * 4;
+	unsigned long addr = smd_info.state + item * 4;
 	unsigned long flags;
 	unsigned state;
 
@@ -937,10 +943,10 @@ int smd_core_init(void)
 	/* wait for essential items to be initialized */
 	for (;;) {
 		unsigned size;
-		void __iomem *state;
+		void *state;
 		state = smem_item(SMEM_SMSM_SHARED_STATE, &size);
 		if (size == SMSM_V1_SIZE || size == SMSM_V2_SIZE) {
-			smd_info.state = state;
+			smd_info.state = (unsigned)state;
 			break;
 		}
 	}
@@ -988,7 +994,7 @@ int smd_core_init(void)
 	return 0;
 }
 
-static int msm_smd_probe(struct platform_device *pdev)
+static int __devinit msm_smd_probe(struct platform_device *pdev)
 {
 	/*
 	 * If we haven't waited for the ARM9 to boot up till now,
