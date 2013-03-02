@@ -40,13 +40,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  *
- * Send feedback to <socketcan-users@lists.berlios.de>
- *
  */
 
 #ifndef SJA1000_DEV_H
 #define SJA1000_DEV_H
 
+#include <linux/irqreturn.h>
 #include <linux/can/dev.h>
 #include <linux/can/platform/sja1000.h>
 
@@ -153,7 +152,6 @@
  */
 struct sja1000_priv {
 	struct can_priv can;	/* must be the first member */
-	int open_time;
 	struct sk_buff *echo_skb;
 
 	/* the lower-layer is responsible for appropriate locking */

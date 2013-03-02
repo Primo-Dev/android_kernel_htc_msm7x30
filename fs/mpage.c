@@ -13,7 +13,7 @@
  */
 
 #include <linux/kernel.h>
-#include <linux/module.h>
+#include <linux/export.h>
 #include <linux/mm.h>
 #include <linux/kdev_t.h>
 #include <linux/gfp.h>
@@ -163,7 +163,7 @@ do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
 	sector_t block_in_file;
 	sector_t last_block;
 	sector_t last_block_in_file;
-	sector_t blocks[MAX_BUF_PER_PAGE] = { 0 };
+	sector_t blocks[MAX_BUF_PER_PAGE];
 	unsigned page_block;
 	unsigned first_hole = blocks_per_page;
 	struct block_device *bdev = NULL;
@@ -286,7 +286,6 @@ do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
 
 alloc_new:
 	if (bio == NULL) {
-		BUG_ON(bdev == NULL);
 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
 			  	min_t(int, nr_pages, bio_get_nr_vecs(bdev)),
 				GFP_KERNEL);
@@ -372,9 +371,6 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
 	sector_t last_block_in_bio = 0;
 	struct buffer_head map_bh;
 	unsigned long first_logical_block = 0;
-	struct blk_plug plug;
-
-	blk_start_plug(&plug);
 
 	map_bh.b_state = 0;
 	map_bh.b_size = 0;
@@ -390,20 +386,12 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
 					&last_block_in_bio, &map_bh,
 					&first_logical_block,
 					get_block);
-
-/* Modified by Memory, Studio Software for Zimmer */
-#if defined(CONFIG_ZIMMER)
-			if (bio) {
-				bio->bi_rw |= (REQ_SWAPIN_DMPG);
-			}
-#endif
 		}
 		page_cache_release(page);
 	}
 	BUG_ON(!list_empty(pages));
 	if (bio)
 		mpage_bio_submit(READ, bio);
-	blk_finish_plug(&plug);
 	return 0;
 }
 EXPORT_SYMBOL(mpage_readpages);
@@ -464,7 +452,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
 	const unsigned blocks_per_page = PAGE_CACHE_SIZE >> blkbits;
 	sector_t last_block;
 	sector_t block_in_file;
-	sector_t blocks[MAX_BUF_PER_PAGE] = { 0 };
+	sector_t blocks[MAX_BUF_PER_PAGE];
 	unsigned page_block;
 	unsigned first_unmapped = blocks_per_page;
 	struct block_device *bdev = NULL;

@@ -313,7 +313,7 @@ void note_interrupt(unsigned int irq, struct irq_desc *desc,
 		/*
 		 * Now kill the IRQ
 		 */
-		printk(KERN_EMERG "[K] Disabling IRQ #%d\n", irq);
+		printk(KERN_EMERG "Disabling IRQ #%d\n", irq);
 		desc->istate |= IRQS_SPURIOUS_DISABLED;
 		desc->depth++;
 		irq_disable(desc);
@@ -324,7 +324,7 @@ void note_interrupt(unsigned int irq, struct irq_desc *desc,
 	desc->irqs_unhandled = 0;
 }
 
-int noirqdebug __read_mostly;
+bool noirqdebug __read_mostly;
 
 int noirqdebug_setup(char *str)
 {

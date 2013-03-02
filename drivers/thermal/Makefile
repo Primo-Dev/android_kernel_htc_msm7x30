@@ -3,9 +3,18 @@
 #
 
 obj-$(CONFIG_THERMAL)		+= thermal_sys.o
-obj-$(CONFIG_THERMAL_PM8901)	+= pmic8901-tm.o
-obj-$(CONFIG_THERMAL_PM8058)	+= pmic8058-tm.o
-obj-$(CONFIG_THERMAL_MSM_POPMEM)	+= msm_popmem-tm.o
-obj-$(CONFIG_THERMAL_TSENS)	+= msm_tsens.o
-obj-$(CONFIG_THERMAL_TSENS8960) += msm8960_tsens.o
-obj-$(CONFIG_THERMAL_PM8XXX)	+= pm8xxx-tm.o
+
+# governors
+obj-$(CONFIG_FAIR_SHARE)	+= fair_share.o
+obj-$(CONFIG_STEP_WISE)		+= step_wise.o
+obj-$(CONFIG_USER_SPACE)	+= user_space.o
+
+# cpufreq cooling
+obj-$(CONFIG_CPU_THERMAL)	+= cpu_cooling.o
+
+# platform thermal drivers
+obj-$(CONFIG_SPEAR_THERMAL)	+= spear_thermal.o
+obj-$(CONFIG_RCAR_THERMAL)	+= rcar_thermal.o
+obj-$(CONFIG_EXYNOS_THERMAL)	+= exynos_thermal.o
+obj-$(CONFIG_DB8500_THERMAL)	+= db8500_thermal.o
+obj-$(CONFIG_DB8500_CPUFREQ_COOLING)	+= db8500_cpufreq_cooling.o

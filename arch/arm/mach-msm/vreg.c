@@ -1,7 +1,7 @@
 /* arch/arm/mach-msm/vreg.c
  *
  * Copyright (C) 2008 Google, Inc.
- * Copyright (c) 2009-2011 Code Aurora Forum. All rights reserved.
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Author: Brian Swetland <swetland@google.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -19,18 +19,11 @@
 #include <linux/device.h>
 #include <linux/init.h>
 #include <linux/debugfs.h>
+#include <linux/module.h>
 #include <linux/string.h>
 #include <mach/vreg.h>
 
 #include "proc_comm.h"
-
-#if defined(CONFIG_MSM_VREG_SWITCH_INVERTED)
-#define VREG_SWITCH_ENABLE 0
-#define VREG_SWITCH_DISABLE 1
-#else
-#define VREG_SWITCH_ENABLE 1
-#define VREG_SWITCH_DISABLE 0
-#endif
 
 struct vreg {
 	const char *name;
@@ -91,15 +84,6 @@ static struct vreg vregs[] = {
 	VREG("xo_out",	46, 0, 0),
 	VREG("lvsw0",	47, 0, 0),
 	VREG("lvsw1",	48, 0, 0),
-	VREG("mddi",	49, 0, 0),
-	VREG("pllx",	50, 0, 0),
-	VREG("wlan3",	51, 0, 0),
-	VREG("emmc",	52, 0,	0),
-	VREG("wlan_tcx0", 53, 0, 0),
-	VREG("usim2",	54, 0, 0),
-	VREG("usim",	55, 0, 0),
-	VREG("bt",	56, 0, 0),
-	VREG("wlan4",	57, 0, 0),
 };
 
 struct vreg *vreg_get(struct device *dev, const char *id)
@@ -111,7 +95,6 @@ struct vreg *vreg_get(struct device *dev, const char *id)
 	}
 	return ERR_PTR(-ENOENT);
 }
-EXPORT_SYMBOL(vreg_get);
 
 void vreg_put(struct vreg *vreg)
 {
@@ -120,51 +103,33 @@ void vreg_put(struct vreg *vreg)
 int vreg_enable(struct vreg *vreg)
 {
 	unsigned id = vreg->id;
-	int enable = VREG_SWITCH_ENABLE;
+	unsigned enable = 1;
 
-#if 1
-	/* set refcnt as vreg state */
-	vreg->status = msm_proc_comm(PCOM_VREG_SWITCH, &id, &enable);
-
-	if (!vreg->status)
-		vreg->refcnt = 1;
-#else
 	if (vreg->refcnt == 0)
 		vreg->status = msm_proc_comm(PCOM_VREG_SWITCH, &id, &enable);
 
 	if ((vreg->refcnt < UINT_MAX) && (!vreg->status))
 		vreg->refcnt++;
-#endif
 
 	return vreg->status;
 }
-EXPORT_SYMBOL(vreg_enable);
 
 int vreg_disable(struct vreg *vreg)
 {
 	unsigned id = vreg->id;
-	int disable = VREG_SWITCH_DISABLE;
+	unsigned enable = 0;
 
-#if 1
-	/* set refcnt as vreg state */
-	vreg->status = msm_proc_comm(PCOM_VREG_SWITCH, &id, &disable);
-
-	if (!vreg->status)
-		vreg->refcnt = 0;
-#else
 	if (!vreg->refcnt)
 		return 0;
 
 	if (vreg->refcnt == 1)
-		vreg->status = msm_proc_comm(PCOM_VREG_SWITCH, &id, &disable);
+		vreg->status = msm_proc_comm(PCOM_VREG_SWITCH, &id, &enable);
 
 	if (!vreg->status)
 		vreg->refcnt--;
-#endif
 
 	return vreg->status;
 }
-EXPORT_SYMBOL(vreg_disable);
 
 int vreg_set_level(struct vreg *vreg, unsigned mv)
 {
@@ -173,7 +138,6 @@ int vreg_set_level(struct vreg *vreg, unsigned mv)
 	vreg->status = msm_proc_comm(PCOM_VREG_SET_LEVEL, &id, &mv);
 	return vreg->status;
 }
-EXPORT_SYMBOL(vreg_set_level);
 
 #if defined(CONFIG_DEBUG_FS)
 

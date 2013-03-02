@@ -34,9 +34,11 @@
  * the composite model the host can use both functions at the same time.
  */
 
+#include <linux/bcd.h>
+#include <linux/version.h>
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
-#include <linux/switch.h>
+#include <linux/log2.h>
 
 /*
  * USB function drivers should return USB_GADGET_DELAYED_STATUS if they
@@ -47,6 +49,10 @@
  */
 #define USB_GADGET_DELAYED_STATUS       0x7fff	/* Impossibly large value */
 
+/* big enough to hold our biggest descriptor */
+#define USB_COMP_EP0_BUFSIZ	1024
+
+#define USB_MS_TO_HS_INTERVAL(x)	(ilog2((x * 1000 / 125)) + 1)
 struct usb_configuration;
 
 /**
@@ -60,6 +66,10 @@ struct usb_configuration;
  * @hs_descriptors: Table of high speed descriptors, using interface and
  *	string identifiers assigned during @bind().  If this pointer is null,
  *	the function will not be available at high speed.
+ * @ss_descriptors: Table of super speed descriptors, using interface and
+ *	string identifiers assigned during @bind(). If this
+ *	pointer is null after initiation, the function will not
+ *	be available at super speed.
  * @config: assigned when @usb_add_function() is called; this is the
  *	configuration with which this function is associated.
  * @bind: Before the gadget can register, all of its functions bind() to the
@@ -78,6 +88,10 @@ struct usb_configuration;
  * @setup: Used for interface-specific control requests.
  * @suspend: Notifies functions when the host stops sending USB traffic.
  * @resume: Notifies functions when the host restarts USB traffic.
+ * @get_status: Returns function status as a reply to
+ *	GetStatus() request when the recepient is Interface.
+ * @func_suspend: callback to be called when
+ *	SetFeature(FUNCTION_SUSPEND) is reseived
  *
  * A single USB function uses one or more interfaces, and should in most
  * cases support operation at both full and high speeds.  Each function is
@@ -105,8 +119,9 @@ struct usb_configuration;
 struct usb_function {
 	const char			*name;
 	struct usb_gadget_strings	**strings;
-	struct usb_descriptor_header	**descriptors;
+	struct usb_descriptor_header	**fs_descriptors;
 	struct usb_descriptor_header	**hs_descriptors;
+	struct usb_descriptor_header	**ss_descriptors;
 
 	struct usb_configuration	*config;
 
@@ -133,6 +148,10 @@ struct usb_function {
 	void			(*suspend)(struct usb_function *);
 	void			(*resume)(struct usb_function *);
 
+	/* USB 3.0 additions */
+	int			(*get_status)(struct usb_function *);
+	int			(*func_suspend)(struct usb_function *,
+						u8 suspend_opt);
 	/* private: */
 	/* internals */
 	struct list_head		list;
@@ -146,20 +165,8 @@ int usb_function_activate(struct usb_function *);
 
 int usb_interface_id(struct usb_configuration *, struct usb_function *);
 
-/**
- * ep_choose - select descriptor endpoint at current device speed
- * @g: gadget, connected and running at some speed
- * @hs: descriptor to use for high speed operation
- * @fs: descriptor to use for full or low speed operation
- */
-static inline struct usb_endpoint_descriptor *
-ep_choose(struct usb_gadget *g, struct usb_endpoint_descriptor *hs,
-		struct usb_endpoint_descriptor *fs)
-{
-	if (gadget_is_dualspeed(g) && g->speed == USB_SPEED_HIGH)
-		return hs;
-	return fs;
-}
+int config_ep_by_speed(struct usb_gadget *g, struct usb_function *f,
+			struct usb_ep *_ep);
 
 #define	MAX_CONFIG_INTERFACES		16	/* arbitrary; max 255 */
 
@@ -232,6 +239,7 @@ struct usb_configuration {
 	struct list_head	list;
 	struct list_head	functions;
 	u8			next_interface_id;
+	unsigned		superspeed:1;
 	unsigned		highspeed:1;
 	unsigned		fullspeed:1;
 	struct usb_function	*interface[MAX_CONFIG_INTERFACES];
@@ -241,24 +249,34 @@ int usb_add_config(struct usb_composite_dev *,
 		struct usb_configuration *,
 		int (*)(struct usb_configuration *));
 
-int usb_remove_config(struct usb_composite_dev *,
+void usb_remove_config(struct usb_composite_dev *,
 		struct usb_configuration *);
+
+/* predefined index for usb_composite_driver */
+enum {
+	USB_GADGET_MANUFACTURER_IDX	= 0,
+	USB_GADGET_PRODUCT_IDX,
+	USB_GADGET_SERIAL_IDX,
+	USB_GADGET_FIRST_AVAIL_IDX,
+};
 
 /**
  * struct usb_composite_driver - groups configurations into a gadget
  * @name: For diagnostics, identifies the driver.
- * @iProduct: Used as iProduct override if @dev->iProduct is not set.
- *	If NULL value of @name is taken.
- * @iManufacturer: Used as iManufacturer override if @dev->iManufacturer is
- *	not set. If NULL a default "<system> <release> with <udc>" value
- *	will be used.
  * @dev: Template descriptor for the device, including default device
  *	identifiers.
- * @strings: tables of strings, keyed by identifiers assigned during bind()
- *	and language IDs provided in control requests
+ * @strings: tables of strings, keyed by identifiers assigned during @bind
+ *	and language IDs provided in control requests. Note: The first entries
+ *	are predefined. The first entry that may be used is
+ *	USB_GADGET_FIRST_AVAIL_IDX
+ * @max_speed: Highest speed the driver supports.
  * @needs_serial: set to 1 if the gadget needs userspace to provide
  * 	a serial number.  If one is not provided, warning will be printed.
- * @unbind: Reverses bind; called as a side effect of unregistering
+ * @bind: (REQUIRED) Used to allocate resources that are shared across the
+ *	whole device, such as string IDs, and add its configurations using
+ *	@usb_add_config(). This may fail by returning a negative errno
+ *	value; it should return zero on successful initialization.
+ * @unbind: Reverses @bind; called as a side effect of unregistering
  *	this driver.
  * @disconnect: optional driver disconnect method
  * @suspend: Notifies when the host stops sending USB traffic,
@@ -267,9 +285,9 @@ int usb_remove_config(struct usb_composite_dev *,
  *	before function notifications
  *
  * Devices default to reporting self powered operation.  Devices which rely
- * on bus powered operation should report this in their @bind() method.
+ * on bus powered operation should report this in their @bind method.
  *
- * Before returning from bind, various fields in the template descriptor
+ * Before returning from @bind, various fields in the template descriptor
  * may be overridden.  These include the idVendor/idProduct/bcdDevice values
  * normally to bind the appropriate host side driver, and the three strings
  * (iManufacturer, iProduct, iSerialNumber) normally used to provide user
@@ -279,21 +297,23 @@ int usb_remove_config(struct usb_composite_dev *,
  */
 struct usb_composite_driver {
 	const char				*name;
-	const char				*iProduct;
-	const char				*iManufacturer;
 	const struct usb_device_descriptor	*dev;
 	struct usb_gadget_strings		**strings;
+	enum usb_device_speed			max_speed;
 	unsigned		needs_serial:1;
 
+	int			(*bind)(struct usb_composite_dev *cdev);
 	int			(*unbind)(struct usb_composite_dev *);
+
+	void			(*disconnect)(struct usb_composite_dev *);
 
 	/* global suspend hooks */
 	void			(*suspend)(struct usb_composite_dev *);
 	void			(*resume)(struct usb_composite_dev *);
+	struct usb_gadget_driver		gadget_driver;
 };
 
-extern int usb_composite_probe(struct usb_composite_driver *driver,
-			       int (*bind)(struct usb_composite_dev *cdev));
+extern int usb_composite_probe(struct usb_composite_driver *driver);
 extern void usb_composite_unregister(struct usb_composite_driver *driver);
 extern void usb_composite_setup_continue(struct usb_composite_dev *cdev);
 
@@ -302,7 +322,6 @@ extern void usb_composite_setup_continue(struct usb_composite_dev *cdev);
  * struct usb_composite_device - represents one composite usb gadget
  * @gadget: read-only, abstracts the gadget's usb peripheral controller
  * @req: used for control responses; buffer is pre-allocated
- * @bufsiz: size of buffer pre-allocated in @req
  * @config: the currently active configuration
  *
  * One of these devices is allocated and initialized before the
@@ -333,7 +352,6 @@ extern void usb_composite_setup_continue(struct usb_composite_dev *cdev);
 struct usb_composite_dev {
 	struct usb_gadget		*gadget;
 	struct usb_request		*req;
-	unsigned			bufsiz;
 
 	struct usb_configuration	*config;
 
@@ -344,9 +362,7 @@ struct usb_composite_dev {
 	struct list_head		configs;
 	struct usb_composite_driver	*driver;
 	u8				next_string_id;
-	u8				manufacturer_override;
-	u8				product_override;
-	u8				serial_override;
+	char				*def_manufacturer;
 
 	/* the gadget driver won't enable the data pullup
 	 * while the deactivation count is nonzero.
@@ -360,13 +376,6 @@ struct usb_composite_dev {
 
 	/* protects deactivations and delayed_status counts*/
 	spinlock_t			lock;
-
-	/* switch indicating Connect_to_PC App only */
-	struct switch_dev		sw_connect2pc;
-	/* current connected state for sw_connected */
-	bool				connected;
-
-	struct work_struct switch_work;
 };
 
 extern int usb_string_id(struct usb_composite_dev *c);
@@ -374,6 +383,53 @@ extern int usb_string_ids_tab(struct usb_composite_dev *c,
 			      struct usb_string *str);
 extern int usb_string_ids_n(struct usb_composite_dev *c, unsigned n);
 
+/*
+ * Some systems will need runtime overrides for the  product identifiers
+ * published in the device descriptor, either numbers or strings or both.
+ * String parameters are in UTF-8 (superset of ASCII's 7 bit characters).
+ */
+struct usb_composite_overwrite {
+	u16	idVendor;
+	u16	idProduct;
+	u16	bcdDevice;
+	char	*serial_number;
+	char	*manufacturer;
+	char	*product;
+};
+#define USB_GADGET_COMPOSITE_OPTIONS()					\
+	static struct usb_composite_overwrite coverwrite;		\
+									\
+	module_param_named(idVendor, coverwrite.idVendor, ushort, S_IRUGO); \
+	MODULE_PARM_DESC(idVendor, "USB Vendor ID");			\
+									\
+	module_param_named(idProduct, coverwrite.idProduct, ushort, S_IRUGO); \
+	MODULE_PARM_DESC(idProduct, "USB Product ID");			\
+									\
+	module_param_named(bcdDevice, coverwrite.bcdDevice, ushort, S_IRUGO); \
+	MODULE_PARM_DESC(bcdDevice, "USB Device version (BCD)");	\
+									\
+	module_param_named(iSerialNumber, coverwrite.serial_number, charp, \
+			S_IRUGO); \
+	MODULE_PARM_DESC(iSerialNumber, "SerialNumber string");		\
+									\
+	module_param_named(iManufacturer, coverwrite.manufacturer, charp, \
+			S_IRUGO); \
+	MODULE_PARM_DESC(iManufacturer, "USB Manufacturer string");	\
+									\
+	module_param_named(iProduct, coverwrite.product, charp, S_IRUGO); \
+	MODULE_PARM_DESC(iProduct, "USB Product string")
+
+void usb_composite_overwrite_options(struct usb_composite_dev *cdev,
+		struct usb_composite_overwrite *covr);
+
+static inline u16 get_default_bcdDevice(void)
+{
+	u16 bcdDevice;
+
+	bcdDevice = bin2bcd((LINUX_VERSION_CODE >> 16 & 0xff)) << 8;
+	bcdDevice |= bin2bcd((LINUX_VERSION_CODE >> 8 & 0xff));
+	return bcdDevice;
+}
 
 /* messaging utils */
 #define DBG(d, fmt, args...) \
