@@ -2937,20 +2937,22 @@ static void maxim_change_INI_func(void)
 static int maxim_batt_INI_reload_flag_update(void)
 {
 	if (htc_batt_info.rep.full_bat < 1100 || htc_batt_info.rep.full_bat > 1700) {
-
 		if (isFirstTime && htc_batt_info.rep.full_bat == 0) {
 			return 1;
 			}
 
 		mutex_lock(&htc_batt_info.lock);
-		smem_batt_info->INI_flag = 11223355;
+		/* This causes the OTA radio to reboot with a NPE on VMUSA
+		 smem_batt_info->INI_flag = 11223355;
+		 */
 		htc_batt_info.rep.INI_flag = 1;
-		BATT_LOG("To force re-load batt maxim INI param -> INI_flag:%d\n.", smem_batt_info->INI_flag);
 		mutex_unlock(&htc_batt_info.lock);
 	}
 	else {
 		mutex_lock(&htc_batt_info.lock);
+		/* This causes the OTA radio to reboot with NPE on VMUSA
 		smem_batt_info->INI_flag = 88888888;
+		 */
 		htc_batt_info.rep.INI_flag = 0;
 		mutex_unlock(&htc_batt_info.lock);
 	}
@@ -3055,27 +3057,20 @@ static void maxim_batt_INI_param_check(void)
 
 static void maxim8957_battery_work(struct work_struct *work)
 {
-	struct maxim8957_alarm *di = container_of(work,
-		struct maxim8957_alarm, level_update_work.work);
-
+	struct maxim8957_alarm *di = container_of(work, struct maxim8957_alarm, level_update_work.work);
 	htc_battery_level_update_work_func();
-
 	maxim_batt_INI_reload_flag_update();
-
 	get_maxim_batt_INI_info();
-
 	maxim_change_INI_func();
-
 	last_poll_ktime = ktime_get_real();
-
 	wake_unlock(&di->work_wake_lock);
-
-	if (di->slow_poll)
+	if (di->slow_poll) {
 		maxim8957_program_alarm(di, SLOW_POLL);
-	else if (htc_batt_info.rep.charging_source > 0)
+	} else if (htc_batt_info.rep.charging_source > 0) {
 		maxim8957_program_alarm(di, VBUS_POLL);
-	else
+	} else {
 		maxim8957_program_alarm(di, FAST_POLL);
+	}
 }
 
 static int htc_batt_suspend(struct device *dev)
