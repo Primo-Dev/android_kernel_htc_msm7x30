@@ -10,10 +10,10 @@
 ##################################################
 
 clear #Clears the terminal window
-project=$1 #$1 = The first data in the command line after ./gerrit.sh
-branch=$2 #$2 = The second data in the command line after ./gerrit.sh
-name="Sickle Software"
-url="http://review.sicklesoftware.com/"
+project="android_kernel_htc_msm7x30"
+branch=$1 #$2 = The second data in the command line after ./gerrit.sh
+name="Simon Sickle"
+url="http://review.simonsickle.com/"
 if [ -f ~/.ssh/ss_username ] #Checks if username file exists
 then #If it does then:
 un=`cat ~/.ssh/ss_username`  #Sets the username ($un) from the .ssh file
@@ -31,16 +31,16 @@ echo "Your username is ${un}. To change this, execute 'rm -rf ~/.ssh/tbr_usernam
 echo "BE SURE YOUR SSH KEYS ARE MATCHED WITH GERRIT IN YOUR SETTINGS"
 fi #End username check "if"
 
-if [ -z "$1" ] #Checks if $1 is empty
-then
-echo "Project name not given. Next time, please use the format './gerrit <project> <branch>'";
-read -p "Project name (case-sensitive): " project #Sets the variable $project from what the user enters
-fi
-if [ -z "$2" ] #Checks if $2 is empty
-then
-echo "Branch wname not given. Next time, please use the format './gerrit <project> <branch>'"
-read -p "Branch name (case-sensitive): " branch #Sets the variable $branch from what the user enters
-fi
+#if [ -z "$1" ] #Checks if $1 is empty
+#then
+#echo "Project name not given. Next time, please use the format './gerrit <project> <branch>'";
+#read -p "Project name (case-sensitive): " project #Sets the variable $project from what the user enters
+#fi
+#if [ -z "$2" ] #Checks if $2 is empty
+#then
+#echo "Branch wname not given. Next time, please use the format './gerrit <project> <branch>'"
+#read -p "Branch name (case-sensitive): " branch #Sets the variable $branch from what the user enters
+#fi
 un=`cat ~/.ssh/tbr_username` #Sets the username ($un) from the .ssh file (in case this wasn't done earlier)
 while true; do
 read -p "Have you already committed your changes [Y/N]? " yn #Asks user if they've committed. We could do this, but asking the user is easier
@@ -57,7 +57,7 @@ echo "Branch: $branch" #Displays branch user is commmitting to
 while true; do
 read -p "Are you sure you wish to push to Gerrit [Y/N]? " yn #Asks user if they are sure they want to commit
 case $yn in
-[Yy]* ) git push "ssh://$un@review.sicklesoftware.com:29418/SickleSoftware/$project" "HEAD:refs/for/$branch"; break;; #Pushes to gerrit
+[Yy]* ) git push "ssh://$un@review.simonsickle.com:29418/$project" "HEAD:refs/for/$branch"; break;; #Pushes to gerrit
 [Nn]* ) echo "Goodbye."; exit;; #Exits if user doesn't want to push
     * ) echo "Please answer Yes or No.";; #Requires "yes" or "no"
 esac #End case
