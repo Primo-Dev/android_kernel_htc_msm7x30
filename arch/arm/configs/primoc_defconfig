@@ -1187,8 +1187,8 @@ CONFIG_WLAN=y
 # CONFIG_ATH_COMMON is not set
 # CONFIG_BCM4329 is not set
 CONFIG_BCMDHD=m
-CONFIG_BCMDHD_FW_PATH="/system/etc/firmware/fw_bcm4330.bin"
-CONFIG_BCMDHD_NVRAM_PATH="/etc/calibration"
+CONFIG_BCMDHD_FW_PATH="/system/vendor/firmware/fw_bcmdhd.bin"
+CONFIG_BCMDHD_NVRAM_PATH="/proc/calibration"
 # CONFIG_HOSTAP is not set
 # CONFIG_IWM is not set
 # CONFIG_LIBERTAS is not set
@@ -1966,6 +1966,7 @@ CONFIG_HID=y
 CONFIG_USB_HID=y
 # CONFIG_HID_PID is not set
 # CONFIG_USB_HIDDEV is not set
+CONFIG_UHID=y
 
 #
 # Special HID drivers
