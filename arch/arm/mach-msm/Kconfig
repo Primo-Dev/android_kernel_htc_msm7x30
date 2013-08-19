@@ -36,7 +36,10 @@ config ARCH_MSM7X30
 	select CPU_V7
 	select MSM_REMOTE_SPINLOCK_DEKKERS
 	select ARCH_HAS_HOLES_MEMORYMODEL
+<<<<<<< HEAD
 	select MIGRATION
+=======
+>>>>>>> upstream/4.3_primoc
 	select MSM_GPIOMUX
 	select RESERVE_FIRST_PAGE
 	select MSM_DALRPC
@@ -204,8 +207,11 @@ config  ARCH_MSM_KRAITMP
 
 config  ARCH_MSM_CORTEX_A5
 	bool
+<<<<<<< HEAD
 	select PERF_EVENTS if !ARCH_MSM9615
 	select HAVE_HW_BREAKPOINT if !ARCH_MSM9615
+=======
+>>>>>>> upstream/4.3_primoc
 	select HAVE_HW_BRKPT_RESERVED_RW_ACCESS
 
 config ARCH_MSM7X27A
@@ -237,6 +243,47 @@ config MSM_REMOTE_SPINLOCK_SFPB
 config MSM_ADM3
 	bool
 
+<<<<<<< HEAD
+=======
+config PERFLOCK
+        depends on CPU_FREQ
+        depends on ARCH_MSM8960 || ARCH_MSM8X60 || ARCH_QSD8X50 || ARCH_MSM7X30 || ARCH_MSM7X00A || ARCH_MSM7X27A || ARCH_MSM7X25
+        default n
+        bool "HTC Performance Lock"
+
+config PERFLOCK_BOOT_LOCK
+        depends on PERFLOCK
+        depends on ARCH_MSM8960 || ARCH_MSM8X60 || ARCH_QSD8X50 || ARCH_MSM7X30 || ARCH_MSM7X00A || ARCH_MSM7X27A || ARCH_MSM7X25
+        default n
+        bool "Boot Time Performance Lock"
+
+config PERFLOCK_SCREEN_POLICY
+        depends on PERFLOCK
+        depends on ARCH_MSM8960 || ARCH_MSM8X60 || ARCH_QSD8X50 || ARCH_MSM7X00A || ARCH_MSM7X27A || ARCH_MSM7X25
+        default n
+        bool "Change Cpufreq Policy while Screen ON/OFF"
+
+config PERFLOCK_SCREEN_ON_MIN
+        depends on PERFLOCK_SCREEN_POLICY
+        int "Minimum speed while screen on"
+        default MSM_CPU_FREQ_ONDEMAND_MIN
+
+config PERFLOCK_SCREEN_ON_MAX
+        depends on PERFLOCK_SCREEN_POLICY
+        int "Maximum speed while screen on"
+        default MSM_CPU_FREQ_ONDEMAND_MAX
+
+config PERFLOCK_SCREEN_OFF_MIN
+        depends on PERFLOCK_SCREEN_POLICY
+        int "Minimum speed while screen off"
+        default MSM_CPU_FREQ_ONDEMAND_MIN
+
+config PERFLOCK_SCREEN_OFF_MAX
+        depends on PERFLOCK_SCREEN_POLICY
+        int "Maximum speed while screen off"
+        default MSM_CPU_FREQ_ONDEMAND_MIN
+
+>>>>>>> upstream/4.3_primoc
 menu "MSM Board Selection"
 
 config MACH_HALIBUT
@@ -329,7 +376,10 @@ config MACH_PRIMODD
 		depends on ARCH_MSM7X27A
 		depends on !MSM_STACKED_MEMORY
 		default n
+<<<<<<< HEAD
 		select FB_MSM_MIPI_VIDEO_ONLY
+=======
+>>>>>>> upstream/4.3_primoc
 		bool "Primodd_ct"
 		help
 			Support for Primodd_ct (PDA phone).
@@ -338,7 +388,10 @@ config MACH_PRIMODS
 		depends on ARCH_MSM7X27A
 		depends on !MSM_STACKED_MEMORY
 		default n
+<<<<<<< HEAD
 		select FB_MSM_MIPI_VIDEO_ONLY
+=======
+>>>>>>> upstream/4.3_primoc
 		bool "Primods"
 		help
 			Support for Primods (PDA phone).
@@ -446,6 +499,16 @@ config MACH_BLISS
        help
          Support for the Qualcomm Bliss board.
 
+<<<<<<< HEAD
+=======
+config MACH_VISION
+       depends on ARCH_MSM7X30
+       default n
+       bool "Vision"
+       help
+         Support for the Qualcomm Vision board.
+
+>>>>>>> upstream/4.3_primoc
 config MACH_SPADE
        depends on ARCH_MSM7X30
        default n
@@ -485,6 +548,16 @@ config MACH_PRIMOC
        depends on ARCH_MSM7X30
        default n
        bool "Primoc"
+<<<<<<< HEAD
+=======
+       select ARCH_SPARSEMEM_ENABLE
+       select MEMORY_HOTPLUG
+       select MEMORY_HOTREMOVE
+       select ARCH_ENABLE_MEMORY_HOTPLUG
+       select ARCH_ENABLE_MEMORY_HOTREMOVE
+       select ARCH_MEMORY_PROBE
+       select ARCH_MEMORY_REMOVE
+>>>>>>> upstream/4.3_primoc
        help
          Support for the Qualcomm Primoc board.
 
@@ -492,6 +565,7 @@ config MACH_PRIMOTD
        depends on ARCH_MSM7X30
        default n
        bool "Primotd"
+<<<<<<< HEAD
        select DONT_MAP_HOLE_AFTER_MEMBANK0
        help
          Support for the Qualcomm Primotd board.
@@ -503,6 +577,11 @@ config MACH_GOLFC
        help
          Support for the Qualcomm Golfc board.
 
+=======
+       help
+         Support for the Qualcomm Primotd board.
+
+>>>>>>> upstream/4.3_primoc
 config MACH_VIVOW_EVM
        depends on ARCH_MSM7X30
        default n
@@ -684,6 +763,7 @@ config MACH_RIDER
         help
           Support for the RIDER device.
 
+<<<<<<< HEAD
 config MACH_VILLEC2
         depends on ARCH_MSM8X60
         default n
@@ -692,6 +772,8 @@ config MACH_VILLEC2
         help
          Support for the VILLEC2 device.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config MACH_VERDI_LTE
 	depends on ARCH_MSM8X60
 	default n
@@ -853,6 +935,7 @@ config MSM_MDP40
 	depends on ARCH_MSM7X30 || ARCH_MSM8X60
 	default y
 
+<<<<<<< HEAD
 config FB_MSM_MIPI_VIDEO_ONLY
 	depends on ARCH_MSM7X27A
 	default n
@@ -860,6 +943,8 @@ config FB_MSM_MIPI_VIDEO_ONLY
 	help
 	  Use for VIDEO mode only panel
 
+=======
+>>>>>>> upstream/4.3_primoc
 config MSM_STACKED_MEMORY
 	bool "Stacked Memory"
 	default y
@@ -895,6 +980,7 @@ config KERNEL_PMEM_SMI_REGION
 	help
 	   Enable the in-kernel PMEM allocator to use SMI memory.
 
+<<<<<<< HEAD
 config PANEL_SELF_REFRESH
 	depends on (MACH_SPADE || MACH_MECHA)
 	default n
@@ -902,6 +988,8 @@ config PANEL_SELF_REFRESH
 	help
 	    Support for the board Spade/Mecha Panel Self-refresh.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config PMEM_GPU0
 	bool "Enable PMEM GPU0 region"
 	default y
@@ -1329,7 +1417,11 @@ config MSM_N_WAY_SMSM
 config MSM_RESET_MODEM
 	tristate "Reset Modem Driver"
 	depends on MSM_SMD
+<<<<<<< HEAD
 	default n
+=======
+	default m
+>>>>>>> upstream/4.3_primoc
 	help
 	  Allows the user to reset the modem through a device node.
 
@@ -1410,8 +1502,13 @@ config MSM_DSPS
 
 config MSM_SDIO_CTL
 	bool "SDIO CTL Driver"
+<<<<<<< HEAD
 	depends on MSM_SDIO_AL
 	default y
+=======
+	depends on MSM_SDIO_CMUX
+	default n
+>>>>>>> upstream/4.3_primoc
 	help
 	  Provides a binary SDIO control port interface.
 
@@ -1514,6 +1611,17 @@ config MSM_RMT_STORAGE_CLIENT
 	  Provide RPC mechanism for remote processors to access storage
 	  device on apps processor.
 
+<<<<<<< HEAD
+=======
+config MSM_RMT_STORAGE_SERVER
+	depends on (ARCH_MSM && MSM_ONCRPCROUTER)
+	default n
+	bool "Remote Storage RPC client"
+	help
+	  Provide RPC mechanism for remote processors to access storage
+	  device on apps processor.
+
+>>>>>>> upstream/4.3_primoc
 config MSM_RMT_STORAGE_CLIENT_STATS
 	depends on (MSM_RMT_STORAGE_CLIENT && DEBUG_FS)
 	default n
@@ -1566,6 +1674,11 @@ config MSM_CPU_FREQ_MIN
 
 endif # CPU_FREQ_MSM
 
+<<<<<<< HEAD
+=======
+if PERFLOCK
+
+>>>>>>> upstream/4.3_primoc
 config MSM_CPU_FREQ_ONDEMAND_MAX
         int "Max"
         default 384000
@@ -1574,6 +1687,46 @@ config MSM_CPU_FREQ_ONDEMAND_MIN
         int "Min"
         default 245760
 
+<<<<<<< HEAD
+=======
+endif # PERFLOCK
+
+config BOOT_CLOCK_OC
+	bool "Enable OverClocking at Boot"
+	default n
+	depends on CPU_FREQ && !PERFLOCK
+	depends on ARCH_MSM7X30
+	help
+	  This sets a clock of 1.516GHz for a faster boot.
+
+config ACPU_HIGH_OC
+	bool "Enable Higher ACPU OC"
+	default n
+	depends on ACPUCLOCK_OVERCLOCKING && ARCH_MSM7X30
+	help
+	  Allow max 2GHz acpu overclock for Spade ARM devices.
+
+config ACPU_HIGH_BUS_OC
+        bool "Enable Higher Bus OC"
+        default n
+        depends on ACPUCLOCK_OVERCLOCKING && ARCH_MSM7X30
+        help
+          Allow experimental high bus overclocks on 7x30 ARM.
+
+config ACPU_AGGRESSIVE_BUS
+        bool "Enable Higher PLL2"
+        default n  
+        depends on ACPUCLOCK_OVERCLOCKING && ARCH_MSM7X30
+        help
+          Shift entire PLL2 table upward for more aggressive bus clocks.
+
+config ACPUCLOCK_OVERCLOCKING
+	bool "Enable support for CPU overclocking"
+	default n
+	depends on CPU_FREQ && !PERFLOCK
+	depends on ARCH_MSM7X30
+
+>>>>>>> upstream/4.3_primoc
 config MSM_CPU_AVS
 	bool "Enable software controlled Adaptive Voltage Scaling (AVS)"
 	depends on (ARCH_MSM_SCORPION && QSD_SVS)
@@ -1632,6 +1785,7 @@ endchoice
 config MSM7KV2_AUDIO
 	bool "MSM7K v2 audio"
 	depends on (ARCH_MSM7X30 && ANDROID_PMEM)
+<<<<<<< HEAD
 	default n
 	help
 	  Enables QDSP5V2-based audio drivers for audio playbacks and
@@ -1641,6 +1795,9 @@ config MSM7KV2_1X_AUDIO
 	bool "MSM7K 1x v2 audio"
 	depends on (ARCH_MSM7X30 && ANDROID_PMEM)
 	default n
+=======
+	default y
+>>>>>>> upstream/4.3_primoc
 	help
 	  Enables QDSP5V2-based audio drivers for audio playbacks and
 	  voice call.
@@ -1648,7 +1805,11 @@ config MSM7KV2_1X_AUDIO
 config MSM_ADSP_REPORT_EVENTS
 	bool "Report modem events from the DSP"
 	default y
+<<<<<<< HEAD
 	depends on (MSM_ADSP || MSM7KV2_AUDIO)
+=======
+	depends on (MSM_ADSP || MSM7KV2_AUDIO || MSM7KV2_1X_AUDIO)
+>>>>>>> upstream/4.3_primoc
 	help
 	  Normally, only messages from the aDSP are reported to userspace.
 	  With this option, we report events from the aDSP as well.
@@ -1674,6 +1835,7 @@ config MSM8X60_FTM_AUDIO_DEVICES
 	  Enable support audio factory test mode devices.  This is used
 	  in a production line environment.
 
+<<<<<<< HEAD
 config HTC_OFFMODE_ALARM
 	bool "Enables HTC offmode alarm."
 	default n
@@ -1686,6 +1848,8 @@ config HTC_QUICKBOOT_OFFMODE_ALARM
 	help
 	support HTC quickboot offmode alarm.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config RTAC
 	bool "MSM8K real-time audio calibration support"
 	default y
@@ -1715,7 +1879,11 @@ config MSM_VREG_SWITCH_INVERTED
 
 config MSM_DMA_TEST
 	tristate "MSM DMA test module"
+<<<<<<< HEAD
 	default n
+=======
+	default m
+>>>>>>> upstream/4.3_primoc
 	help
 	  Intended to be compiled as a module.  Provides a device node
 	  and ioctls for testing the MSM dma system.
@@ -1742,6 +1910,16 @@ config ARCH_MSM_FLASHLIGHT
 	help
 	  The flashlight driver is for MSM series.
 
+<<<<<<< HEAD
+=======
+config ARCH_MSM_FLASHLIGHT_DEATH_RAY
+        bool "Enable high-brightness (death ray) mode"
+        depends on ARCH_MSM_FLASHLIGHT
+        default n
+        help
+          Enables a high-brightness mode for the flash LED. Dangerous
+
+>>>>>>> upstream/4.3_primoc
 config QSD_AUDIO
 	bool "QSD audio"
 	depends on ARCH_MSM_SCORPION && MSM_DALRPC && ANDROID_PMEM && !MSM_SMP
@@ -1920,12 +2098,15 @@ config HTC_HEADSET_8X60
 	help
 	  Provides support of HTC 8X60 headset detection.
 
+<<<<<<< HEAD
 config HTC_ONMODE_CHARGING
 	bool "On Mode Charging Icon Support"
 	default n
 	help
 		support on mode charing icon
 
+=======
+>>>>>>> upstream/4.3_primoc
 config SMD_OFFSET_TCXO_STAT
 	depends on MSM_SMD
 	hex "SMD offset of total TCXO-off time"
@@ -2226,6 +2407,7 @@ config MSM_AUDIO_QDSP6
           Enable HW audio support in QDSP6.
           QDSP6 can support HW encoder & decoder and audio processing
 
+<<<<<<< HEAD
 config RPC_VIBRATOR
         bool "RPC based MSM Vibrator Support"
         depends on MSM_ONCRPCROUTER
@@ -2234,6 +2416,8 @@ config RPC_VIBRATOR
           is connected on the PMIC. Say Y if you want to enable this
           feature.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config MSM_RPC_VIBRATOR
 	bool "RPC based MSM Vibrator Support"
 	depends on MSM_ONCRPCROUTER
@@ -2343,4 +2527,14 @@ config HTC_ACCESSORY_ONEWIRE
         default n
         help
           Provides support of HTC one wire protocol driver.
+<<<<<<< HEAD
+=======
+
+config FORCE_FAST_CHARGE
+        bool "Force AC charge mode at will"
+        default y
+        help
+          A simple sysfs interface to force adapters that
+          are detected as USB to charge as AC.
+>>>>>>> upstream/4.3_primoc
 endif

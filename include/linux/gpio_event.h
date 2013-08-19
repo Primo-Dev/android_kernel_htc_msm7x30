@@ -18,9 +18,15 @@
 
 #include <linux/input.h>
 
+<<<<<<< HEAD
 #define KEY_LOGD(fmt, args...) printk(KERN_DEBUG "[KEY] "fmt, ##args)
 #define KEY_LOGI(fmt, args...) printk(KERN_INFO "[KEY] "fmt, ##args)
 #define KEY_LOGE(fmt, args...) printk(KERN_ERR "[KEY] "fmt, ##args)
+=======
+#define KEY_LOGD(fmt, args...) pr_debug("[KEY] "fmt, ##args)
+#define KEY_LOGI(fmt, args...) pr_info("[KEY] "fmt, ##args)
+#define KEY_LOGE(fmt, args...) pr_err("[KEY] "fmt, ##args)
+>>>>>>> upstream/4.3_primoc
 
 struct gpio_event_input_devs {
 	int count;
@@ -41,6 +47,12 @@ struct gpio_event_info {
 		     void **data, unsigned int dev, unsigned int type,
 		     unsigned int code, int value); /* out events */
 	bool no_suspend;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_OPTICALJOYSTICK_CRUCIAL
+	bool oj_btn;
+#endif
+>>>>>>> upstream/4.3_primoc
 };
 
 struct gpio_event_platform_data {

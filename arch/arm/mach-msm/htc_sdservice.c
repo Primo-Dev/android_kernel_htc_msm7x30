@@ -23,9 +23,15 @@
 #include <linux/vmalloc.h>
 #include <linux/mm.h>
 
+<<<<<<< HEAD
 #if !defined(CONFIG_ARCH_MSM7X30) && !defined(CONFIG_ARCH_MSM7X27A)
 #include <mach/scm.h>
 #else	/* CONFIG_ARCH_MSM7X30 && CONFIG_ARCH_MSM7X27A */
+=======
+#ifndef CONFIG_ARCH_MSM7X30
+#include <mach/scm.h>
+#else	/* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 #include <linux/types.h>
 #include <linux/errno.h>
 #include <linux/mm.h>
@@ -45,7 +51,11 @@
 #define OEM_RAPI_STREAMING_FUNCTION_PROC          2
 
 #define OEM_RAPI_CLIENT_MAX_OUT_BUFF_SIZE 32
+<<<<<<< HEAD
 #endif	/* CONFIG_ARCH_MSM7X30 && CONFIG_ARCH_MSM7X27A */
+=======
+#endif	/* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 
 #define DEVICE_NAME "htc_sdservice"
 
@@ -85,7 +95,11 @@ enum {
 		HTC_SD_KEY_DECRYPT,
 };
 
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM7X27A)
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 static struct msm_rpc_client *rpc_client;
 static DEFINE_MUTEX(oem_rapi_client_lock);
 /* TODO: check where to allocate memory for return */
@@ -283,10 +297,17 @@ ssize_t oem_rapi_pack_send(unsigned int operation, char *buf, size_t size)
 
 	ret_rpc = oem_rapi_client_streaming_function2(rpc_client, &arg, &ret);
 	if (ret_rpc) {
+<<<<<<< HEAD
 		printk(KERN_INFO "%s: Send data from modem failed: %d\n", __func__, ret_rpc);
 		return -EFAULT;
 	}
 	printk(KERN_ERR "%s: Data sent to modem %s\n", __func__, buf);
+=======
+		printk(KERN_ERR "%s: Send data from modem failed: %d\n", __func__, ret_rpc);
+		return -EFAULT;
+	}
+	printk(KERN_INFO "%s: Data sent to modem %s\n", __func__, buf);
+>>>>>>> upstream/4.3_primoc
 	if(ret.output)
 		memcpy(buf, ret.output, OEM_RAPI_CLIENT_MAX_OUT_BUFF_SIZE);
 	else{
@@ -296,7 +317,11 @@ ssize_t oem_rapi_pack_send(unsigned int operation, char *buf, size_t size)
 
 	return 0;
 }
+<<<<<<< HEAD
 #endif /* CONFIG_ARCH_MSM7X30 && CONFIG_ARCH_MSM7X27A */
+=======
+#endif /* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 
 static long htc_sdservice_ioctl(struct file *file, unsigned int command, unsigned long arg)
 {
@@ -310,9 +335,15 @@ static long htc_sdservice_ioctl(struct file *file, unsigned int command, unsigne
 			PERR("copy_from_user error (msg)");
 			return -EFAULT;
 		}
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM7X27A)
 		oem_rapi_client_init2();
 #endif /* CONFIG_ARCH_MSM7X30 && CONFIG_ARCH_MSM7X27A */
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+		oem_rapi_client_init2();
+#endif /* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 		PDEBUG("func = %x\n", hmsg.func);
 		switch (hmsg.func) {
 		case HTC_SD_KEY_ENCRYPT:
@@ -324,12 +355,20 @@ static long htc_sdservice_ioctl(struct file *file, unsigned int command, unsigne
 				PERR("copy_from_user error (sdkey)");
 				return -EFAULT;
 			}
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM7X27A)
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 			ret = oem_rapi_pack_send(OEM_RAPI_CLIENT_EVENT_SDSERVICE_ENC, htc_sdkey, hmsg.req_len);
 			oem_rapi_client_close2();
 #else
 			ret = secure_access_item(0, HTC_SD_KEY_ENCRYPT, hmsg.req_len, htc_sdkey);
+<<<<<<< HEAD
 #endif	/* CONFIG_ARCH_MSM7X30  && CONFIG_ARCH_MSM7X27A*/
+=======
+#endif	/* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 			if (ret)
 				PERR("Encrypt SD key fail (%d)\n", ret);
 
@@ -348,12 +387,20 @@ static long htc_sdservice_ioctl(struct file *file, unsigned int command, unsigne
 				PERR("copy_from_user error (sdkey)");
 				return -EFAULT;
 			}
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM7X27A)
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 			ret = oem_rapi_pack_send(OEM_RAPI_CLIENT_EVENT_SDSERVICE_DEC, htc_sdkey, hmsg.req_len);
 			oem_rapi_client_close2();
 #else
 			ret = secure_access_item(0, HTC_SD_KEY_DECRYPT, hmsg.req_len, htc_sdkey);
+<<<<<<< HEAD
 #endif	/* CONFIG_ARCH_MSM7X30 && CONFIG_ARCH_MSM7X27A */
+=======
+#endif	/* CONFIG_ARCH_MSM7X30 */
+>>>>>>> upstream/4.3_primoc
 			if (ret)
 				PERR("Encrypt SD key fail (%d)\n", ret);
 

@@ -20,7 +20,11 @@
 #define __ASM_ARCH_MSM_HSUSB_H
 
 #include <linux/types.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 
 #define PHY_TYPE_MASK		0x0F
 #define PHY_TYPE_MODE		0xF0

@@ -123,6 +123,22 @@ static inline struct cpuset *task_cs(struct task_struct *task)
 			    struct cpuset, css);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_NUMA
+static inline bool task_has_mempolicy(struct task_struct *task)
+{
+	return task->mempolicy;
+}
+#else
+static inline bool task_has_mempolicy(struct task_struct *task)
+{
+	return false;
+}
+#endif
+
+
+>>>>>>> upstream/4.3_primoc
 /* bits in struct cpuset flags field */
 typedef enum {
 	CS_CPU_EXCLUSIVE,
@@ -949,7 +965,12 @@ static void cpuset_migrate_mm(struct mm_struct *mm, const nodemask_t *from,
 static void cpuset_change_task_nodemask(struct task_struct *tsk,
 					nodemask_t *newmems)
 {
+<<<<<<< HEAD
 repeat:
+=======
+	bool need_loop;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Allow tasks that have access to memory reserves because they have
 	 * been OOM killed to get memory anywhere.
@@ -960,6 +981,7 @@ repeat:
 		return;
 
 	task_lock(tsk);
+<<<<<<< HEAD
 	nodes_or(tsk->mems_allowed, tsk->mems_allowed, *newmems);
 	mpol_rebind_task(tsk, newmems, MPOL_REBIND_STEP1);
 
@@ -1000,6 +1022,29 @@ repeat:
 
 	mpol_rebind_task(tsk, newmems, MPOL_REBIND_STEP2);
 	tsk->mems_allowed = *newmems;
+=======
+	/*
+	 * Determine if a loop is necessary if another thread is doing
+	 * get_mems_allowed().  If at least one node remains unchanged and
+	 * tsk does not have a mempolicy, then an empty nodemask will not be
+	 * possible when mems_allowed is larger than a word.
+	 */
+	need_loop = task_has_mempolicy(tsk) ||
+			!nodes_intersects(*newmems, tsk->mems_allowed);
+
+	if (need_loop)
+		write_seqcount_begin(&tsk->mems_allowed_seq);
+
+	nodes_or(tsk->mems_allowed, tsk->mems_allowed, *newmems);
+	mpol_rebind_task(tsk, newmems, MPOL_REBIND_STEP1);
+
+	mpol_rebind_task(tsk, newmems, MPOL_REBIND_STEP2);
+	tsk->mems_allowed = *newmems;
+
+	if (need_loop)
+		write_seqcount_end(&tsk->mems_allowed_seq);
+
+>>>>>>> upstream/4.3_primoc
 	task_unlock(tsk);
 }
 
@@ -1368,10 +1413,17 @@ static int fmeter_getrate(struct fmeter *fmp)
 }
 
 /* Called by cgroups to determine if a cpuset is usable; cgroup_mutex held */
+<<<<<<< HEAD
 static int cpuset_can_attach(struct cgroup_subsys *ss, struct cgroup *cont,
 			     struct task_struct *tsk)
 {
 	struct cpuset *cs = cgroup_cs(cont);
+=======
+static int cpuset_can_attach(struct cgroup_subsys *ss, struct cgroup *cgrp,
+			     struct cgroup_taskset *tset)
+{
+	struct cpuset *cs = cgroup_cs(cgrp);
+>>>>>>> upstream/4.3_primoc
 
 	if (cpumask_empty(cs->cpus_allowed) || nodes_empty(cs->mems_allowed))
 		return -ENOSPC;
@@ -1384,7 +1436,11 @@ static int cpuset_can_attach(struct cgroup_subsys *ss, struct cgroup *cont,
 	 * set_cpus_allowed_ptr() on all attached tasks before cpus_allowed may
 	 * be changed.
 	 */
+<<<<<<< HEAD
 	if (tsk->flags & PF_THREAD_BOUND)
+=======
+	if (cgroup_taskset_first(tset)->flags & PF_THREAD_BOUND)
+>>>>>>> upstream/4.3_primoc
 		return -EINVAL;
 
 	return 0;
@@ -1434,12 +1490,23 @@ static void cpuset_attach_task(struct cgroup *cont, struct task_struct *tsk)
 	cpuset_update_task_spread_flag(cs, tsk);
 }
 
+<<<<<<< HEAD
 static void cpuset_attach(struct cgroup_subsys *ss, struct cgroup *cont,
 			  struct cgroup *oldcont, struct task_struct *tsk)
 {
 	struct mm_struct *mm;
 	struct cpuset *cs = cgroup_cs(cont);
 	struct cpuset *oldcs = cgroup_cs(oldcont);
+=======
+static void cpuset_attach(struct cgroup_subsys *ss, struct cgroup *cgrp,
+			  struct cgroup_taskset *tset)
+{
+	struct mm_struct *mm;
+	struct task_struct *tsk = cgroup_taskset_first(tset);
+	struct cgroup *oldcgrp = cgroup_taskset_cur_cgroup(tset);
+	struct cpuset *cs = cgroup_cs(cgrp);
+	struct cpuset *oldcs = cgroup_cs(oldcgrp);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Change mm, possibly for multiple threads in a threadgroup. This is
@@ -2185,7 +2252,11 @@ void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
 	mutex_unlock(&callback_mutex);
 }
 
+<<<<<<< HEAD
 int cpuset_cpus_allowed_fallback(struct task_struct *tsk)
+=======
+void cpuset_cpus_allowed_fallback(struct task_struct *tsk)
+>>>>>>> upstream/4.3_primoc
 {
 	const struct cpuset *cs;
 	int cpu;
@@ -2209,6 +2280,7 @@ int cpuset_cpus_allowed_fallback(struct task_struct *tsk)
 	 * changes in tsk_cs()->cpus_allowed. Otherwise we can temporary
 	 * set any mask even if it is not right from task_cs() pov,
 	 * the pending set_cpus_allowed_ptr() will fix things.
+<<<<<<< HEAD
 	 */
 
 	cpu = cpumask_any_and(&tsk->cpus_allowed, cpu_active_mask);
@@ -2225,6 +2297,12 @@ int cpuset_cpus_allowed_fallback(struct task_struct *tsk)
 	}
 
 	return cpu;
+=======
+	 *
+	 * select_fallback_rq() will fix things ups and set cpu_possible_mask
+	 * if required.
+	 */
+>>>>>>> upstream/4.3_primoc
 }
 
 void cpuset_init_current_mems_allowed(void)
@@ -2504,8 +2582,21 @@ void cpuset_print_task_mems_allowed(struct task_struct *tsk)
 
 	dentry = task_cs(tsk)->css.cgroup->dentry;
 	spin_lock(&cpuset_buffer_lock);
+<<<<<<< HEAD
 	snprintf(cpuset_name, CPUSET_NAME_LEN,
 		 dentry ? (const char *)dentry->d_name.name : "/");
+=======
+
+	if (!dentry) {
+		strcpy(cpuset_name, "/");
+	} else {
+		spin_lock(&dentry->d_lock);
+		strlcpy(cpuset_name, (const char *)dentry->d_name.name,
+			CPUSET_NAME_LEN);
+		spin_unlock(&dentry->d_lock);
+	}
+
+>>>>>>> upstream/4.3_primoc
 	nodelist_scnprintf(cpuset_nodelist, CPUSET_NODELIST_LEN,
 			   tsk->mems_allowed);
 	printk(KERN_INFO "%s cpuset=%s mems_allowed=%s\n",

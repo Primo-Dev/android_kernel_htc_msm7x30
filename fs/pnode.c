@@ -28,6 +28,7 @@ static inline struct vfsmount *next_slave(struct vfsmount *p)
 	return list_entry(p->mnt_slave.next, struct vfsmount, mnt_slave);
 }
 
+<<<<<<< HEAD
 /*
  * Return true if path is reachable from root
  *
@@ -43,6 +44,8 @@ static bool is_path_reachable(struct vfsmount *mnt, struct dentry *dentry,
 	return mnt == root->mnt && is_subdir(dentry, root->dentry);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static struct vfsmount *get_peer_under_root(struct vfsmount *mnt,
 					    struct mnt_namespace *ns,
 					    const struct path *root)

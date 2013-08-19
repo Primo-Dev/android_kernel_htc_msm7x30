@@ -26,7 +26,10 @@
 */
 
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/interrupt.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 #include <linux/kernel.h>
 #include <linux/sched.h>
@@ -57,8 +60,13 @@
 
 #define VERSION "1.3"
 
+<<<<<<< HEAD
 static bool compress_src = 1;
 static bool compress_dst = 1;
+=======
+static int compress_src = 1;
+static int compress_dst = 1;
+>>>>>>> upstream/4.3_primoc
 
 static LIST_HEAD(bnep_session_list);
 static DECLARE_RWSEM(bnep_session_sem);

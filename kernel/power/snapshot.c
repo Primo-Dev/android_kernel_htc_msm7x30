@@ -812,7 +812,12 @@ unsigned int snapshot_additional_pages(struct zone *zone)
 	unsigned int res;
 
 	res = DIV_ROUND_UP(zone->spanned_pages, BM_BITS_PER_BLOCK);
+<<<<<<< HEAD
 	res += DIV_ROUND_UP(res * sizeof(struct bm_block), PAGE_SIZE);
+=======
+	res += DIV_ROUND_UP(res * sizeof(struct bm_block),
+			    LINKED_PAGE_DATA_SIZE);
+>>>>>>> upstream/4.3_primoc
 	return 2 * res;
 }
 

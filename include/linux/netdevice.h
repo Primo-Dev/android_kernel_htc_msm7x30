@@ -31,7 +31,11 @@
 #include <linux/if_link.h>
 
 #ifdef __KERNEL__
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/timer.h>
 #include <linux/delay.h>
 #include <linux/mm.h>
@@ -231,9 +235,15 @@ struct netdev_hw_addr {
 #define NETDEV_HW_ADDR_T_SLAVE		3
 #define NETDEV_HW_ADDR_T_UNICAST	4
 #define NETDEV_HW_ADDR_T_MULTICAST	5
+<<<<<<< HEAD
 	bool			synced;
 	bool			global_use;
 	int			refcount;
+=======
+	bool			global_use;
+	int			refcount;
+	int			synced;
+>>>>>>> upstream/4.3_primoc
 	struct rcu_head		rcu_head;
 };
 

@@ -67,3 +67,7 @@ SECTIONS
   .stab.indexstr 0	: { *(.stab.indexstr) }
   .comment 0		: { *(.comment) }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc

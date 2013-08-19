@@ -26,7 +26,10 @@
  */
 
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/interrupt.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 #include <linux/tty.h>
 #include <linux/tty_driver.h>

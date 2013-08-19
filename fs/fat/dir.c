@@ -98,8 +98,11 @@ next:
 
 	*bh = sb_bread(sb, phys);
 	if (*bh == NULL) {
+<<<<<<< HEAD
 		fat_msg(sb, KERN_ERR, "Directory bread(block %llu) failed",
 		       (llu)phys);
+=======
+>>>>>>> upstream/4.3_primoc
 		/* skip this block */
 		*pos = (iblock + 1) << sb->s_blocksize_bits;
 		goto next;
@@ -343,7 +346,11 @@ int fat_search_long(struct inode *inode, const unsigned char *name,
 	struct super_block *sb = inode->i_sb;
 	struct msdos_sb_info *sbi = MSDOS_SB(sb);
 	struct buffer_head *bh = NULL;
+<<<<<<< HEAD
 	struct msdos_dir_entry *de = NULL;
+=======
+	struct msdos_dir_entry *de;
+>>>>>>> upstream/4.3_primoc
 	struct nls_table *nls_disk = sbi->nls_disk;
 	unsigned char nr_slots;
 	wchar_t bufuname[14];
@@ -362,10 +369,17 @@ parse_record:
 		nr_slots = 0;
 		if (de->name[0] == DELETED_FLAG)
 			continue;
+<<<<<<< HEAD
 		if (de->attr != ATTR_EXT && (de->attr & ATTR_VOLUME))
 			continue;
 		if (de->attr != ATTR_EXT && IS_FREE(de->name))
 			continue;
+=======
+		if (!de->name[0])
+			goto end_of_dir;
+		if (de->attr != ATTR_EXT && (de->attr & ATTR_VOLUME))
+			continue;
+>>>>>>> upstream/4.3_primoc
 		if (de->attr == ATTR_EXT) {
 			int status = fat_parse_long(inode, &cpos, &bh, &de,
 						    &unicode, &nr_slots);
@@ -522,8 +536,13 @@ parse_record:
 			goto record_end;
 		if (de->attr != ATTR_EXT && (de->attr & ATTR_VOLUME))
 			goto record_end;
+<<<<<<< HEAD
 		if (de->attr != ATTR_EXT && IS_FREE(de->name))
 			goto record_end;
+=======
+		if (!de->name[0])
+			goto end_of_dir;
+>>>>>>> upstream/4.3_primoc
 	} else {
 		if ((de->attr & ATTR_VOLUME) || IS_FREE(de->name))
 			goto record_end;

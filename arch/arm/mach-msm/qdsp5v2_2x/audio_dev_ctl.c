@@ -752,7 +752,12 @@ void broadcast_event(u32 evt_id, u32 dev_id, u32 session_id)
 
 	if ((evt_id != AUDDEV_EVT_START_VOICE)
 		&& (evt_id != AUDDEV_EVT_END_VOICE)
+<<<<<<< HEAD
 		&& (evt_id != AUDDEV_EVT_STREAM_VOL_CHG)) {
+=======
+		&& (evt_id != AUDDEV_EVT_STREAM_VOL_CHG)
+		&& (evt_id != AUDDEV_EVT_VOICE_STATE_CHG)) {
+>>>>>>> upstream/4.3_primoc
 		dev_info = audio_dev_ctrl_find_dev(dev_id);
 		if (IS_ERR(dev_info))
 			return;
@@ -764,6 +769,12 @@ void broadcast_event(u32 evt_id, u32 dev_id, u32 session_id)
 		return;
 	mutex_lock(&session_lock);
 
+<<<<<<< HEAD
+=======
+	if (evt_id == AUDDEV_EVT_VOICE_STATE_CHG)
+		routing_info.call_state = dev_id;
+
+>>>>>>> upstream/4.3_primoc
 	evt_payload = kzalloc(sizeof(union auddev_evt_data),
 			GFP_KERNEL);
 
@@ -798,8 +809,15 @@ void broadcast_event(u32 evt_id, u32 dev_id, u32 session_id)
 		session_mask = (0x1 << (clnt_id))
 				<< (8 * ((int)callback->clnt_type-1));
 
+<<<<<<< HEAD
 		if (evt_id == AUDDEV_EVT_STREAM_VOL_CHG) {
 			MM_DBG("AUDDEV_EVT_STREAM_VOL_CHG\n");
+=======
+		if ((evt_id == AUDDEV_EVT_STREAM_VOL_CHG) ||
+                        (evt_id == AUDDEV_EVT_VOICE_STATE_CHG)) {
+			MM_DBG("AUDDEV_EVT_STREAM_VOL_CHG or\
+                                AUDDEV_EVT_VOICE_STATE_CHG\n");
+>>>>>>> upstream/4.3_primoc
 			goto volume_strm;
 		}
 
@@ -835,7 +853,11 @@ volume_strm:
 				else
 					evt_payload->session_vol =
 						msm_vol_ctl.volume;
+<<<<<<< HEAD
 			} else if (evt_id == AUDDEV_EVT_FREQ_CHG) {
+=======
+			} else if (evt_id == AUDDEV_EVT_FREQ_CHG && dev_info != NULL) {
+>>>>>>> upstream/4.3_primoc
 				if (routing_info.dec_freq[clnt_id].evt) {
 					routing_info.dec_freq[clnt_id].evt
 							= 0;
@@ -851,14 +873,26 @@ volume_strm:
 					evt_payload->freq_info.acdb_dev_id
 						= dev_info->acdb_id;
 				}
+<<<<<<< HEAD
 			} else
+=======
+			} else if (evt_id == AUDDEV_EVT_VOICE_STATE_CHG)
+                                evt_payload->voice_state =
+                                        routing_info.call_state;
+			else
+>>>>>>> upstream/4.3_primoc
 				evt_payload->routing_id = dev_info->copp_id;
 			callback->auddev_evt_listener(
 					evt_id,
 					evt_payload,
 					callback->private_data);
 sent_dec:
+<<<<<<< HEAD
 			if (evt_id != AUDDEV_EVT_STREAM_VOL_CHG)
+=======
+			if ((evt_id != AUDDEV_EVT_STREAM_VOL_CHG) &&
+                                (evt_id != AUDDEV_EVT_VOICE_STATE_CHG))
+>>>>>>> upstream/4.3_primoc
 				routing_info.dec_freq[clnt_id].freq
 						= dev_info->set_sample_rate;
 
@@ -884,7 +918,14 @@ sent_dec:
 					evt_payload->freq_info.acdb_dev_id
 						= dev_info->acdb_id;
 				}
+<<<<<<< HEAD
 			} else {
+=======
+			} else if (evt_id == AUDDEV_EVT_VOICE_STATE_CHG) 
+                                evt_payload->voice_state =
+                                        routing_info.call_state;
+			else {
+>>>>>>> upstream/4.3_primoc
 				if (dev_info)
 					evt_payload->routing_id = dev_info->copp_id;
 				else
@@ -911,6 +952,14 @@ aud_cal:
 			}
 			if (!dev_info->sessions)
 				goto sent_aud_cal;
+<<<<<<< HEAD
+=======
+
+                        if (evt_id == AUDDEV_EVT_VOICE_STATE_CHG)
+                                evt_payload->voice_state =
+                                        routing_info.call_state;
+			else {
+>>>>>>> upstream/4.3_primoc
 			evt_payload->audcal_info.dev_id = dev_info->copp_id;
 			evt_payload->audcal_info.acdb_id =
 				dev_info->acdb_id;
@@ -921,7 +970,11 @@ aud_cal:
 				dev_info->set_sample_rate ?
 				dev_info->set_sample_rate :
 				dev_info->sample_rate;
+<<<<<<< HEAD
 
+=======
+			}
+>>>>>>> upstream/4.3_primoc
 			callback->auddev_evt_listener(
 				evt_id,
 				evt_payload,
@@ -988,7 +1041,14 @@ voc_events:
 						= dev_info->acdb_id;
 				} else
 					goto sent_voc;
+<<<<<<< HEAD
 			} else {
+=======
+			} else if (evt_id == AUDDEV_EVT_VOICE_STATE_CHG)
+                                evt_payload->voice_state =
+                                                routing_info.call_state;
+                        else {
+>>>>>>> upstream/4.3_primoc
 				evt_payload->voc_devinfo.dev_type =
 					(dev_info->capability & SNDDEV_CAP_TX) ?
 					SNDDEV_CAP_TX : SNDDEV_CAP_RX;
@@ -1075,6 +1135,10 @@ static int __init audio_dev_ctrl_init(void)
 	audio_dev_ctrl.num_dev = 0;
 	audio_dev_ctrl.voice_tx_dev = NULL;
 	audio_dev_ctrl.voice_rx_dev = NULL;
+<<<<<<< HEAD
+=======
+	routing_info.call_state = VOICE_STATE_INVALID;
+>>>>>>> upstream/4.3_primoc
 	return misc_register(&audio_dev_ctrl_misc);
 }
 

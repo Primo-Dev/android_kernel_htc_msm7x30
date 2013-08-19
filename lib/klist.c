@@ -193,10 +193,17 @@ static void klist_release(struct kref *kref)
 		if (waiter->node != n)
 			continue;
 
+<<<<<<< HEAD
 		waiter->woken = 1;
 		mb();
 		wake_up_process(waiter->process);
 		list_del(&waiter->list);
+=======
+		list_del(&waiter->list);
+		waiter->woken = 1;
+		mb();
+		wake_up_process(waiter->process);
+>>>>>>> upstream/4.3_primoc
 	}
 	spin_unlock(&klist_remove_lock);
 	knode_set_klist(n, NULL);

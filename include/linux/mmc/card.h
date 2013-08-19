@@ -221,7 +221,10 @@ struct mmc_card {
 
 	struct dentry		*debugfs_root;
 	unsigned int		removed;
+<<<<<<< HEAD
 	unsigned int		write_prot_type;/* write protection type of card setting */
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 /*

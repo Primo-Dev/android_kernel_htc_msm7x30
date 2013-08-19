@@ -197,7 +197,11 @@ static struct msm_rpc_client *msm_rpc_create_client(void)
 	client->cb_avail = 0;
 	init_waitqueue_head(&client->cb_wait);
 	INIT_LIST_HEAD(&client->cb_list);
+<<<<<<< HEAD
 	spin_lock_init(&client->cb_list_lock);
+=======
+	mutex_init(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 	atomic_set(&client->next_cb_id, 1);
 
 	return client;
@@ -214,15 +218,24 @@ static void msm_rpc_destroy_client(struct msm_rpc_client *client)
 void msm_rpc_remove_all_cb_func(struct msm_rpc_client *client)
 {
 	struct msm_rpc_cb_table_item *cb_item, *tmp_cb_item;
+<<<<<<< HEAD
 	unsigned long flags;
 
 	spin_lock_irqsave(&client->cb_list_lock, flags);
+=======
+
+	mutex_lock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 	list_for_each_entry_safe(cb_item, tmp_cb_item,
 				 &client->cb_list, list) {
 		list_del(&cb_item->list);
 		kfree(cb_item);
 	}
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&client->cb_list_lock, flags);
+=======
+	mutex_unlock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -720,11 +733,15 @@ EXPORT_SYMBOL(msm_rpc_send_accepted_reply);
 int msm_rpc_add_cb_func(struct msm_rpc_client *client, void *cb_func)
 {
 	struct msm_rpc_cb_table_item *cb_item;
+<<<<<<< HEAD
 	unsigned long flags;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (cb_func == NULL)
 		return MSM_RPC_CLIENT_NULL_CB_ID;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&client->cb_list_lock, flags);
 	list_for_each_entry(cb_item, &client->cb_list, list) {
 		if (cb_item->cb_func == cb_func) {
@@ -733,6 +750,16 @@ int msm_rpc_add_cb_func(struct msm_rpc_client *client, void *cb_func)
 		}
 	}
 	spin_unlock_irqrestore(&client->cb_list_lock, flags);
+=======
+	mutex_lock(&client->cb_list_lock);
+	list_for_each_entry(cb_item, &client->cb_list, list) {
+		if (cb_item->cb_func == cb_func) {
+			mutex_unlock(&client->cb_list_lock);
+			return cb_item->cb_id;
+		}
+	}
+	mutex_unlock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 
 	cb_item = kmalloc(sizeof(struct msm_rpc_cb_table_item), GFP_KERNEL);
 	if (!cb_item)
@@ -742,9 +769,15 @@ int msm_rpc_add_cb_func(struct msm_rpc_client *client, void *cb_func)
 	cb_item->cb_id = atomic_add_return(1, &client->next_cb_id);
 	cb_item->cb_func = cb_func;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&client->cb_list_lock, flags);
 	list_add_tail(&cb_item->list, &client->cb_list);
 	spin_unlock_irqrestore(&client->cb_list_lock, flags);
+=======
+	mutex_lock(&client->cb_list_lock);
+	list_add_tail(&cb_item->list, &client->cb_list);
+	mutex_unlock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 
 	return cb_item->cb_id;
 }
@@ -765,6 +798,7 @@ EXPORT_SYMBOL(msm_rpc_add_cb_func);
 void *msm_rpc_get_cb_func(struct msm_rpc_client *client, uint32_t cb_id)
 {
 	struct msm_rpc_cb_table_item *cb_item;
+<<<<<<< HEAD
 	unsigned long flags;
 
 	spin_lock_irqsave(&client->cb_list_lock, flags);
@@ -775,6 +809,17 @@ void *msm_rpc_get_cb_func(struct msm_rpc_client *client, uint32_t cb_id)
 		}
 	}
 	spin_unlock_irqrestore(&client->cb_list_lock, flags);
+=======
+
+	mutex_lock(&client->cb_list_lock);
+	list_for_each_entry(cb_item, &client->cb_list, list) {
+		if (cb_item->cb_id == cb_id) {
+			mutex_unlock(&client->cb_list_lock);
+			return cb_item->cb_func;
+		}
+	}
+	mutex_unlock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 	return NULL;
 }
 EXPORT_SYMBOL(msm_rpc_get_cb_func);
@@ -790,21 +835,36 @@ EXPORT_SYMBOL(msm_rpc_get_cb_func);
 void msm_rpc_remove_cb_func(struct msm_rpc_client *client, void *cb_func)
 {
 	struct msm_rpc_cb_table_item *cb_item, *tmp_cb_item;
+<<<<<<< HEAD
 	unsigned long flags;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (cb_func == NULL)
 		return;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&client->cb_list_lock, flags);
+=======
+	mutex_lock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 	list_for_each_entry_safe(cb_item, tmp_cb_item,
 				 &client->cb_list, list) {
 		if (cb_item->cb_func == cb_func) {
 			list_del(&cb_item->list);
 			kfree(cb_item);
+<<<<<<< HEAD
 			spin_unlock_irqrestore(&client->cb_list_lock, flags);
 			return;
 		}
 	}
 	spin_unlock_irqrestore(&client->cb_list_lock, flags);
+=======
+			mutex_unlock(&client->cb_list_lock);
+			return;
+		}
+	}
+	mutex_unlock(&client->cb_list_lock);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(msm_rpc_remove_cb_func);

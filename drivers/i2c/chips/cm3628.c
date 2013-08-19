@@ -28,7 +28,11 @@
 #include <linux/miscdevice.h>
 #include <linux/lightsensor.h>
 #include <linux/slab.h>
+<<<<<<< HEAD
 #include <linux/uaccess.h>
+=======
+#include <asm/uaccess.h>
+>>>>>>> upstream/4.3_primoc
 #include <asm/mach-types.h>
 #include <linux/cm3628.h>
 #include <linux/pl_sensor.h>
@@ -41,7 +45,11 @@
 
 #define D(x...) pr_info(x)
 
+<<<<<<< HEAD
 #define I2C_RETRY_COUNT 1
+=======
+#define I2C_RETRY_COUNT 10
+>>>>>>> upstream/4.3_primoc
 
 #define POLLING_PROXIMITY 1
 #define NO_IGNORE_BOOT_MODE 1
@@ -52,7 +60,11 @@
 #define POLLING_DELAY		200
 #define TH_ADD			3
 #endif
+<<<<<<< HEAD
 static int record_init_fail;
+=======
+static int record_init_fail = 0;
+>>>>>>> upstream/4.3_primoc
 static void sensor_irq_do_work(struct work_struct *work);
 static DECLARE_WORK(sensor_irq_work, sensor_irq_do_work);
 
@@ -71,9 +83,14 @@ struct cm3628_info {
 
 	struct input_dev *ls_input_dev;
 	struct input_dev *ps_input_dev;
+<<<<<<< HEAD
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	struct early_suspend early_suspend;
 #endif
+=======
+
+	struct early_suspend early_suspend;
+>>>>>>> upstream/4.3_primoc
 	struct i2c_client *i2c_client;
 	struct workqueue_struct *lp_wq;
 
@@ -135,8 +152,13 @@ static uint8_t ps_cancel_set;
 static uint8_t ps_offset_adc;
 static uint8_t ps_offset_adc2;
 struct cm3628_info *lp_info;
+<<<<<<< HEAD
 int enable_log;
 int fLevel = -1;
+=======
+int enable_log = 0;
+int fLevel=-1;
+>>>>>>> upstream/4.3_primoc
 static struct mutex als_enable_mutex, als_disable_mutex, als_get_adc_mutex;
 static int lightsensor_enable(struct cm3628_info *lpi);
 static int lightsensor_disable(struct cm3628_info *lpi);
@@ -146,6 +168,10 @@ static void psensor_initial_cmd(struct cm3628_info *lpi);
 static int I2C_RxData(uint16_t slaveAddr, uint8_t *rxData, int length)
 {
 	uint8_t loop_i;
+<<<<<<< HEAD
+=======
+	int val;
+>>>>>>> upstream/4.3_primoc
 	struct cm3628_info *lpi = lp_info;
 
 	struct i2c_msg msgs[] = {
@@ -168,6 +194,7 @@ static int I2C_RxData(uint16_t slaveAddr, uint8_t *rxData, int length)
 		if (i2c_transfer(lp_info->i2c_client->adapter, msgs, 1) > 0)
 			break;
 
+<<<<<<< HEAD
 		/*val = gpio_get_value(lpi->intr_pin);*/
 		/*check intr GPIO when i2c error*/
 		if (loop_i == 0 || loop_i == I2C_RETRY_COUNT - 1)
@@ -175,6 +202,15 @@ static int I2C_RxData(uint16_t slaveAddr, uint8_t *rxData, int length)
 				__func__, slaveAddr, lpi->intr_pin, record_init_fail);
 
 		/*mdelay(1);*/
+=======
+		val = gpio_get_value(lpi->intr_pin);
+		/*check intr GPIO when i2c error*/
+		if (loop_i == 0 || loop_i == I2C_RETRY_COUNT -1)
+			D("[PS][CM3628 error] %s, i2c err, slaveAddr 0x%x ISR gpio %d  = %d, record_init_fail %d \n",
+				__func__, slaveAddr, lpi->intr_pin, val, record_init_fail);
+
+		msleep(10);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (loop_i >= I2C_RETRY_COUNT) {
 		printk(KERN_ERR "[PS_ERR][CM3628 error] %s retry over %d\n",
@@ -188,6 +224,10 @@ static int I2C_RxData(uint16_t slaveAddr, uint8_t *rxData, int length)
 static int I2C_TxData(uint16_t slaveAddr, uint8_t *txData, int length)
 {
 	uint8_t loop_i;
+<<<<<<< HEAD
+=======
+	int val;
+>>>>>>> upstream/4.3_primoc
 	struct cm3628_info *lpi = lp_info;
 	struct i2c_msg msg[] = {
 		{
@@ -202,12 +242,22 @@ static int I2C_TxData(uint16_t slaveAddr, uint8_t *txData, int length)
 		if (i2c_transfer(lp_info->i2c_client->adapter, msg, 1) > 0)
 			break;
 
+<<<<<<< HEAD
 		/*check intr GPIO when i2c error*/
 		if (loop_i == 0 || loop_i == I2C_RETRY_COUNT - 1)
 			D("[PS][CM3628 error] %s, i2c err, slaveAddr 0x%x, register 0x%x, value 0x%x, ISR gpio%d, record_init_fail %d\n",
 				__func__, slaveAddr, txData[0], txData[1], lpi->intr_pin, record_init_fail);
 
 		/*mdelay(1);*/
+=======
+		val = gpio_get_value(lpi->intr_pin);
+		/*check intr GPIO when i2c error*/
+		if (loop_i == 0 || loop_i == I2C_RETRY_COUNT -1)
+			D("[PS][CM3628 error] %s, i2c err, slaveAddr 0x%x, register 0x%x, value 0x%x, ISR gpio%d  = %d, record_init_fail %d\n",
+				__func__, slaveAddr, txData[0], txData[1], lpi->intr_pin, val, record_init_fail);
+
+		msleep(10);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (loop_i >= I2C_RETRY_COUNT) {
@@ -386,6 +436,10 @@ static void report_near_do_work(struct work_struct *w)
 	input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, 0);
 	input_sync(lpi->ps_input_dev);
 	blocking_notifier_call_chain(&psensor_notifier_list, 2, NULL);
+<<<<<<< HEAD
+=======
+	wake_lock_timeout(&(lpi->ps_wake_lock), 2*HZ);
+>>>>>>> upstream/4.3_primoc
 }
 static void report_psensor_input_event(struct cm3628_info *lpi, int interrupt_flag)
 {
@@ -446,6 +500,10 @@ static void report_psensor_input_event(struct cm3628_info *lpi, int interrupt_fl
 		blocking_notifier_call_chain(&psensor_notifier_list, val+2, NULL);
 	}
 
+<<<<<<< HEAD
+=======
+	wake_lock_timeout(&(lpi->ps_wake_lock), 2*HZ);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void enable_als_int(void)/*enable als interrupt*/
@@ -482,7 +540,11 @@ static void report_lsensor_input_event(struct cm3628_info *lpi, bool resume)
 			if (*(lpi->adc_table + i))
 				break;
 		}
+<<<<<<< HEAD
 		if (i == 9) {/*avoid  i = 10, because 'cali_table' of size is 10 */
+=======
+		if ( i == 9) {/*avoid  i = 10, because 'cali_table' of size is 10 */
+>>>>>>> upstream/4.3_primoc
 			level = i;
 			break;
 		}
@@ -504,10 +566,16 @@ static void report_lsensor_input_event(struct cm3628_info *lpi, bool resume)
 	lpi->current_level = level;
 	lpi->current_adc = adc_value;
 	/*D("[CM3628] %s: *(lpi->cali_table + (i - 1)) + 1 = 0x%X, *(lpi->cali_table + i) = 0x%x \n", __func__, *(lpi->cali_table + (i - 1)) + 1, *(lpi->cali_table + i));*/
+<<<<<<< HEAD
 	if (fLevel >= 0) {
 		D("[LS][CM3628] L-sensor force level enable level=%d fLevel=%d\n",
 			level, fLevel);
 		level = fLevel;
+=======
+	if(fLevel>=0){
+		D("[LS][CM3628] L-sensor force level enable level=%d fLevel=%d\n",level,fLevel);
+		level=fLevel;
+>>>>>>> upstream/4.3_primoc
 	}
 	input_report_abs(lpi->ls_input_dev, ABS_MISC, level);
 	input_sync(lpi->ls_input_dev);
@@ -549,13 +617,20 @@ static void sensor_irq_do_work(struct work_struct *work)
 
 	uint8_t add = 0;
 
+<<<<<<< HEAD
 	wake_lock_timeout(&(lpi->ps_wake_lock), 3*HZ);
+=======
+>>>>>>> upstream/4.3_primoc
 	/*check ALS or PS*/
 	_cm3628_I2C_Read_Byte(lpi->check_interrupt_add, &add);
 	/*D("[PS][CM3628] %s: check_interrupt_add = 0x%03X, add = 0x%x , add>>1 = 0x%x\n",
 		__func__, lpi->check_interrupt_add, add, add>>1);*/
 	add = add>>1;
+<<<<<<< HEAD
 	if (add == lpi->ALS_slave_address) {
+=======
+	if (add == lpi->ALS_slave_address ) {
+>>>>>>> upstream/4.3_primoc
 		report_lsensor_input_event(lpi, 0);
 	} else if (add == lpi->PS_slave_address) {
 		report_psensor_input_event(lpi, 1);
@@ -769,7 +844,11 @@ static int psensor_enable(struct cm3628_info *lpi)
 	} else
 		report_psensor_input_event(lpi, 0);
 
+<<<<<<< HEAD
 	cmd = (lpi->ps_conf1_val | CM3628_PS_INT_EN);
+=======
+	cmd = ( lpi->ps_conf1_val | CM3628_PS_INT_EN);
+>>>>>>> upstream/4.3_primoc
 	enable_ps_int(cmd);
 
 	ret = irq_set_irq_wake(lpi->irq, 1);
@@ -830,10 +909,18 @@ static int psensor_disable(struct cm3628_info *lpi)
 		return ret;
 	}
 	while (1) {
+<<<<<<< HEAD
 		ret = psensor_set_disable(lpi);
 		retry_count++;
 		if (ret >= 0 || retry_count == 3)
 			break;
+=======
+		ret = psensor_set_disable (lpi);
+		retry_count++;
+		if (ret >= 0 || retry_count == 3) {
+			break;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 	if (ret < 0) {
 		pr_err("[PS][CM3628 error]%s: retry disable psensor fail\n", __func__);
@@ -1125,16 +1212,27 @@ static ssize_t ps_adc_show(struct device *dev,
 	if (lpi->ps_calibration_rule == 1) {
 		D("[PS][CM3628] %s: ps ADC value=0x%x, adc offset 0x%x\n",
 			__func__, value, lpi->ps_adc_offset);
+<<<<<<< HEAD
 		if (value >= lpi->ps_adc_offset)
 			value = value - lpi->ps_adc_offset;
+=======
+		if (value >= lpi->ps_adc_offset )
+			value = value -lpi->ps_adc_offset;
+>>>>>>> upstream/4.3_primoc
 		else
 			value = 0;
 	} else if (lpi->ps_calibration_rule == 2 && lpi->ps_adc_offset > 0) {/*for saga*/
 		D("[PS][CM3628] %s: ps ADC value=0x%x, adc offset 0x%x, adc offset2 0x%x,\n",
 			__func__, value, lpi->ps_adc_offset,  lpi->ps_adc_offset2);
+<<<<<<< HEAD
 		if (value < 20) {
 			if (value >= lpi->ps_adc_offset)
 				value = value - lpi->ps_adc_offset;
+=======
+		if (value < 20 ) {
+			if (value >= lpi->ps_adc_offset )
+				value = value -lpi->ps_adc_offset;
+>>>>>>> upstream/4.3_primoc
 			else
 				value = 0;
 		} else
@@ -1175,7 +1273,11 @@ static ssize_t ps_enable_store(struct device *dev,
 }
 
 static DEVICE_ATTR(ps_adc, 0664, ps_adc_show, ps_enable_store);
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> upstream/4.3_primoc
 unsigned PS_cmd_test_value;
 static ssize_t ps_parameters_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
@@ -1204,8 +1306,13 @@ static ssize_t ps_parameters_store(struct device *dev,
 	for (i = 0; i < 2; i++)
 		token[i] = strsep((char **)&buf, " ");
 
+<<<<<<< HEAD
 	lpi->ps_thd_set = strict_strtoul(token[0], 16);
 	PS_cmd_test_value = strict_strtoul(token[1], 16);
+=======
+	lpi->ps_thd_set = simple_strtoul(token[0], NULL, 16);
+	PS_cmd_test_value = simple_strtoul(token[1], NULL, 16);
+>>>>>>> upstream/4.3_primoc
 	printk(KERN_INFO
 		"[PS][CM3628]Set lpi->ps_thd_set = 0x%x, PS_cmd_cmd:value = 0x%x\n",
 		lp_info->ps_thd_set, PS_cmd_test_value);
@@ -1218,7 +1325,11 @@ static ssize_t ps_parameters_store(struct device *dev,
 
 static DEVICE_ATTR(ps_parameters, 0664,
 	ps_parameters_show, ps_parameters_store);
+<<<<<<< HEAD
 */
+=======
+
+>>>>>>> upstream/4.3_primoc
 static ssize_t ps_kadc_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
 {
@@ -1258,7 +1369,11 @@ static ssize_t ps_kadc_store(struct device *dev,
 			__func__, lpi->ps_thd_set);
 	}
 	if (lpi->ps_enable)
+<<<<<<< HEAD
 		enable_ps_int(lpi->ps_conf1_val | CM3628_PS_INT_EN);
+=======
+		enable_ps_int(lpi->ps_conf1_val |CM3628_PS_INT_EN);
+>>>>>>> upstream/4.3_primoc
 
 	lpi->inte_cancel_set = (param2 & 0xFF);
 	ps_cancel_set = lpi->inte_cancel_set;
@@ -1305,7 +1420,11 @@ static ssize_t ps_conf2_store(struct device *dev,
 
 static DEVICE_ATTR(ps_conf2, 0664, ps_conf2_show, ps_conf2_store);
 
+<<<<<<< HEAD
 static uint8_t PS_CONF1;
+=======
+static uint8_t PS_CONF1 = 0;
+>>>>>>> upstream/4.3_primoc
 static ssize_t ps_conf1_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
 {
@@ -1332,7 +1451,11 @@ static ssize_t ps_conf1_store(struct device *dev,
 }
 static DEVICE_ATTR(ps_conf1, 0664, ps_conf1_show, ps_conf1_store);
 
+<<<<<<< HEAD
 static uint8_t PS_THD;
+=======
+static uint8_t PS_THD = 0;
+>>>>>>> upstream/4.3_primoc
 static ssize_t ps_thd_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
 {
@@ -1554,7 +1677,11 @@ static ssize_t ls_kadc_store(struct device *dev,
 }
 
 static DEVICE_ATTR(ls_kadc, 0664, ls_kadc_show, ls_kadc_store);
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> upstream/4.3_primoc
 static ssize_t ls_adc_table_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
 {
@@ -1585,7 +1712,11 @@ static ssize_t ls_adc_table_store(struct device *dev,
 	printk(KERN_INFO "[LS][CM3628]%s\n", buf);
 	for (i = 0; i < 10; i++) {
 		token[i] = strsep((char **)&buf, " ");
+<<<<<<< HEAD
 		tempdata[i] = strict_strtoul(token[i], 16);
+=======
+		tempdata[i] = simple_strtoul(token[i], NULL, 16);
+>>>>>>> upstream/4.3_primoc
 		if (tempdata[i] < 1 || tempdata[i] > 0xffff) {
 			printk(KERN_ERR
 			"[LS][CM3628 error] adc_table[%d] =  0x%x Err\n",
@@ -1611,8 +1742,13 @@ static ssize_t ls_adc_table_store(struct device *dev,
 
 static DEVICE_ATTR(ls_adc_table, 0664,
 	ls_adc_table_show, ls_adc_table_store);
+<<<<<<< HEAD
 */
 static uint8_t ALS_CONF1;
+=======
+
+static uint8_t ALS_CONF1 = 0;
+>>>>>>> upstream/4.3_primoc
 static ssize_t ls_conf1_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
 {
@@ -1633,7 +1769,11 @@ static ssize_t ls_conf1_store(struct device *dev,
 }
 static DEVICE_ATTR(ls_conf1, 0664, ls_conf1_show, ls_conf1_store);
 
+<<<<<<< HEAD
 static uint8_t ALS_CONF2;
+=======
+static uint8_t ALS_CONF2 = 0;
+>>>>>>> upstream/4.3_primoc
 static ssize_t ls_conf2_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
 {
@@ -1664,16 +1804,27 @@ static ssize_t ls_fLevel_store(struct device *dev,
 				const char *buf, size_t count)
 {
 	struct cm3628_info *lpi = lp_info;
+<<<<<<< HEAD
 	int value = 0;
 	sscanf(buf, "%d", &value);
 	(value >= 0)?(value = min(value, 10)):(value = max(value, -1));
 	fLevel = value;
+=======
+	int value=0;
+	sscanf(buf, "%d", &value);
+	(value>=0)?(value=min(value,10)):(value=max(value,-1));
+	fLevel=value;
+>>>>>>> upstream/4.3_primoc
 	input_report_abs(lpi->ls_input_dev, ABS_MISC, fLevel);
 	input_sync(lpi->ls_input_dev);
 	printk(KERN_INFO "[LS]set fLevel = %d\n", fLevel);
 
 	msleep(1000);
+<<<<<<< HEAD
 	fLevel = -1;
+=======
+	fLevel=-1;
+>>>>>>> upstream/4.3_primoc
 	return count;
 }
 static DEVICE_ATTR(ls_flevel, 0664, ls_fLevel_show, ls_fLevel_store);
@@ -1768,21 +1919,34 @@ static int initial_cm3628(struct cm3628_info *lpi)
 
 check_interrupt_gpio:
 	if (fail_counter > 0) {
+<<<<<<< HEAD
 		ret = _cm3628_I2C_Read_Byte(lpi->check_interrupt_add, &add);
+=======
+		ret =_cm3628_I2C_Read_Byte(lpi->check_interrupt_add, &add);
+>>>>>>> upstream/4.3_primoc
 		D("[PS][CM3628] %s, check_interrupt_add value = 0x%x, ret %d\n",
 				__func__, add, ret);
 	}
 	ret = _cm3628_I2C_Write_Byte(lpi->ALS_slave_address,
 			ALS_cmd_cmd, CM3628_ALS_BIT2_Default_1);/*0x04 bit[3:2] */
+<<<<<<< HEAD
 	if ((ret < 0) && (fail_counter < 4)) {
 		fail_counter++;
 		/*val = gpio_get_value_cansleep(lpi->intr_pin);
 		D("[LS][CM3628] %s, interrupt GPIO val = %d, , inital fail_counter %d\n",
 			__func__, val, fail_counter);*/
+=======
+	if ((ret < 0) && (fail_counter < 10)) {
+		fail_counter++;
+		val = gpio_get_value(lpi->intr_pin);
+		D("[LS][CM3628] %s, interrupt GPIO val = %d, , inital fail_counter %d\n",
+			__func__, val, fail_counter);
+>>>>>>> upstream/4.3_primoc
 		goto	check_interrupt_gpio;
 	}
 	ret = _cm3628_I2C_Write_Byte(lpi->PS_slave_address,
 		PS_cmd_cmd, 0x00);/*first init need 0x0*/
+<<<<<<< HEAD
 	if ((ret < 0) && (fail_counter < 4)) {
 		fail_counter++;
 		/*val = gpio_get_value_cansleep(lpi->intr_pin);
@@ -1791,6 +1955,16 @@ check_interrupt_gpio:
 		goto	check_interrupt_gpio;
 	}
 	if (fail_counter >= 4) {
+=======
+	if ((ret < 0) && (fail_counter < 10)) {
+		fail_counter++;
+		val = gpio_get_value(lpi->intr_pin);
+		D("[PS][CM3628] %s, interrupt GPIO val = %d, , inital fail_counter %d\n",
+			__func__, val, fail_counter);
+		goto	check_interrupt_gpio;
+	}
+	if (fail_counter >= 10) {
+>>>>>>> upstream/4.3_primoc
 		D("[PS][CM3628] %s, initial fail_counter = %d\n", __func__, fail_counter);
 		if (record_init_fail == 0)
 			record_init_fail = 1;
@@ -1847,7 +2021,11 @@ static int cm3628_setup(struct cm3628_info *lpi)
 	psensor_initial_cmd(lpi);
 	_cm3628_I2C_Write_Byte(lpi->PS_slave_address,
 		PS_cmd_cmd,
+<<<<<<< HEAD
 		lpi->ps_conf1_val | CM3628_PS_SD);
+=======
+		lpi->ps_conf1_val |CM3628_PS_SD);
+>>>>>>> upstream/4.3_primoc
 	/*Default disable P sensor*/
 
 	lpi->led = 0;
@@ -1871,7 +2049,11 @@ fail_free_intr_pin:
 	gpio_free(lpi->intr_pin);
 	return ret;
 }
+<<<<<<< HEAD
 #ifdef CONFIG_HAS_EARLYSUSPEND
+=======
+
+>>>>>>> upstream/4.3_primoc
 static void cm3628_early_suspend(struct early_suspend *h)
 {
 	struct cm3628_info *lpi = lp_info;
@@ -1892,14 +2074,21 @@ static void cm3628_late_resume(struct early_suspend *h)
 	if (!lpi->als_enable)
 		lightsensor_enable(lpi);
 }
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 static int cm3628_probe(struct i2c_client *client,
 	const struct i2c_device_id *id)
 {
 	int ret = 0;
 	struct cm3628_info *lpi;
 	struct cm3628_platform_data *pdata;
+<<<<<<< HEAD
 	int irq = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	D("[PS][CM3628] %s\n", __func__);
 
@@ -1918,11 +2107,17 @@ static int cm3628_probe(struct i2c_client *client,
 		ret = -EBUSY;
 		goto err_platform_data_null;
 	}
+<<<<<<< HEAD
 	irq = gpio_to_irq(pdata->intr);/*for kernel 3.0*/
 
 	lpi->irq = irq;
 	pr_info("[PS][CM3628]%s: client->irq %d, irq %d!!\n",
 			__func__, client->irq, irq);
+=======
+
+	lpi->irq = client->irq;
+
+>>>>>>> upstream/4.3_primoc
 	lpi->mfg_mode = board_mfg_mode();
 
 	i2c_set_clientdata(client, lpi);
@@ -1953,8 +2148,14 @@ static int cm3628_probe(struct i2c_client *client,
 	lpi->ps_reset_thd = pdata->ps_reset_thd;
 	D("[PS][CM3628] %s: is_cmd 0x%x, ps_adc_offset=0x%x, ps_debounce=0x%x\n",
 		__func__, lpi->is_cmd, lpi->ps_adc_offset, lpi->ps_debounce);
+<<<<<<< HEAD
 	if (pdata->is_cmd == 0)
 		lpi->is_cmd  = CM3628_ALS_IT_400ms | CM3628_ALS_PERS_4;
+=======
+	if (pdata->is_cmd == 0) {
+		lpi->is_cmd  = CM3628_ALS_IT_400ms | CM3628_ALS_PERS_4;
+	}
+>>>>>>> upstream/4.3_primoc
 
 	lp_info = lpi;
 
@@ -2037,9 +2238,15 @@ static int cm3628_probe(struct i2c_client *client,
 	if (ret)
 		goto err_create_ls_device_file;
 
+<<<<<<< HEAD
 	/*ret = device_create_file(lpi->ls_dev, &dev_attr_ls_adc_table);
 	if (ret)
 		goto err_create_ls_device_file;*/
+=======
+	ret = device_create_file(lpi->ls_dev, &dev_attr_ls_adc_table);
+	if (ret)
+		goto err_create_ls_device_file;
+>>>>>>> upstream/4.3_primoc
 
 	ret = device_create_file(lpi->ls_dev, &dev_attr_ls_conf1);
 	if (ret)
@@ -2066,11 +2273,19 @@ static int cm3628_probe(struct i2c_client *client,
 	if (ret)
 		goto err_create_ps_device;
 
+<<<<<<< HEAD
 	/*ret = device_create_file(lpi->ps_dev,
 		&dev_attr_ps_parameters);
 	if (ret)
 		goto err_create_ps_device;
 */
+=======
+	ret = device_create_file(lpi->ps_dev,
+		&dev_attr_ps_parameters);
+	if (ret)
+		goto err_create_ps_device;
+
+>>>>>>> upstream/4.3_primoc
 	/* register the attributes */
 	ret = device_create_file(lpi->ps_dev, &dev_attr_ps_kadc);
 	if (ret)
@@ -2099,13 +2314,21 @@ static int cm3628_probe(struct i2c_client *client,
 	ret = device_create_file(lpi->ps_dev, &dev_attr_ps_hw);
 	if (ret)
 		goto err_create_ps_device;
+<<<<<<< HEAD
 #ifdef CONFIG_HAS_EARLYSUSPEND
+=======
+
+>>>>>>> upstream/4.3_primoc
 	lpi->early_suspend.level =
 			EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
 	lpi->early_suspend.suspend = cm3628_early_suspend;
 	lpi->early_suspend.resume = cm3628_late_resume;
 	register_early_suspend(&lpi->early_suspend);
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 	D("[PS][CM3628] %s: Probe success!\n", __func__);
 
 	return ret;

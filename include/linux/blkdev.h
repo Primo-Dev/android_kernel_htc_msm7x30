@@ -73,7 +73,11 @@ enum rq_cmd_type_bits {
 
 /*
  * try to put the fields that are referenced together in the same cacheline.
+<<<<<<< HEAD
  * if you modify this structure, be sure to check block/blk-core.c:rq_init()
+=======
+ * if you modify this structure, be sure to check block/blk-core.c:blk_rq_init()
+>>>>>>> upstream/4.3_primoc
  * as well!
  */
 struct request {
@@ -110,6 +114,7 @@ struct request {
 	 * Three pointers are available for the IO schedulers, if they need
 	 * more they have to dynamically allocate it.  Flush requests are
 	 * never put on the IO scheduler. So let the flush fields share
+<<<<<<< HEAD
 	 * space with the three elevator_private pointers.
 	 */
 	union {
@@ -117,6 +122,20 @@ struct request {
 		struct {
 			unsigned int		seq;
 			struct list_head	list;
+=======
+	 * space with the elevator data.
+	 */
+	union {
+		struct {
+			struct io_cq		*icq;
+			void			*priv[2];
+		} elv;
+
+		struct {
+			unsigned int		seq;
+			struct list_head	list;
+			rq_end_io_fn		*saved_end_io;
+>>>>>>> upstream/4.3_primoc
 		} flush;
 	};
 
@@ -193,7 +212,11 @@ struct request_pm_state
 #include <linux/elevator.h>
 
 typedef void (request_fn_proc) (struct request_queue *q);
+<<<<<<< HEAD
 typedef int (make_request_fn) (struct request_queue *q, struct bio *bio);
+=======
+typedef void (make_request_fn) (struct request_queue *q, struct bio *bio);
+>>>>>>> upstream/4.3_primoc
 typedef int (prep_rq_fn) (struct request_queue *, struct request *);
 typedef void (unprep_rq_fn) (struct request_queue *, struct request *);
 
@@ -260,8 +283,12 @@ struct queue_limits {
 	unsigned char		discard_zeroes_data;
 };
 
+<<<<<<< HEAD
 struct request_queue
 {
+=======
+struct request_queue {
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Together with queue_head for cacheline sharing
 	 */
@@ -275,6 +302,10 @@ struct request_queue
 	struct request_list	rq;
 
 	request_fn_proc		*request_fn;
+<<<<<<< HEAD
+=======
+	request_fn_proc		*urgent_request_fn;
+>>>>>>> upstream/4.3_primoc
 	make_request_fn		*make_request_fn;
 	prep_rq_fn		*prep_rq_fn;
 	unprep_rq_fn		*unprep_rq_fn;
@@ -304,6 +335,7 @@ struct request_queue
 	void			*queuedata;
 
 	/*
+<<<<<<< HEAD
 	 * queue needs bounce pages for pages above this limit
 	 */
 	gfp_t			bounce_gfp;
@@ -312,6 +344,22 @@ struct request_queue
 	 * various queue flags, see QUEUE_* below
 	 */
 	unsigned long		queue_flags;
+=======
+	 * various queue flags, see QUEUE_* below
+	 */
+	unsigned long		queue_flags;
+
+	/*
+	 * ida allocated id for this queue.  Used to index queues from
+	 * ioctx.
+	 */
+	int			id;
+
+	/*
+	 * queue needs bounce pages for pages above this limit
+	 */
+	gfp_t			bounce_gfp;
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * protects queue structures from reentrancy. ->__queue_lock should
@@ -334,8 +382,13 @@ struct request_queue
 	unsigned int		nr_congestion_off;
 	unsigned int		nr_batching;
 
+<<<<<<< HEAD
 	void			*dma_drain_buffer;
 	unsigned int		dma_drain_size;
+=======
+	unsigned int		dma_drain_size;
+	void			*dma_drain_buffer;
+>>>>>>> upstream/4.3_primoc
 	unsigned int		dma_pad_mask;
 	unsigned int		dma_alignment;
 
@@ -349,7 +402,15 @@ struct request_queue
 	struct timer_list	timeout;
 	struct list_head	timeout_list;
 
+<<<<<<< HEAD
 	struct queue_limits	limits;
+=======
+	struct list_head	icq_list;
+
+	struct queue_limits	limits;
+	bool			notified_urgent;
+	bool			dispatched_urgent;
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * sg stuff
@@ -393,7 +454,11 @@ struct request_queue
 #define QUEUE_FLAG_ELVSWITCH	6	/* don't use elevator, just do FIFO */
 #define QUEUE_FLAG_BIDI		7	/* queue supports bidi requests */
 #define QUEUE_FLAG_NOMERGES     8	/* disable merge attempts */
+<<<<<<< HEAD
 #define QUEUE_FLAG_SAME_COMP	9	/* force complete on same CPU */
+=======
+#define QUEUE_FLAG_SAME_COMP	9	/* complete on same CPU-group */
+>>>>>>> upstream/4.3_primoc
 #define QUEUE_FLAG_FAIL_IO     10	/* fake timeout */
 #define QUEUE_FLAG_STACKABLE   11	/* supports request stacking */
 #define QUEUE_FLAG_NONROT      12	/* non-rotational device (SSD) */
@@ -403,12 +468,17 @@ struct request_queue
 #define QUEUE_FLAG_NOXMERGES   15	/* No extended merges */
 #define QUEUE_FLAG_ADD_RANDOM  16	/* Contributes to random pool */
 #define QUEUE_FLAG_SECDISCARD  17	/* supports SECDISCARD */
+<<<<<<< HEAD
+=======
+#define QUEUE_FLAG_SAME_FORCE  18	/* force complete on same CPU */
+>>>>>>> upstream/4.3_primoc
 
 #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
 				 (1 << QUEUE_FLAG_ADD_RANDOM))
 
+<<<<<<< HEAD
 static inline int queue_is_locked(struct request_queue *q)
 {
 #ifdef CONFIG_SMP
@@ -417,6 +487,12 @@ static inline int queue_is_locked(struct request_queue *q)
 #else
 	return 1;
 #endif
+=======
+static inline void queue_lockdep_assert_held(struct request_queue *q)
+{
+	if (q->queue_lock)
+		lockdep_assert_held(q->queue_lock);
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline void queue_flag_set_unlocked(unsigned int flag,
@@ -428,7 +504,11 @@ static inline void queue_flag_set_unlocked(unsigned int flag,
 static inline int queue_flag_test_and_clear(unsigned int flag,
 					    struct request_queue *q)
 {
+<<<<<<< HEAD
 	WARN_ON_ONCE(!queue_is_locked(q));
+=======
+	queue_lockdep_assert_held(q);
+>>>>>>> upstream/4.3_primoc
 
 	if (test_bit(flag, &q->queue_flags)) {
 		__clear_bit(flag, &q->queue_flags);
@@ -441,7 +521,11 @@ static inline int queue_flag_test_and_clear(unsigned int flag,
 static inline int queue_flag_test_and_set(unsigned int flag,
 					  struct request_queue *q)
 {
+<<<<<<< HEAD
 	WARN_ON_ONCE(!queue_is_locked(q));
+=======
+	queue_lockdep_assert_held(q);
+>>>>>>> upstream/4.3_primoc
 
 	if (!test_bit(flag, &q->queue_flags)) {
 		__set_bit(flag, &q->queue_flags);
@@ -453,7 +537,11 @@ static inline int queue_flag_test_and_set(unsigned int flag,
 
 static inline void queue_flag_set(unsigned int flag, struct request_queue *q)
 {
+<<<<<<< HEAD
 	WARN_ON_ONCE(!queue_is_locked(q));
+=======
+	queue_lockdep_assert_held(q);
+>>>>>>> upstream/4.3_primoc
 	__set_bit(flag, &q->queue_flags);
 }
 
@@ -470,12 +558,20 @@ static inline int queue_in_flight(struct request_queue *q)
 
 static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
 {
+<<<<<<< HEAD
 	WARN_ON_ONCE(!queue_is_locked(q));
+=======
+	queue_lockdep_assert_held(q);
+>>>>>>> upstream/4.3_primoc
 	__clear_bit(flag, &q->queue_flags);
 }
 
 #define blk_queue_tagged(q)	test_bit(QUEUE_FLAG_QUEUED, &(q)->queue_flags)
 #define blk_queue_stopped(q)	test_bit(QUEUE_FLAG_STOPPED, &(q)->queue_flags)
+<<<<<<< HEAD
+=======
+#define blk_queue_dead(q)	test_bit(QUEUE_FLAG_DEAD, &(q)->queue_flags)
+>>>>>>> upstream/4.3_primoc
 #define blk_queue_nomerges(q)	test_bit(QUEUE_FLAG_NOMERGES, &(q)->queue_flags)
 #define blk_queue_noxmerges(q)	\
 	test_bit(QUEUE_FLAG_NOXMERGES, &(q)->queue_flags)
@@ -655,8 +751,14 @@ extern void __blk_put_request(struct request_queue *, struct request *);
 extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
 extern struct request *blk_make_request(struct request_queue *, struct bio *,
 					gfp_t);
+<<<<<<< HEAD
 extern void blk_insert_request(struct request_queue *, struct request *, int, void *);
 extern void blk_requeue_request(struct request_queue *, struct request *);
+=======
+extern void blk_requeue_request(struct request_queue *, struct request *);
+extern int blk_reinsert_request(struct request_queue *q, struct request *rq);
+extern bool blk_reinsert_req_sup(struct request_queue *q);
+>>>>>>> upstream/4.3_primoc
 extern void blk_add_request_payload(struct request *rq, struct page *page,
 		unsigned int len);
 extern int blk_rq_check_limits(struct request_queue *q, struct request *rq);
@@ -678,6 +780,11 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
 extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
 			 struct scsi_ioctl_command __user *);
 
+<<<<<<< HEAD
+=======
+extern void blk_queue_bio(struct request_queue *q, struct bio *bio);
+
+>>>>>>> upstream/4.3_primoc
 /*
  * A queue has just exitted congestion.  Note this in the global counter of
  * congested queues, and wake up anyone who was waiting for requests to be
@@ -716,6 +823,11 @@ extern int blk_execute_rq(struct request_queue *, struct gendisk *,
 			  struct request *, int);
 extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
 				  struct request *, int, rq_end_io_fn *);
+<<<<<<< HEAD
+=======
+extern int blk_reinsert_request(struct request_queue *q, struct request *rq);
+extern bool blk_reinsert_req_sup(struct request_queue *q);
+>>>>>>> upstream/4.3_primoc
 
 static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
 {
@@ -804,6 +916,10 @@ extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
 extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
 extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
 						      request_fn_proc *, spinlock_t *);
+<<<<<<< HEAD
+=======
+extern void blk_urgent_request(struct request_queue *q, request_fn_proc *fn);
+>>>>>>> upstream/4.3_primoc
 extern void blk_cleanup_queue(struct request_queue *);
 extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
 extern void blk_queue_bounce_limit(struct request_queue *, u64);
@@ -822,6 +938,10 @@ extern void blk_queue_io_min(struct request_queue *q, unsigned int min);
 extern void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt);
 extern void blk_queue_io_opt(struct request_queue *q, unsigned int opt);
 extern void blk_set_default_limits(struct queue_limits *lim);
+<<<<<<< HEAD
+=======
+extern void blk_set_stacking_limits(struct queue_limits *lim);
+>>>>>>> upstream/4.3_primoc
 extern int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
 			    sector_t offset);
 extern int bdev_stack_limits(struct queue_limits *t, struct block_device *bdev,
@@ -852,17 +972,45 @@ extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatte
 extern void blk_dump_rq_flags(struct request *, char *);
 extern long nr_blockdev_pages(void);
 
+<<<<<<< HEAD
 int blk_get_queue(struct request_queue *);
+=======
+bool __must_check blk_get_queue(struct request_queue *);
+>>>>>>> upstream/4.3_primoc
 struct request_queue *blk_alloc_queue(gfp_t);
 struct request_queue *blk_alloc_queue_node(gfp_t, int);
 extern void blk_put_queue(struct request_queue *);
 
+<<<<<<< HEAD
 struct blk_plug {
 	unsigned long magic;
 	struct list_head list;
 	struct list_head cb_list;
 	unsigned int should_sort;
 };
+=======
+/*
+ * blk_plug permits building a queue of related requests by holding the I/O
+ * fragments for a short period. This allows merging of sequential requests
+ * into single larger request. As the requests are moved from a per-task list to
+ * the device's request_queue in a batch, this results in improved scalability
+ * as the lock contention for request_queue lock is reduced.
+ *
+ * It is ok not to disable preemption when adding the request to the plug list
+ * or when attempting a merge, because blk_schedule_flush_list() will only flush
+ * the plug list when the task sleeps by itself. For details, please see
+ * schedule() where blk_schedule_flush_plug() is called.
+ */
+struct blk_plug {
+	unsigned long magic; /* detect uninitialized use-cases */
+	struct list_head list; /* requests */
+	struct list_head cb_list; /* md requires an unplug callback */
+	unsigned int should_sort; /* list to be sorted before flushing? */
+	unsigned int count; /* number of queued requests */
+};
+#define BLK_MAX_REQUEST_COUNT 16
+
+>>>>>>> upstream/4.3_primoc
 struct blk_plug_cb {
 	struct list_head list;
 	void (*callback)(struct blk_plug_cb *);
@@ -1133,6 +1281,11 @@ static inline void put_dev_sector(Sector p)
 
 struct work_struct;
 int kblockd_schedule_work(struct request_queue *q, struct work_struct *work);
+<<<<<<< HEAD
+=======
+int kblockd_schedule_delayed_work(struct request_queue *q,
+			struct delayed_work *dwork, unsigned long delay);
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_BLK_CGROUP
 /*
@@ -1176,6 +1329,7 @@ static inline uint64_t rq_io_start_time_ns(struct request *req)
 }
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_BLK_DEV_THROTTLING
 extern int blk_throtl_init(struct request_queue *q);
 extern void blk_throtl_exit(struct request_queue *q);
@@ -1190,6 +1344,8 @@ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
 static inline int blk_throtl_exit(struct request_queue *q) { return 0; }
 #endif /* CONFIG_BLK_DEV_THROTTLING */
 
+=======
+>>>>>>> upstream/4.3_primoc
 #define MODULE_ALIAS_BLOCKDEV(major,minor) \
 	MODULE_ALIAS("block-major-" __stringify(major) "-" __stringify(minor))
 #define MODULE_ALIAS_BLOCKDEV_MAJOR(major) \

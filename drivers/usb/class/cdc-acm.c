@@ -562,10 +562,25 @@ static void acm_port_down(struct acm *acm)
 
 static void acm_tty_hangup(struct tty_struct *tty)
 {
+<<<<<<< HEAD
 	struct acm *acm = tty->driver_data;
 	tty_port_hangup(&acm->port);
 	mutex_lock(&open_mutex);
 	acm_port_down(acm);
+=======
+	struct acm *acm;
+
+	mutex_lock(&open_mutex);
+	acm = tty->driver_data;
+
+	if (!acm)
+		goto out;
+
+	tty_port_hangup(&acm->port);
+	acm_port_down(acm);
+
+out:
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&open_mutex);
 }
 
@@ -752,10 +767,13 @@ static const __u32 acm_tty_speed[] = {
 	2500000, 3000000, 3500000, 4000000
 };
 
+<<<<<<< HEAD
 static const __u8 acm_tty_size[] = {
 	5, 6, 7, 8
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 static void acm_tty_set_termios(struct tty_struct *tty,
 						struct ktermios *termios_old)
 {
@@ -772,7 +790,25 @@ static void acm_tty_set_termios(struct tty_struct *tty,
 	newline.bParityType = termios->c_cflag & PARENB ?
 				(termios->c_cflag & PARODD ? 1 : 2) +
 				(termios->c_cflag & CMSPAR ? 2 : 0) : 0;
+<<<<<<< HEAD
 	newline.bDataBits = acm_tty_size[(termios->c_cflag & CSIZE) >> 4];
+=======
+	switch (termios->c_cflag & CSIZE) {
+	case CS5:
+		newline.bDataBits = 5;
+		break;
+	case CS6:
+		newline.bDataBits = 6;
+		break;
+	case CS7:
+		newline.bDataBits = 7;
+		break;
+	case CS8:
+	default:
+		newline.bDataBits = 8;
+		break;
+	}
+>>>>>>> upstream/4.3_primoc
 	/* FIXME: Needs to clear unsupported bits in the termios */
 	acm->clocal = ((termios->c_cflag & CLOCAL) != 0);
 
@@ -1164,7 +1200,11 @@ made_compressed_probe:
 
 		if (usb_endpoint_xfer_int(epwrite))
 			usb_fill_int_urb(snd->urb, usb_dev,
+<<<<<<< HEAD
 				usb_sndbulkpipe(usb_dev, epwrite->bEndpointAddress),
+=======
+				usb_sndintpipe(usb_dev, epwrite->bEndpointAddress),
+>>>>>>> upstream/4.3_primoc
 				NULL, acm->writesize, acm_write_bulk, snd, epwrite->bInterval);
 		else
 			usb_fill_bulk_urb(snd->urb, usb_dev,
@@ -1192,6 +1232,11 @@ made_compressed_probe:
 		i = device_create_file(&intf->dev, &dev_attr_wCountryCodes);
 		if (i < 0) {
 			kfree(acm->country_codes);
+<<<<<<< HEAD
+=======
+			acm->country_codes = NULL;
+			acm->country_code_size = 0;
+>>>>>>> upstream/4.3_primoc
 			goto skip_countries;
 		}
 
@@ -1200,6 +1245,11 @@ made_compressed_probe:
 		if (i < 0) {
 			device_remove_file(&intf->dev, &dev_attr_wCountryCodes);
 			kfree(acm->country_codes);
+<<<<<<< HEAD
+=======
+			acm->country_codes = NULL;
+			acm->country_code_size = 0;
+>>>>>>> upstream/4.3_primoc
 			goto skip_countries;
 		}
 	}
@@ -1484,6 +1534,12 @@ static const struct usb_device_id acm_ids[] = {
 					   Maybe we should define a new
 					   quirk for this. */
 	},
+<<<<<<< HEAD
+=======
+	{ USB_DEVICE(0x0572, 0x1340), /* Conexant CX93010-2x UCMxx */
+	.driver_info = NO_UNION_NORMAL,
+	},
+>>>>>>> upstream/4.3_primoc
 	{ USB_DEVICE(0x05f9, 0x4002), /* PSC Scanning, Magellan 800i */
 	.driver_info = NO_UNION_NORMAL,
 	},

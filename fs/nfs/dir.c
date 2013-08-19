@@ -47,16 +47,27 @@ static int nfs_opendir(struct inode *, struct file *);
 static int nfs_closedir(struct inode *, struct file *);
 static int nfs_readdir(struct file *, void *, filldir_t);
 static struct dentry *nfs_lookup(struct inode *, struct dentry *, struct nameidata *);
+<<<<<<< HEAD
 static int nfs_create(struct inode *, struct dentry *, int, struct nameidata *);
+=======
+static int nfs_create(struct inode *, struct dentry *, umode_t, struct nameidata *);
+>>>>>>> upstream/4.3_primoc
 static int nfs_mkdir(struct inode *, struct dentry *, int);
 static int nfs_rmdir(struct inode *, struct dentry *);
 static int nfs_unlink(struct inode *, struct dentry *);
 static int nfs_symlink(struct inode *, struct dentry *, const char *);
 static int nfs_link(struct dentry *, struct inode *, struct dentry *);
+<<<<<<< HEAD
 static int nfs_mknod(struct inode *, struct dentry *, int, dev_t);
 static int nfs_rename(struct inode *, struct dentry *,
 		      struct inode *, struct dentry *);
 static int nfs_fsync_dir(struct file *, int);
+=======
+static int nfs_mknod(struct inode *, struct dentry *, umode_t, dev_t);
+static int nfs_rename(struct inode *, struct dentry *,
+		      struct inode *, struct dentry *);
+static int nfs_fsync_dir(struct file *, loff_t, loff_t, int);
+>>>>>>> upstream/4.3_primoc
 static loff_t nfs_llseek_dir(struct file *, loff_t, int);
 static void nfs_readdir_clear_array(struct page*);
 
@@ -112,7 +123,11 @@ const struct inode_operations nfs3_dir_inode_operations = {
 #ifdef CONFIG_NFS_V4
 
 static struct dentry *nfs_atomic_lookup(struct inode *, struct dentry *, struct nameidata *);
+<<<<<<< HEAD
 static int nfs_open_create(struct inode *dir, struct dentry *dentry, int mode, struct nameidata *nd);
+=======
+static int nfs_open_create(struct inode *dir, struct dentry *dentry, umode_t mode, struct nameidata *nd);
+>>>>>>> upstream/4.3_primoc
 const struct inode_operations nfs4_dir_inode_operations = {
 	.create		= nfs_open_create,
 	.lookup		= nfs_atomic_lookup,
@@ -955,15 +970,29 @@ out:
  * All directory operations under NFS are synchronous, so fsync()
  * is a dummy operation.
  */
+<<<<<<< HEAD
 static int nfs_fsync_dir(struct file *filp, int datasync)
 {
 	struct dentry *dentry = filp->f_path.dentry;
+=======
+static int nfs_fsync_dir(struct file *filp, loff_t start, loff_t end,
+			 int datasync)
+{
+	struct dentry *dentry = filp->f_path.dentry;
+	struct inode *inode = dentry->d_inode;
+>>>>>>> upstream/4.3_primoc
 
 	dfprintk(FILE, "NFS: fsync dir(%s/%s) datasync %d\n",
 			dentry->d_parent->d_name.name, dentry->d_name.name,
 			datasync);
 
+<<<<<<< HEAD
 	nfs_inc_stats(dentry->d_inode, NFSIOS_VFSFSYNC);
+=======
+	mutex_lock(&inode->i_mutex);
+	nfs_inc_stats(dentry->d_inode, NFSIOS_VFSFSYNC);
+	mutex_unlock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -1577,8 +1606,13 @@ no_open:
 	return nfs_lookup_revalidate(dentry, nd);
 }
 
+<<<<<<< HEAD
 static int nfs_open_create(struct inode *dir, struct dentry *dentry, int mode,
 		struct nameidata *nd)
+=======
+static int nfs_open_create(struct inode *dir, struct dentry *dentry,
+		umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct nfs_open_context *ctx = NULL;
 	struct iattr attr;
@@ -1668,8 +1702,13 @@ out_error:
  * that the operation succeeded on the server, but an error in the
  * reply path made it appear to have failed.
  */
+<<<<<<< HEAD
 static int nfs_create(struct inode *dir, struct dentry *dentry, int mode,
 		struct nameidata *nd)
+=======
+static int nfs_create(struct inode *dir, struct dentry *dentry,
+		umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct iattr attr;
 	int error;
@@ -1697,7 +1736,11 @@ out_err:
  * See comments for nfs_proc_create regarding failed operations.
  */
 static int
+<<<<<<< HEAD
 nfs_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t rdev)
+=======
+nfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct iattr attr;
 	int status;
@@ -2284,12 +2327,20 @@ int nfs_may_open(struct inode *inode, struct rpc_cred *cred, int openflags)
 	return nfs_do_access(inode, cred, nfs_open_permission_mask(openflags));
 }
 
+<<<<<<< HEAD
 int nfs_permission(struct inode *inode, int mask, unsigned int flags)
+=======
+int nfs_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	struct rpc_cred *cred;
 	int res = 0;
 
+<<<<<<< HEAD
 	if (flags & IPERM_FLAG_RCU)
+=======
+	if (mask & MAY_NOT_BLOCK)
+>>>>>>> upstream/4.3_primoc
 		return -ECHILD;
 
 	nfs_inc_stats(inode, NFSIOS_VFSACCESS);
@@ -2339,7 +2390,11 @@ out:
 out_notsup:
 	res = nfs_revalidate_inode(NFS_SERVER(inode), inode);
 	if (res == 0)
+<<<<<<< HEAD
 		res = generic_permission(inode, mask, flags, NULL);
+=======
+		res = generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 	goto out;
 }
 

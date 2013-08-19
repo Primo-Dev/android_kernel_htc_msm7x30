@@ -74,7 +74,11 @@ static int pc_reset(struct clk *clk, enum clk_reset_action action)
 	return pc_clk_reset(id, action);
 }
 
+<<<<<<< HEAD
 static int pc_clk_set_rate(struct clk *clk, unsigned long rate)
+=======
+static int _pc_clk_set_rate(struct clk *clk, unsigned long rate)
+>>>>>>> upstream/4.3_primoc
 {
 	/* The rate _might_ be rounded off to the nearest KHz value by the
 	 * remote function. So a return value of 0 doesn't necessarily mean
@@ -89,7 +93,11 @@ static int pc_clk_set_rate(struct clk *clk, unsigned long rate)
 		return (int)id < 0 ? -EINVAL : 0;
 }
 
+<<<<<<< HEAD
 static int pc_clk_set_min_rate(struct clk *clk, unsigned long rate)
+=======
+static int _pc_clk_set_min_rate(struct clk *clk, unsigned long rate)
+>>>>>>> upstream/4.3_primoc
 {
 	int rc;
 	int id = to_pcom_clk(clk)->id;
@@ -105,6 +113,17 @@ static int pc_clk_set_min_rate(struct clk *clk, unsigned long rate)
 		return (int)id < 0 ? -EINVAL : 0;
 }
 
+<<<<<<< HEAD
+=======
+static int pc_clk_set_rate(struct clk *clk, unsigned long rate)
+{
+	if (clk->flags & CLKFLAG_MIN)
+		return _pc_clk_set_min_rate(clk, rate);
+	else
+		return _pc_clk_set_rate(clk, rate);
+}
+
+>>>>>>> upstream/4.3_primoc
 static int pc_clk_set_max_rate(struct clk *clk, unsigned long rate)
 {
 	int id = to_pcom_clk(clk)->id;
@@ -173,7 +192,10 @@ struct clk_ops clk_ops_pcom = {
 	.auto_off = pc_clk_disable,
 	.reset = pc_reset,
 	.set_rate = pc_clk_set_rate,
+<<<<<<< HEAD
 	.set_min_rate = pc_clk_set_min_rate,
+=======
+>>>>>>> upstream/4.3_primoc
 	.set_max_rate = pc_clk_set_max_rate,
 	.set_flags = pc_clk_set_flags,
 	.get_rate = pc_clk_get_rate,
@@ -188,7 +210,10 @@ struct clk_ops clk_ops_pcom_ext_config = {
 	.auto_off = pc_clk_disable,
 	.reset = pc_reset,
 	.set_rate = pc_clk_set_ext_config,
+<<<<<<< HEAD
 	.set_min_rate = pc_clk_set_min_rate,
+=======
+>>>>>>> upstream/4.3_primoc
 	.set_max_rate = pc_clk_set_max_rate,
 	.set_flags = pc_clk_set_flags,
 	.get_rate = pc_clk_get_rate,

@@ -21,7 +21,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: dhd_bta.h 275786 2011-08-04 22:42:42Z $
+=======
+ * $Id: dhd_bta.h,v 1.2 2009-02-26 22:35:56 Exp $
+>>>>>>> upstream/4.3_primoc
  */
 #ifndef __dhd_bta_h__
 #define __dhd_bta_h__

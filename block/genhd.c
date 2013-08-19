@@ -26,7 +26,11 @@ static DEFINE_MUTEX(block_class_lock);
 struct kobject *block_depr;
 
 /* for extended dynamic devt allocation, currently only one major is used */
+<<<<<<< HEAD
 #define MAX_EXT_DEVT		(1 << MINORBITS)
+=======
+#define NR_EXT_DEVT		(1 << MINORBITS)
+>>>>>>> upstream/4.3_primoc
 
 /* For extended devt allocation.  ext_devt_mutex prevents look up
  * results from going away underneath its user.
@@ -421,17 +425,30 @@ int blk_alloc_devt(struct hd_struct *part, dev_t *devt)
 	do {
 		if (!idr_pre_get(&ext_devt_idr, GFP_KERNEL))
 			return -ENOMEM;
+<<<<<<< HEAD
 		rc = idr_get_new(&ext_devt_idr, part, &idx);
+=======
+		mutex_lock(&ext_devt_mutex);
+		rc = idr_get_new(&ext_devt_idr, part, &idx);
+		if (!rc && idx >= NR_EXT_DEVT) {
+			idr_remove(&ext_devt_idr, idx);
+			rc = -EBUSY;
+		}
+		mutex_unlock(&ext_devt_mutex);
+>>>>>>> upstream/4.3_primoc
 	} while (rc == -EAGAIN);
 
 	if (rc)
 		return rc;
 
+<<<<<<< HEAD
 	if (idx > MAX_EXT_DEVT) {
 		idr_remove(&ext_devt_idr, idx);
 		return -EBUSY;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	*devt = MKDEV(BLOCK_EXT_MAJOR, blk_mangle_minor(idx));
 	return 0;
 }
@@ -508,7 +525,11 @@ static int exact_lock(dev_t devt, void *data)
 	return 0;
 }
 
+<<<<<<< HEAD
 void register_disk(struct gendisk *disk)
+=======
+static void register_disk(struct gendisk *disk)
+>>>>>>> upstream/4.3_primoc
 {
 	struct device *ddev = disk_to_dev(disk);
 	struct block_device *bdev;
@@ -518,7 +539,11 @@ void register_disk(struct gendisk *disk)
 
 	ddev->parent = disk->driverfs_dev;
 
+<<<<<<< HEAD
 	dev_set_name(ddev, disk->disk_name);
+=======
+	dev_set_name(ddev, "%s", disk->disk_name);
+>>>>>>> upstream/4.3_primoc
 
 	/* delay uevents, until we scanned partition table */
 	dev_set_uevent_suppress(ddev, 1);
@@ -537,7 +562,11 @@ void register_disk(struct gendisk *disk)
 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
 
 	/* No minors to use for partitions */
+<<<<<<< HEAD
 	if (!disk_partitionable(disk))
+=======
+	if (!disk_part_scan_enabled(disk))
+>>>>>>> upstream/4.3_primoc
 		goto exit;
 
 	/* No such device (e.g., media were just removed) */
@@ -618,12 +647,39 @@ void add_disk(struct gendisk *disk)
 	 * Take an extra ref on queue which will be put on disk_release()
 	 * so that it sticks around as long as @disk is there.
 	 */
+<<<<<<< HEAD
 	WARN_ON_ONCE(blk_get_queue(disk->queue));
+=======
+	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+>>>>>>> upstream/4.3_primoc
 
 	retval = sysfs_create_link(&disk_to_dev(disk)->kobj, &bdi->dev->kobj,
 				   "bdi");
 	WARN_ON(retval);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Limit default readahead size for small devices.
+	 *        disk size    readahead size
+	 *               1M                8k
+	 *               4M               16k
+	 *              16M               32k
+	 *              64M               64k
+	 *             256M              128k
+	 *               1G              256k
+	 *               4G              512k
+	 *              16G             1024k
+	 *              64G             2048k
+	 *             256G             4096k
+	 */
+	if (get_capacity(disk)) {
+		unsigned long size = get_capacity(disk) >> 9;
+		size = 1UL << (ilog2(size) / 2);
+		bdi->ra_pages = min(bdi->ra_pages, size);
+	}
+
+>>>>>>> upstream/4.3_primoc
 	disk_add_events(disk);
 }
 EXPORT_SYMBOL(add_disk);
@@ -691,7 +747,10 @@ void del_gendisk(struct gendisk *disk)
 	disk_part_iter_exit(&piter);
 
 	invalidate_partition(disk, 0);
+<<<<<<< HEAD
 	blk_free_devt(disk_to_dev(disk)->devt);
+=======
+>>>>>>> upstream/4.3_primoc
 	set_capacity(disk, 0);
 	disk->flags &= ~GENHD_FL_UP;
 
@@ -709,6 +768,10 @@ void del_gendisk(struct gendisk *disk)
 	if (!sysfs_deprecated)
 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
 	device_del(disk_to_dev(disk));
+<<<<<<< HEAD
+=======
+	blk_free_devt(disk_to_dev(disk)->devt);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(del_gendisk);
 
@@ -898,7 +961,11 @@ static int show_partition(struct seq_file *seqf, void *v)
 	char buf[BDEVNAME_SIZE];
 
 	/* Don't show non-partitionable removeable devices or empty devices */
+<<<<<<< HEAD
 	if (!get_capacity(sgp) || (!disk_partitionable(sgp) &&
+=======
+	if (!get_capacity(sgp) || (!disk_max_parts(sgp) &&
+>>>>>>> upstream/4.3_primoc
 				   (sgp->flags & GENHD_FL_REMOVABLE)))
 		return 0;
 	if (sgp->flags & GENHD_FL_SUPPRESS_PARTITION_INFO)
@@ -1576,6 +1643,7 @@ void disk_unblock_events(struct gendisk *disk)
 }
 
 /**
+<<<<<<< HEAD
  * disk_check_events - schedule immediate event checking
  * @disk: disk to check events for
  *
@@ -1588,18 +1656,44 @@ void disk_check_events(struct gendisk *disk)
 {
 	struct disk_events *ev = disk->ev;
 	unsigned long flags;
+=======
+ * disk_flush_events - schedule immediate event checking and flushing
+ * @disk: disk to check and flush events for
+ * @mask: events to flush
+ *
+ * Schedule immediate event checking on @disk if not blocked.  Events in
+ * @mask are scheduled to be cleared from the driver.  Note that this
+ * doesn't clear the events from @disk->ev.
+ *
+ * CONTEXT:
+ * If @mask is non-zero must be called with bdev->bd_mutex held.
+ */
+void disk_flush_events(struct gendisk *disk, unsigned int mask)
+{
+	struct disk_events *ev = disk->ev;
+>>>>>>> upstream/4.3_primoc
 
 	if (!ev)
 		return;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&ev->lock, flags);
+=======
+	spin_lock_irq(&ev->lock);
+	ev->clearing |= mask;
+>>>>>>> upstream/4.3_primoc
 	if (!ev->block) {
 		cancel_delayed_work(&ev->dwork);
 		queue_delayed_work(system_nrt_freezable_wq, &ev->dwork, 0);
 	}
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&ev->lock, flags);
 }
 EXPORT_SYMBOL_GPL(disk_check_events);
+=======
+	spin_unlock_irq(&ev->lock);
+}
+>>>>>>> upstream/4.3_primoc
 
 /**
  * disk_clear_events - synchronously check, clear and return pending events
@@ -1789,7 +1883,11 @@ static int disk_events_set_dfl_poll_msecs(const char *val,
 	mutex_lock(&disk_events_mutex);
 
 	list_for_each_entry(ev, &disk_events, node)
+<<<<<<< HEAD
 		disk_check_events(ev->disk);
+=======
+		disk_flush_events(ev->disk, 0);
+>>>>>>> upstream/4.3_primoc
 
 	mutex_unlock(&disk_events_mutex);
 

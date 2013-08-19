@@ -22,7 +22,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: siutils.h 275703 2011-08-04 20:20:27Z $
+=======
+ * $Id: siutils.h 335486 2012-05-28 09:47:55Z $
+>>>>>>> upstream/4.3_primoc
  */
 
 
@@ -60,6 +64,10 @@ struct si_pub {
 typedef const struct si_pub si_t;
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 #define	SI_OSH		NULL	
 
 #define	BADIDX		(SI_MAXCORES + 1)
@@ -221,6 +229,11 @@ static INLINE void * si_seci_init(si_t *sih, uint8 use_seci) {return NULL;}
 extern bool si_is_otp_disabled(si_t *sih);
 extern bool si_is_otp_powered(si_t *sih);
 extern void si_otp_power(si_t *sih, bool on);
+<<<<<<< HEAD
+=======
+extern void si_set_otp_wr_volts(si_t *sih);
+extern void si_set_otp_rd_volts(si_t *sih);
+>>>>>>> upstream/4.3_primoc
 
 
 extern bool si_is_sprom_available(si_t *sih);
@@ -270,4 +283,8 @@ extern uint32 si_pcieserdesreg(si_t *sih, uint32 mdioslave, uint32 offset, uint3
 
 char *si_getnvramflvar(si_t *sih, const char *name);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 #endif	

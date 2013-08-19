@@ -59,11 +59,14 @@ masquerade_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	ct = nf_ct_get(skb, &ctinfo);
 	nat = nfct_nat(ct);
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(nat) || (!nat))
 		printk(KERN_ERR "[NET] nat is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	NF_CT_ASSERT(ct && (ctinfo == IP_CT_NEW || ctinfo == IP_CT_RELATED ||
 			    ctinfo == IP_CT_RELATED_REPLY));
 

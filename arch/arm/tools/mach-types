@@ -3825,5 +3825,8 @@ primodd			MACH_PRIMODD	PRIMODD			3925
 primods			MACH_PRIMODS		PRIMODS			3921
 primotd			MACH_PRIMOTD		PRIMOTD			3923
 golfu			MACH_GOLFU		GOLFU			3936
+<<<<<<< HEAD
 villec2			MACH_VILLEC2		VILLEC2			4065
 golfc			MACH_GOLFC		GOLFC			4089
+=======
+>>>>>>> upstream/4.3_primoc

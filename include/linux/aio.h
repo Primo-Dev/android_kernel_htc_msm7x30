@@ -24,6 +24,10 @@ struct kioctx;
 #define KIOCB_C_COMPLETE	0x02
 
 #define KIOCB_SYNC_KEY		(~0U)
+<<<<<<< HEAD
+=======
+#define KIOCB_KERNEL_KEY		(~1U)
+>>>>>>> upstream/4.3_primoc
 
 /* ki_flags bits */
 /*
@@ -99,6 +103,10 @@ struct kiocb {
 	union {
 		void __user		*user;
 		struct task_struct	*tsk;
+<<<<<<< HEAD
+=======
+		void			(*complete)(u64 user_data, long res);
+>>>>>>> upstream/4.3_primoc
 	} ki_obj;
 
 	__u64			ki_user_data;	/* user's data for completion */
@@ -117,15 +125,27 @@ struct kiocb {
 
 	struct list_head	ki_list;	/* the aio core uses this
 						 * for cancellation */
+<<<<<<< HEAD
+=======
+	struct list_head	ki_batch;	/* batch allocation */
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * If the aio_resfd field of the userspace iocb is not zero,
 	 * this is the underlying eventfd context to deliver events to.
 	 */
 	struct eventfd_ctx	*ki_eventfd;
+<<<<<<< HEAD
 };
 
 #define is_sync_kiocb(iocb)	((iocb)->ki_key == KIOCB_SYNC_KEY)
+=======
+	struct iov_iter		*ki_iter;
+};
+
+#define is_sync_kiocb(iocb)	((iocb)->ki_key == KIOCB_SYNC_KEY)
+#define is_kernel_kiocb(iocb)	((iocb)->ki_key == KIOCB_KERNEL_KEY)
+>>>>>>> upstream/4.3_primoc
 #define init_sync_kiocb(x, filp)			\
 	do {						\
 		struct task_struct *tsk = current;	\
@@ -214,6 +234,19 @@ struct mm_struct;
 extern void exit_aio(struct mm_struct *mm);
 extern long do_io_submit(aio_context_t ctx_id, long nr,
 			 struct iocb __user *__user *iocbpp, bool compat);
+<<<<<<< HEAD
+=======
+struct kiocb *aio_kernel_alloc(gfp_t gfp);
+void aio_kernel_free(struct kiocb *iocb);
+void aio_kernel_init_rw(struct kiocb *iocb, struct file *filp,
+			unsigned short op, void *ptr, size_t nr, loff_t off);
+void aio_kernel_init_iter(struct kiocb *iocb, struct file *filp,
+			  unsigned short op, struct iov_iter *iter, loff_t off);
+void aio_kernel_init_callback(struct kiocb *iocb,
+			      void (*complete)(u64 user_data, long res),
+			      u64 user_data);
+int aio_kernel_submit(struct kiocb *iocb);
+>>>>>>> upstream/4.3_primoc
 #else
 static inline ssize_t wait_on_sync_kiocb(struct kiocb *iocb) { return 0; }
 static inline int aio_put_req(struct kiocb *iocb) { return 0; }

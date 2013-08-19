@@ -44,6 +44,11 @@ enum {
 	IOCB_CMD_NOOP = 6,
 	IOCB_CMD_PREADV = 7,
 	IOCB_CMD_PWRITEV = 8,
+<<<<<<< HEAD
+=======
+	IOCB_CMD_READ_ITER = 9,
+	IOCB_CMD_WRITE_ITER = 10,
+>>>>>>> upstream/4.3_primoc
 };
 
 /*

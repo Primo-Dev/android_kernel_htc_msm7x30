@@ -79,7 +79,11 @@
 #define BIT_FM_SPEAKER		(1 << 4)
 #define BIT_TTY_VCO		(1 << 5)
 #define BIT_TTY_HCO		(1 << 6)
+<<<<<<< HEAD
 #define BIT_35MM_HEADSET	(1 << 7)
+=======
+#define BIT_35MM_HEADSET	0
+>>>>>>> upstream/4.3_primoc
 #define BIT_TV_OUT		(1 << 8)
 #define BIT_USB_CRADLE		(1 << 9)
 #define BIT_TV_OUT_AUDIO	(1 << 10)
@@ -128,7 +132,12 @@
 #define HS_DELAY_INSERT			500
 #define HS_DELAY_REMOVE_LONG		700
 #define HS_DELAY_REMOVE_SHORT		200
+<<<<<<< HEAD
 #define HS_DELAY_BUTTON			500
+=======
+#define HS_DELAY_BUTTON			10
+#define HS_DELAY_BUTTON_LONG		50
+>>>>>>> upstream/4.3_primoc
 #define HS_DELAY_IRQ_INIT		(10 * HS_DELAY_SEC)
 
 #define HS_JIFFIES_ZERO			msecs_to_jiffies(HS_DELAY_ZERO)
@@ -138,6 +147,10 @@
 #define HS_JIFFIES_REMOVE_LONG		msecs_to_jiffies(HS_DELAY_REMOVE_LONG)
 #define HS_JIFFIES_REMOVE_SHORT		msecs_to_jiffies(HS_DELAY_REMOVE_SHORT)
 #define HS_JIFFIES_BUTTON		msecs_to_jiffies(HS_DELAY_BUTTON)
+<<<<<<< HEAD
+=======
+#define HS_JIFFIES_BUTTON_LONG		msecs_to_jiffies(HS_DELAY_BUTTON_LONG)
+>>>>>>> upstream/4.3_primoc
 #define HS_JIFFIES_IRQ_INIT		msecs_to_jiffies(HS_DELAY_IRQ_INIT)
 
 #define HS_WAKE_LOCK_TIMEOUT		(2 * HZ)

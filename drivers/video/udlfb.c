@@ -613,7 +613,11 @@ static ssize_t dlfb_ops_write(struct fb_info *info, const char __user *buf,
 	result = fb_sys_write(info, buf, count, ppos);
 
 	if (result > 0) {
+<<<<<<< HEAD
 		int start = max((int)(offset / info->fix.line_length) - 1, 0);
+=======
+		int start = max((int)(offset / info->fix.line_length), 0);
+>>>>>>> upstream/4.3_primoc
 		int lines = min((u32)((result / info->fix.line_length) + 1),
 				(u32)info->var.yres);
 

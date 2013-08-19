@@ -119,8 +119,13 @@ static ssize_t hfsplus_direct_IO(int rw, struct kiocb *iocb,
 	struct inode *inode = file->f_path.dentry->d_inode->i_mapping->host;
 	ssize_t ret;
 
+<<<<<<< HEAD
 	ret = blockdev_direct_IO(rw, iocb, inode, inode->i_sb->s_bdev, iov,
 				  offset, nr_segs, hfsplus_get_block, NULL);
+=======
+	ret = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
+				 hfsplus_get_block);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * In case of error extending write may have instantiated a few
@@ -296,6 +301,11 @@ static int hfsplus_setattr(struct dentry *dentry, struct iattr *attr)
 
 	if ((attr->ia_valid & ATTR_SIZE) &&
 	    attr->ia_size != i_size_read(inode)) {
+<<<<<<< HEAD
+=======
+		inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 		error = vmtruncate(inode, attr->ia_size);
 		if (error)
 			return error;
@@ -306,13 +316,26 @@ static int hfsplus_setattr(struct dentry *dentry, struct iattr *attr)
 	return 0;
 }
 
+<<<<<<< HEAD
 int hfsplus_file_fsync(struct file *file, int datasync)
+=======
+int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
+		       int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode = file->f_mapping->host;
 	struct hfsplus_inode_info *hip = HFSPLUS_I(inode);
 	struct hfsplus_sb_info *sbi = HFSPLUS_SB(inode->i_sb);
 	int error = 0, error2;
 
+<<<<<<< HEAD
+=======
+	error = filemap_write_and_wait_range(inode->i_mapping, start, end);
+	if (error)
+		return error;
+	mutex_lock(&inode->i_mutex);
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Sync inode metadata into the catalog and extent trees.
 	 */
@@ -340,6 +363,11 @@ int hfsplus_file_fsync(struct file *file, int datasync)
 	if (!test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
 		blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
 
+<<<<<<< HEAD
+=======
+	mutex_unlock(&inode->i_mutex);
+
+>>>>>>> upstream/4.3_primoc
 	return error;
 }
 

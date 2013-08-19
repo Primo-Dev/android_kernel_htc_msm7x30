@@ -14,10 +14,13 @@ struct himax_config_init_api {
 struct himax_i2c_platform_data_config_type_1 {
 	uint8_t version;
 	uint8_t tw_id;
+<<<<<<< HEAD
 	uint8_t x_fuzz;
 	uint8_t y_fuzz;
 	uint8_t z_fuzz;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	uint8_t c1[3];
 	uint8_t c2[3];
 	uint8_t c3[5];
@@ -68,10 +71,13 @@ struct himax_i2c_platform_data_config_type_1 {
 struct himax_i2c_platform_data_config_type_2 {
 	uint8_t version;
 	uint8_t tw_id;
+<<<<<<< HEAD
 	uint8_t x_fuzz;
 	uint8_t y_fuzz;
 	uint8_t z_fuzz;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	uint8_t c1[3];
 	uint8_t c2[3];
 	uint8_t c3[5];
@@ -123,10 +129,13 @@ struct himax_i2c_platform_data_config_type_2 {
 struct himax_i2c_platform_data_config_type_3 {
 	uint8_t version;
 	uint8_t tw_id;
+<<<<<<< HEAD
 	uint8_t x_fuzz;
 	uint8_t y_fuzz;
 	uint8_t z_fuzz;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	uint8_t c1[11];
 	uint8_t c2[11];
 	uint8_t c3[11];
@@ -184,6 +193,7 @@ struct himax_i2c_platform_data {
 	/* common variables */
 	int abs_x_min;
 	int abs_x_max;
+<<<<<<< HEAD
 	int abs_x_fuzz;
 	int abs_y_min;
 	int abs_y_max;
@@ -191,6 +201,12 @@ struct himax_i2c_platform_data {
 	int abs_pressure_min;
 	int abs_pressure_max;
 	int abs_pressure_fuzz;
+=======
+	int abs_y_min;
+	int abs_y_max;
+	int abs_pressure_min;
+	int abs_pressure_max;
+>>>>>>> upstream/4.3_primoc
 	int abs_width_min;
 	int abs_width_max;
 	uint8_t powerOff3V3;
@@ -212,6 +228,7 @@ struct himax_i2c_platform_data {
 	int screenHeight;
 	/* For fake event --end-- */
 
+<<<<<<< HEAD
 	/* Touch Window Vendor Names --Start-- */
 	char ID0[20];
 	char ID1[20];
@@ -219,6 +236,8 @@ struct himax_i2c_platform_data {
 	char ID3[20];
 	/* Touch Window Vendor Names --End-- */
 
+=======
+>>>>>>> upstream/4.3_primoc
 	void (*reset)(void);
 	int (*loadSensorConfig)(struct i2c_client *client, struct himax_i2c_platform_data *pdata, struct himax_config_init_api *i2c_api);
 	/* for compatible and caching purpose */

@@ -221,7 +221,12 @@ static int uhci_hub_status_data(struct usb_hcd *hcd, char *buf)
 		/* auto-stop if nothing connected for 1 second */
 		if (any_ports_active(uhci))
 			uhci->rh_state = UHCI_RH_RUNNING;
+<<<<<<< HEAD
 		else if (time_after_eq(jiffies, uhci->auto_stop_time))
+=======
+		else if (time_after_eq(jiffies, uhci->auto_stop_time) &&
+				!uhci->wait_for_hp)
+>>>>>>> upstream/4.3_primoc
 			suspend_rh(uhci, UHCI_RH_AUTO_STOPPED);
 		break;
 

@@ -353,13 +353,21 @@ himax_store(struct device *dev, struct device_attribute *attr,
 	mutex_lock(&cabc->lock);
 	switch (off) {
 	case CABC_MODE:
+<<<<<<< HEAD
 		if (res < CABC_UNDEF) {
+=======
+		if (res >= CABC_OFF && res < CABC_UNDEF) {
+>>>>>>> upstream/4.3_primoc
 			cabc->mode_cabc = res;
 			cabc->cabc_config->change_cabcmode(client_data, res, 0x25);
 		}
 		break;
 	case BC_MODE:
+<<<<<<< HEAD
 		if (res < BC_UNDEF)
+=======
+		if (res >= BC_OFF && res < BC_UNDEF)
+>>>>>>> upstream/4.3_primoc
 			cabc->mode_bc = res;
 		break;
 	case AUTO_BACKLIGHT:

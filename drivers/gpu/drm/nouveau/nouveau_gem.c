@@ -315,6 +315,7 @@ retry:
 }
 
 static int
+<<<<<<< HEAD
 validate_sync(struct nouveau_channel *chan, struct nouveau_bo *nvbo)
 {
 	struct nouveau_fence *fence = NULL;
@@ -334,6 +335,8 @@ validate_sync(struct nouveau_channel *chan, struct nouveau_bo *nvbo)
 }
 
 static int
+=======
+>>>>>>> upstream/4.3_primoc
 validate_list(struct nouveau_channel *chan, struct list_head *list,
 	      struct drm_nouveau_gem_pushbuf_bo *pbbo, uint64_t user_pbbo_ptr)
 {
@@ -346,7 +349,11 @@ validate_list(struct nouveau_channel *chan, struct list_head *list,
 	list_for_each_entry(nvbo, list, entry) {
 		struct drm_nouveau_gem_pushbuf_bo *b = &pbbo[nvbo->pbbo_index];
 
+<<<<<<< HEAD
 		ret = validate_sync(chan, nvbo);
+=======
+		ret = nouveau_fence_sync(nvbo->bo.sync_obj, chan);
+>>>>>>> upstream/4.3_primoc
 		if (unlikely(ret)) {
 			NV_ERROR(dev, "fail pre-validate sync\n");
 			return ret;
@@ -369,7 +376,11 @@ validate_list(struct nouveau_channel *chan, struct list_head *list,
 			return ret;
 		}
 
+<<<<<<< HEAD
 		ret = validate_sync(chan, nvbo);
+=======
+		ret = nouveau_fence_sync(nvbo->bo.sync_obj, chan);
+>>>>>>> upstream/4.3_primoc
 		if (unlikely(ret)) {
 			NV_ERROR(dev, "fail post-validate sync\n");
 			return ret;

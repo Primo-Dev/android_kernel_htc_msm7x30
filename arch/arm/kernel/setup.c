@@ -49,6 +49,10 @@
 #include <asm/mach/time.h>
 #include <asm/traps.h>
 #include <asm/unwind.h>
+<<<<<<< HEAD
+=======
+#include <asm/memblock.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/board_htc.h>
 
 #if defined(CONFIG_DEPRECATED_PARAM_STRUCT)
@@ -90,6 +94,12 @@ unsigned int system_rev;
 unsigned int system_rev2;
 EXPORT_SYMBOL(system_rev);
 
+<<<<<<< HEAD
+=======
+char microp_ver[4];
+EXPORT_SYMBOL(microp_ver);
+
+>>>>>>> upstream/4.3_primoc
 unsigned int system_serial_low;
 EXPORT_SYMBOL(system_serial_low);
 

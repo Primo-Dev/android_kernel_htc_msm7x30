@@ -277,7 +277,11 @@ struct mmc_host {
 
 	unsigned int		sdio_irqs;
 	struct task_struct	*sdio_irq_thread;
+<<<<<<< HEAD
 
+=======
+	bool			sdio_irq_pending;
+>>>>>>> upstream/4.3_primoc
 	atomic_t		sdio_irq_thread_abort;
 
 	mmc_pm_flag_t		pm_flags;	/* requested pm features */
@@ -373,6 +377,10 @@ extern void mmc_request_done(struct mmc_host *, struct mmc_request *);
 static inline void mmc_signal_sdio_irq(struct mmc_host *host)
 {
 	host->ops->enable_sdio_irq(host, 0);
+<<<<<<< HEAD
+=======
+	host->sdio_irq_pending = true;
+>>>>>>> upstream/4.3_primoc
 	wake_up_process(host->sdio_irq_thread);
 }
 
@@ -459,4 +467,9 @@ static inline unsigned int mmc_host_clk_rate(struct mmc_host *host)
 	return host->ios.clock;
 }
 #endif
+<<<<<<< HEAD
 #endif
+=======
+#endif
+
+>>>>>>> upstream/4.3_primoc

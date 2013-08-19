@@ -16,6 +16,11 @@
 
 #include <linux/init.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/export.h>
+#include <linux/kernel.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/slab.h>
 #include <linux/fs.h>
 #include <linux/namei.h>
@@ -32,6 +37,10 @@
 #include <linux/fcntl.h>
 #include <linux/device_cgroup.h>
 #include <linux/fs_struct.h>
+<<<<<<< HEAD
+=======
+#include <linux/posix_acl.h>
+>>>>>>> upstream/4.3_primoc
 #include <asm/uaccess.h>
 
 #include "internal.h"
@@ -175,6 +184,7 @@ void putname(const char *name)
 EXPORT_SYMBOL(putname);
 #endif
 
+<<<<<<< HEAD
 /*
  * This does basic POSIX ACL permission checking
  */
@@ -184,6 +194,65 @@ static int acl_permission_check(struct inode *inode, int mask, unsigned int flag
 	unsigned int mode = inode->i_mode;
 
 	mask &= MAY_READ | MAY_WRITE | MAY_EXEC;
+=======
+static int check_acl(struct inode *inode, int mask)
+{
+	struct posix_acl *acl;
+
+	/*
+	 * Under RCU walk, we cannot even do a "get_cached_acl()",
+	 * because that involves locking and getting a refcount on
+	 * a cached ACL.
+	 *
+	 * So the only case we handle during RCU walking is the
+	 * case of a cached "no ACL at all", which needs no locks
+	 * or refcounts.
+	 */
+	if (mask & MAY_NOT_BLOCK) {
+	        if (negative_cached_acl(inode, ACL_TYPE_ACCESS))
+	                return -EAGAIN;
+	        return -ECHILD;
+	}
+
+	acl = get_cached_acl(inode, ACL_TYPE_ACCESS);
+
+	/*
+	 * A filesystem can force a ACL callback by just never filling the
+	 * ACL cache. But normally you'd fill the cache either at inode
+	 * instantiation time, or on the first ->get_acl call.
+	 *
+	 * If the filesystem doesn't have a get_acl() function at all, we'll
+	 * just create the negative cache entry.
+	 */
+	if (acl == ACL_NOT_CACHED) {
+	        if (inode->i_op->get_acl) {
+			acl = inode->i_op->get_acl(inode, ACL_TYPE_ACCESS);
+			if (IS_ERR(acl))
+				return PTR_ERR(acl);
+		} else {
+		        set_cached_acl(inode, ACL_TYPE_ACCESS, NULL);
+		        return -EAGAIN;
+		}
+	}
+
+	if (acl) {
+	        int error = posix_acl_permission(inode, acl, mask);
+	        posix_acl_release(acl);
+	        return error;
+	}
+
+	return -EAGAIN;
+}
+
+/*
+ * This does basic POSIX ACL permission checking
+ */
+static int acl_permission_check(struct inode *inode, int mask)
+{
+	unsigned int mode = inode->i_mode;
+
+	mask &= MAY_READ | MAY_WRITE | MAY_EXEC | MAY_NOT_BLOCK;
+>>>>>>> upstream/4.3_primoc
 
 	if (current_user_ns() != inode_userns(inode))
 		goto other_perms;
@@ -191,8 +260,13 @@ static int acl_permission_check(struct inode *inode, int mask, unsigned int flag
 	if (current_fsuid() == inode->i_uid)
 		mode >>= 6;
 	else {
+<<<<<<< HEAD
 		if (IS_POSIXACL(inode) && (mode & S_IRWXG) && check_acl) {
 			int error = check_acl(inode, mask, flags);
+=======
+		if (IS_POSIXACL(inode) && (mode & S_IRWXG)) {
+			int error = check_acl(inode, mask);
+>>>>>>> upstream/4.3_primoc
 			if (error != -EAGAIN)
 				return error;
 		}
@@ -205,7 +279,11 @@ other_perms:
 	/*
 	 * If the DACs are ok we don't need any capability check.
 	 */
+<<<<<<< HEAD
 	if ((mask & ~mode) == 0)
+=======
+	if ((mask & ~mode & (MAY_READ | MAY_WRITE | MAY_EXEC)) == 0)
+>>>>>>> upstream/4.3_primoc
 		return 0;
 	return -EACCES;
 }
@@ -214,7 +292,10 @@ other_perms:
  * generic_permission -  check for access rights on a Posix-like filesystem
  * @inode:	inode to check access rights for
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC)
+<<<<<<< HEAD
  * @check_acl:	optional callback to check for Posix ACLs
+=======
+>>>>>>> upstream/4.3_primoc
  * @flags:	IPERM_FLAG_ flags.
  *
  * Used to check for read/write/execute permissions on a file.
@@ -226,14 +307,19 @@ other_perms:
  * request cannot be satisfied (eg. requires blocking or too much complexity).
  * It would then be called again in ref-walk mode.
  */
+<<<<<<< HEAD
 int generic_permission(struct inode *inode, int mask, unsigned int flags,
 	int (*check_acl)(struct inode *inode, int mask, unsigned int flags))
+=======
+int generic_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	int ret;
 
 	/*
 	 * Do the basic POSIX ACL permission checks.
 	 */
+<<<<<<< HEAD
 	ret = acl_permission_check(inode, mask, flags, check_acl);
 	if (ret != -EACCES)
 		return ret;
@@ -244,6 +330,27 @@ int generic_permission(struct inode *inode, int mask, unsigned int flags,
 	 * for non-directories that have least one exec bit set.
 	 */
 	if (!(mask & MAY_EXEC) || execute_ok(inode))
+=======
+	ret = acl_permission_check(inode, mask);
+	if (ret != -EACCES)
+		return ret;
+
+	if (S_ISDIR(inode->i_mode)) {
+		/* DACs are overridable for directories */
+		if (ns_capable(inode_userns(inode), CAP_DAC_OVERRIDE))
+			return 0;
+		if (!(mask & MAY_WRITE))
+			if (ns_capable(inode_userns(inode), CAP_DAC_READ_SEARCH))
+				return 0;
+		return -EACCES;
+	}
+	/*
+	 * Read/write DACs are always overridable.
+	 * Executable DACs are overridable when there is
+	 * at least one exec bit set.
+	 */
+	if (!(mask & MAY_EXEC) || (inode->i_mode & S_IXUGO))
+>>>>>>> upstream/4.3_primoc
 		if (ns_capable(inode_userns(inode), CAP_DAC_OVERRIDE))
 			return 0;
 
@@ -251,13 +358,40 @@ int generic_permission(struct inode *inode, int mask, unsigned int flags,
 	 * Searching includes executable on directories, else just read.
 	 */
 	mask &= MAY_READ | MAY_WRITE | MAY_EXEC;
+<<<<<<< HEAD
 	if (mask == MAY_READ || (S_ISDIR(inode->i_mode) && !(mask & MAY_WRITE)))
+=======
+	if (mask == MAY_READ)
+>>>>>>> upstream/4.3_primoc
 		if (ns_capable(inode_userns(inode), CAP_DAC_READ_SEARCH))
 			return 0;
 
 	return -EACCES;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * We _really_ want to just do "generic_permission()" without
+ * even looking at the inode->i_op values. So we keep a cache
+ * flag in inode->i_opflags, that says "this has not special
+ * permission function, use the fast case".
+ */
+static inline int do_inode_permission(struct inode *inode, int mask)
+{
+	if (unlikely(!(inode->i_opflags & IOP_FASTPERM))) {
+		if (likely(inode->i_op->permission))
+			return inode->i_op->permission(inode, mask);
+
+		/* This gets set once for the inode lifetime */
+		spin_lock(&inode->i_lock);
+		inode->i_opflags |= IOP_FASTPERM;
+		spin_unlock(&inode->i_lock);
+	}
+	return generic_permission(inode, mask);
+}
+
+>>>>>>> upstream/4.3_primoc
 /**
  * inode_permission  -  check for access rights to a given inode
  * @inode:	inode to check permission on
@@ -272,7 +406,11 @@ int inode_permission(struct inode *inode, int mask)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (mask & MAY_WRITE) {
+=======
+	if (unlikely(mask & MAY_WRITE)) {
+>>>>>>> upstream/4.3_primoc
 		umode_t mode = inode->i_mode;
 
 		/*
@@ -289,12 +427,16 @@ int inode_permission(struct inode *inode, int mask)
 			return -EACCES;
 	}
 
+<<<<<<< HEAD
 	if (inode->i_op->permission)
 		retval = inode->i_op->permission(inode, mask, 0);
 	else
 		retval = generic_permission(inode, mask, 0,
 				inode->i_op->check_acl);
 
+=======
+	retval = do_inode_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 	if (retval)
 		return retval;
 
@@ -306,6 +448,7 @@ int inode_permission(struct inode *inode, int mask)
 }
 
 /**
+<<<<<<< HEAD
  * file_permission  -  check for additional access rights to a given file
  * @file:	file to check access rights for
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC)
@@ -369,6 +512,8 @@ int deny_write_access(struct file * file)
 }
 
 /**
+=======
+>>>>>>> upstream/4.3_primoc
  * path_get - get a reference to a path
  * @path: path to get the reference to
  *
@@ -494,6 +639,7 @@ static inline int d_revalidate(struct dentry *dentry, struct nameidata *nd)
 	return dentry->d_op->d_revalidate(dentry, nd);
 }
 
+<<<<<<< HEAD
 static struct dentry *
 do_revalidate(struct dentry *dentry, struct nameidata *nd)
 {
@@ -516,6 +662,8 @@ do_revalidate(struct dentry *dentry, struct nameidata *nd)
 	return dentry;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /**
  * complete_walk - successful completion of path walk
  * @nd:  pointer nameidata
@@ -570,6 +718,7 @@ static int complete_walk(struct nameidata *nd)
 	return status;
 }
 
+<<<<<<< HEAD
 /*
  * Short-cut version of permission(), for calling on directories
  * during pathname resolution.  Combines parts of permission()
@@ -604,6 +753,8 @@ ok:
 	return security_inode_exec_permission(inode, flags);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static __always_inline void set_root(struct nameidata *nd)
 {
 	if (!nd->root.mnt)
@@ -1140,6 +1291,33 @@ static struct dentry *d_alloc_and_lookup(struct dentry *parent,
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * We already have a dentry, but require a lookup to be performed on the parent
+ * directory to fill in d_inode. Returns the new dentry, or ERR_PTR on error.
+ * parent->d_inode->i_mutex must be held. d_lookup must have verified that no
+ * child exists while under i_mutex.
+ */
+static struct dentry *d_inode_lookup(struct dentry *parent, struct dentry *dentry,
+				     struct nameidata *nd)
+{
+	struct inode *inode = parent->d_inode;
+	struct dentry *old;
+
+	/* Don't create child dentry for a dead directory. */
+	if (unlikely(IS_DEADDIR(inode)))
+		return ERR_PTR(-ENOENT);
+
+	old = inode->i_op->lookup(inode, dentry, nd);
+	if (unlikely(old)) {
+		dput(dentry);
+		dentry = old;
+	}
+	return dentry;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  *  It's more convoluted than I'd like it to be, but... it's still fairly
  *  small and for now I'd prefer to have fast path as straight as possible.
  *  It _is_ time-critical.
@@ -1178,6 +1356,11 @@ static int do_lookup(struct nameidata *nd, struct qstr *name,
 				goto unlazy;
 			}
 		}
+<<<<<<< HEAD
+=======
+		if (unlikely(d_need_lookup(dentry)))
+			goto unlazy;
+>>>>>>> upstream/4.3_primoc
 		path->mnt = mnt;
 		path->dentry = dentry;
 		if (unlikely(!__follow_mount_rcu(nd, path, inode)))
@@ -1192,6 +1375,13 @@ unlazy:
 		dentry = __d_lookup(parent, name);
 	}
 
+<<<<<<< HEAD
+=======
+	if (dentry && unlikely(d_need_lookup(dentry))) {
+		dput(dentry);
+		dentry = NULL;
+	}
+>>>>>>> upstream/4.3_primoc
 retry:
 	if (unlikely(!dentry)) {
 		struct inode *dir = parent->d_inode;
@@ -1208,6 +1398,18 @@ retry:
 			/* known good */
 			need_reval = 0;
 			status = 1;
+<<<<<<< HEAD
+=======
+		} else if (unlikely(d_need_lookup(dentry))) {
+			dentry = d_inode_lookup(parent, dentry, nd);
+			if (IS_ERR(dentry)) {
+				mutex_unlock(&dir->i_mutex);
+				return PTR_ERR(dentry);
+			}
+			/* known good */
+			need_reval = 0;
+			status = 1;
+>>>>>>> upstream/4.3_primoc
 		}
 		mutex_unlock(&dir->i_mutex);
 	}
@@ -1242,13 +1444,21 @@ retry:
 static inline int may_lookup(struct nameidata *nd)
 {
 	if (nd->flags & LOOKUP_RCU) {
+<<<<<<< HEAD
 		int err = exec_permission(nd->inode, IPERM_FLAG_RCU);
+=======
+		int err = inode_permission(nd->inode, MAY_EXEC|MAY_NOT_BLOCK);
+>>>>>>> upstream/4.3_primoc
 		if (err != -ECHILD)
 			return err;
 		if (unlazy_walk(nd, NULL))
 			return -ECHILD;
 	}
+<<<<<<< HEAD
 	return exec_permission(nd->inode, 0);
+=======
+	return inode_permission(nd->inode, MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline int handle_dots(struct nameidata *nd, int type)
@@ -1276,6 +1486,29 @@ static void terminate_walk(struct nameidata *nd)
 	}
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Do we need to follow links? We _really_ want to be able
+ * to do this check without having to look at inode->i_op,
+ * so we keep a cache of "no, this doesn't need follow_link"
+ * for the common case.
+ */
+static inline int do_follow_link(struct inode *inode, int follow)
+{
+	if (unlikely(!(inode->i_opflags & IOP_NOFOLLOW))) {
+		if (likely(inode->i_op->follow_link))
+			return follow;
+
+		/* This gets set once for the inode lifetime */
+		spin_lock(&inode->i_lock);
+		inode->i_opflags |= IOP_NOFOLLOW;
+		spin_unlock(&inode->i_lock);
+	}
+	return 0;
+}
+
+>>>>>>> upstream/4.3_primoc
 static inline int walk_component(struct nameidata *nd, struct path *path,
 		struct qstr *name, int type, int follow)
 {
@@ -1298,7 +1531,11 @@ static inline int walk_component(struct nameidata *nd, struct path *path,
 		terminate_walk(nd);
 		return -ENOENT;
 	}
+<<<<<<< HEAD
 	if (unlikely(inode->i_op->follow_link) && follow) {
+=======
+	if (do_follow_link(inode, follow)) {
+>>>>>>> upstream/4.3_primoc
 		if (nd->flags & LOOKUP_RCU) {
 			if (unlikely(unlazy_walk(nd, path->dentry))) {
 				terminate_walk(nd);
@@ -1351,6 +1588,29 @@ static inline int nested_symlink(struct path *path, struct nameidata *nd)
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * We really don't want to look at inode->i_op->lookup
+ * when we don't have to. So we keep a cache bit in
+ * the inode ->i_opflags field that says "yes, we can
+ * do lookup on this inode".
+ */
+static inline int can_lookup(struct inode *inode)
+{
+	if (likely(inode->i_opflags & IOP_LOOKUP))
+		return 1;
+	if (likely(!inode->i_op->lookup))
+		return 0;
+
+	/* We do this once for the lifetime of the inode */
+	spin_lock(&inode->i_lock);
+	inode->i_opflags |= IOP_LOOKUP;
+	spin_unlock(&inode->i_lock);
+	return 1;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  * Name resolution.
  * This is the basic name resolution function, turning a pathname into
  * the final dentry. We expect 'base' to be positive and a directory.
@@ -1432,10 +1692,17 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 			if (err)
 				return err;
 		}
+<<<<<<< HEAD
 		err = -ENOTDIR; 
 		if (!nd->inode->i_op->lookup)
 			break;
 		continue;
+=======
+		if (can_lookup(nd->inode))
+			continue;
+		err = -ENOTDIR; 
+		break;
+>>>>>>> upstream/4.3_primoc
 		/* here ends the main loop */
 
 last_component:
@@ -1523,7 +1790,11 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 			if (!S_ISDIR(dentry->d_inode->i_mode))
 				goto fput_fail;
 
+<<<<<<< HEAD
 			retval = file_permission(file, MAY_EXEC);
+=======
+			retval = inode_permission(dentry->d_inode, MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 			if (retval)
 				goto fput_fail;
 		}
@@ -1680,7 +1951,11 @@ static struct dentry *__lookup_hash(struct qstr *name,
 	struct dentry *dentry;
 	int err;
 
+<<<<<<< HEAD
 	err = exec_permission(inode, 0);
+=======
+	err = inode_permission(inode, MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 	if (err)
 		return ERR_PTR(err);
 
@@ -1691,8 +1966,39 @@ static struct dentry *__lookup_hash(struct qstr *name,
 	 */
 	dentry = d_lookup(base, name);
 
+<<<<<<< HEAD
 	if (dentry && (dentry->d_flags & DCACHE_OP_REVALIDATE))
 		dentry = do_revalidate(dentry, nd);
+=======
+	if (dentry && d_need_lookup(dentry)) {
+		/*
+		 * __lookup_hash is called with the parent dir's i_mutex already
+		 * held, so we are good to go here.
+		 */
+		dentry = d_inode_lookup(base, dentry, nd);
+		if (IS_ERR(dentry))
+			return dentry;
+	}
+
+	if (dentry && (dentry->d_flags & DCACHE_OP_REVALIDATE)) {
+		int status = d_revalidate(dentry, nd);
+		if (unlikely(status <= 0)) {
+			/*
+			 * The dentry failed validation.
+			 * If d_revalidate returned 0 attempt to invalidate
+			 * the dentry otherwise d_revalidate is asking us
+			 * to return a fail status.
+			 */
+			if (status < 0) {
+				dput(dentry);
+				return ERR_PTR(status);
+			} else if (!d_invalidate(dentry)) {
+				dput(dentry);
+				dentry = NULL;
+			}
+		}
+	}
+>>>>>>> upstream/4.3_primoc
 
 	if (!dentry)
 		dentry = d_alloc_and_lookup(base, name, nd);
@@ -1928,7 +2234,11 @@ void unlock_rename(struct dentry *p1, struct dentry *p2)
 	}
 }
 
+<<<<<<< HEAD
 int vfs_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+int vfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		struct nameidata *nd)
 {
 	int error = may_create(dir, dentry);
@@ -2405,7 +2715,11 @@ fail:
 }
 EXPORT_SYMBOL_GPL(lookup_create);
 
+<<<<<<< HEAD
 int vfs_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev)
+=======
+int vfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
+>>>>>>> upstream/4.3_primoc
 {
 	int error = may_create(dir, dentry);
 
@@ -2454,7 +2768,11 @@ SYSCALL_DEFINE4(mknodat, int, dfd, const char __user *, filename, int, mode,
 		unsigned, dev)
 {
 	int error;
+<<<<<<< HEAD
 	char *tmp;
+=======
+	char *tmp = 0;
+>>>>>>> upstream/4.3_primoc
 	struct dentry *dentry;
 	struct nameidata nd;
 
@@ -2483,7 +2801,11 @@ SYSCALL_DEFINE4(mknodat, int, dfd, const char __user *, filename, int, mode,
 		goto out_drop_write;
 	switch (mode & S_IFMT) {
 		case 0: case S_IFREG:
+<<<<<<< HEAD
 			error = vfs_create(nd.path.dentry->d_inode,dentry,mode,&nd);
+=======
+			error = vfs_create(nd.path.dentry->d_inode,dentry,mode,NULL);
+>>>>>>> upstream/4.3_primoc
 			break;
 		case S_IFCHR: case S_IFBLK:
 			error = vfs_mknod(nd.path.dentry->d_inode,dentry,mode,
@@ -2534,7 +2856,11 @@ int vfs_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 SYSCALL_DEFINE3(mkdirat, int, dfd, const char __user *, pathname, int, mode)
 {
 	int error = 0;
+<<<<<<< HEAD
 	char * tmp;
+=======
+	char * tmp = 0;
+>>>>>>> upstream/4.3_primoc
 	struct dentry *dentry;
 	struct nameidata nd;
 
@@ -2637,7 +2963,11 @@ out:
 static long do_rmdir(int dfd, const char __user *pathname)
 {
 	int error = 0;
+<<<<<<< HEAD
 	char * name;
+=======
+	char * name = 0;
+>>>>>>> upstream/4.3_primoc
 	struct dentry *dentry;
 	struct nameidata nd;
 
@@ -2733,7 +3063,11 @@ int vfs_unlink(struct inode *dir, struct dentry *dentry)
 static long do_unlinkat(int dfd, const char __user *pathname)
 {
 	int error;
+<<<<<<< HEAD
 	char *name;
+=======
+	char *name = 0;
+>>>>>>> upstream/4.3_primoc
 	struct dentry *dentry;
 	struct nameidata nd;
 	struct inode *inode = NULL;
@@ -2826,7 +3160,11 @@ SYSCALL_DEFINE3(symlinkat, const char __user *, oldname,
 {
 	int error;
 	char *from;
+<<<<<<< HEAD
 	char *to;
+=======
+	char *to = 0;
+>>>>>>> upstream/4.3_primoc
 	struct dentry *dentry;
 	struct nameidata nd;
 
@@ -2926,7 +3264,11 @@ SYSCALL_DEFINE5(linkat, int, olddfd, const char __user *, oldname,
 	struct path old_path;
 	int how = 0;
 	int error;
+<<<<<<< HEAD
 	char *to;
+=======
+	char *to = 0;
+>>>>>>> upstream/4.3_primoc
 
 	if ((flags & ~(AT_SYMLINK_FOLLOW | AT_EMPTY_PATH)) != 0)
 		return -EINVAL;
@@ -3138,8 +3480,13 @@ SYSCALL_DEFINE4(renameat, int, olddfd, const char __user *, oldname,
 	struct dentry *old_dentry, *new_dentry;
 	struct dentry *trap;
 	struct nameidata oldnd, newnd;
+<<<<<<< HEAD
 	char *from;
 	char *to;
+=======
+	char *from = 0;
+	char *to = 0;
+>>>>>>> upstream/4.3_primoc
 	int error;
 
 	error = user_path_parent(olddfd, oldname, &oldnd, &from);
@@ -3385,7 +3732,10 @@ EXPORT_SYMBOL(kern_path_parent);
 EXPORT_SYMBOL(kern_path);
 EXPORT_SYMBOL(vfs_path_lookup);
 EXPORT_SYMBOL(inode_permission);
+<<<<<<< HEAD
 EXPORT_SYMBOL(file_permission);
+=======
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(unlock_rename);
 EXPORT_SYMBOL(vfs_create);
 EXPORT_SYMBOL(vfs_follow_link);

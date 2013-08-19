@@ -22,7 +22,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: bcmsdh.c 275784 2011-08-04 22:41:49Z $
+=======
+ * $Id: bcmsdh.c 344235 2012-07-11 23:47:18Z $
+>>>>>>> upstream/4.3_primoc
  */
 
 /**
@@ -362,9 +366,16 @@ bcmsdh_cis_read(void *sdh, uint func, uint8 *cis, uint length)
 		}
 		bcopy(cis, tmp_buf, length);
 		for (tmp_ptr = tmp_buf, ptr = cis; ptr < (cis + length - 4); tmp_ptr++) {
+<<<<<<< HEAD
 			ptr += sprintf((char*)ptr, "%.2x ", *tmp_ptr & 0xff);
 			if ((((tmp_ptr - tmp_buf) + 1) & 0xf) == 0)
 				ptr += sprintf((char *)ptr, "\n");
+=======
+			ptr += snprintf((char*)ptr, (cis + length - ptr - 4),
+				"%.2x ", *tmp_ptr & 0xff);
+			if ((((tmp_ptr - tmp_buf) + 1) & 0xf) == 0)
+				ptr += snprintf((char *)ptr, (cis + length - ptr -4), "\n");
+>>>>>>> upstream/4.3_primoc
 		}
 		MFREE(bcmsdh->osh, tmp_buf, length);
 	}
@@ -688,6 +699,7 @@ bcmsdh_sleep(void *sdh, bool enab)
 	return BCME_UNSUPPORTED;
 #endif
 }
+<<<<<<< HEAD
 
 int
 bcmsdh_gpio_init(void *sdh)
@@ -725,3 +737,5 @@ bcmsdh_gpioout(void *sdh, uint32 gpio, bool enab)
 	return sdioh_gpioout(sd, gpio, enab);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc

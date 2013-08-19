@@ -160,7 +160,11 @@ identity_mapped:
 	xorq    %rbp, %rbp
 	xorq	%r8,  %r8
 	xorq	%r9,  %r9
+<<<<<<< HEAD
 	xorq	%r10, %r9
+=======
+	xorq	%r10, %r10
+>>>>>>> upstream/4.3_primoc
 	xorq	%r11, %r11
 	xorq	%r12, %r12
 	xorq	%r13, %r13

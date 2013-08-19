@@ -2249,6 +2249,10 @@ static int wm8994_aif3_hw_params(struct snd_pcm_substream *substream,
 		default:
 			return 0;
 		}
+<<<<<<< HEAD
+=======
+		break;
+>>>>>>> upstream/4.3_primoc
 	default:
 		return 0;
 	}

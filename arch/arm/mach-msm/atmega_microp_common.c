@@ -77,7 +77,11 @@ static int i2c_read_block(struct i2c_client *client, uint8_t addr,
 
 	cdata = i2c_get_clientdata(client);
 	mutex_lock(&cdata->microp_i2c_rw_mutex);
+<<<<<<< HEAD
 	hr_msleep(1);
+=======
+	msleep(1);
+>>>>>>> upstream/4.3_primoc
 	for (retry = 0; retry <= I2C_READ_RETRY_TIMES; retry++) {
 		if (i2c_transfer(client->adapter, msgs, 2) == 2)
 			break;
@@ -126,7 +130,11 @@ static int i2c_write_block(struct i2c_client *client, uint8_t addr,
 		buf[i+1] = data[i];
 
 	mutex_lock(&cdata->microp_i2c_rw_mutex);
+<<<<<<< HEAD
 	hr_msleep(1);
+=======
+	msleep(1);
+>>>>>>> upstream/4.3_primoc
 	for (retry = 0; retry <= I2C_WRITE_RETRY_TIMES; retry++) {
 		if (i2c_transfer(client->adapter, msg, 1) == 1)
 			break;
@@ -646,8 +654,11 @@ static int microp_i2c_probe(struct i2c_client *client
 	uint8_t data[6];
 	int ret;
 
+<<<<<<< HEAD
 	memset(data, 0, sizeof(data));
 
+=======
+>>>>>>> upstream/4.3_primoc
 	cdata = kzalloc(sizeof(struct microp_i2c_client_data), GFP_KERNEL);
 	if (!cdata) {
 		ret = -ENOMEM;
@@ -671,7 +682,11 @@ static int microp_i2c_probe(struct i2c_client *client
 	microp_rw_delay = 5;
 
 	ret = i2c_read_block(client, MICROP_I2C_RCMD_VERSION, data, 2);
+<<<<<<< HEAD
 	if ((ret != 0) || !(data[0] && data[1])) {
+=======
+	if (ret || !(data[0] && data[1])) {
+>>>>>>> upstream/4.3_primoc
 		ret = -ENODEV;
 		dev_err(&client->dev, "[MP_PROBE_ERR] failed on get microp version\n");
 		goto err_exit;
@@ -760,8 +775,11 @@ err_gpio_reset:
 	gpio_free(pdata->gpio_reset);
 err_exit:
 	private_microp_client = NULL;
+<<<<<<< HEAD
 	dev_err(&client->dev, "[MP_PROBE_ERR] try to reset microp to recovery I2C bus\n");
 	microp_reset_microp(client);
+=======
+>>>>>>> upstream/4.3_primoc
 err_cdata:
 	return ret;
 }
@@ -797,18 +815,29 @@ static void microp_irq_unmask(struct irq_data *d)
 	;
 }
 
+<<<<<<< HEAD
 static int microp_irq_set_wake(struct irq_data *data, unsigned int on)
+=======
+static int microp_irq_set_wake(struct irq_data *d, unsigned int on)
+>>>>>>> upstream/4.3_primoc
 {
 	return 0;
 }
 
 static struct irq_chip microp_irq_chip = {
 	.name = "microp",
+<<<<<<< HEAD
 	.irq_disable = microp_irq_mask,
+=======
+>>>>>>> upstream/4.3_primoc
 	.irq_ack = microp_irq_ack,
 	.irq_mask = microp_irq_mask,
 	.irq_unmask = microp_irq_unmask,
 	.irq_set_wake = microp_irq_set_wake,
+<<<<<<< HEAD
+=======
+        //	.disable = microp_irq_mask,
+>>>>>>> upstream/4.3_primoc
 };
 
 static int __init microp_common_init(void)
@@ -817,7 +846,12 @@ static int __init microp_common_init(void)
 	int n, MICROP_IRQ_END = FIRST_MICROP_IRQ + NR_MICROP_IRQS;
 
 	for (n = FIRST_MICROP_IRQ; n < MICROP_IRQ_END; n++) {
+<<<<<<< HEAD
 		irq_set_chip_and_handler(n, &microp_irq_chip, handle_level_irq);
+=======
+          irq_set_chip(n, &microp_irq_chip);
+		irq_set_handler(n, handle_level_irq);
+>>>>>>> upstream/4.3_primoc
 		set_irq_flags(n, IRQF_VALID);
 	}
 

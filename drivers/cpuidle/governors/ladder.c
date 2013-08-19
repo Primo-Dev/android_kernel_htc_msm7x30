@@ -14,8 +14,13 @@
 
 #include <linux/kernel.h>
 #include <linux/cpuidle.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
 #include <linux/moduleparam.h>
+=======
+#include <linux/pm_qos.h>
+#include <linux/module.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/jiffies.h>
 
 #include <asm/io.h>

@@ -801,6 +801,15 @@ static int process_msg(void)
 		goto out;
 	}
 
+<<<<<<< HEAD
+=======
+	if (msg->hdr.len > XENSTORE_PAYLOAD_MAX) {
+		kfree(msg);
+		err = -EINVAL;
+		goto out;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	body = kmalloc(msg->hdr.len + 1, GFP_NOIO | __GFP_HIGH);
 	if (body == NULL) {
 		kfree(msg);

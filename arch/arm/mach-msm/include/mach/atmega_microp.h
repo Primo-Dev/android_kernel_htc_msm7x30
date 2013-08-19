@@ -46,6 +46,13 @@
 #define MICROP_FUNCTION_OJ		18
 #define MICROP_FUNCTION_P		19
 
+<<<<<<< HEAD
+=======
+#define AT_HEADSET_NO_MIC			0
+#define AT_HEADSET_MIC			1
+#define AT_HEADSET_METRICO			2
+
+>>>>>>> upstream/4.3_primoc
 #define LED_RGB					(1 << 0)
 #define LED_JOGBALL				(1 << 1)
 #define LED_GPO					(1 << 2)

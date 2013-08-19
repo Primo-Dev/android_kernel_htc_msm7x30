@@ -56,5 +56,9 @@ obj-$(CONFIG_TRACEPOINTS) += power-traces.o
 ifeq ($(CONFIG_TRACING),y)
 obj-$(CONFIG_KGDB_KDB) += trace_kdb.o
 endif
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_GPU_TRACEPOINTS) += gpu-traces.o
+>>>>>>> upstream/4.3_primoc
 
 libftrace-y := ftrace.o

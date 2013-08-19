@@ -25,6 +25,10 @@
 #include <linux/dma-mapping.h>
 #include <linux/msm_audio_7X30.h>
 #include <linux/msm_audio_amrnb.h>
+<<<<<<< HEAD
+=======
+#include <linux/android_pmem.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/atomic.h>
 #include <asm/ioctls.h>
@@ -736,6 +740,14 @@ static int audamrnb_in_release(struct inode *inode, struct file *file)
 	audpreproc_aenc_free(audio->enc_id);
 	audio->audrec = NULL;
 	audio->opened = 0;
+<<<<<<< HEAD
+=======
+	if (audio->data) {
+		iounmap(audio->data);
+		pmem_kfree(audio->phys);
+		audio->data = NULL;
+	}
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&audio->lock);
 	return 0;
 }
@@ -751,6 +763,26 @@ static int audamrnb_in_open(struct inode *inode, struct file *file)
 		rc = -EBUSY;
 		goto done;
 	}
+<<<<<<< HEAD
+=======
+	audio->phys = pmem_kalloc(DMASZ, PMEM_MEMTYPE_EBI1|
+					PMEM_ALIGNMENT_4K);
+	if (!IS_ERR((void *)audio->phys)) {
+		audio->data = ioremap(audio->phys, DMASZ);
+		if (!audio->data) {
+			pr_aud_err("could not allocate DMA buffers\n");
+			rc = -ENOMEM;
+			pmem_kfree(audio->phys);
+			goto done;
+		}
+	} else {
+		pr_aud_err("could not allocate DMA buffers\n");
+		rc = -ENOMEM;
+		goto done;
+	}
+	MM_DBG("Memory addr = 0x%8x  phy addr = 0x%8x\n",\
+		(int) audio->data, (int) audio->phys);
+>>>>>>> upstream/4.3_primoc
 	if ((file->f_mode & FMODE_WRITE) &&
 			(file->f_mode & FMODE_READ)) {
 		rc = -EACCES;
@@ -837,6 +869,7 @@ struct miscdevice audio_amrnb_in_misc = {
 
 static int __init audamrnb_in_init(void)
 {
+<<<<<<< HEAD
 	the_audio_amrnb_in.data = dma_alloc_coherent(NULL, DMASZ,
 				       &the_audio_amrnb_in.phys, GFP_KERNEL);
 	MM_DBG("Memory addr = 0x%8x  Phy addr= 0x%8x ---- \n", \
@@ -846,6 +879,8 @@ static int __init audamrnb_in_init(void)
 		pr_aud_err("Unable to allocate DMA buffer\n");
 		return -ENOMEM;
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_init(&the_audio_amrnb_in.lock);
 	mutex_init(&the_audio_amrnb_in.read_lock);
 	spin_lock_init(&the_audio_amrnb_in.dsp_lock);

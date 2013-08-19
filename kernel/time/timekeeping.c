@@ -649,9 +649,15 @@ static void update_sleep_time(struct timespec t)
  */
 static void __timekeeping_inject_sleeptime(struct timespec *delta)
 {
+<<<<<<< HEAD
 	if (!timespec_valid_strict(delta)) {
 		printk(KERN_WARNING "__timekeeping_inject_sleeptime: Invalid "
 					"sleep delta value!\n");
+=======
+	if (!timespec_valid(delta)) {
+		printk(KERN_WARNING "__timekeeping_inject_sleeptime: Invalid "
+			"sleep delta value!\n");
+>>>>>>> upstream/4.3_primoc
 		return;
 	}
 
@@ -884,7 +890,11 @@ static cycle_t logarithmic_accumulation(cycle_t offset, int shift)
 	}
 
 	/* Accumulate raw time */
+<<<<<<< HEAD
 	raw_nsecs = timekeeper.raw_interval << shift;
+=======
+	raw_nsecs = (u64)timekeeper.raw_interval << shift;
+>>>>>>> upstream/4.3_primoc
 	raw_nsecs += raw_time.tv_nsec;
 	if (raw_nsecs >= NSEC_PER_SEC) {
 		u64 raw_secs = raw_nsecs;
@@ -1053,7 +1063,11 @@ void get_monotonic_boottime(struct timespec *ts)
 	} while (read_seqretry(&xtime_lock, seq));
 
 	set_normalized_timespec(ts, ts->tv_sec + tomono.tv_sec + sleep.tv_sec,
+<<<<<<< HEAD
 			ts->tv_nsec + tomono.tv_nsec + sleep.tv_nsec + nsecs);
+=======
+		(s64)ts->tv_nsec + tomono.tv_nsec + sleep.tv_nsec + nsecs);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(get_monotonic_boottime);
 
@@ -1137,6 +1151,10 @@ void do_timer(unsigned long ticks)
 	jiffies_64 += ticks;
 	update_wall_time();
 	calc_global_load(ticks);
+<<<<<<< HEAD
+=======
+	prepare_idle_mask(ticks);
+>>>>>>> upstream/4.3_primoc
 }
 
 /**

@@ -521,6 +521,10 @@ static int gianfar_ptp_probe(struct platform_device *dev)
 	return 0;
 
 no_clock:
+<<<<<<< HEAD
+=======
+	iounmap(etsects->regs);
+>>>>>>> upstream/4.3_primoc
 no_ioremap:
 	release_resource(etsects->rsrc);
 no_resource:

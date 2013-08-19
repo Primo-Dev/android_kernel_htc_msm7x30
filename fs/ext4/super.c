@@ -48,6 +48,10 @@
 #endif
 
 #include "ext4.h"
+<<<<<<< HEAD
+=======
+#include "ext4_extents.h"
+>>>>>>> upstream/4.3_primoc
 #include "ext4_jbd2.h"
 #include "xattr.h"
 #include "acl.h"
@@ -117,6 +121,38 @@ static struct file_system_type ext3_fs_type = {
 #define IS_EXT3_SB(sb) (0)
 #endif
 
+<<<<<<< HEAD
+=======
+void *ext4_kvmalloc(size_t size, gfp_t flags)
+{
+	void *ret;
+
+	ret = kmalloc(size, flags);
+	if (!ret)
+		ret = __vmalloc(size, flags, PAGE_KERNEL);
+	return ret;
+}
+
+void *ext4_kvzalloc(size_t size, gfp_t flags)
+{
+	void *ret;
+
+	ret = kzalloc(size, flags);
+	if (!ret)
+		ret = __vmalloc(size, flags | __GFP_ZERO, PAGE_KERNEL);
+	return ret;
+}
+
+void ext4_kvfree(void *ptr)
+{
+	if (is_vmalloc_addr(ptr))
+		vfree(ptr);
+	else
+		kfree(ptr);
+
+}
+
+>>>>>>> upstream/4.3_primoc
 ext4_fsblk_t ext4_block_bitmap(struct super_block *sb,
 			       struct ext4_group_desc *bg)
 {
@@ -141,8 +177,13 @@ ext4_fsblk_t ext4_inode_table(struct super_block *sb,
 		 (ext4_fsblk_t)le32_to_cpu(bg->bg_inode_table_hi) << 32 : 0);
 }
 
+<<<<<<< HEAD
 __u32 ext4_free_blks_count(struct super_block *sb,
 			      struct ext4_group_desc *bg)
+=======
+__u32 ext4_free_group_clusters(struct super_block *sb,
+			       struct ext4_group_desc *bg)
+>>>>>>> upstream/4.3_primoc
 {
 	return le16_to_cpu(bg->bg_free_blocks_count_lo) |
 		(EXT4_DESC_SIZE(sb) >= EXT4_MIN_DESC_SIZE_64BIT ?
@@ -197,8 +238,13 @@ void ext4_inode_table_set(struct super_block *sb,
 		bg->bg_inode_table_hi = cpu_to_le32(blk >> 32);
 }
 
+<<<<<<< HEAD
 void ext4_free_blks_set(struct super_block *sb,
 			  struct ext4_group_desc *bg, __u32 count)
+=======
+void ext4_free_group_clusters_set(struct super_block *sb,
+				  struct ext4_group_desc *bg, __u32 count)
+>>>>>>> upstream/4.3_primoc
 {
 	bg->bg_free_blocks_count_lo = cpu_to_le16((__u16)count);
 	if (EXT4_DESC_SIZE(sb) >= EXT4_MIN_DESC_SIZE_64BIT)
@@ -276,6 +322,10 @@ handle_t *ext4_journal_start_sb(struct super_block *sb, int nblocks)
 	journal_t *journal;
 	handle_t  *handle;
 
+<<<<<<< HEAD
+=======
+	trace_ext4_journal_start(sb, nblocks, _RET_IP_);
+>>>>>>> upstream/4.3_primoc
 	if (sb->s_flags & MS_RDONLY)
 		return ERR_PTR(-EROFS);
 
@@ -391,6 +441,25 @@ static void save_error_info(struct super_block *sb, const char *func,
 	ext4_commit_super(sb, 1);
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * The del_gendisk() function uninitializes the disk-specific data
+ * structures, including the bdi structure, without telling anyone
+ * else.  Once this happens, any attempt to call mark_buffer_dirty()
+ * (for example, by ext4_commit_super), will cause a kernel OOPS.
+ * This is a kludge to prevent these oops until we can put in a proper
+ * hook in del_gendisk() to inform the VFS and file system layers.
+ */
+static int block_device_ejected(struct super_block *sb)
+{
+	struct inode *bd_inode = sb->s_bdev->bd_inode;
+	struct backing_dev_info *bdi = bd_inode->i_mapping->backing_dev_info;
+
+	return bdi->dev == NULL;
+}
+
+>>>>>>> upstream/4.3_primoc
 
 /* Deal with the reporting of failure conditions on a filesystem such as
  * inconsistencies detected or read IO failures.
@@ -838,6 +907,7 @@ static void ext4_put_super(struct super_block *sb)
 
 	for (i = 0; i < sbi->s_gdb_count; i++)
 		brelse(sbi->s_group_desc[i]);
+<<<<<<< HEAD
 	kfree(sbi->s_group_desc);
 	if (is_vmalloc_addr(sbi->s_flex_groups))
 		vfree(sbi->s_flex_groups);
@@ -847,6 +917,14 @@ static void ext4_put_super(struct super_block *sb)
 	percpu_counter_destroy(&sbi->s_freeinodes_counter);
 	percpu_counter_destroy(&sbi->s_dirs_counter);
 	percpu_counter_destroy(&sbi->s_dirtyblocks_counter);
+=======
+	ext4_kvfree(sbi->s_group_desc);
+	ext4_kvfree(sbi->s_flex_groups);
+	percpu_counter_destroy(&sbi->s_freeclusters_counter);
+	percpu_counter_destroy(&sbi->s_freeinodes_counter);
+	percpu_counter_destroy(&sbi->s_dirs_counter);
+	percpu_counter_destroy(&sbi->s_dirtyclusters_counter);
+>>>>>>> upstream/4.3_primoc
 	brelse(sbi->s_sbh);
 #ifdef CONFIG_QUOTA
 	for (i = 0; i < MAXQUOTAS; i++)
@@ -936,7 +1014,10 @@ static int ext4_drop_inode(struct inode *inode)
 static void ext4_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(ext4_inode_cachep, EXT4_I(inode));
 }
 
@@ -1080,8 +1161,11 @@ static int ext4_show_options(struct seq_file *seq, struct vfsmount *vfs)
 		seq_puts(seq, ",nouid32");
 	if (test_opt(sb, DEBUG) && !(def_mount_opts & EXT4_DEFM_DEBUG))
 		seq_puts(seq, ",debug");
+<<<<<<< HEAD
 	if (test_opt(sb, OLDALLOC))
 		seq_puts(seq, ",oldalloc");
+=======
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_EXT4_FS_XATTR
 	if (test_opt(sb, XATTR_USER))
 		seq_puts(seq, ",user_xattr");
@@ -1589,10 +1673,19 @@ static int parse_options(char *options, struct super_block *sb,
 			set_opt(sb, DEBUG);
 			break;
 		case Opt_oldalloc:
+<<<<<<< HEAD
 			set_opt(sb, OLDALLOC);
 			break;
 		case Opt_orlov:
 			clear_opt(sb, OLDALLOC);
+=======
+			ext4_msg(sb, KERN_WARNING,
+				 "Ignoring deprecated oldalloc option");
+			break;
+		case Opt_orlov:
+			ext4_msg(sb, KERN_WARNING,
+				 "Ignoring deprecated orlov option");
+>>>>>>> upstream/4.3_primoc
 			break;
 #ifdef CONFIG_EXT4_FS_XATTR
 		case Opt_user_xattr:
@@ -1688,7 +1781,13 @@ static int parse_options(char *options, struct super_block *sb,
 			data_opt = EXT4_MOUNT_WRITEBACK_DATA;
 		datacheck:
 			if (is_remount) {
+<<<<<<< HEAD
 				if (test_opt(sb, DATA_FLAGS) != data_opt) {
+=======
+				if (!sbi->s_journal)
+					ext4_msg(sb, KERN_WARNING, "Remounting file system with no journal so ignoring journalled data option");
+				else if (test_opt(sb, DATA_FLAGS) != data_opt) {
+>>>>>>> upstream/4.3_primoc
 					ext4_msg(sb, KERN_ERR,
 						"Cannot change data mode on remount");
 					return 0;
@@ -1823,6 +1922,10 @@ set_qf_format:
 			break;
 		case Opt_nodelalloc:
 			clear_opt(sb, DELALLOC);
+<<<<<<< HEAD
+=======
+			clear_opt2(sb, EXPLICIT_DELALLOC);
+>>>>>>> upstream/4.3_primoc
 			break;
 		case Opt_mblk_io_submit:
 			set_opt(sb, MBLK_IO_SUBMIT);
@@ -1839,6 +1942,10 @@ set_qf_format:
 			break;
 		case Opt_delalloc:
 			set_opt(sb, DELALLOC);
+<<<<<<< HEAD
+=======
+			set_opt2(sb, EXPLICIT_DELALLOC);
+>>>>>>> upstream/4.3_primoc
 			break;
 		case Opt_block_validity:
 			set_opt(sb, BLOCK_VALIDITY);
@@ -1957,7 +2064,11 @@ static int ext4_setup_super(struct super_block *sb, struct ext4_super_block *es,
 		res = MS_RDONLY;
 	}
 	if (read_only)
+<<<<<<< HEAD
 		return res;
+=======
+		goto done;
+>>>>>>> upstream/4.3_primoc
 	if (!(sbi->s_mount_state & EXT4_VALID_FS))
 		ext4_msg(sb, KERN_WARNING, "warning: mounting unchecked fs, "
 			 "running e2fsck is recommended");
@@ -1988,6 +2099,10 @@ static int ext4_setup_super(struct super_block *sb, struct ext4_super_block *es,
 		EXT4_SET_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
 
 	ext4_commit_super(sb, 1);
+<<<<<<< HEAD
+=======
+done:
+>>>>>>> upstream/4.3_primoc
 	if (test_opt(sb, DEBUG))
 		printk(KERN_INFO "[EXT4 FS bs=%lu, gc=%u, "
 				"bpg=%lu, ipg=%lu, mo=%04x, mo2=%04x]\n",
@@ -2023,6 +2138,7 @@ static int ext4_fill_flex_info(struct super_block *sb)
 			((le16_to_cpu(sbi->s_es->s_reserved_gdt_blocks) + 1) <<
 			      EXT4_DESC_PER_BLOCK_BITS(sb))) / groups_per_flex;
 	size = flex_group_count * sizeof(struct flex_groups);
+<<<<<<< HEAD
 	sbi->s_flex_groups = kzalloc(size, GFP_KERNEL);
 	if (sbi->s_flex_groups == NULL) {
 		sbi->s_flex_groups = vzalloc(size);
@@ -2032,6 +2148,13 @@ static int ext4_fill_flex_info(struct super_block *sb)
 				 flex_group_count);
 			goto failed;
 		}
+=======
+	sbi->s_flex_groups = ext4_kvzalloc(size, GFP_KERNEL);
+	if (sbi->s_flex_groups == NULL) {
+		ext4_msg(sb, KERN_ERR, "not enough memory for %u flex groups",
+			 flex_group_count);
+		goto failed;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	for (i = 0; i < sbi->s_groups_count; i++) {
@@ -2040,8 +2163,13 @@ static int ext4_fill_flex_info(struct super_block *sb)
 		flex_group = ext4_flex_group(sbi, i);
 		atomic_add(ext4_free_inodes_count(sb, gdp),
 			   &sbi->s_flex_groups[flex_group].free_inodes);
+<<<<<<< HEAD
 		atomic_add(ext4_free_blks_count(sb, gdp),
 			   &sbi->s_flex_groups[flex_group].free_blocks);
+=======
+		atomic_add(ext4_free_group_clusters(sb, gdp),
+			   &sbi->s_flex_groups[flex_group].free_clusters);
+>>>>>>> upstream/4.3_primoc
 		atomic_add(ext4_used_dirs_count(sb, gdp),
 			   &sbi->s_flex_groups[flex_group].used_dirs);
 	}
@@ -2159,7 +2287,12 @@ static int ext4_check_descriptors(struct super_block *sb,
 	if (NULL != first_not_zeroed)
 		*first_not_zeroed = grp;
 
+<<<<<<< HEAD
 	ext4_free_blocks_count_set(sbi->s_es, ext4_count_free_blocks(sb));
+=======
+	ext4_free_blocks_count_set(sbi->s_es,
+				   EXT4_C2B(sbi, ext4_count_free_clusters(sb)));
+>>>>>>> upstream/4.3_primoc
 	sbi->s_es->s_free_inodes_count =cpu_to_le32(ext4_count_free_inodes(sb));
 	return 1;
 }
@@ -2432,6 +2565,7 @@ static unsigned long ext4_get_stripe_size(struct ext4_sb_info *sbi)
 	unsigned long stride = le16_to_cpu(sbi->s_es->s_raid_stride);
 	unsigned long stripe_width =
 			le32_to_cpu(sbi->s_es->s_raid_stripe_width);
+<<<<<<< HEAD
 
 	if (sbi->s_stripe && sbi->s_stripe <= sbi->s_blocks_per_group)
 		return sbi->s_stripe;
@@ -2443,6 +2577,27 @@ static unsigned long ext4_get_stripe_size(struct ext4_sb_info *sbi)
 		return stride;
 
 	return 0;
+=======
+	int ret;
+
+	if (sbi->s_stripe && sbi->s_stripe <= sbi->s_blocks_per_group)
+		ret = sbi->s_stripe;
+	else if (stripe_width <= sbi->s_blocks_per_group)
+		ret = stripe_width;
+	else if (stride <= sbi->s_blocks_per_group)
+		ret = stride;
+	else
+		ret = 0;
+
+	/*
+	 * If the stripe width is 1, this makes no sense and
+	 * we set it to 0 to turn off stripe handling code.
+	 */
+	if (ret <= 1)
+		ret = 0;
+
+	return ret;
+>>>>>>> upstream/4.3_primoc
 }
 
 /* sysfs supprt */
@@ -2473,7 +2628,12 @@ static ssize_t delayed_allocation_blocks_show(struct ext4_attr *a,
 					      char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%llu\n",
+<<<<<<< HEAD
 			(s64) percpu_counter_sum(&sbi->s_dirtyblocks_counter));
+=======
+		(s64) EXT4_C2B(sbi,
+			percpu_counter_sum(&sbi->s_dirtyclusters_counter)));
+>>>>>>> upstream/4.3_primoc
 }
 
 static ssize_t session_write_kbytes_show(struct ext4_attr *a,
@@ -2701,6 +2861,16 @@ static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 			return 0;
 		}
 	}
+<<<<<<< HEAD
+=======
+	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_BIGALLOC) &&
+	    !EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_EXTENTS)) {
+		ext4_msg(sb, KERN_ERR,
+			 "Can't support bigalloc feature without "
+			 "extents feature\n");
+		return 0;
+	}
+>>>>>>> upstream/4.3_primoc
 	return 1;
 }
 
@@ -3089,8 +3259,11 @@ static void ext4_destroy_lazyinit_thread(void)
 }
 
 static int ext4_fill_super(struct super_block *sb, void *data, int silent)
+<<<<<<< HEAD
 				__releases(kernel_lock)
 				__acquires(kernel_lock)
+=======
+>>>>>>> upstream/4.3_primoc
 {
 	char *orig_data = kstrdup(data, GFP_KERNEL);
 	struct buffer_head *bh;
@@ -3106,10 +3279,17 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	char *cp;
 	const char *descr;
 	int ret = -ENOMEM;
+<<<<<<< HEAD
 	int blocksize;
 	unsigned int db_count;
 	unsigned int i;
 	int needs_recovery, has_huge_files;
+=======
+	int blocksize, clustersize;
+	unsigned int db_count;
+	unsigned int i;
+	int needs_recovery, has_huge_files, has_bigalloc;
+>>>>>>> upstream/4.3_primoc
 	__u64 blocks_count;
 	int err;
 	unsigned int journal_ioprio = DEFAULT_JOURNAL_IOPRIO;
@@ -3243,6 +3423,36 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 			   &journal_ioprio, NULL, 0))
 		goto failed_mount;
 
+<<<<<<< HEAD
+=======
+	if (test_opt(sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA) {
+		printk_once(KERN_WARNING "EXT4-fs: Warning: mounting "
+			    "with data=journal disables delayed "
+			    "allocation and O_DIRECT support!\n");
+		if (test_opt2(sb, EXPLICIT_DELALLOC)) {
+			ext4_msg(sb, KERN_ERR, "can't mount with "
+				 "both data=journal and delalloc");
+			goto failed_mount;
+		}
+		if (test_opt(sb, DIOREAD_NOLOCK)) {
+			ext4_msg(sb, KERN_ERR, "can't mount with "
+				 "both data=journal and delalloc");
+			goto failed_mount;
+		}
+		if (test_opt(sb, DELALLOC))
+			clear_opt(sb, DELALLOC);
+	}
+
+	blocksize = BLOCK_SIZE << le32_to_cpu(es->s_log_block_size);
+	if (test_opt(sb, DIOREAD_NOLOCK)) {
+		if (blocksize < PAGE_SIZE) {
+			ext4_msg(sb, KERN_ERR, "can't mount with "
+				 "dioread_nolock if block size != PAGE_SIZE");
+			goto failed_mount;
+		}
+	}
+
+>>>>>>> upstream/4.3_primoc
 	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
 		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
 
@@ -3284,8 +3494,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	if (!ext4_feature_set_ok(sb, (sb->s_flags & MS_RDONLY)))
 		goto failed_mount;
 
+<<<<<<< HEAD
 	blocksize = BLOCK_SIZE << le32_to_cpu(es->s_log_block_size);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (blocksize < EXT4_MIN_BLOCK_SIZE ||
 	    blocksize > EXT4_MAX_BLOCK_SIZE) {
 		ext4_msg(sb, KERN_ERR,
@@ -3388,12 +3601,62 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		sb->s_dirt = 1;
 	}
 
+<<<<<<< HEAD
 	if (sbi->s_blocks_per_group > blocksize * 8) {
 		ext4_msg(sb, KERN_ERR,
 		       "#blocks per group too big: %lu",
 		       sbi->s_blocks_per_group);
 		goto failed_mount;
 	}
+=======
+	/* Handle clustersize */
+	clustersize = BLOCK_SIZE << le32_to_cpu(es->s_log_cluster_size);
+	has_bigalloc = EXT4_HAS_RO_COMPAT_FEATURE(sb,
+				EXT4_FEATURE_RO_COMPAT_BIGALLOC);
+	if (has_bigalloc) {
+		if (clustersize < blocksize) {
+			ext4_msg(sb, KERN_ERR,
+				 "cluster size (%d) smaller than "
+				 "block size (%d)", clustersize, blocksize);
+			goto failed_mount;
+		}
+		sbi->s_cluster_bits = le32_to_cpu(es->s_log_cluster_size) -
+			le32_to_cpu(es->s_log_block_size);
+		sbi->s_clusters_per_group =
+			le32_to_cpu(es->s_clusters_per_group);
+		if (sbi->s_clusters_per_group > blocksize * 8) {
+			ext4_msg(sb, KERN_ERR,
+				 "#clusters per group too big: %lu",
+				 sbi->s_clusters_per_group);
+			goto failed_mount;
+		}
+		if (sbi->s_blocks_per_group !=
+		    (sbi->s_clusters_per_group * (clustersize / blocksize))) {
+			ext4_msg(sb, KERN_ERR, "blocks per group (%lu) and "
+				 "clusters per group (%lu) inconsistent",
+				 sbi->s_blocks_per_group,
+				 sbi->s_clusters_per_group);
+			goto failed_mount;
+		}
+	} else {
+		if (clustersize != blocksize) {
+			ext4_warning(sb, "fragment/cluster size (%d) != "
+				     "block size (%d)", clustersize,
+				     blocksize);
+			clustersize = blocksize;
+		}
+		if (sbi->s_blocks_per_group > blocksize * 8) {
+			ext4_msg(sb, KERN_ERR,
+				 "#blocks per group too big: %lu",
+				 sbi->s_blocks_per_group);
+			goto failed_mount;
+		}
+		sbi->s_clusters_per_group = sbi->s_blocks_per_group;
+		sbi->s_cluster_bits = 0;
+	}
+	sbi->s_cluster_ratio = clustersize / blocksize;
+
+>>>>>>> upstream/4.3_primoc
 	if (sbi->s_inodes_per_group > blocksize * 8) {
 		ext4_msg(sb, KERN_ERR,
 		       "#inodes per group too big: %lu",
@@ -3433,7 +3696,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	 * of the filesystem.
 	 */
 	if (le32_to_cpu(es->s_first_data_block) >= ext4_blocks_count(es)) {
+<<<<<<< HEAD
                 ext4_msg(sb, KERN_WARNING, "bad geometry: first data"
+=======
+		ext4_msg(sb, KERN_WARNING, "bad geometry: first data "
+>>>>>>> upstream/4.3_primoc
 			 "block %u is beyond end of filesystem (%llu)",
 			 le32_to_cpu(es->s_first_data_block),
 			 ext4_blocks_count(es));
@@ -3457,17 +3724,28 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 			(EXT4_MAX_BLOCK_FILE_PHYS / EXT4_BLOCKS_PER_GROUP(sb)));
 	db_count = (sbi->s_groups_count + EXT4_DESC_PER_BLOCK(sb) - 1) /
 		   EXT4_DESC_PER_BLOCK(sb);
+<<<<<<< HEAD
 	sbi->s_group_desc = kmalloc(db_count * sizeof(struct buffer_head *),
 				    GFP_KERNEL);
+=======
+	sbi->s_group_desc = ext4_kvmalloc(db_count *
+					  sizeof(struct buffer_head *),
+					  GFP_KERNEL);
+>>>>>>> upstream/4.3_primoc
 	if (sbi->s_group_desc == NULL) {
 		ext4_msg(sb, KERN_ERR, "not enough memory");
 		goto failed_mount;
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_PROC_FS
 	if (ext4_proc_root)
 		sbi->s_proc = proc_mkdir(sb->s_id, ext4_proc_root);
 #endif
+=======
+	if (ext4_proc_root)
+		sbi->s_proc = proc_mkdir(sb->s_id, ext4_proc_root);
+>>>>>>> upstream/4.3_primoc
 
 	bgl_lock_init(sbi->s_blockgroup_lock);
 
@@ -3501,8 +3779,13 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->s_err_report.function = print_daily_error_info;
 	sbi->s_err_report.data = (unsigned long) sb;
 
+<<<<<<< HEAD
 	err = percpu_counter_init(&sbi->s_freeblocks_counter,
 			ext4_count_free_blocks(sb));
+=======
+	err = percpu_counter_init(&sbi->s_freeclusters_counter,
+			ext4_count_free_clusters(sb));
+>>>>>>> upstream/4.3_primoc
 	if (!err) {
 		err = percpu_counter_init(&sbi->s_freeinodes_counter,
 				ext4_count_free_inodes(sb));
@@ -3512,7 +3795,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 				ext4_count_dirs(sb));
 	}
 	if (!err) {
+<<<<<<< HEAD
 		err = percpu_counter_init(&sbi->s_dirtyblocks_counter, 0);
+=======
+		err = percpu_counter_init(&sbi->s_dirtyclusters_counter, 0);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (err) {
 		ext4_msg(sb, KERN_ERR, "insufficient memory");
@@ -3540,7 +3827,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 
 	INIT_LIST_HEAD(&sbi->s_orphan); /* unlinked but open files */
 	mutex_init(&sbi->s_orphan_lock);
+<<<<<<< HEAD
 	mutex_init(&sbi->s_resize_lock);
+=======
+	sbi->s_resize_flags = 0;
+>>>>>>> upstream/4.3_primoc
 
 	sb->s_root = NULL;
 
@@ -3627,13 +3918,22 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	 * The journal may have updated the bg summary counts, so we
 	 * need to update the global counters.
 	 */
+<<<<<<< HEAD
 	percpu_counter_set(&sbi->s_freeblocks_counter,
 			   ext4_count_free_blocks(sb));
+=======
+	percpu_counter_set(&sbi->s_freeclusters_counter,
+			   ext4_count_free_clusters(sb));
+>>>>>>> upstream/4.3_primoc
 	percpu_counter_set(&sbi->s_freeinodes_counter,
 			   ext4_count_free_inodes(sb));
 	percpu_counter_set(&sbi->s_dirs_counter,
 			   ext4_count_dirs(sb));
+<<<<<<< HEAD
 	percpu_counter_set(&sbi->s_dirtyblocks_counter, 0);
+=======
+	percpu_counter_set(&sbi->s_dirtyclusters_counter, 0);
+>>>>>>> upstream/4.3_primoc
 
 no_journal:
 	/*
@@ -3698,6 +3998,7 @@ no_journal:
 			 "available");
 	}
 
+<<<<<<< HEAD
 	if (test_opt(sb, DELALLOC) &&
 	    (test_opt(sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA)) {
 		ext4_msg(sb, KERN_WARNING, "Ignoring delalloc option - "
@@ -3717,6 +4018,8 @@ no_journal:
 		}
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	err = ext4_setup_system_zone(sb);
 	if (err) {
 		ext4_msg(sb, KERN_ERR, "failed to initialize system "
@@ -3794,6 +4097,7 @@ failed_mount_wq:
 	}
 failed_mount3:
 	del_timer(&sbi->s_err_report);
+<<<<<<< HEAD
 	if (sbi->s_flex_groups) {
 		if (is_vmalloc_addr(sbi->s_flex_groups))
 			vfree(sbi->s_flex_groups);
@@ -3804,12 +4108,24 @@ failed_mount3:
 	percpu_counter_destroy(&sbi->s_freeinodes_counter);
 	percpu_counter_destroy(&sbi->s_dirs_counter);
 	percpu_counter_destroy(&sbi->s_dirtyblocks_counter);
+=======
+	if (sbi->s_flex_groups)
+		ext4_kvfree(sbi->s_flex_groups);
+	percpu_counter_destroy(&sbi->s_freeclusters_counter);
+	percpu_counter_destroy(&sbi->s_freeinodes_counter);
+	percpu_counter_destroy(&sbi->s_dirs_counter);
+	percpu_counter_destroy(&sbi->s_dirtyclusters_counter);
+>>>>>>> upstream/4.3_primoc
 	if (sbi->s_mmp_tsk)
 		kthread_stop(sbi->s_mmp_tsk);
 failed_mount2:
 	for (i = 0; i < db_count; i++)
 		brelse(sbi->s_group_desc[i]);
+<<<<<<< HEAD
 	kfree(sbi->s_group_desc);
+=======
+	ext4_kvfree(sbi->s_group_desc);
+>>>>>>> upstream/4.3_primoc
 failed_mount:
 	if (sbi->s_proc) {
 		remove_proc_entry(sb->s_id, ext4_proc_root);
@@ -4090,7 +4406,11 @@ static int ext4_commit_super(struct super_block *sb, int sync)
 	struct buffer_head *sbh = EXT4_SB(sb)->s_sbh;
 	int error = 0;
 
+<<<<<<< HEAD
 	if (!sbh)
+=======
+	if (!sbh || block_device_ejected(sb))
+>>>>>>> upstream/4.3_primoc
 		return error;
 	if (buffer_write_io_error(sbh)) {
 		/*
@@ -4126,8 +4446,14 @@ static int ext4_commit_super(struct super_block *sb, int sync)
 	else
 		es->s_kbytes_written =
 			cpu_to_le64(EXT4_SB(sb)->s_kbytes_written);
+<<<<<<< HEAD
 	ext4_free_blocks_count_set(es, percpu_counter_sum_positive(
 					   &EXT4_SB(sb)->s_freeblocks_counter));
+=======
+	ext4_free_blocks_count_set(es,
+			EXT4_C2B(EXT4_SB(sb), percpu_counter_sum_positive(
+				&EXT4_SB(sb)->s_freeclusters_counter)));
+>>>>>>> upstream/4.3_primoc
 	es->s_free_inodes_count =
 		cpu_to_le32(percpu_counter_sum_positive(
 				&EXT4_SB(sb)->s_freeinodes_counter));
@@ -4532,16 +4858,43 @@ restore_opts:
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Note: calculating the overhead so we can be compatible with
+ * historical BSD practice is quite difficult in the face of
+ * clusters/bigalloc.  This is because multiple metadata blocks from
+ * different block group can end up in the same allocation cluster.
+ * Calculating the exact overhead in the face of clustered allocation
+ * requires either O(all block bitmaps) in memory or O(number of block
+ * groups**2) in time.  We will still calculate the superblock for
+ * older file systems --- and if we come across with a bigalloc file
+ * system with zero in s_overhead_clusters the estimate will be close to
+ * correct especially for very large cluster sizes --- but for newer
+ * file systems, it's better to calculate this figure once at mkfs
+ * time, and store it in the superblock.  If the superblock value is
+ * present (even for non-bigalloc file systems), we will use it.
+ */
+>>>>>>> upstream/4.3_primoc
 static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
 	struct super_block *sb = dentry->d_sb;
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	struct ext4_super_block *es = sbi->s_es;
+<<<<<<< HEAD
+=======
+	struct ext4_group_desc *gdp;
+>>>>>>> upstream/4.3_primoc
 	u64 fsid;
 	s64 bfree;
 
 	if (test_opt(sb, MINIX_DF)) {
 		sbi->s_overhead_last = 0;
+<<<<<<< HEAD
+=======
+	} else if (es->s_overhead_clusters) {
+		sbi->s_overhead_last = le32_to_cpu(es->s_overhead_clusters);
+>>>>>>> upstream/4.3_primoc
 	} else if (sbi->s_blocks_last != ext4_blocks_count(es)) {
 		ext4_group_t i, ngroups = ext4_get_groups_count(sb);
 		ext4_fsblk_t overhead = 0;
@@ -4556,6 +4909,7 @@ static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 		 * All of the blocks before first_data_block are
 		 * overhead
 		 */
+<<<<<<< HEAD
 		overhead = le32_to_cpu(es->s_first_data_block);
 
 		/*
@@ -4574,6 +4928,18 @@ static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 		 * bitmap, and an inode table.
 		 */
 		overhead += ngroups * (2 + sbi->s_itb_per_group);
+=======
+		overhead = EXT4_B2C(sbi, le32_to_cpu(es->s_first_data_block));
+
+		/*
+		 * Add the overhead found in each block group
+		 */
+		for (i = 0; i < ngroups; i++) {
+			gdp = ext4_get_group_desc(sb, i, NULL);
+			overhead += ext4_num_overhead_clusters(sb, i, gdp);
+			cond_resched();
+		}
+>>>>>>> upstream/4.3_primoc
 		sbi->s_overhead_last = overhead;
 		smp_wmb();
 		sbi->s_blocks_last = ext4_blocks_count(es);
@@ -4581,11 +4947,20 @@ static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 
 	buf->f_type = EXT4_SUPER_MAGIC;
 	buf->f_bsize = sb->s_blocksize;
+<<<<<<< HEAD
 	buf->f_blocks = ext4_blocks_count(es) - sbi->s_overhead_last;
 	bfree = percpu_counter_sum_positive(&sbi->s_freeblocks_counter) -
 		       percpu_counter_sum_positive(&sbi->s_dirtyblocks_counter);
 	/* prevent underflow in case that few free space is available */
 	buf->f_bfree = max_t(s64, bfree, 0);
+=======
+	buf->f_blocks = (ext4_blocks_count(es) -
+			 EXT4_C2B(sbi, sbi->s_overhead_last));
+	bfree = percpu_counter_sum_positive(&sbi->s_freeclusters_counter) -
+		percpu_counter_sum_positive(&sbi->s_dirtyclusters_counter);
+	/* prevent underflow in case that few free space is available */
+	buf->f_bfree = EXT4_C2B(sbi, max_t(s64, bfree, 0));
+>>>>>>> upstream/4.3_primoc
 	buf->f_bavail = buf->f_bfree - ext4_r_blocks_count(es);
 	if (buf->f_bfree < ext4_r_blocks_count(es))
 		buf->f_bavail = 0;
@@ -4720,7 +5095,11 @@ static int ext4_quota_on(struct super_block *sb, int type, int format_id,
 		return -EINVAL;
 
 	/* Quotafile not on the same filesystem? */
+<<<<<<< HEAD
 	if (path->mnt->mnt_sb != sb)
+=======
+	if (path->dentry->d_sb != sb)
+>>>>>>> upstream/4.3_primoc
 		return -EXDEV;
 	/* Journaling quota? */
 	if (EXT4_SB(sb)->s_qf_names[type]) {
@@ -5006,6 +5385,7 @@ static int __init ext4_init_fs(void)
 		return err;
 	err = ext4_init_system_zone();
 	if (err)
+<<<<<<< HEAD
 		goto out7;
 	ext4_kset = kset_create_and_add("ext4", NULL, fs_kobj);
 	if (!ext4_kset)
@@ -5013,6 +5393,13 @@ static int __init ext4_init_fs(void)
 	ext4_proc_root = proc_mkdir("fs/ext4", NULL);
 	if (!ext4_proc_root)
 		goto out5;
+=======
+		goto out6;
+	ext4_kset = kset_create_and_add("ext4", NULL, fs_kobj);
+	if (!ext4_kset)
+		goto out5;
+	ext4_proc_root = proc_mkdir("fs/ext4", NULL);
+>>>>>>> upstream/4.3_primoc
 
 	err = ext4_init_feat_adverts();
 	if (err)
@@ -5048,12 +5435,21 @@ out2:
 out3:
 	ext4_exit_feat_adverts();
 out4:
+<<<<<<< HEAD
 	remove_proc_entry("fs/ext4", NULL);
 out5:
 	kset_unregister(ext4_kset);
 out6:
 	ext4_exit_system_zone();
 out7:
+=======
+	if (ext4_proc_root)
+		remove_proc_entry("fs/ext4", NULL);
+	kset_unregister(ext4_kset);
+out5:
+	ext4_exit_system_zone();
+out6:
+>>>>>>> upstream/4.3_primoc
 	ext4_exit_pageio();
 	return err;
 }

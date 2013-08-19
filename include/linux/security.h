@@ -36,6 +36,10 @@
 #include <linux/key.h>
 #include <linux/xfrm.h>
 #include <linux/slab.h>
+<<<<<<< HEAD
+=======
+#include <linux/xattr.h>
+>>>>>>> upstream/4.3_primoc
 #include <net/flow.h>
 
 /* Maximum number of letters for an LSM name string */
@@ -147,6 +151,13 @@ extern int mmap_min_addr_handler(struct ctl_table *table, int write,
 				 void __user *buffer, size_t *lenp, loff_t *ppos);
 #endif
 
+<<<<<<< HEAD
+=======
+/* security_inode_init_security callback function to write xattrs */
+typedef int (*initxattrs) (struct inode *inode,
+			   const struct xattr *xattr_array, void *fs_data);
+
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_SECURITY
 
 struct security_mnt_opts {
@@ -1375,6 +1386,14 @@ static inline void security_free_mnt_opts(struct security_mnt_opts *opts)
 struct security_operations {
 	char name[SECURITY_NAME_MAX + 1];
 
+<<<<<<< HEAD
+=======
+	int (*binder_set_context_mgr) (struct task_struct *mgr);
+	int (*binder_transaction) (struct task_struct *from, struct task_struct *to);
+	int (*binder_transfer_binder) (struct task_struct *from, struct task_struct *to);
+	int (*binder_transfer_file) (struct task_struct *from, struct task_struct *to, struct file *file);
+
+>>>>>>> upstream/4.3_primoc
 	int (*ptrace_access_check) (struct task_struct *child, unsigned int mode);
 	int (*ptrace_traceme) (struct task_struct *parent);
 	int (*capget) (struct task_struct *target,
@@ -1442,7 +1461,11 @@ struct security_operations {
 				    const struct qstr *qstr, char **name,
 				    void **value, size_t *len);
 	int (*inode_create) (struct inode *dir,
+<<<<<<< HEAD
 			     struct dentry *dentry, int mode);
+=======
+			     struct dentry *dentry, umode_t mode);
+>>>>>>> upstream/4.3_primoc
 	int (*inode_link) (struct dentry *old_dentry,
 			   struct inode *dir, struct dentry *new_dentry);
 	int (*inode_unlink) (struct inode *dir, struct dentry *dentry);
@@ -1451,7 +1474,11 @@ struct security_operations {
 	int (*inode_mkdir) (struct inode *dir, struct dentry *dentry, int mode);
 	int (*inode_rmdir) (struct inode *dir, struct dentry *dentry);
 	int (*inode_mknod) (struct inode *dir, struct dentry *dentry,
+<<<<<<< HEAD
 			    int mode, dev_t dev);
+=======
+			    umode_t mode, dev_t dev);
+>>>>>>> upstream/4.3_primoc
 	int (*inode_rename) (struct inode *old_dir, struct dentry *old_dentry,
 			     struct inode *new_dir, struct dentry *new_dentry);
 	int (*inode_readlink) (struct dentry *dentry);
@@ -1657,6 +1684,13 @@ extern int security_module_enable(struct security_operations *ops);
 extern int register_security(struct security_operations *ops);
 
 /* Security operations */
+<<<<<<< HEAD
+=======
+int security_binder_set_context_mgr(struct task_struct *mgr);
+int security_binder_transaction(struct task_struct *from, struct task_struct *to);
+int security_binder_transfer_binder(struct task_struct *from, struct task_struct *to);
+int security_binder_transfer_file(struct task_struct *from, struct task_struct *to, struct file *file);
+>>>>>>> upstream/4.3_primoc
 int security_ptrace_access_check(struct task_struct *child, unsigned int mode);
 int security_ptrace_traceme(struct task_struct *parent);
 int security_capget(struct task_struct *target,
@@ -1704,9 +1738,18 @@ int security_sb_parse_opts_str(char *options, struct security_mnt_opts *opts);
 int security_inode_alloc(struct inode *inode);
 void security_inode_free(struct inode *inode);
 int security_inode_init_security(struct inode *inode, struct inode *dir,
+<<<<<<< HEAD
 				 const struct qstr *qstr, char **name,
 				 void **value, size_t *len);
 int security_inode_create(struct inode *dir, struct dentry *dentry, int mode);
+=======
+				 const struct qstr *qstr,
+				 initxattrs initxattrs, void *fs_data);
+int security_old_inode_init_security(struct inode *inode, struct inode *dir,
+				     const struct qstr *qstr, char **name,
+				     void **value, size_t *len);
+int security_inode_create(struct inode *dir, struct dentry *dentry, umode_t mode);
+>>>>>>> upstream/4.3_primoc
 int security_inode_link(struct dentry *old_dentry, struct inode *dir,
 			 struct dentry *new_dentry);
 int security_inode_unlink(struct inode *dir, struct dentry *dentry);
@@ -1714,13 +1757,20 @@ int security_inode_symlink(struct inode *dir, struct dentry *dentry,
 			   const char *old_name);
 int security_inode_mkdir(struct inode *dir, struct dentry *dentry, int mode);
 int security_inode_rmdir(struct inode *dir, struct dentry *dentry);
+<<<<<<< HEAD
 int security_inode_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev);
+=======
+int security_inode_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev);
+>>>>>>> upstream/4.3_primoc
 int security_inode_rename(struct inode *old_dir, struct dentry *old_dentry,
 			  struct inode *new_dir, struct dentry *new_dentry);
 int security_inode_readlink(struct dentry *dentry);
 int security_inode_follow_link(struct dentry *dentry, struct nameidata *nd);
 int security_inode_permission(struct inode *inode, int mask);
+<<<<<<< HEAD
 int security_inode_exec_permission(struct inode *inode, unsigned int flags);
+=======
+>>>>>>> upstream/4.3_primoc
 int security_inode_setattr(struct dentry *dentry, struct iattr *attr);
 int security_inode_getattr(struct vfsmount *mnt, struct dentry *dentry);
 int security_inode_setxattr(struct dentry *dentry, const char *name,
@@ -1837,6 +1887,29 @@ static inline int security_init(void)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static inline int security_binder_set_context_mgr(struct task_struct *mgr)
+{
+	return 0;
+}
+
+static inline int security_binder_transaction(struct task_struct *from, struct task_struct *to)
+{
+	return 0;
+}
+
+static inline int security_binder_transfer_binder(struct task_struct *from, struct task_struct *to)
+{
+	return 0;
+}
+
+static inline int security_binder_transfer_file(struct task_struct *from, struct task_struct *to, struct file *file)
+{
+	return 0;
+}
+
+>>>>>>> upstream/4.3_primoc
 static inline int security_ptrace_access_check(struct task_struct *child,
 					     unsigned int mode)
 {
@@ -2035,16 +2108,25 @@ static inline void security_inode_free(struct inode *inode)
 static inline int security_inode_init_security(struct inode *inode,
 						struct inode *dir,
 						const struct qstr *qstr,
+<<<<<<< HEAD
 						char **name,
 						void **value,
 						size_t *len)
+=======
+						initxattrs initxattrs,
+						void *fs_data)
+>>>>>>> upstream/4.3_primoc
 {
 	return -EOPNOTSUPP;
 }
 
 static inline int security_inode_create(struct inode *dir,
 					 struct dentry *dentry,
+<<<<<<< HEAD
 					 int mode)
+=======
+					 umode_t mode)
+>>>>>>> upstream/4.3_primoc
 {
 	return 0;
 }
@@ -2113,12 +2195,15 @@ static inline int security_inode_permission(struct inode *inode, int mask)
 	return 0;
 }
 
+<<<<<<< HEAD
 static inline int security_inode_exec_permission(struct inode *inode,
 						  unsigned int flags)
 {
 	return 0;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static inline int security_inode_setattr(struct dentry *dentry,
 					  struct iattr *attr)
 {

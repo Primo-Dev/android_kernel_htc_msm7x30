@@ -42,6 +42,10 @@
 #include "acl.h"
 
 static int ext3_writepage_trans_blocks(struct inode *inode);
+<<<<<<< HEAD
+=======
+static int ext3_block_truncate_page(struct inode *inode, loff_t from);
+>>>>>>> upstream/4.3_primoc
 
 /*
  * Test whether an inode is a fast symlink.
@@ -194,6 +198,10 @@ static int truncate_restart_transaction(handle_t *handle, struct inode *inode)
  */
 void ext3_evict_inode (struct inode *inode)
 {
+<<<<<<< HEAD
+=======
+	struct ext3_inode_info *ei = EXT3_I(inode);
+>>>>>>> upstream/4.3_primoc
 	struct ext3_block_alloc_info *rsv;
 	handle_t *handle;
 	int want_delete = 0;
@@ -203,11 +211,48 @@ void ext3_evict_inode (struct inode *inode)
 		want_delete = 1;
 	}
 
+<<<<<<< HEAD
 	truncate_inode_pages(&inode->i_data, 0);
 
 	ext3_discard_reservation(inode);
 	rsv = EXT3_I(inode)->i_block_alloc_info;
 	EXT3_I(inode)->i_block_alloc_info = NULL;
+=======
+	/*
+	 * When journalling data dirty buffers are tracked only in the journal.
+	 * So although mm thinks everything is clean and ready for reaping the
+	 * inode might still have some pages to write in the running
+	 * transaction or waiting to be checkpointed. Thus calling
+	 * journal_invalidatepage() (via truncate_inode_pages()) to discard
+	 * these buffers can cause data loss. Also even if we did not discard
+	 * these buffers, we would have no way to find them after the inode
+	 * is reaped and thus user could see stale data if he tries to read
+	 * them before the transaction is checkpointed. So be careful and
+	 * force everything to disk here... We use ei->i_datasync_tid to
+	 * store the newest transaction containing inode's data.
+	 *
+	 * Note that directories do not have this problem because they don't
+	 * use page cache.
+	 *
+	 * The s_journal check handles the case when ext3_get_journal() fails
+	 * and puts the journal inode.
+	 */
+	if (inode->i_nlink && ext3_should_journal_data(inode) &&
+	    EXT3_SB(inode->i_sb)->s_journal &&
+	    (S_ISLNK(inode->i_mode) || S_ISREG(inode->i_mode))) {
+		tid_t commit_tid = atomic_read(&ei->i_datasync_tid);
+		journal_t *journal = EXT3_SB(inode->i_sb)->s_journal;
+
+		log_start_commit(journal, commit_tid);
+		log_wait_commit(journal, commit_tid);
+		filemap_write_and_wait(&inode->i_data);
+	}
+	truncate_inode_pages(&inode->i_data, 0);
+
+	ext3_discard_reservation(inode);
+	rsv = ei->i_block_alloc_info;
+	ei->i_block_alloc_info = NULL;
+>>>>>>> upstream/4.3_primoc
 	if (unlikely(rsv))
 		kfree(rsv);
 
@@ -231,6 +276,7 @@ void ext3_evict_inode (struct inode *inode)
 	if (inode->i_blocks)
 		ext3_truncate(inode);
 	/*
+<<<<<<< HEAD
 	 * Kill off the orphan record which ext3_truncate created.
 	 * AKPM: I think this can be inside the above `if'.
 	 * Note that ext3_orphan_del() has to be able to cope with the
@@ -240,6 +286,15 @@ void ext3_evict_inode (struct inode *inode)
 	 */
 	ext3_orphan_del(handle, inode);
 	EXT3_I(inode)->i_dtime	= get_seconds();
+=======
+	 * Kill off the orphan record created when the inode lost the last
+	 * link.  Note that ext3_orphan_del() has to be able to cope with the
+	 * deletion of a non-existent orphan - ext3_truncate() could
+	 * have removed the record.
+	 */
+	ext3_orphan_del(handle, inode);
+	ei->i_dtime = get_seconds();
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * One subtle ordering requirement: if anything has gone wrong
@@ -886,6 +941,12 @@ int ext3_get_blocks_handle(handle_t *handle, struct inode *inode,
 	if (!create || err == -EIO)
 		goto cleanup;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Block out ext3_truncate while we alter the tree
+	 */
+>>>>>>> upstream/4.3_primoc
 	mutex_lock(&ei->truncate_mutex);
 
 	/*
@@ -934,9 +995,12 @@ int ext3_get_blocks_handle(handle_t *handle, struct inode *inode,
 	 */
 	count = ext3_blks_to_allocate(partial, indirect_blks,
 					maxblocks, blocks_to_boundary);
+<<<<<<< HEAD
 	/*
 	 * Block out ext3_truncate while we alter the tree
 	 */
+=======
+>>>>>>> upstream/4.3_primoc
 	err = ext3_alloc_branch(handle, inode, indirect_blks, &count, goal,
 				offsets + (partial - chain), partial);
 
@@ -1100,9 +1164,17 @@ struct buffer_head *ext3_bread(handle_t *handle, struct inode *inode,
 	bh = ext3_getblk(handle, inode, block, create, err);
 	if (!bh)
 		return bh;
+<<<<<<< HEAD
 	if (buffer_uptodate(bh))
 		return bh;
 	ll_rw_block(READ_META, 1, &bh);
+=======
+	if (bh_uptodate_or_lock(bh))
+		return bh;
+	get_bh(bh);
+	bh->b_end_io = end_buffer_read_sync;
+	submit_bh(READ | REQ_META | REQ_PRIO, bh);
+>>>>>>> upstream/4.3_primoc
 	wait_on_buffer(bh);
 	if (buffer_uptodate(bh))
 		return bh;
@@ -1202,6 +1274,19 @@ static void ext3_truncate_failed_write(struct inode *inode)
 	ext3_truncate(inode);
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Truncate blocks that were not used by direct IO write. We have to zero out
+ * the last file block as well because direct IO might have written to it.
+ */
+static void ext3_truncate_failed_direct_write(struct inode *inode)
+{
+	ext3_block_truncate_page(inode, inode->i_size);
+	ext3_truncate(inode);
+}
+
+>>>>>>> upstream/4.3_primoc
 static int ext3_write_begin(struct file *file, struct address_space *mapping,
 				loff_t pos, unsigned len, unsigned flags,
 				struct page **pagep, void **fsdata)
@@ -1391,6 +1476,10 @@ static int ext3_journalled_write_end(struct file *file,
 {
 	handle_t *handle = ext3_journal_current_handle();
 	struct inode *inode = mapping->host;
+<<<<<<< HEAD
+=======
+	struct ext3_inode_info *ei = EXT3_I(inode);
+>>>>>>> upstream/4.3_primoc
 	int ret = 0, ret2;
 	int partial = 0;
 	unsigned from, to;
@@ -1419,8 +1508,14 @@ static int ext3_journalled_write_end(struct file *file,
 	if (pos + len > inode->i_size && ext3_can_truncate(inode))
 		ext3_orphan_add(handle, inode);
 	ext3_set_inode_state(inode, EXT3_STATE_JDATA);
+<<<<<<< HEAD
 	if (inode->i_size > EXT3_I(inode)->i_disksize) {
 		EXT3_I(inode)->i_disksize = inode->i_size;
+=======
+	atomic_set(&ei->i_datasync_tid, handle->h_transaction->t_tid);
+	if (inode->i_size > ei->i_disksize) {
+		ei->i_disksize = inode->i_size;
+>>>>>>> upstream/4.3_primoc
 		ret2 = ext3_mark_inode_dirty(handle, inode);
 		if (!ret)
 			ret = ret2;
@@ -1568,7 +1663,17 @@ static int ext3_ordered_writepage(struct page *page,
 	int err;
 
 	J_ASSERT(PageLocked(page));
+<<<<<<< HEAD
 	WARN_ON_ONCE(IS_RDONLY(inode));
+=======
+	/*
+	 * We don't want to warn for emergency remount. The condition is
+	 * ordered to avoid dereferencing inode->i_sb in non-error case to
+	 * avoid slow-downs.
+	 */
+	WARN_ON_ONCE(IS_RDONLY(inode) &&
+		     !(EXT3_SB(inode->i_sb)->s_mount_state & EXT3_ERROR_FS));
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * We give up here if we're reentered, because it might be for a
@@ -1642,7 +1747,17 @@ static int ext3_writeback_writepage(struct page *page,
 	int err;
 
 	J_ASSERT(PageLocked(page));
+<<<<<<< HEAD
 	WARN_ON_ONCE(IS_RDONLY(inode));
+=======
+	/*
+	 * We don't want to warn for emergency remount. The condition is
+	 * ordered to avoid dereferencing inode->i_sb in non-error case to
+	 * avoid slow-downs.
+	 */
+	WARN_ON_ONCE(IS_RDONLY(inode) &&
+		     !(EXT3_SB(inode->i_sb)->s_mount_state & EXT3_ERROR_FS));
+>>>>>>> upstream/4.3_primoc
 
 	if (ext3_journal_current_handle())
 		goto out_fail;
@@ -1684,7 +1799,17 @@ static int ext3_journalled_writepage(struct page *page,
 	int err;
 
 	J_ASSERT(PageLocked(page));
+<<<<<<< HEAD
 	WARN_ON_ONCE(IS_RDONLY(inode));
+=======
+	/*
+	 * We don't want to warn for emergency remount. The condition is
+	 * ordered to avoid dereferencing inode->i_sb in non-error case to
+	 * avoid slow-downs.
+	 */
+	WARN_ON_ONCE(IS_RDONLY(inode) &&
+		     !(EXT3_SB(inode->i_sb)->s_mount_state & EXT3_ERROR_FS));
+>>>>>>> upstream/4.3_primoc
 
 	if (ext3_journal_current_handle())
 		goto no_write;
@@ -1715,6 +1840,11 @@ static int ext3_journalled_writepage(struct page *page,
 		if (ret == 0)
 			ret = err;
 		ext3_set_inode_state(inode, EXT3_STATE_JDATA);
+<<<<<<< HEAD
+=======
+		atomic_set(&EXT3_I(inode)->i_datasync_tid,
+			   handle->h_transaction->t_tid);
+>>>>>>> upstream/4.3_primoc
 		unlock_page(page);
 	} else {
 		/*
@@ -1816,9 +1946,14 @@ static ssize_t ext3_direct_IO(int rw, struct kiocb *iocb,
 	}
 
 retry:
+<<<<<<< HEAD
 	ret = blockdev_direct_IO(rw, iocb, inode, inode->i_sb->s_bdev, iov,
 				 offset, nr_segs,
 				 ext3_get_block, NULL);
+=======
+	ret = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
+				 ext3_get_block);
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * In case of error extending write may have instantiated a few
 	 * blocks outside i_size. Trim these off again.
@@ -1828,7 +1963,11 @@ retry:
 		loff_t end = offset + iov_length(iov, nr_segs);
 
 		if (end > isize)
+<<<<<<< HEAD
 			vmtruncate(inode, isize);
+=======
+			ext3_truncate_failed_direct_write(inode);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (ret == -ENOSPC && ext3_should_retry_alloc(inode->i_sb, &retries))
 		goto retry;
@@ -1842,7 +1981,11 @@ retry:
 			/* This is really bad luck. We've written the data
 			 * but cannot extend i_size. Truncate allocated blocks
 			 * and pretend the write failed... */
+<<<<<<< HEAD
 			ext3_truncate(inode);
+=======
+			ext3_truncate_failed_direct_write(inode);
+>>>>>>> upstream/4.3_primoc
 			ret = PTR_ERR(handle);
 			goto out;
 		}
@@ -1950,6 +2093,7 @@ void ext3_set_aops(struct inode *inode)
  * This required during truncate. We need to physically zero the tail end
  * of that block so it doesn't yield old data if the file is later grown.
  */
+<<<<<<< HEAD
 static int ext3_block_truncate_page(handle_t *handle, struct page *page,
 		struct address_space *mapping, loff_t from)
 {
@@ -1961,6 +2105,26 @@ static int ext3_block_truncate_page(handle_t *handle, struct page *page,
 	int err = 0;
 
 	blocksize = inode->i_sb->s_blocksize;
+=======
+static int ext3_block_truncate_page(struct inode *inode, loff_t from)
+{
+	ext3_fsblk_t index = from >> PAGE_CACHE_SHIFT;
+	unsigned offset = from & (PAGE_CACHE_SIZE - 1);
+	unsigned blocksize, iblock, length, pos;
+	struct page *page;
+	handle_t *handle = NULL;
+	struct buffer_head *bh;
+	int err = 0;
+
+	/* Truncated on block boundary - nothing to do */
+	blocksize = inode->i_sb->s_blocksize;
+	if ((from & (blocksize - 1)) == 0)
+		return 0;
+
+	page = grab_cache_page(inode->i_mapping, index);
+	if (!page)
+		return -ENOMEM;
+>>>>>>> upstream/4.3_primoc
 	length = blocksize - (offset & (blocksize - 1));
 	iblock = index << (PAGE_CACHE_SHIFT - inode->i_sb->s_blocksize_bits);
 
@@ -1996,6 +2160,7 @@ static int ext3_block_truncate_page(handle_t *handle, struct page *page,
 	if (PageUptodate(page))
 		set_buffer_uptodate(bh);
 
+<<<<<<< HEAD
 	if (!buffer_uptodate(bh)) {
 		err = -EIO;
 		ll_rw_block(READ, 1, &bh);
@@ -2005,11 +2170,36 @@ static int ext3_block_truncate_page(handle_t *handle, struct page *page,
 			goto unlock;
 	}
 
+=======
+	if (!bh_uptodate_or_lock(bh)) {
+		err = bh_submit_read(bh);
+		/* Uhhuh. Read error. Complain and punt. */
+		if (err)
+			goto unlock;
+	}
+
+	/* data=writeback mode doesn't need transaction to zero-out data */
+	if (!ext3_should_writeback_data(inode)) {
+		/* We journal at most one block */
+		handle = ext3_journal_start(inode, 1);
+		if (IS_ERR(handle)) {
+			clear_highpage(page);
+			flush_dcache_page(page);
+			err = PTR_ERR(handle);
+			goto unlock;
+		}
+	}
+
+>>>>>>> upstream/4.3_primoc
 	if (ext3_should_journal_data(inode)) {
 		BUFFER_TRACE(bh, "get write access");
 		err = ext3_journal_get_write_access(handle, bh);
 		if (err)
+<<<<<<< HEAD
 			goto unlock;
+=======
+			goto stop;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	zero_user(page, offset, length);
@@ -2023,6 +2213,12 @@ static int ext3_block_truncate_page(handle_t *handle, struct page *page,
 			err = ext3_journal_dirty_data(handle, bh);
 		mark_buffer_dirty(bh);
 	}
+<<<<<<< HEAD
+=======
+stop:
+	if (handle)
+		ext3_journal_stop(handle);
+>>>>>>> upstream/4.3_primoc
 
 unlock:
 	unlock_page(page);
@@ -2391,8 +2587,11 @@ static void ext3_free_branches(handle_t *handle, struct inode *inode,
 
 int ext3_can_truncate(struct inode *inode)
 {
+<<<<<<< HEAD
 	if (IS_APPEND(inode) || IS_IMMUTABLE(inode))
 		return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 	if (S_ISREG(inode->i_mode))
 		return 1;
 	if (S_ISDIR(inode->i_mode))
@@ -2436,7 +2635,10 @@ void ext3_truncate(struct inode *inode)
 	struct ext3_inode_info *ei = EXT3_I(inode);
 	__le32 *i_data = ei->i_data;
 	int addr_per_block = EXT3_ADDR_PER_BLOCK(inode->i_sb);
+<<<<<<< HEAD
 	struct address_space *mapping = inode->i_mapping;
+=======
+>>>>>>> upstream/4.3_primoc
 	int offsets[4];
 	Indirect chain[4];
 	Indirect *partial;
@@ -2444,7 +2646,10 @@ void ext3_truncate(struct inode *inode)
 	int n;
 	long last_block;
 	unsigned blocksize = inode->i_sb->s_blocksize;
+<<<<<<< HEAD
 	struct page *page;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (!ext3_can_truncate(inode))
 		goto out_notrans;
@@ -2452,6 +2657,7 @@ void ext3_truncate(struct inode *inode)
 	if (inode->i_size == 0 && ext3_should_writeback_data(inode))
 		ext3_set_inode_state(inode, EXT3_STATE_FLUSH_ON_CLOSE);
 
+<<<<<<< HEAD
 	/*
 	 * We have to lock the EOF page here, because lock_page() nests
 	 * outside journal_start().
@@ -2483,6 +2689,14 @@ void ext3_truncate(struct inode *inode)
 	if (page)
 		ext3_block_truncate_page(handle, page, mapping, inode->i_size);
 
+=======
+	handle = start_transaction(inode);
+	if (IS_ERR(handle))
+		goto out_notrans;
+
+	last_block = (inode->i_size + blocksize-1)
+					>> EXT3_BLOCK_SIZE_BITS(inode->i_sb);
+>>>>>>> upstream/4.3_primoc
 	n = ext3_block_to_path(inode, last_block, offsets, NULL);
 	if (n == 0)
 		goto out_stop;	/* error */
@@ -2748,7 +2962,11 @@ make_io:
 		 */
 		get_bh(bh);
 		bh->b_end_io = end_buffer_read_sync;
+<<<<<<< HEAD
 		submit_bh(READ_META, bh);
+=======
+		submit_bh(READ | REQ_META | REQ_PRIO, bh);
+>>>>>>> upstream/4.3_primoc
 		wait_on_buffer(bh);
 		if (!buffer_uptodate(bh)) {
 			ext3_error(inode->i_sb, "ext3_get_inode_loc",
@@ -3227,6 +3445,12 @@ int ext3_setattr(struct dentry *dentry, struct iattr *attr)
 		ext3_journal_stop(handle);
 	}
 
+<<<<<<< HEAD
+=======
+	if (attr->ia_valid & ATTR_SIZE)
+		inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 	if (S_ISREG(inode->i_mode) &&
 	    attr->ia_valid & ATTR_SIZE && attr->ia_size < inode->i_size) {
 		handle_t *handle;
@@ -3238,18 +3462,50 @@ int ext3_setattr(struct dentry *dentry, struct iattr *attr)
 		}
 
 		error = ext3_orphan_add(handle, inode);
+<<<<<<< HEAD
 		EXT3_I(inode)->i_disksize = attr->ia_size;
 		rc = ext3_mark_inode_dirty(handle, inode);
 		if (!error)
 			error = rc;
 		ext3_journal_stop(handle);
+=======
+		if (error) {
+			ext3_journal_stop(handle);
+			goto err_out;
+		}
+		EXT3_I(inode)->i_disksize = attr->ia_size;
+		error = ext3_mark_inode_dirty(handle, inode);
+		ext3_journal_stop(handle);
+		if (error) {
+			/* Some hard fs error must have happened. Bail out. */
+			ext3_orphan_del(NULL, inode);
+			goto err_out;
+		}
+		rc = ext3_block_truncate_page(inode, attr->ia_size);
+		if (rc) {
+			/* Cleanup orphan list and exit */
+			handle = ext3_journal_start(inode, 3);
+			if (IS_ERR(handle)) {
+				ext3_orphan_del(NULL, inode);
+				goto err_out;
+			}
+			ext3_orphan_del(handle, inode);
+			ext3_journal_stop(handle);
+			goto err_out;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if ((attr->ia_valid & ATTR_SIZE) &&
 	    attr->ia_size != i_size_read(inode)) {
+<<<<<<< HEAD
 		rc = vmtruncate(inode, attr->ia_size);
 		if (rc)
 			goto err_out;
+=======
+		truncate_setsize(inode, attr->ia_size);
+		ext3_truncate(inode);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	setattr_copy(inode, attr);

@@ -5,8 +5,11 @@
 #include <linux/init.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
+<<<<<<< HEAD
 #include <linux/interrupt.h>
 #include <linux/module.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 #include <net/bluetooth/bluetooth.h>
 #include <net/bluetooth/hci_core.h>

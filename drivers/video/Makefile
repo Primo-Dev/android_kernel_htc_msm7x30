@@ -142,23 +142,38 @@ ifeq ($(CONFIG_ARCH_MSM8960),y)
   obj-$(CONFIG_FB_MSM)            += msm/
 else
   ifeq ($(CONFIG_ARCH_MSM8X60),y)
+<<<<<<< HEAD
     ifeq ($(CONFIG_FB_MSM8960),y)
 	  obj-$(CONFIG_FB_MSM)          += msm/
     else
       obj-$(CONFIG_FB_MSM)          += msm_8x60/
     endif
+=======
+    obj-$(CONFIG_FB_MSM)          += msm_8x60/
+>>>>>>> upstream/4.3_primoc
   else
     ifeq ($(CONFIG_ARCH_MSM7X27A),y)
       obj-$(CONFIG_FB_MSM)          += msm_7x27A/
     else
+<<<<<<< HEAD
       obj-$(CONFIG_FB_MSM)          += msm_7x30/
+=======
+	ifeq ($(CONFIG_FB_MSM_NEW),y)
+	        obj-$(CONFIG_FB_MSM)          += msm/
+	else
+	        obj-$(CONFIG_FB_MSM)          += msm_7x30/
+	endif
+>>>>>>> upstream/4.3_primoc
     endif
   endif
 endif
 
+<<<<<<< HEAD
 obj-$(CONFIG_MSM_VIDC_1080P) += msm/vidc/
 obj-$(CONFIG_MSM_VIDC_720P) += msm/vidc/
 
+=======
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_FB_NUC900)           += nuc900fb.o
 obj-$(CONFIG_FB_JZ4740)		  += jz4740_fb.o
 obj-$(CONFIG_FB_PUV3_UNIGFX)      += fb-puv3.o

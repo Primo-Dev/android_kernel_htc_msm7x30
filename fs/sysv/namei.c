@@ -61,7 +61,11 @@ static struct dentry *sysv_lookup(struct inode * dir, struct dentry * dentry, st
 	return NULL;
 }
 
+<<<<<<< HEAD
 static int sysv_mknod(struct inode * dir, struct dentry * dentry, int mode, dev_t rdev)
+=======
+static int sysv_mknod(struct inode * dir, struct dentry * dentry, umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode * inode;
 	int err;
@@ -80,7 +84,11 @@ static int sysv_mknod(struct inode * dir, struct dentry * dentry, int mode, dev_
 	return err;
 }
 
+<<<<<<< HEAD
 static int sysv_create(struct inode * dir, struct dentry * dentry, int mode, struct nameidata *nd)
+=======
+static int sysv_create(struct inode * dir, struct dentry * dentry, umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	return sysv_mknod(dir, dentry, mode, 0);
 }

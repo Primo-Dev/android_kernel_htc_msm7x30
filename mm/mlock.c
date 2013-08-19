@@ -14,7 +14,11 @@
 #include <linux/mempolicy.h>
 #include <linux/syscalls.h>
 #include <linux/sched.h>
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+#include <linux/export.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/rmap.h>
 #include <linux/mmzone.h>
 #include <linux/hugetlb.h>
@@ -110,7 +114,19 @@ void munlock_vma_page(struct page *page)
 	if (TestClearPageMlocked(page)) {
 		dec_zone_page_state(page, NR_MLOCK);
 		if (!isolate_lru_page(page)) {
+<<<<<<< HEAD
 			int ret = try_to_munlock(page);
+=======
+			int ret = SWAP_AGAIN;
+
+			/*
+			 * Optimization: if the page was mapped just once,
+			 * that's our mapping and we don't need to check all the
+			 * other vmas.
+			 */
+			if (page_mapcount(page) > 1)
+				ret = try_to_munlock(page);
+>>>>>>> upstream/4.3_primoc
 			/*
 			 * did try_to_unlock() succeed or punt?
 			 */
@@ -549,7 +565,12 @@ SYSCALL_DEFINE1(mlockall, int, flags)
 	if (!can_do_mlock())
 		goto out;
 
+<<<<<<< HEAD
 	lru_add_drain_all();	/* flush pagevec */
+=======
+	if (flags & MCL_CURRENT)
+		lru_add_drain_all();	/* flush pagevec */
+>>>>>>> upstream/4.3_primoc
 
 	down_write(&current->mm->mmap_sem);
 

@@ -3509,9 +3509,12 @@ config VMXNET3
 	  To compile this driver as a module, choose M here: the
 	  module will be called vmxnet3.
 
+<<<<<<< HEAD
 config HTC_NETWORK_MODIFY
 	tristate "Belong to HTC Netowrking modifications"
 
+=======
+>>>>>>> upstream/4.3_primoc
 config KINETO_GAN
         tristate "Kineto GAN virtual network interface"
         depends on ARM

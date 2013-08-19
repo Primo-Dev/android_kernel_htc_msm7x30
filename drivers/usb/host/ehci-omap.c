@@ -160,6 +160,10 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 	hcd->rsrc_start = res->start;
 	hcd->rsrc_len = resource_size(res);
 	hcd->regs = regs;
+<<<<<<< HEAD
+=======
+	hcd->self.dma_align = 1;
+>>>>>>> upstream/4.3_primoc
 
 	/* get ehci regulator and enable */
 	for (i = 0 ; i < OMAP3_HS_USB_PORTS ; i++) {

@@ -371,7 +371,11 @@ static struct block_device *ext3_blkdev_get(dev_t dev, struct super_block *sb)
 	return bdev;
 
 fail:
+<<<<<<< HEAD
 	ext3_msg(sb, "error: failed to open journal device %s: %ld",
+=======
+	ext3_msg(sb, KERN_ERR, "error: failed to open journal device %s: %ld",
+>>>>>>> upstream/4.3_primoc
 		__bdevname(dev, b), PTR_ERR(bdev));
 
 	return NULL;
@@ -500,7 +504,10 @@ static struct inode *ext3_alloc_inode(struct super_block *sb)
 static void ext3_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(ext3_inode_cachep, EXT3_I(inode));
 }
 
@@ -892,7 +899,11 @@ static ext3_fsblk_t get_sb_block(void **data, struct super_block *sb)
 	/*todo: use simple_strtoll with >32bit ext3 */
 	sb_block = simple_strtoul(options, &options, 0);
 	if (*options && *options != ',') {
+<<<<<<< HEAD
 		ext3_msg(sb, "error: invalid sb specification: %s",
+=======
+		ext3_msg(sb, KERN_ERR, "error: invalid sb specification: %s",
+>>>>>>> upstream/4.3_primoc
 		       (char *) *data);
 		return 1;
 	}
@@ -2216,11 +2227,19 @@ static journal_t *ext3_get_dev_journal(struct super_block *sb,
 		goto out_bdev;
 	}
 	journal->j_private = sb;
+<<<<<<< HEAD
 	ll_rw_block(READ, 1, &journal->j_sb_buffer);
 	wait_on_buffer(journal->j_sb_buffer);
 	if (!buffer_uptodate(journal->j_sb_buffer)) {
 		ext3_msg(sb, KERN_ERR, "I/O error on journal device");
 		goto out_journal;
+=======
+	if (!bh_uptodate_or_lock(journal->j_sb_buffer)) {
+		if (bh_submit_read(journal->j_sb_buffer)) {
+			ext3_msg(sb, KERN_ERR, "I/O error on journal device");
+			goto out_journal;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 	if (be32_to_cpu(journal->j_superblock->s_nr_users) != 1) {
 		ext3_msg(sb, KERN_ERR,
@@ -2895,7 +2914,11 @@ static int ext3_quota_on(struct super_block *sb, int type, int format_id,
 		return -EINVAL;
 
 	/* Quotafile not on the same filesystem? */
+<<<<<<< HEAD
 	if (path->mnt->mnt_sb != sb)
+=======
+	if (path->dentry->d_sb != sb)
+>>>>>>> upstream/4.3_primoc
 		return -EXDEV;
 	/* Journaling quota? */
 	if (EXT3_SB(sb)->s_qf_names[type]) {

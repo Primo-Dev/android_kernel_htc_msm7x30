@@ -506,7 +506,11 @@ extern const struct file_operations logfs_reg_fops;
 extern const struct address_space_operations logfs_reg_aops;
 int logfs_readpage(struct file *file, struct page *page);
 long logfs_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+<<<<<<< HEAD
 int logfs_fsync(struct file *file, int datasync);
+=======
+int logfs_fsync(struct file *file, loff_t start, loff_t end, int datasync);
+>>>>>>> upstream/4.3_primoc
 
 /* gc.c */
 u32 get_best_cand(struct super_block *sb, struct candidate_list *list, u32 *ec);
@@ -618,7 +622,10 @@ static inline int logfs_buf_recover(struct logfs_area *area, u64 ofs,
 struct page *emergency_read_begin(struct address_space *mapping, pgoff_t index);
 void emergency_read_end(struct page *page);
 void logfs_crash_dump(struct super_block *sb);
+<<<<<<< HEAD
 void *memchr_inv(const void *s, int c, size_t n);
+=======
+>>>>>>> upstream/4.3_primoc
 int logfs_statfs(struct dentry *dentry, struct kstatfs *stats);
 int logfs_check_ds(struct logfs_disk_super *ds);
 int logfs_write_sb(struct super_block *sb);

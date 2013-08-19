@@ -116,10 +116,13 @@ static int load_misc_binary(struct linux_binprm *bprm, struct pt_regs *regs)
 	if (!enabled)
 		goto _ret;
 
+<<<<<<< HEAD
 	retval = -ENOEXEC;
 	if (bprm->recursion_depth > BINPRM_MAX_RECURSION)
 		goto _ret;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* to keep locking time low, we copy the interpreter string */
 	read_lock(&entries_lock);
 	fmt = check_file(bprm);
@@ -149,8 +152,12 @@ static int load_misc_binary(struct linux_binprm *bprm, struct pt_regs *regs)
 
 		/* if the binary is not readable than enforce mm->dumpable=0
 		   regardless of the interpreter's permissions */
+<<<<<<< HEAD
 		if (file_permission(bprm->file, MAY_READ))
 			bprm->interp_flags |= BINPRM_FLAGS_ENFORCE_NONDUMP;
+=======
+		would_dump(bprm, bprm->file);
+>>>>>>> upstream/4.3_primoc
 
 		allow_write_access(bprm->file);
 		bprm->file = NULL;
@@ -200,8 +207,11 @@ static int load_misc_binary(struct linux_binprm *bprm, struct pt_regs *regs)
 	if (retval < 0)
 		goto _error;
 
+<<<<<<< HEAD
 	bprm->recursion_depth++;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	retval = search_binary_handler (bprm, regs);
 	if (retval < 0)
 		goto _error;
@@ -525,7 +535,11 @@ static void kill_node(Node *e)
 	write_unlock(&entries_lock);
 
 	if (dentry) {
+<<<<<<< HEAD
 		dentry->d_inode->i_nlink--;
+=======
+		drop_nlink(dentry->d_inode);
+>>>>>>> upstream/4.3_primoc
 		d_drop(dentry);
 		dput(dentry);
 		simple_release_fs(&bm_mnt, &entry_count);
@@ -564,7 +578,11 @@ static ssize_t bm_entry_write(struct file *file, const char __user *buffer,
 			break;
 		case 2: set_bit(Enabled, &e->flags);
 			break;
+<<<<<<< HEAD
 		case 3: root = dget(file->f_path.mnt->mnt_sb->s_root);
+=======
+		case 3: root = dget(file->f_path.dentry->d_sb->s_root);
+>>>>>>> upstream/4.3_primoc
 			mutex_lock(&root->d_inode->i_mutex);
 
 			kill_node(e);
@@ -591,7 +609,11 @@ static ssize_t bm_register_write(struct file *file, const char __user *buffer,
 	Node *e;
 	struct inode *inode;
 	struct dentry *root, *dentry;
+<<<<<<< HEAD
 	struct super_block *sb = file->f_path.mnt->mnt_sb;
+=======
+	struct super_block *sb = file->f_path.dentry->d_sb;
+>>>>>>> upstream/4.3_primoc
 	int err = 0;
 
 	e = create_entry(buffer, count);
@@ -670,7 +692,11 @@ static ssize_t bm_status_write(struct file * file, const char __user * buffer,
 	switch (res) {
 		case 1: enabled = 0; break;
 		case 2: enabled = 1; break;
+<<<<<<< HEAD
 		case 3: root = dget(file->f_path.mnt->mnt_sb->s_root);
+=======
+		case 3: root = dget(file->f_path.dentry->d_sb->s_root);
+>>>>>>> upstream/4.3_primoc
 			mutex_lock(&root->d_inode->i_mutex);
 
 			while (!list_empty(&entries))

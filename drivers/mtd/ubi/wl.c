@@ -790,7 +790,14 @@ static int wear_leveling_worker(struct ubi_device *ubi, struct ubi_work *wrk,
 			protect = 1;
 			goto out_not_moved;
 		}
+<<<<<<< HEAD
 
+=======
+		if (err == MOVE_RETRY) {
+			scrubbing = 1;
+			goto out_not_moved;
+		}
+>>>>>>> upstream/4.3_primoc
 		if (err == MOVE_CANCEL_BITFLIPS || err == MOVE_TARGET_WR_ERR ||
 		    err == MOVE_TARGET_RD_ERR) {
 			/*
@@ -1044,7 +1051,10 @@ static int erase_worker(struct ubi_device *ubi, struct ubi_work *wl_wrk,
 
 	ubi_err("failed to erase PEB %d, error %d", pnum, err);
 	kfree(wl_wrk);
+<<<<<<< HEAD
 	kmem_cache_free(ubi_wl_entry_slab, e);
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (err == -EINTR || err == -ENOMEM || err == -EAGAIN ||
 	    err == -EBUSY) {
@@ -1057,14 +1067,24 @@ static int erase_worker(struct ubi_device *ubi, struct ubi_work *wl_wrk,
 			goto out_ro;
 		}
 		return err;
+<<<<<<< HEAD
 	} else if (err != -EIO) {
+=======
+	}
+
+	kmem_cache_free(ubi_wl_entry_slab, e);
+	if (err != -EIO)
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * If this is not %-EIO, we have no idea what to do. Scheduling
 		 * this physical eraseblock for erasure again would cause
 		 * errors again and again. Well, lets switch to R/O mode.
 		 */
 		goto out_ro;
+<<<<<<< HEAD
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/* It is %-EIO, the PEB went bad */
 

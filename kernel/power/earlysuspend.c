@@ -25,6 +25,7 @@
 enum {
 	DEBUG_USER_STATE = 1U << 0,
 	DEBUG_SUSPEND = 1U << 2,
+<<<<<<< HEAD
 	DEBUG_NO_SUSPEND = 1U << 3,
 	DEBUG_VERBOSE = 1U << 3,
 };
@@ -35,14 +36,31 @@ static int debug_mask = DEBUG_USER_STATE | DEBUG_NO_SUSPEND;
 static int debug_mask = DEBUG_USER_STATE;
 #endif
 
+=======
+	DEBUG_VERBOSE = 1U << 3,
+};
+static int debug_mask = DEBUG_USER_STATE;
+>>>>>>> upstream/4.3_primoc
 module_param_named(debug_mask, debug_mask, int, S_IRUGO | S_IWUSR | S_IWGRP);
 
 static DEFINE_MUTEX(early_suspend_lock);
 static LIST_HEAD(early_suspend_handlers);
+<<<<<<< HEAD
 static void early_suspend(struct work_struct *work);
 static void late_resume(struct work_struct *work);
 static DECLARE_WORK(early_suspend_work, early_suspend);
 static DECLARE_WORK(late_resume_work, late_resume);
+=======
+
+static void early_suspend(struct work_struct *work);
+static DECLARE_WORK(early_suspend_work, early_suspend);
+static DECLARE_COMPLETION(early_suspend_complete);
+
+static void late_resume(struct work_struct *work);
+static DECLARE_WORK(late_resume_work, late_resume);
+static DECLARE_COMPLETION(late_resume_complete);
+
+>>>>>>> upstream/4.3_primoc
 static DEFINE_SPINLOCK(state_lock);
 enum {
 	SUSPEND_REQUESTED = 0x1,
@@ -50,6 +68,7 @@ enum {
 	SUSPEND_REQUESTED_AND_SUSPENDED = SUSPEND_REQUESTED | SUSPENDED,
 };
 static int state;
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_ONMODE_CHARGING
 static LIST_HEAD(onchg_suspend_handlers);
 static void onchg_suspend(struct work_struct *work);
@@ -60,6 +79,8 @@ static DECLARE_WORK(onchg_resume_work, onchg_resume);
 
 static int state_onchg;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 void register_early_suspend(struct early_suspend *handler)
 {
@@ -93,6 +114,7 @@ static void early_suspend(struct work_struct *work)
 	unsigned long irqflags;
 	int abort = 0;
 
+<<<<<<< HEAD
 	pr_info("[R] early_suspend start\n");
 	mutex_lock(&early_suspend_lock);
 	spin_lock_irqsave(&state_lock, irqflags);
@@ -102,6 +124,12 @@ static void early_suspend(struct work_struct *work)
 		state_onchg = SUSPEND_REQUESTED_AND_SUSPENDED;
 #endif
 	}
+=======
+	mutex_lock(&early_suspend_lock);
+	spin_lock_irqsave(&state_lock, irqflags);
+	if (state == SUSPEND_REQUESTED)
+		state |= SUSPENDED;
+>>>>>>> upstream/4.3_primoc
 	else
 		abort = 1;
 	spin_unlock_irqrestore(&state_lock, irqflags);
@@ -125,18 +153,26 @@ static void early_suspend(struct work_struct *work)
 	mutex_unlock(&early_suspend_lock);
 
 	suspend_sys_sync_queue();
+<<<<<<< HEAD
 
 	if (debug_mask & DEBUG_NO_SUSPEND) {
 		pr_info("DEBUG_NO_SUSPEND set, will not suspend\n");
 		wake_lock(&no_suspend_wake_lock);
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 abort:
 	spin_lock_irqsave(&state_lock, irqflags);
 	if (state == SUSPEND_REQUESTED_AND_SUSPENDED)
 		wake_unlock(&main_wake_lock);
 	spin_unlock_irqrestore(&state_lock, irqflags);
+<<<<<<< HEAD
 	pr_info("[R] early_suspend end\n");
+=======
+
+	complete(&early_suspend_complete);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void late_resume(struct work_struct *work)
@@ -145,6 +181,7 @@ static void late_resume(struct work_struct *work)
 	unsigned long irqflags;
 	int abort = 0;
 
+<<<<<<< HEAD
 	pr_info("[R] late_resume start\n");
 	mutex_lock(&early_suspend_lock);
 	spin_lock_irqsave(&state_lock, irqflags);
@@ -154,6 +191,12 @@ static void late_resume(struct work_struct *work)
 		state_onchg &= ~SUSPEND_REQUESTED_AND_SUSPENDED;
 #endif
 	}
+=======
+	mutex_lock(&early_suspend_lock);
+	spin_lock_irqsave(&state_lock, irqflags);
+	if (state == SUSPENDED)
+		state &= ~SUSPENDED;
+>>>>>>> upstream/4.3_primoc
 	else
 		abort = 1;
 	spin_unlock_irqrestore(&state_lock, irqflags);
@@ -175,6 +218,7 @@ static void late_resume(struct work_struct *work)
 	}
 	if (debug_mask & DEBUG_SUSPEND)
 		pr_info("late_resume: done\n");
+<<<<<<< HEAD
 
 	if (debug_mask & DEBUG_NO_SUSPEND)
 		wake_unlock(&no_suspend_wake_lock);
@@ -314,11 +358,22 @@ int get_onchg_state(void)
 	return state_onchg;
 }
 #endif
+=======
+abort:
+	mutex_unlock(&early_suspend_lock);
+
+	complete(&late_resume_complete);
+}
+>>>>>>> upstream/4.3_primoc
 
 void request_suspend_state(suspend_state_t new_state)
 {
 	unsigned long irqflags;
 	int old_sleep;
+<<<<<<< HEAD
+=======
+	int suspend = 0, resume = 0;
+>>>>>>> upstream/4.3_primoc
 
 	spin_lock_irqsave(&state_lock, irqflags);
 	old_sleep = state & SUSPEND_REQUESTED;
@@ -338,13 +393,29 @@ void request_suspend_state(suspend_state_t new_state)
 	if (!old_sleep && new_state != PM_SUSPEND_ON) {
 		state |= SUSPEND_REQUESTED;
 		queue_work(suspend_work_queue, &early_suspend_work);
+<<<<<<< HEAD
+=======
+		suspend = 1;
+>>>>>>> upstream/4.3_primoc
 	} else if (old_sleep && new_state == PM_SUSPEND_ON) {
 		state &= ~SUSPEND_REQUESTED;
 		wake_lock(&main_wake_lock);
 		queue_work(suspend_work_queue, &late_resume_work);
+<<<<<<< HEAD
 	}
 	requested_suspend_state = new_state;
 	spin_unlock_irqrestore(&state_lock, irqflags);
+=======
+		resume = 1;
+	}
+	requested_suspend_state = new_state;
+	spin_unlock_irqrestore(&state_lock, irqflags);
+
+	if (suspend)
+		wait_for_completion(&early_suspend_complete);
+	if (resume)
+		wait_for_completion(&late_resume_complete);
+>>>>>>> upstream/4.3_primoc
 }
 
 suspend_state_t get_suspend_state(void)

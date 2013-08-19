@@ -32,6 +32,7 @@ struct address_space;
  * who is mapping it.
  */
 struct page {
+<<<<<<< HEAD
 	unsigned long flags;		/* Atomic flags, some possibly
 					 * updated asynchronously */
 	atomic_t _count;		/* Usage count, see below. */
@@ -61,6 +62,67 @@ struct page {
 	};
 	union {
 	    struct {
+=======
+	/* First double word block */
+	unsigned long flags;		/* Atomic flags, some possibly
+					 * updated asynchronously */
+	struct address_space *mapping;	/* If low bit clear, points to
+					 * inode address_space, or NULL.
+					 * If page mapped as anonymous
+					 * memory, low bit is set, and
+					 * it points to anon_vma object:
+					 * see PAGE_MAPPING_ANON below.
+					 */
+	/* Second double word */
+	struct {
+		union {
+			pgoff_t index;		/* Our offset within mapping. */
+			void *freelist;		/* slub first free object */
+		};
+
+		union {
+			/* Used for cmpxchg_double in slub */
+			unsigned long counters;
+
+			struct {
+
+				union {
+					atomic_t _mapcount;	/* Count of ptes mapped in mms,
+							 * to show when page is mapped
+							 * & limit reverse map searches.
+							 */
+
+					struct {
+						unsigned inuse:16;
+						unsigned objects:15;
+						unsigned frozen:1;
+					};
+				};
+				atomic_t _count;		/* Usage count, see below. */
+			};
+		};
+	};
+
+	/* Third double word block */
+	union {
+		struct list_head lru;	/* Pageout list, eg. active_list
+					 * protected by zone->lru_lock !
+					 */
+		struct {		/* slub per cpu partial pages */
+			struct page *next;	/* Next partial slab */
+#ifdef CONFIG_64BIT
+			int pages;	/* Nr of partial slabs left */
+			int pobjects;	/* Approximate # of objects */
+#else
+			short int pages;
+			short int pobjects;
+#endif
+		};
+	};
+
+	/* Remainder is not double word aligned */
+	union {
+>>>>>>> upstream/4.3_primoc
 		unsigned long private;		/* Mapping-private opaque data:
 					 	 * usually used for buffer_heads
 						 * if PagePrivate set; used for
@@ -68,6 +130,7 @@ struct page {
 						 * indicates order in the buddy
 						 * system if PG_buddy is set.
 						 */
+<<<<<<< HEAD
 		struct address_space *mapping;	/* If low bit clear, points to
 						 * inode address_space, or NULL.
 						 * If page mapped as anonymous
@@ -89,6 +152,15 @@ struct page {
 	struct list_head lru;		/* Pageout list, eg. active_list
 					 * protected by zone->lru_lock !
 					 */
+=======
+#if USE_SPLIT_PTLOCKS
+		spinlock_t ptl;
+#endif
+		struct kmem_cache *slab;	/* SLUB: Pointer to slab */
+		struct page *first_page;	/* Compound tail pages */
+	};
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * On machines where all RAM is mapped into kernel address space,
 	 * we can simply calculate the virtual address. On machines with
@@ -114,7 +186,20 @@ struct page {
 	 */
 	void *shadow;
 #endif
+<<<<<<< HEAD
 };
+=======
+}
+/*
+ * If another subsystem starts using the double word pairing for atomic
+ * operations on struct page then it must change the #if to ensure
+ * proper alignment of the page struct.
+ */
+#if defined(CONFIG_SLUB) && defined(CONFIG_CMPXCHG_LOCAL)
+	__attribute__((__aligned__(2*sizeof(unsigned long))))
+#endif
+;
+>>>>>>> upstream/4.3_primoc
 
 typedef unsigned long __nocast vm_flags_t;
 
@@ -294,9 +379,12 @@ struct mm_struct {
 	unsigned int token_priority;
 	unsigned int last_interval;
 
+<<<<<<< HEAD
 	/* How many tasks sharing this mm are OOM_DISABLE */
 	atomic_t oom_disable_count;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	unsigned long flags; /* Must use atomic bitops to access the bits */
 
 	struct core_state *core_state; /* coredumping support */

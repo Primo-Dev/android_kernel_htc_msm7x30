@@ -2935,7 +2935,11 @@ static struct sk_buff *fill_packet_ipv6(struct net_device *odev,
 		  sizeof(struct ipv6hdr) - sizeof(struct udphdr) -
 		  pkt_dev->pkt_overhead;
 
+<<<<<<< HEAD
 	if (datalen < sizeof(struct pktgen_hdr)) {
+=======
+	if (datalen < 0 || datalen < sizeof(struct pktgen_hdr)) {
+>>>>>>> upstream/4.3_primoc
 		datalen = sizeof(struct pktgen_hdr);
 		if (net_ratelimit())
 			pr_info("increased datalen to %d\n", datalen);

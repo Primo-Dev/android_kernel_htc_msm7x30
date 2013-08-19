@@ -349,12 +349,27 @@ unsigned long membank0_size;
 EXPORT_SYMBOL(membank0_size);
 unsigned long membank1_start;
 EXPORT_SYMBOL(membank1_start);
+<<<<<<< HEAD
+=======
+
+void __init find_membank0_hole(void)
+{
+	sort(&meminfo.bank, meminfo.nr_banks,
+		sizeof(meminfo.bank[0]), meminfo_cmp, NULL);
+
+	membank0_size = meminfo.bank[0].size;
+	membank1_start = meminfo.bank[1].start;
+
+	pr_info("m0 size %lx m1 start %lx\n", membank0_size, membank1_start);
+}
+>>>>>>> upstream/4.3_primoc
 #endif
 
 void __init arm_memblock_init(struct meminfo *mi, struct machine_desc *mdesc)
 {
 	int i;
 
+<<<<<<< HEAD
 	sort(&meminfo.bank, meminfo.nr_banks, sizeof(meminfo.bank[0]), meminfo_cmp, NULL);
 
 	memblock_init();
@@ -366,6 +381,15 @@ void __init arm_memblock_init(struct meminfo *mi, struct machine_desc *mdesc)
 	membank1_start = meminfo.bank[1].start;
 #endif
 
+=======
+#ifndef CONFIG_DONT_MAP_HOLE_AFTER_MEMBANK0
+	sort(&meminfo.bank, meminfo.nr_banks, sizeof(meminfo.bank[0]), meminfo_cmp, NULL);
+#endif
+
+	for (i = 0; i < mi->nr_banks; i++)
+		memblock_add(mi->bank[i].start, mi->bank[i].size);
+
+>>>>>>> upstream/4.3_primoc
 	/* Register the kernel text, kernel data and initrd with memblock. */
 #ifdef CONFIG_XIP_KERNEL
 	memblock_reserve(__pa(_sdata), _end - _sdata);
@@ -401,7 +425,11 @@ void __init arm_memblock_init(struct meminfo *mi, struct machine_desc *mdesc)
 	if (mdesc->reserve)
 		mdesc->reserve();
 
+<<<<<<< HEAD
 	memblock_analyze();
+=======
+	memblock_allow_resize();
+>>>>>>> upstream/4.3_primoc
 	memblock_dump_all();
 }
 

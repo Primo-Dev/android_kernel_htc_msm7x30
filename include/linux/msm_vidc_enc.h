@@ -442,9 +442,17 @@ struct venc_ioctl_msg{
 
 #define VEN_IOCTL_GET_NUMBER_INSTANCES \
 	_IOR(VEN_IOCTLBASE_ENC, 46, struct venc_ioctl_msg)
+<<<<<<< HEAD
 #define VEN_IOCTL_SET_METABUFFER_MODE \
 	_IOW(VEN_IOCTLBASE_ENC, 47, struct venc_ioctl_msg)
 
+=======
+
+#define VEN_IOCTL_SET_METABUFFER_MODE \
+	_IOW(VEN_IOCTLBASE_ENC, 47, struct venc_ioctl_msg)
+
+
+>>>>>>> upstream/4.3_primoc
 /*IOCTL params:SET: InputData - unsigned int, OutputData - NULL.*/
 #define VEN_IOCTL_SET_EXTRADATA \
 	_IOW(VEN_IOCTLBASE_ENC, 48, struct venc_ioctl_msg)
@@ -452,6 +460,13 @@ struct venc_ioctl_msg{
 #define VEN_IOCTL_GET_EXTRADATA \
 	_IOR(VEN_IOCTLBASE_ENC, 49, struct venc_ioctl_msg)
 
+<<<<<<< HEAD
+=======
+/*IOCTL params:SET: InputData - NULL, OutputData - NULL.*/
+#define VEN_IOCTL_SET_SLICE_DELIVERY_MODE \
+	_IO(VEN_IOCTLBASE_ENC, 50)
+
+>>>>>>> upstream/4.3_primoc
 struct venc_switch{
 	unsigned char	status;
 };
@@ -595,12 +610,19 @@ struct venc_msg{
 };
 
 struct venc_recon_addr{
+<<<<<<< HEAD
 	unsigned long buffer_size;
 	unsigned long pmem_fd;
 	unsigned long offset;
 /* HTC START */
 	unsigned char *pbuffer;
 /* HTC END */
+=======
+	unsigned char *pbuffer;
+	unsigned long buffer_size;
+	unsigned long pmem_fd;
+	unsigned long offset;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct venc_recon_buff_size{

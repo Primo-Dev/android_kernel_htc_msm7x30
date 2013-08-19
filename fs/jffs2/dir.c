@@ -22,7 +22,11 @@
 
 static int jffs2_readdir (struct file *, void *, filldir_t);
 
+<<<<<<< HEAD
 static int jffs2_create (struct inode *,struct dentry *,int,
+=======
+static int jffs2_create (struct inode *,struct dentry *,umode_t,
+>>>>>>> upstream/4.3_primoc
 			 struct nameidata *);
 static struct dentry *jffs2_lookup (struct inode *,struct dentry *,
 				    struct nameidata *);
@@ -31,7 +35,11 @@ static int jffs2_unlink (struct inode *,struct dentry *);
 static int jffs2_symlink (struct inode *,struct dentry *,const char *);
 static int jffs2_mkdir (struct inode *,struct dentry *,int);
 static int jffs2_rmdir (struct inode *,struct dentry *);
+<<<<<<< HEAD
 static int jffs2_mknod (struct inode *,struct dentry *,int,dev_t);
+=======
+static int jffs2_mknod (struct inode *,struct dentry *,umode_t,dev_t);
+>>>>>>> upstream/4.3_primoc
 static int jffs2_rename (struct inode *, struct dentry *,
 			 struct inode *, struct dentry *);
 
@@ -56,7 +64,11 @@ const struct inode_operations jffs2_dir_inode_operations =
 	.rmdir =	jffs2_rmdir,
 	.mknod =	jffs2_mknod,
 	.rename =	jffs2_rename,
+<<<<<<< HEAD
 	.check_acl =	jffs2_check_acl,
+=======
+	.get_acl =	jffs2_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.setattr =	jffs2_setattr,
 	.setxattr =	jffs2_setxattr,
 	.getxattr =	jffs2_getxattr,
@@ -102,10 +114,15 @@ static struct dentry *jffs2_lookup(struct inode *dir_i, struct dentry *target,
 	mutex_unlock(&dir_f->sem);
 	if (ino) {
 		inode = jffs2_iget(dir_i->i_sb, ino);
+<<<<<<< HEAD
 		if (IS_ERR(inode)) {
 			printk(KERN_WARNING "iget() failed for ino #%u\n", ino);
 			return ERR_CAST(inode);
 		}
+=======
+		if (IS_ERR(inode))
+			printk(KERN_WARNING "iget() failed for ino #%u\n", ino);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	return d_splice_alias(inode, target);
@@ -171,8 +188,13 @@ static int jffs2_readdir(struct file *filp, void *dirent, filldir_t filldir)
 /***********************************************************************/
 
 
+<<<<<<< HEAD
 static int jffs2_create(struct inode *dir_i, struct dentry *dentry, int mode,
 			struct nameidata *nd)
+=======
+static int jffs2_create(struct inode *dir_i, struct dentry *dentry,
+			umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct jffs2_raw_inode *ri;
 	struct jffs2_inode_info *f, *dir_f;
@@ -620,7 +642,11 @@ static int jffs2_rmdir (struct inode *dir_i, struct dentry *dentry)
 	return ret;
 }
 
+<<<<<<< HEAD
 static int jffs2_mknod (struct inode *dir_i, struct dentry *dentry, int mode, dev_t rdev)
+=======
+static int jffs2_mknod (struct inode *dir_i, struct dentry *dentry, umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct jffs2_inode_info *f, *dir_f;
 	struct jffs2_sb_info *c;

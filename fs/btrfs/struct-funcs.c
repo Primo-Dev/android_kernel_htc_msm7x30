@@ -50,6 +50,7 @@ u##bits btrfs_##name(struct extent_buffer *eb,				\
 	unsigned long part_offset = (unsigned long)s;			\
 	unsigned long offset = part_offset + offsetof(type, member);	\
 	type *p;							\
+<<<<<<< HEAD
 	/* ugly, but we want the fast path here */			\
 	if (eb->map_token && offset >= eb->map_start &&			\
 	    offset + sizeof(((type *)0)->member) <= eb->map_start +	\
@@ -80,6 +81,24 @@ u##bits btrfs_##name(struct extent_buffer *eb,				\
 			unmap_extent_buffer(eb, map_token, KM_USER1);	\
 		return res;						\
 	}								\
+=======
+	int err;						\
+	char *kaddr;						\
+	unsigned long map_start;				\
+	unsigned long map_len;					\
+	u##bits res;						\
+	err = map_private_extent_buffer(eb, offset,		\
+			sizeof(((type *)0)->member),		\
+			&kaddr, &map_start, &map_len);		\
+	if (err) {						\
+		__le##bits leres;				\
+		read_eb_member(eb, s, type, member, &leres);	\
+		return le##bits##_to_cpu(leres);		\
+	}							\
+	p = (type *)(kaddr + part_offset - map_start);		\
+	res = le##bits##_to_cpu(p->member);			\
+	return res;						\
+>>>>>>> upstream/4.3_primoc
 }									\
 void btrfs_set_##name(struct extent_buffer *eb,				\
 				    type *s, u##bits val)		\
@@ -87,6 +106,7 @@ void btrfs_set_##name(struct extent_buffer *eb,				\
 	unsigned long part_offset = (unsigned long)s;			\
 	unsigned long offset = part_offset + offsetof(type, member);	\
 	type *p;							\
+<<<<<<< HEAD
 	/* ugly, but we want the fast path here */			\
 	if (eb->map_token && offset >= eb->map_start &&			\
 	    offset + sizeof(((type *)0)->member) <= eb->map_start +	\
@@ -117,6 +137,23 @@ void btrfs_set_##name(struct extent_buffer *eb,				\
 		if (unmap_on_exit)					\
 			unmap_extent_buffer(eb, map_token, KM_USER1);	\
 	}								\
+=======
+	int err;						\
+	char *kaddr;						\
+	unsigned long map_start;				\
+	unsigned long map_len;					\
+	err = map_private_extent_buffer(eb, offset,		\
+			sizeof(((type *)0)->member),		\
+			&kaddr, &map_start, &map_len);		\
+	if (err) {						\
+		__le##bits val2;				\
+		val2 = cpu_to_le##bits(val);			\
+		write_eb_member(eb, s, type, member, &val2);	\
+		return;						\
+	}							\
+	p = (type *)(kaddr + part_offset - map_start);		\
+	p->member = cpu_to_le##bits(val);			\
+>>>>>>> upstream/4.3_primoc
 }
 
 #include "ctree.h"
@@ -125,6 +162,7 @@ void btrfs_node_key(struct extent_buffer *eb,
 		    struct btrfs_disk_key *disk_key, int nr)
 {
 	unsigned long ptr = btrfs_node_key_ptr_offset(nr);
+<<<<<<< HEAD
 	if (eb->map_token && ptr >= eb->map_start &&
 	    ptr + sizeof(*disk_key) <= eb->map_start + eb->map_len) {
 		memcpy(disk_key, eb->kaddr + ptr - eb->map_start,
@@ -134,6 +172,8 @@ void btrfs_node_key(struct extent_buffer *eb,
 		unmap_extent_buffer(eb, eb->map_token, KM_USER1);
 		eb->map_token = NULL;
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	read_eb_member(eb, (struct btrfs_key_ptr *)ptr,
 		       struct btrfs_key_ptr, key, disk_key);
 }

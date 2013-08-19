@@ -5,14 +5,23 @@
 mmu-y			:= nommu.o
 mmu-$(CONFIG_MMU)	:= fremap.o highmem.o madvise.o memory.o mincore.o \
 			   mlock.o mmap.o mprotect.o mremap.o msync.o rmap.o \
+<<<<<<< HEAD
 			   vmalloc.o pagewalk.o pgtable-generic.o
+=======
+			   vmalloc.o pagewalk.o pgtable-generic.o \
+			   process_vm_access.o
+>>>>>>> upstream/4.3_primoc
 
 obj-y			:= filemap.o mempool.o oom_kill.o fadvise.o \
 			   maccess.o page_alloc.o page-writeback.o \
 			   readahead.o swap.o truncate.o vmscan.o shmem.o \
 			   prio_tree.o util.o mmzone.o vmstat.o backing-dev.o \
 			   page_isolation.o mm_init.o mmu_context.o percpu.o \
+<<<<<<< HEAD
 			   $(mmu-y)
+=======
+			   iov-iter.o $(mmu-y)
+>>>>>>> upstream/4.3_primoc
 obj-y += init-mm.o
 
 ifdef CONFIG_NO_BOOTMEM
@@ -25,6 +34,10 @@ obj-$(CONFIG_HAVE_MEMBLOCK) += memblock.o
 
 obj-$(CONFIG_BOUNCE)	+= bounce.o
 obj-$(CONFIG_SWAP)	+= page_io.o swap_state.o swapfile.o thrash.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_FRONTSWAP)	+= frontswap.o
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_HAS_DMA)	+= dmapool.o
 obj-$(CONFIG_HUGETLBFS)	+= hugetlb.o
 obj-$(CONFIG_NUMA) 	+= mempolicy.o
@@ -38,6 +51,10 @@ obj-$(CONFIG_KSM) += ksm.o
 obj-$(CONFIG_PAGE_POISONING) += debug-pagealloc.o
 obj-$(CONFIG_SLAB) += slab.o
 obj-$(CONFIG_SLUB) += slub.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_SLQB) += slqb.o
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_KMEMCHECK) += kmemcheck.o
 obj-$(CONFIG_FAILSLAB) += failslab.o
 obj-$(CONFIG_MEMORY_HOTPLUG) += memory_hotplug.o

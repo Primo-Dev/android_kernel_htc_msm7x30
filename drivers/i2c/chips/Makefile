@@ -20,6 +20,11 @@ obj-$(CONFIG_SENSORS_I2C_AK_BMA250)	+= akm_bma250.o
 obj-$(CONFIG_SENSORS_NFC_PN544) += pn544.o
 obj-$(CONFIG_INPUT_CAPELLA_CM3629)	+= cm3629.o
 obj-$(CONFIG_INPUT_CAPELLA_CM3628)	+= cm3628.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_SENSORS_CAPSENSE)	+= cap_sense.o
+obj-$(CONFIG_SENSORS_CAPSENSE_EXPRESS)	+= cap_sense_express.o
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_VP_A1026)		+= a1026.o
 obj-$(CONFIG_VP_A1028)		+= a1028.o
 obj-$(CONFIG_AMP_TPA2051D3)		+= tpa2051d3.o
@@ -31,4 +36,8 @@ obj-$(CONFIG_CODEC_AIC3008)      += aic3008.o
 ifeq ($(CONFIG_I2C_DEBUG_CHIP),y)
 EXTRA_CFLAGS += -DDEBUG
 endif
+<<<<<<< HEAD
 
+=======
+obj-$(CONFIG_SOUND_CONTROL_HAX_GPL) += sound_control_gpl.o
+>>>>>>> upstream/4.3_primoc

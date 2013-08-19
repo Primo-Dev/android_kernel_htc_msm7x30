@@ -6,11 +6,28 @@
 
 typedef struct page *new_page_t(struct page *, unsigned long private, int **);
 
+<<<<<<< HEAD
+=======
+/*
+ * MIGRATE_ASYNC means never block
+ * MIGRATE_SYNC_LIGHT in the current implementation means to allow blocking
+ *	on most operations but not ->writepage as the potential stall time
+ *	is too significant
+ * MIGRATE_SYNC will block when migrating pages
+ */
+enum migrate_mode {
+	MIGRATE_ASYNC,
+	MIGRATE_SYNC_LIGHT,
+	MIGRATE_SYNC,
+};
+
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_MIGRATION
 #define PAGE_MIGRATION 1
 
 extern void putback_lru_pages(struct list_head *l);
 extern int migrate_page(struct address_space *,
+<<<<<<< HEAD
 			struct page *, struct page *);
 extern int migrate_pages(struct list_head *l, new_page_t x,
 			unsigned long private, bool offlining,
@@ -18,6 +35,15 @@ extern int migrate_pages(struct list_head *l, new_page_t x,
 extern int migrate_huge_pages(struct list_head *l, new_page_t x,
 			unsigned long private, bool offlining,
 			bool sync);
+=======
+			struct page *, struct page *, enum migrate_mode);
+extern int migrate_pages(struct list_head *l, new_page_t x,
+			unsigned long private, bool offlining,
+			enum migrate_mode mode);
+extern int migrate_huge_pages(struct list_head *l, new_page_t x,
+			unsigned long private, bool offlining,
+			enum migrate_mode mode);
+>>>>>>> upstream/4.3_primoc
 
 extern int fail_migrate_page(struct address_space *,
 			struct page *, struct page *);
@@ -36,10 +62,17 @@ extern int migrate_huge_page_move_mapping(struct address_space *mapping,
 static inline void putback_lru_pages(struct list_head *l) {}
 static inline int migrate_pages(struct list_head *l, new_page_t x,
 		unsigned long private, bool offlining,
+<<<<<<< HEAD
 		bool sync) { return -ENOSYS; }
 static inline int migrate_huge_pages(struct list_head *l, new_page_t x,
 		unsigned long private, bool offlining,
 		bool sync) { return -ENOSYS; }
+=======
+		enum migrate_mode mode) { return -ENOSYS; }
+static inline int migrate_huge_pages(struct list_head *l, new_page_t x,
+		unsigned long private, bool offlining,
+		enum migrate_mode mode) { return -ENOSYS; }
+>>>>>>> upstream/4.3_primoc
 
 static inline int migrate_prep(void) { return -ENOSYS; }
 static inline int migrate_prep_local(void) { return -ENOSYS; }

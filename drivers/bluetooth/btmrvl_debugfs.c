@@ -64,8 +64,11 @@ static ssize_t btmrvl_hscfgcmd_write(struct file *file,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 10, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.hscfgcmd = result;
 
@@ -110,8 +113,11 @@ static ssize_t btmrvl_psmode_write(struct file *file, const char __user *ubuf,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 10, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.psmode = result;
 
@@ -151,8 +157,11 @@ static ssize_t btmrvl_pscmd_write(struct file *file, const char __user *ubuf,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 10, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.pscmd = result;
 
@@ -197,8 +206,11 @@ static ssize_t btmrvl_gpiogap_write(struct file *file, const char __user *ubuf,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 16, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.gpio_gap = result;
 
@@ -238,8 +250,11 @@ static ssize_t btmrvl_hscmd_write(struct file *file, const char __user *ubuf,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 10, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.hscmd = result;
 	if (priv->btmrvl_dev.hscmd) {
@@ -282,8 +297,11 @@ static ssize_t btmrvl_hsmode_write(struct file *file, const char __user *ubuf,
 		return -EFAULT;
 
 	ret = strict_strtol(buf, 10, &result);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	priv->btmrvl_dev.hsmode = result;
 

@@ -1,7 +1,11 @@
 /*
    HIDP implementation for Linux Bluetooth stack (BlueZ).
    Copyright (C) 2003-2004 Marcel Holtmann <marcel@holtmann.org>
+<<<<<<< HEAD
    Copyright (c) 2012 Code Aurora Forum.  All rights reserved.
+=======
+   Copyright (c) 2012 The Linux Foundation.  All rights reserved.
+>>>>>>> upstream/4.3_primoc
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 2 as
@@ -22,7 +26,10 @@
 */
 
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/interrupt.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 #include <linux/types.h>
 #include <linux/errno.h>
@@ -93,6 +100,7 @@ static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
 	return NULL;
 }
 
+<<<<<<< HEAD
 static struct device *hidp_get_device(struct hidp_session *session)
 {
 	bdaddr_t *src = &bt_sk(session->ctrl_sock->sk)->src;
@@ -113,20 +121,29 @@ static struct device *hidp_get_device(struct hidp_session *session)
 	return device;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static void __hidp_link_session(struct hidp_session *session)
 {
 	__module_get(THIS_MODULE);
 	list_add(&session->list, &hidp_session_list);
+<<<<<<< HEAD
 
 	hci_conn_hold_device(session->conn);
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void __hidp_unlink_session(struct hidp_session *session)
 {
+<<<<<<< HEAD
 	struct device *dev;
 
 	dev = hidp_get_device(session);
 	if (dev)
+=======
+	if (session->conn)
+>>>>>>> upstream/4.3_primoc
 		hci_conn_put_device(session->conn);
 
 	list_del(&session->list);
@@ -660,6 +677,31 @@ static int hidp_session(void *arg)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static struct hci_conn *hidp_get_connection(struct hidp_session *session)
+{
+	bdaddr_t *src = &bt_sk(session->ctrl_sock->sk)->src;
+	bdaddr_t *dst = &bt_sk(session->ctrl_sock->sk)->dst;
+	struct hci_conn *conn;
+	struct hci_dev *hdev;
+
+	hdev = hci_get_route(dst, src);
+	if (!hdev)
+		return NULL;
+
+	hci_dev_lock_bh(hdev);
+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
+	if (conn)
+		hci_conn_hold_device(conn);
+	hci_dev_unlock_bh(hdev);
+
+	hci_dev_put(hdev);
+
+	return conn;
+}
+
+>>>>>>> upstream/4.3_primoc
 static int hidp_setup_input(struct hidp_session *session,
 				struct hidp_connadd_req *req)
 {
@@ -707,7 +749,11 @@ static int hidp_setup_input(struct hidp_session *session,
 		input->relbit[0] |= BIT_MASK(REL_WHEEL);
 	}
 
+<<<<<<< HEAD
 	input->dev.parent = hidp_get_device(session);
+=======
+	input->dev.parent = &session->conn->dev;
+>>>>>>> upstream/4.3_primoc
 
 	input->event = hidp_input_event;
 
@@ -808,7 +854,11 @@ static int hidp_setup_hid(struct hidp_session *session,
 	strncpy(hid->phys, batostr(&bt_sk(session->ctrl_sock->sk)->src), 64);
 	strncpy(hid->uniq, batostr(&bt_sk(session->ctrl_sock->sk)->dst), 64);
 
+<<<<<<< HEAD
 	hid->dev.parent = hidp_get_device(session);
+=======
+	hid->dev.parent = &session->conn->dev;
+>>>>>>> upstream/4.3_primoc
 	hid->ll_driver = &hidp_hid_driver;
 
 	hid->hid_output_raw_report = hidp_output_raw_report;
@@ -866,6 +916,15 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, 
 	session->intr_sock = intr_sock;
 	session->state     = BT_CONNECTED;
 
+<<<<<<< HEAD
+=======
+	session->conn = hidp_get_connection(session);
+	if (!session->conn) {
+		err = -ENOTCONN;
+		goto failed;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	setup_timer(&session->timer, hidp_idle_timeout, (unsigned long)session);
 
 	skb_queue_head_init(&session->ctrl_transmit);
@@ -874,6 +933,11 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, 
 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
 	session->idle_to = req->idle_to;
 
+<<<<<<< HEAD
+=======
+	__hidp_link_session(session);
+
+>>>>>>> upstream/4.3_primoc
 	if (req->rd_size > 0) {
 		err = hidp_setup_hid(session, req);
 		if (err && err != -ENODEV)
@@ -886,8 +950,11 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, 
 			goto purge;
 	}
 
+<<<<<<< HEAD
 	__hidp_link_session(session);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	hidp_set_timer(session);
 
 	err = kernel_thread(hidp_session, session, CLONE_KERNEL);
@@ -909,8 +976,11 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, 
 unlink:
 	hidp_del_timer(session);
 
+<<<<<<< HEAD
 	__hidp_unlink_session(session);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (session->input) {
 		input_unregister_device(session->input);
 		session->input = NULL;
@@ -925,6 +995,11 @@ unlink:
 	session->rd_data = NULL;
 
 purge:
+<<<<<<< HEAD
+=======
+	__hidp_unlink_session(session);
+
+>>>>>>> upstream/4.3_primoc
 	skb_queue_purge(&session->ctrl_transmit);
 	skb_queue_purge(&session->intr_transmit);
 

@@ -85,6 +85,7 @@ static inline struct radeon_i2c_bus_rec radeon_lookup_i2c_gpio(struct radeon_dev
 		for (i = 0; i < num_indices; i++) {
 			gpio = &i2c_info->asGPIO_Info[i];
 
+<<<<<<< HEAD
 			/* r4xx mask is technically not used by the hw, so patch in the legacy mask bits */
 			if ((rdev->family == CHIP_R420) ||
 			    (rdev->family == CHIP_R423) ||
@@ -97,6 +98,8 @@ static inline struct radeon_i2c_bus_rec radeon_lookup_i2c_gpio(struct radeon_dev
 				}
 			}
 
+=======
+>>>>>>> upstream/4.3_primoc
 			/* some evergreen boards have bad data for this entry */
 			if (ASIC_IS_DCE4(rdev)) {
 				if ((i == 7) &&
@@ -181,6 +184,7 @@ void radeon_atombios_i2c_init(struct radeon_device *rdev)
 			gpio = &i2c_info->asGPIO_Info[i];
 			i2c.valid = false;
 
+<<<<<<< HEAD
 			/* r4xx mask is technically not used by the hw, so patch in the legacy mask bits */
 			if ((rdev->family == CHIP_R420) ||
 			    (rdev->family == CHIP_R423) ||
@@ -193,6 +197,8 @@ void radeon_atombios_i2c_init(struct radeon_device *rdev)
 				}
 			}
 
+=======
+>>>>>>> upstream/4.3_primoc
 			/* some evergreen boards have bad data for this entry */
 			if (ASIC_IS_DCE4(rdev)) {
 				if ((i == 7) &&
@@ -484,6 +490,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 		struct radeon_device *rdev = dev->dev_private;
 		*i2c_bus = radeon_lookup_i2c_gpio(rdev, 0x93);
 	}
+<<<<<<< HEAD
 
 	/* Fujitsu D3003-S2 board lists DVI-I as DVI-D and VGA */
 	if ((dev->pdev->device == 0x9802) &&
@@ -498,6 +505,8 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 	}
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return true;
 }
 
@@ -2029,6 +2038,11 @@ static int radeon_atombios_parse_power_table_1_3(struct radeon_device *rdev)
 	num_modes = power_info->info.ucNumOfPowerModeEntries;
 	if (num_modes > ATOM_MAX_NUMBEROF_POWER_BLOCK)
 		num_modes = ATOM_MAX_NUMBEROF_POWER_BLOCK;
+<<<<<<< HEAD
+=======
+	if (num_modes == 0)
+		return state_index;
+>>>>>>> upstream/4.3_primoc
 	rdev->pm.power_state = kzalloc(sizeof(struct radeon_power_state) * num_modes, GFP_KERNEL);
 	if (!rdev->pm.power_state)
 		return state_index;
@@ -2399,6 +2413,11 @@ static int radeon_atombios_parse_power_table_4_5(struct radeon_device *rdev)
 	power_info = (union power_info *)(mode_info->atom_context->bios + data_offset);
 
 	radeon_atombios_add_pplib_thermal_controller(rdev, &power_info->pplib.sThermalController);
+<<<<<<< HEAD
+=======
+	if (power_info->pplib.ucNumStates == 0)
+		return state_index;
+>>>>>>> upstream/4.3_primoc
 	rdev->pm.power_state = kzalloc(sizeof(struct radeon_power_state) *
 				       power_info->pplib.ucNumStates, GFP_KERNEL);
 	if (!rdev->pm.power_state)
@@ -2483,6 +2502,11 @@ static int radeon_atombios_parse_power_table_6(struct radeon_device *rdev)
 	non_clock_info_array = (struct NonClockInfoArray *)
 		(mode_info->atom_context->bios + data_offset +
 		 le16_to_cpu(power_info->pplib.usNonClockInfoArrayOffset));
+<<<<<<< HEAD
+=======
+	if (state_array->ucNumEntries == 0)
+		return state_index;
+>>>>>>> upstream/4.3_primoc
 	rdev->pm.power_state = kzalloc(sizeof(struct radeon_power_state) *
 				       state_array->ucNumEntries, GFP_KERNEL);
 	if (!rdev->pm.power_state)
@@ -2559,7 +2583,13 @@ void radeon_atombios_get_power_modes(struct radeon_device *rdev)
 		default:
 			break;
 		}
+<<<<<<< HEAD
 	} else {
+=======
+	}
+
+	if (state_index == 0) {
+>>>>>>> upstream/4.3_primoc
 		rdev->pm.power_state = kzalloc(sizeof(struct radeon_power_state), GFP_KERNEL);
 		if (rdev->pm.power_state) {
 			/* add the default mode */
@@ -2582,11 +2612,15 @@ void radeon_atombios_get_power_modes(struct radeon_device *rdev)
 
 	rdev->pm.current_power_state_index = rdev->pm.default_power_state_index;
 	rdev->pm.current_clock_mode_index = 0;
+<<<<<<< HEAD
 	if (rdev->pm.default_power_state_index >= 0)
 		rdev->pm.current_vddc =
 			rdev->pm.power_state[rdev->pm.default_power_state_index].clock_info[0].voltage.voltage;
 	else
 		rdev->pm.current_vddc = 0;
+=======
+	rdev->pm.current_vddc = rdev->pm.power_state[rdev->pm.default_power_state_index].clock_info[0].voltage.voltage;
+>>>>>>> upstream/4.3_primoc
 }
 
 void radeon_atom_set_clock_gating(struct radeon_device *rdev, int enable)

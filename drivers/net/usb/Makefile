@@ -29,4 +29,8 @@ obj-$(CONFIG_USB_SIERRA_NET)	+= sierra_net.o
 obj-$(CONFIG_USB_NET_CX82310_ETH)	+= cx82310_eth.o
 obj-$(CONFIG_USB_NET_CDC_NCM)	+= cdc_ncm.o
 obj-$(CONFIG_USB_VL600)		+= lg-vl600.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_USB_NET_RAW_IP)	+= raw_ip_net.o
+>>>>>>> upstream/4.3_primoc
 

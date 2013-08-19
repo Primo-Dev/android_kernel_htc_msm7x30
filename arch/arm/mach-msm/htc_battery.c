@@ -27,7 +27,11 @@
 #include <mach/board.h>
 #include <asm/mach-types.h>
 #include <mach/board_htc.h>
+<<<<<<< HEAD
 #include <mach/msm_fb-7x30.h> /*to register display notifier */
+=======
+#include <mach/msm_fb.h> /*to register display notifier */
+>>>>>>> upstream/4.3_primoc
 #include <mach/htc_battery.h>
 #include <linux/rtc.h>
 #include <linux/workqueue.h>
@@ -49,6 +53,13 @@
 #include <linux/ds2746_battery.h>
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
+
+>>>>>>> upstream/4.3_primoc
 #include <linux/android_alarm.h>
 
 static struct wake_lock vbus_wake_lock;
@@ -141,7 +152,10 @@ static unsigned int cache_time;
 static int htc_battery_initial = 0;
 static int htc_full_level_flag = 0;
 static int htc_is_DMB = 0;
+<<<<<<< HEAD
 static int fast_charge = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 static struct alarm batt_charger_ctrl_alarm;
 static struct work_struct batt_charger_ctrl_work;
@@ -440,9 +454,25 @@ int battery_charging_ctrl(enum batt_ctl_t ctl)
 		result = gpio_direction_output(htc_batt_info.gpio_mchg_en_n, 1);
 		break;
 	case ENABLE_SLOW_CHG:
+<<<<<<< HEAD
 		BATT_LOG("charger ON (SLOW)");
 		result = gpio_direction_output(htc_batt_info.gpio_iset, 0);
 		result = gpio_direction_output(htc_batt_info.gpio_mchg_en_n, 0);
+=======
+#ifdef CONFIG_FORCE_FAST_CHARGE
+		if (force_fast_charge == 1) {
+			BATT_LOG("charger ON (FORCE_FAST_CHARGE)");
+			result = gpio_direction_output(htc_batt_info.gpio_iset, 1);
+			result = gpio_direction_output(htc_batt_info.gpio_mchg_en_n, 0);
+		} else {
+#endif
+			BATT_LOG("charger ON (SLOW)");
+			result = gpio_direction_output(htc_batt_info.gpio_iset, 0);
+			result = gpio_direction_output(htc_batt_info.gpio_mchg_en_n, 0);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+		}
+#endif
+>>>>>>> upstream/4.3_primoc
 		if (htc_batt_info.gpio_adp_9v > 0)
 			result = gpio_direction_output(htc_batt_info.gpio_adp_9v, 0);
 		break;
@@ -640,8 +670,19 @@ static int htc_cable_status_update(int status)
 	 * if receives AC notification */
 	last_source = htc_batt_info.rep.charging_source;
 	if (status == CHARGER_USB && g_usb_online == 0) {
+<<<<<<< HEAD
 		htc_set_smem_cable_type(CHARGER_USB);
 		htc_batt_info.rep.charging_source = CHARGER_USB;
+=======
+#ifdef CONFIG_FORCE_FAST_CHARGE
+		BATT_LOG("cable USB forced fast charge");
+		htc_set_smem_cable_type(CHARGER_AC);
+		htc_batt_info.rep.charging_source = CHARGER_AC;
+#else
+		htc_set_smem_cable_type(CHARGER_USB);
+		htc_batt_info.rep.charging_source = CHARGER_USB;
+#endif
+>>>>>>> upstream/4.3_primoc
 	} else {
 		htc_set_smem_cable_type(status);
 		htc_batt_info.rep.charging_source  = status;
@@ -1117,6 +1158,7 @@ static ssize_t htc_battery_show_batt_attr(struct device *dev,
 	return 0;
 }
 
+<<<<<<< HEAD
 static ssize_t
 fast_charge_show(struct device *dev,
 					struct device_attribute *attr,
@@ -1141,6 +1183,8 @@ fast_charge_store(struct device *dev,
 			
 	return size;
 }
+=======
+>>>>>>> upstream/4.3_primoc
 /* -------------------------------------------------------------------------- */
 static int htc_power_get_property(struct power_supply *psy,
 				    enum power_supply_property psp,
@@ -1346,7 +1390,10 @@ static struct device_attribute htc_battery_attrs[] = {
 	__ATTR(smem_text, S_IRUGO, htc_battery_show_smem, NULL),
 #endif
 	__ATTR(batt_attr_text, S_IRUGO, htc_battery_show_batt_attr, NULL),
+<<<<<<< HEAD
 	__ATTR(fast_charge, S_IRUGO|S_IWUSR, fast_charge_show, fast_charge_store),
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 enum {
@@ -1413,10 +1460,18 @@ static int htc_rpc_charger_switch(unsigned enable)
 			if (ret < 0)
 				BATT_ERR("%s: msm_rpc_call failed (%d)!", __func__, ret);
 		}
+<<<<<<< HEAD
+=======
+#if 0
+>>>>>>> upstream/4.3_primoc
 #if defined(CONFIG_BATTERY_DS2746)
 		if (htc_batt_info.guage_driver == GUAGE_DS2746)
 			ds2746_charger_switch(enable);
 #endif
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 		power_supply_changed(&htc_power_supplies[CHARGER_BATTERY]);
 	}
 
@@ -1944,6 +1999,7 @@ static int handle_battery_call(struct msm_rpc_server *server,
 		}
 		if (htc_batt_debug_mask & HTC_BATT_DEBUG_M2A_RPC)
 			BATT_LOG("M2A_RPC: set_charging: %d", args->enable);
+<<<<<<< HEAD
 		if (htc_batt_info.charger == SWITCH_CHARGER_TPS65200){
 			if (args->enable == POWER_SUPPLY_ENABLE_SLOW_CHARGE && fast_charge){
 				args->enable = POWER_SUPPLY_ENABLE_FAST_CHARGE;
@@ -1952,6 +2008,10 @@ static int handle_battery_call(struct msm_rpc_server *server,
 			}
 			tps_set_charger_ctrl(args->enable);
 		}
+=======
+		if (htc_batt_info.charger == SWITCH_CHARGER_TPS65200)
+			tps_set_charger_ctrl(args->enable);
+>>>>>>> upstream/4.3_primoc
 		else if (htc_batt_info.charger == SWITCH_CHARGER)
 			blocking_notifier_call_chain(&cable_status_notifier_list,
 				args->enable, NULL);

@@ -18,6 +18,10 @@
 #define _MSM_FB_H_
 
 #include <linux/device.h>
+<<<<<<< HEAD
+=======
+#include <linux/msm_mdp.h>
+>>>>>>> upstream/4.3_primoc
 
 struct mddi_info;
 
@@ -69,12 +73,15 @@ struct msm_panel_data {
 	uint32_t caps;
 };
 
+<<<<<<< HEAD
 struct mdp_reg {
     uint32_t reg;
     uint32_t val;
     uint32_t mask;
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 struct msm_mddi_client_data {
 	void (*suspend)(struct msm_mddi_client_data *);
 	void (*resume)(struct msm_mddi_client_data *);
@@ -193,6 +200,7 @@ struct msm_mddi_bridge_platform_data {
 	uint32_t panel_caps;
 };
 
+<<<<<<< HEAD
 #if (defined(CONFIG_USB_FUNCTION_PROJECTOR) || defined(CONFIG_USB_ANDROID_PROJECTOR))
 /* For USB Projector to quick access the frame buffer info */
 struct msm_fb_info {
@@ -206,5 +214,34 @@ extern int msmfb_get_var(struct msm_fb_info *tmp);
 extern int msmfb_get_fb_area(void);
 #endif
 
+=======
+
+struct mdp_v4l2_req;
+int msm_fb_v4l2_enable(struct mdp_overlay *req, bool enable, void **par);
+int msm_fb_v4l2_update(void *par,
+	unsigned long srcp0_addr, unsigned long srcp0_size,
+	unsigned long srcp1_addr, unsigned long srcp1_size,
+	unsigned long srcp2_addr, unsigned long srcp2_size);
+
+/*
+ * This is used to communicate event between msm_fb, mddi, mddi_client,
+ * and board.
+ * It's mainly used to reset the display system.
+ * Also, it is used for battery power policy.
+ *
+ */
+#define NOTIFY_MDDI     0x00000000
+#define NOTIFY_POWER    0x00000001
+#define NOTIFY_MSM_FB   0x00000010
+
+extern int register_display_notifier(struct notifier_block *nb);
+extern int display_notifier_call_chain(unsigned long val, void *data);
+
+#define display_notifier(fn, pri) {                     \
+	static struct notifier_block fn##_nb =          \
+	{ .notifier_call = fn, .priority = pri };       \
+	register_display_notifier(&fn##_nb);		\
+}
+>>>>>>> upstream/4.3_primoc
 
 #endif

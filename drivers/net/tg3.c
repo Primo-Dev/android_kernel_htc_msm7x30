@@ -13704,8 +13704,14 @@ static int __devinit tg3_get_invariants(struct tg3 *tp)
 	 */
 	tg3_flag_set(tp, 4G_DMA_BNDRY_BUG);
 
+<<<<<<< HEAD
 	if (tg3_flag(tp, 5755_PLUS))
 		tg3_flag_set(tp, SHORT_DMA_BUG);
+=======
+	if (tg3_flag(tp, 5755_PLUS) ||
+		GET_ASIC_REV(tp->pci_chip_rev_id) == ASIC_REV_5906)
+			tg3_flag_set(tp, SHORT_DMA_BUG);
+>>>>>>> upstream/4.3_primoc
 	else
 		tg3_flag_set(tp, 40BIT_DMA_LIMIT_BUG);
 

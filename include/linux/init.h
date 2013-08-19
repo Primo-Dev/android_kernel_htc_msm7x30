@@ -158,6 +158,21 @@ extern void (*late_time_init)(void);
 
 extern int initcall_debug;
 
+<<<<<<< HEAD
+=======
+
+#ifdef MODULE
+static inline int initcall_schedule(void)
+{
+	return -1;
+}
+#else
+extern int initcall_schedule(void);
+struct mutex;
+extern void initcall_lock(struct mutex *);
+#endif
+
+>>>>>>> upstream/4.3_primoc
 #endif
   
 #ifndef MODULE

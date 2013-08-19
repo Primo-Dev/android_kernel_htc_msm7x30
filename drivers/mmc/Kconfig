@@ -30,6 +30,7 @@ config MMC_PERF_PROFILING
 # Modified by Memory, Studio Software for Zimmer
 config ZIMMER
 	bool "Using new eMMC driver for Zimmer"
+<<<<<<< HEAD
 	depends on MMC != n && SWAP != n
 	help
 	  This is an option to enable Zimmer.
@@ -41,6 +42,12 @@ config MMC_DISABLE_WP_RFG_5
 	help
 	  This is an option to enable workaround for radio_config on SHR/SHRK.
 
+=======
+	depends on SWAP != n
+	help
+	  This is an option to enable Zimmer.
+
+>>>>>>> upstream/4.3_primoc
 if MMC
 
 source "drivers/mmc/core/Kconfig"

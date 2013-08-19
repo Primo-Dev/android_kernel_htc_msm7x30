@@ -47,6 +47,7 @@
 #define BAND_SET_CMD				"SETBAND"
 #define DTIM_SKIP_GET_CMD			"DTIMSKIPGET"
 #define DTIM_SKIP_SET_CMD			"DTIMSKIPSET"
+<<<<<<< HEAD
 #define SETSUSPEND_CMD				"SETSUSPENDOPT"
 #define PNOSSIDCLR_SET_CMD			"PNOSSIDCLR"
 
@@ -54,6 +55,17 @@
 #define PNOENABLE_SET_CMD			"PNOFORCE"
 #define PNODEBUG_SET_CMD			"PNODEBUG"
 #define TXPOWER_SET_CMD			"TXPOWER"
+=======
+#define SETSUSPENDOPT_CMD			"SETSUSPENDOPT"
+#define SETSUSPENDMODE_CMD			"SETSUSPENDMODE"
+#define PNOSSIDCLR_SET_CMD			"PNOSSIDCLR"
+
+#define PNOSETUP_SET_CMD			"PNOSETUP " 
+#define PNOSETADD_SET_CMD			"PNOSETADD"
+#define PNOENABLE_SET_CMD			"PNOFORCE"
+#define PNODEBUG_SET_CMD			"PNODEBUG"
+#define TXPOWER_SET_CMD				"TXPOWER"
+>>>>>>> upstream/4.3_primoc
 
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
 #define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
@@ -96,6 +108,7 @@ struct cntry_locales_custom {
 #define AP_LPB_CMD              (SIOCIWFIRSTPRIV+23)
 #define WL_AP_STOP              (SIOCIWFIRSTPRIV+25)
 #define WL_FW_RELOAD            (SIOCIWFIRSTPRIV+27)
+<<<<<<< HEAD
 /* HTC_CSP_START */
 #define WL_SET_AP_TXPWR         (SIOCIWFIRSTPRIV+29)
 /* HTC_CSP_END */
@@ -106,6 +119,11 @@ struct cntry_locales_custom {
 #define WL_REGISTRAR_WSEC       (SIOCIWFIRSTPRIV+35)
 #endif /* BRCM_WPSAP */
 //BRCM WPSAP END
+=======
+#define WL_AP_STA_DISASSOC		(SIOCIWFIRSTPRIV+29)
+#define WL_COMBO_SCAN           (SIOCIWFIRSTPRIV+31)
+
+>>>>>>> upstream/4.3_primoc
 
 #define			G_SCAN_RESULTS 8*1024
 #define 		WE_ADD_EVENT_FIX	0x80
@@ -166,8 +184,41 @@ typedef enum broadcast_first_scan {
 	BROADCAST_SCAN_FIRST_RESULT_READY,
 	BROADCAST_SCAN_FIRST_RESULT_CONSUMED
 } broadcast_first_scan_t;
+<<<<<<< HEAD
 
 
+=======
+#ifdef SOFTAP
+#define SSID_LEN	33
+#define SEC_LEN		16
+#define KEY_LEN		65
+#define PROFILE_OFFSET	32
+struct ap_profile {
+	uint8	ssid[SSID_LEN];
+	uint8	sec[SEC_LEN];
+	uint8	key[KEY_LEN];
+	uint32	channel; 
+	uint32	preamble;
+	uint32	max_scb;	
+	uint32  closednet;  
+	char country_code[WLC_CNTRY_BUF_SZ];
+};
+
+
+#define MACLIST_MODE_DISABLED	0
+#define MACLIST_MODE_DENY		1
+#define MACLIST_MODE_ALLOW		2
+struct mflist {
+	uint count;
+	struct ether_addr ea[16];
+};
+struct mac_list_set {
+	uint32	mode;
+	struct mflist mac_list;
+};
+#endif   
+
+>>>>>>> upstream/4.3_primoc
 #if WIRELESS_EXT > 12
 #include <net/iw_handler.h>
 extern const struct iw_handler_def wl_iw_handler_def;
@@ -181,6 +232,7 @@ void wl_iw_detach(void);
 
 extern int net_os_wake_lock(struct net_device *dev);
 extern int net_os_wake_unlock(struct net_device *dev);
+<<<<<<< HEAD
 extern int dhd_os_wake_force_unlock(dhd_pub_t *pub);
 extern int net_os_wake_lock_timeout(struct net_device *dev);
 extern int net_os_wake_lock_timeout_enable(struct net_device *dev, int val);
@@ -189,6 +241,13 @@ extern int net_os_set_suspend(struct net_device *dev, int val);
 extern int net_os_set_dtim_skip(struct net_device *dev, int val);
 extern int net_os_set_packet_filter(struct net_device *dev, int val);
 extern int net_os_send_hang_message(struct net_device *dev);
+=======
+extern int net_os_wake_lock_timeout(struct net_device *dev);
+extern int  net_os_wake_lock_ctrl_timeout_enable(struct net_device *dev, int val);
+extern int net_os_set_suspend_disable(struct net_device *dev, int val);
+extern int net_os_set_suspend(struct net_device *dev, int val, int force);
+extern int net_os_set_dtim_skip(struct net_device *dev, int val);
+>>>>>>> upstream/4.3_primoc
 extern void get_customized_country_code(char *country_iso_code, wl_country_t *cspec);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
@@ -207,6 +266,21 @@ extern void get_customized_country_code(char *country_iso_code, wl_country_t *cs
 	iwe_stream_add_point(stream, ends, iwe, extra)
 #endif
 
+<<<<<<< HEAD
+=======
+extern int dhd_pno_enable(dhd_pub_t *dhd, int pfn_enabled);
+extern int dhd_pno_clean(dhd_pub_t *dhd);
+extern int dhd_pno_set(dhd_pub_t *dhd, wlc_ssid_t* ssids_local, int nssid,
+                       ushort  scan_fr, int pno_repeat, int pno_freq_expo_max);
+extern int dhd_pno_get_status(dhd_pub_t *dhd);
+extern int dhd_dev_pno_reset(struct net_device *dev);
+extern int dhd_dev_pno_set(struct net_device *dev, wlc_ssid_t* ssids_local,
+                           int nssid, ushort  scan_fr, int pno_repeat, int pno_freq_expo_max);
+extern int dhd_dev_pno_enable(struct net_device *dev,  int pfn_enabled);
+extern int dhd_dev_get_pno_status(struct net_device *dev);
+extern int dhd_get_dtim_skip(dhd_pub_t *dhd);
+
+>>>>>>> upstream/4.3_primoc
 void	dhd_bus_country_set(struct net_device *dev, wl_country_t *cspec);
 
 #define PNO_TLV_PREFIX			'S'
@@ -275,7 +349,10 @@ extern int wl_iw_parse_ssid_list(char** list_str, wlc_ssid_t* ssid, int idx, int
 
 extern int wl_iw_parse_channel_list(char** list_str, uint16* channel_list, int channel_num);
 
+<<<<<<< HEAD
 extern int wl_iw_get_onoff(void);
+=======
+>>>>>>> upstream/4.3_primoc
 
 #define NETDEV_PRIV(dev)	(*(wl_iw_t **)netdev_priv(dev))
 
@@ -283,6 +360,10 @@ extern int wl_iw_get_onoff(void);
 #define WPS_ADD_PROBE_REQ_IE_CMD "ADD_WPS_PROBE_REQ_IE "
 #define WPS_DEL_PROBE_REQ_IE_CMD "DEL_WPS_PROBE_REQ_IE "
 #define WPS_PROBE_REQ_IE_CMD_LENGTH 21
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 #endif 

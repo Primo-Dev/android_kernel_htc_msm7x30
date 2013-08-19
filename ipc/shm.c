@@ -277,13 +277,21 @@ static int shm_release(struct inode *ino, struct file *file)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int shm_fsync(struct file *file, int datasync)
+=======
+static int shm_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	struct shm_file_data *sfd = shm_file_data(file);
 
 	if (!sfd->file->f_op->fsync)
 		return -EINVAL;
+<<<<<<< HEAD
 	return sfd->file->f_op->fsync(sfd->file, datasync);
+=======
+	return sfd->file->f_op->fsync(sfd->file, start, end, datasync);
+>>>>>>> upstream/4.3_primoc
 }
 
 static unsigned long shm_get_unmapped_area(struct file *file,
@@ -343,7 +351,11 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
 	size_t size = params->u.size;
 	int error;
 	struct shmid_kernel *shp;
+<<<<<<< HEAD
 	int numpages = (size + PAGE_SIZE -1) >> PAGE_SHIFT;
+=======
+	size_t numpages = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;
+>>>>>>> upstream/4.3_primoc
 	struct file * file;
 	char name[13];
 	int id;
@@ -762,9 +774,13 @@ SYSCALL_DEFINE3(shmctl, int, shmid, int, cmd, struct shmid_ds __user *, buf)
 	case SHM_LOCK:
 	case SHM_UNLOCK:
 	{
+<<<<<<< HEAD
 		struct file *uninitialized_var(shm_file);
 
 		lru_add_drain_all();  /* drain pagevecs to lru lists */
+=======
+		struct file *shm_file;
+>>>>>>> upstream/4.3_primoc
 
 		shp = shm_lock_check(ns, shmid);
 		if (IS_ERR(shp)) {
@@ -787,6 +803,7 @@ SYSCALL_DEFINE3(shmctl, int, shmid, int, cmd, struct shmid_ds __user *, buf)
 		err = security_shm_shmctl(shp, cmd);
 		if (err)
 			goto out_unlock;
+<<<<<<< HEAD
 		
 		if(cmd==SHM_LOCK) {
 			struct user_struct *user = current_user();
@@ -803,6 +820,33 @@ SYSCALL_DEFINE3(shmctl, int, shmid, int, cmd, struct shmid_ds __user *, buf)
 			shp->mlock_user = NULL;
 		}
 		shm_unlock(shp);
+=======
+
+		shm_file = shp->shm_file;
+		if (is_file_hugepages(shm_file))
+			goto out_unlock;
+
+		if (cmd == SHM_LOCK) {
+			struct user_struct *user = current_user();
+			err = shmem_lock(shm_file, 1, user);
+			if (!err && !(shp->shm_perm.mode & SHM_LOCKED)) {
+				shp->shm_perm.mode |= SHM_LOCKED;
+				shp->mlock_user = user;
+			}
+			goto out_unlock;
+		}
+
+		/* SHM_UNLOCK */
+		if (!(shp->shm_perm.mode & SHM_LOCKED))
+			goto out_unlock;
+		shmem_lock(shm_file, 0, shp->mlock_user);
+		shp->shm_perm.mode &= ~SHM_LOCKED;
+		shp->mlock_user = NULL;
+		get_file(shm_file);
+		shm_unlock(shp);
+		shmem_unlock_mapping(shm_file->f_mapping);
+		fput(shm_file);
+>>>>>>> upstream/4.3_primoc
 		goto out;
 	}
 	case IPC_RMID:

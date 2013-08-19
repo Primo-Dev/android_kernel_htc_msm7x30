@@ -842,10 +842,17 @@ static int fuse_copy_page(struct fuse_copy_state *cs, struct page **pagep,
 			}
 		}
 		if (page) {
+<<<<<<< HEAD
 			void *mapaddr = kmap_atomic(page, KM_USER0);
 			void *buf = mapaddr + offset;
 			offset += fuse_copy_do(cs, &buf, &count);
 			kunmap_atomic(mapaddr, KM_USER0);
+=======
+			void *mapaddr = kmap_atomic(page);
+			void *buf = mapaddr + offset;
+			offset += fuse_copy_do(cs, &buf, &count);
+			kunmap_atomic(mapaddr);
+>>>>>>> upstream/4.3_primoc
 		} else
 			offset += fuse_copy_do(cs, NULL, &count);
 	}
@@ -854,9 +861,15 @@ static int fuse_copy_page(struct fuse_copy_state *cs, struct page **pagep,
 	return 0;
 }
 
+<<<<<<< HEAD
 /* Copy pages in the request to/from userspace buffer */
 static int fuse_copy_pages(struct fuse_copy_state *cs, unsigned nbytes,
 			   int zeroing)
+=======
+/* Start from addr(pages[0]) + page_offset. No holes in the middle. */
+static int fuse_copy_pages_for_buf(struct fuse_copy_state *cs, unsigned nbytes,
+				   int zeroing)
+>>>>>>> upstream/4.3_primoc
 {
 	unsigned i;
 	struct fuse_req *req = cs->req;
@@ -878,6 +891,55 @@ static int fuse_copy_pages(struct fuse_copy_state *cs, unsigned nbytes,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/* Take iov_offset as offset in iovec[0]. Iterate based on iovec[].iov_len */
+static int fuse_copy_pages_for_iovec(struct fuse_copy_state *cs,
+				     unsigned nbytes, int zeroing)
+{
+	unsigned i;
+	struct fuse_req *req = cs->req;
+	const struct iovec *iov = req->iovec;
+	unsigned iov_offset = req->iov_offset;
+
+	for (i = 0; i < req->num_pages && (nbytes || zeroing); i++) {
+		int err;
+		unsigned long user_addr = (unsigned long)iov->iov_base +
+					  iov_offset;
+		unsigned offset = user_addr & ~PAGE_MASK;
+		unsigned count = min_t(size_t, PAGE_SIZE - offset,
+				       iov->iov_len - iov_offset);
+		count = min(nbytes, count);
+
+		err = fuse_copy_page(cs, &req->pages[i], offset, count,
+				     zeroing);
+		if (err)
+			return err;
+
+		nbytes -= count;
+
+		if (count < iov->iov_len - iov_offset) {
+			iov_offset += count;
+		} else {
+			iov++;
+			iov_offset = 0;
+		}
+	}
+
+	return 0;
+}
+
+/* Copy pages in the request to/from userspace buffer */
+static int fuse_copy_pages(struct fuse_copy_state *cs, unsigned nbytes,
+			   int zeroing)
+{
+	if (cs->req->iovec)
+		return fuse_copy_pages_for_iovec(cs, nbytes, zeroing);
+	else
+		return fuse_copy_pages_for_buf(cs, nbytes, zeroing);
+}
+
+>>>>>>> upstream/4.3_primoc
 /* Copy a single argument in the request to/from userspace buffer */
 static int fuse_copy_one(struct fuse_copy_state *cs, void *val, unsigned size)
 {
@@ -1382,7 +1444,63 @@ static int fuse_notify_inval_entry(struct fuse_conn *fc, unsigned int size,
 	down_read(&fc->killsb);
 	err = -ENOENT;
 	if (fc->sb)
+<<<<<<< HEAD
 		err = fuse_reverse_inval_entry(fc->sb, outarg.parent, &name);
+=======
+		err = fuse_reverse_inval_entry(fc->sb, outarg.parent, 0, &name);
+	up_read(&fc->killsb);
+	kfree(buf);
+	return err;
+
+err:
+	kfree(buf);
+	fuse_copy_finish(cs);
+	return err;
+}
+
+static int fuse_notify_delete(struct fuse_conn *fc, unsigned int size,
+			      struct fuse_copy_state *cs)
+{
+	struct fuse_notify_delete_out outarg;
+	int err = -ENOMEM;
+	char *buf;
+	struct qstr name;
+
+	buf = kzalloc(FUSE_NAME_MAX + 1, GFP_KERNEL);
+	if (!buf)
+		goto err;
+
+	err = -EINVAL;
+	if (size < sizeof(outarg))
+		goto err;
+
+	err = fuse_copy_one(cs, &outarg, sizeof(outarg));
+	if (err)
+		goto err;
+
+	err = -ENAMETOOLONG;
+	if (outarg.namelen > FUSE_NAME_MAX)
+		goto err;
+
+	err = -EINVAL;
+	if (size != sizeof(outarg) + outarg.namelen + 1)
+		goto err;
+
+	name.name = buf;
+	name.len = outarg.namelen;
+	err = fuse_copy_one(cs, buf, outarg.namelen + 1);
+	if (err)
+		goto err;
+	fuse_copy_finish(cs);
+	buf[outarg.namelen] = 0;
+	name.hash = full_name_hash(name.name, name.len);
+
+	down_read(&fc->killsb);
+	err = -ENOENT;
+	if (fc->sb)
+		err = fuse_reverse_inval_entry(fc->sb, outarg.parent,
+					       outarg.child, &name);
+>>>>>>> upstream/4.3_primoc
 	up_read(&fc->killsb);
 	kfree(buf);
 	return err;
@@ -1602,6 +1720,12 @@ static int fuse_notify(struct fuse_conn *fc, enum fuse_notify_code code,
 	case FUSE_NOTIFY_RETRIEVE:
 		return fuse_notify_retrieve(fc, size, cs);
 
+<<<<<<< HEAD
+=======
+	case FUSE_NOTIFY_DELETE:
+		return fuse_notify_delete(fc, size, cs);
+
+>>>>>>> upstream/4.3_primoc
 	default:
 		fuse_copy_finish(cs);
 		return -EINVAL;

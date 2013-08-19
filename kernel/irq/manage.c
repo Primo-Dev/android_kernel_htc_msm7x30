@@ -28,8 +28,11 @@ static int __init setup_forced_irqthreads(char *arg)
 early_param("threadirqs", setup_forced_irqthreads);
 #endif
 
+<<<<<<< HEAD
 void rand_intialize_irq(int irq); 
 
+=======
+>>>>>>> upstream/4.3_primoc
 /**
  *	synchronize_irq - wait for pending IRQ handlers (on other CPUs)
  *	@irq: interrupt number to wait for
@@ -564,9 +567,15 @@ int can_request_irq(unsigned int irq, unsigned long irqflags)
 		return 0;
 
 	if (irq_settings_can_request(desc)) {
+<<<<<<< HEAD
 		if (desc->action)
 			if (irqflags & desc->action->flags & IRQF_SHARED)
 				canrequest =1;
+=======
+		if (!desc->action ||
+		    irqflags & desc->action->flags & IRQF_SHARED)
+			canrequest = 1;
+>>>>>>> upstream/4.3_primoc
 	}
 	irq_put_desc_unlock(desc, flags);
 	return canrequest;
@@ -618,7 +627,11 @@ int __irq_set_trigger(struct irq_desc *desc, unsigned int irq,
 		ret = 0;
 		break;
 	default:
+<<<<<<< HEAD
 		pr_err("[K] setting trigger mode %lu for irq %u failed (%pF)\n",
+=======
+		pr_err("setting trigger mode %lu for irq %u failed (%pF)\n",
+>>>>>>> upstream/4.3_primoc
 		       flags, irq, chip->irq_set_type);
 	}
 	if (unmask)
@@ -815,6 +828,10 @@ static int irq_thread(void *data)
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
 	current->irqaction = action;
+<<<<<<< HEAD
+=======
+	irq_thread_check_affinity(desc, action);
+>>>>>>> upstream/4.3_primoc
 
 	while (!irq_wait_for_interrupt(action)) {
 
@@ -923,6 +940,7 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 
 	if (desc->irq_data.chip == &no_irq_chip)
 		return -ENOSYS;
+<<<<<<< HEAD
 	if (!try_module_get(desc->owner))
 		return -ENODEV;
 	/*
@@ -941,6 +959,8 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 		 */
 		rand_initialize_irq(irq);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Check whether the interrupt nests into another interrupt
@@ -1075,7 +1095,11 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 		 * thread_mask assigned. See the loop above which or's
 		 * all existing action->thread_mask bits.
 		 */
+<<<<<<< HEAD
 		new->thread_mask = 1 << ffz(thread_mask);
+=======
+		new->thread_mask = 1UL << ffz(thread_mask);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (!shared) {
@@ -1102,9 +1126,16 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 		if (new->flags & IRQF_ONESHOT)
 			desc->istate |= IRQS_ONESHOT;
 
+<<<<<<< HEAD
 		if (irq_settings_can_autoenable(desc))
 			irq_startup(desc, true);
 		else
+=======
+		if (irq_settings_can_autoenable(desc)) {
+			irq_startup(desc, true);
+			check_irq_resend(desc, irq);
+		} else
+>>>>>>> upstream/4.3_primoc
 			/* Undo nested disables: */
 			desc->depth = 1;
 

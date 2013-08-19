@@ -46,7 +46,11 @@
 #include <linux/if_vlan.h>
 #include <linux/cpu.h>
 #include <linux/smp.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/pm_runtime.h>
 #include <linux/aer.h>
 #include <linux/prefetch.h>
@@ -5330,7 +5334,11 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake,
 	 */
 	e1000e_release_hw_control(adapter);
 
+<<<<<<< HEAD
 	pci_disable_device(pdev);
+=======
+	pci_clear_master(pdev);
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 }

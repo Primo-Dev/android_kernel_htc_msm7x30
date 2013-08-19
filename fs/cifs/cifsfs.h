@@ -48,13 +48,21 @@ extern void cifs_sb_deactive(struct super_block *sb);
 /* Functions related to inodes */
 extern const struct inode_operations cifs_dir_inode_ops;
 extern struct inode *cifs_root_iget(struct super_block *);
+<<<<<<< HEAD
 extern int cifs_create(struct inode *, struct dentry *, int,
+=======
+extern int cifs_create(struct inode *, struct dentry *, umode_t,
+>>>>>>> upstream/4.3_primoc
 		       struct nameidata *);
 extern struct dentry *cifs_lookup(struct inode *, struct dentry *,
 				  struct nameidata *);
 extern int cifs_unlink(struct inode *dir, struct dentry *dentry);
 extern int cifs_hardlink(struct dentry *, struct inode *, struct dentry *);
+<<<<<<< HEAD
 extern int cifs_mknod(struct inode *, struct dentry *, int, dev_t);
+=======
+extern int cifs_mknod(struct inode *, struct dentry *, umode_t, dev_t);
+>>>>>>> upstream/4.3_primoc
 extern int cifs_mkdir(struct inode *, struct dentry *, int);
 extern int cifs_rmdir(struct inode *, struct dentry *);
 extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
@@ -91,8 +99,13 @@ extern ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
 extern ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
 				  unsigned long nr_segs, loff_t pos);
 extern int cifs_lock(struct file *, int, struct file_lock *);
+<<<<<<< HEAD
 extern int cifs_fsync(struct file *, int);
 extern int cifs_strict_fsync(struct file *, int);
+=======
+extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+extern int cifs_strict_fsync(struct file *, loff_t, loff_t, int);
+>>>>>>> upstream/4.3_primoc
 extern int cifs_flush(struct file *, fl_owner_t id);
 extern int cifs_file_mmap(struct file * , struct vm_area_struct *);
 extern int cifs_file_strict_mmap(struct file * , struct vm_area_struct *);

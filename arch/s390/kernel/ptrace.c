@@ -20,8 +20,13 @@
 #include <linux/regset.h>
 #include <linux/tracehook.h>
 #include <linux/seccomp.h>
+<<<<<<< HEAD
 #include <trace/syscall.h>
 #include <asm/compat.h>
+=======
+#include <linux/compat.h>
+#include <trace/syscall.h>
+>>>>>>> upstream/4.3_primoc
 #include <asm/segment.h>
 #include <asm/page.h>
 #include <asm/pgtable.h>

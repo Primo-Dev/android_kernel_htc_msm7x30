@@ -93,8 +93,12 @@ struct sfb_skb_cb {
 
 static inline struct sfb_skb_cb *sfb_skb_cb(const struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	BUILD_BUG_ON(sizeof(skb->cb) <
 		sizeof(struct qdisc_skb_cb) + sizeof(struct sfb_skb_cb));
+=======
+	qdisc_cb_private_validate(skb, sizeof(struct sfb_skb_cb));
+>>>>>>> upstream/4.3_primoc
 	return (struct sfb_skb_cb *)qdisc_skb_cb(skb)->data;
 }
 
@@ -284,7 +288,11 @@ static int sfb_enqueue(struct sk_buff *skb, struct Qdisc *sch)
 	int i;
 	u32 p_min = ~0;
 	u32 minqlen = ~0;
+<<<<<<< HEAD
 	u32 r, slot, salt=0, sfbhash;
+=======
+	u32 r, slot, salt, sfbhash;
+>>>>>>> upstream/4.3_primoc
 	int ret = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
 
 	if (q->rehash_interval > 0) {

@@ -31,6 +31,10 @@
 #include <asm/cacheflush.h>
 #include <asm/cpu.h>
 #include <asm/cputype.h>
+<<<<<<< HEAD
+=======
+#include <asm/topology.h>
+>>>>>>> upstream/4.3_primoc
 #include <asm/mmu_context.h>
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
@@ -55,6 +59,11 @@ enum ipi_msg_type {
 	IPI_CPU_STOP,
 };
 
+<<<<<<< HEAD
+=======
+static DECLARE_COMPLETION(cpu_running);
+
+>>>>>>> upstream/4.3_primoc
 int __cpuinit __cpu_up(unsigned int cpu)
 {
 	struct cpuinfo_arm *ci = &per_cpu(cpu_data, cpu);
@@ -114,12 +123,16 @@ int __cpuinit __cpu_up(unsigned int cpu)
 	 */
 	ret = boot_secondary(cpu, idle);
 	if (ret == 0) {
+<<<<<<< HEAD
 		unsigned long timeout;
 
+=======
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * CPU was successfully started, wait for it
 		 * to come online or time out.
 		 */
+<<<<<<< HEAD
 		timeout = jiffies + HZ;
 		while (time_before(jiffies, timeout)) {
 			if (cpu_online(cpu))
@@ -128,6 +141,10 @@ int __cpuinit __cpu_up(unsigned int cpu)
 			udelay(10);
 			barrier();
 		}
+=======
+		wait_for_completion_timeout(&cpu_running,
+						 msecs_to_jiffies(1000));
+>>>>>>> upstream/4.3_primoc
 
 		if (!cpu_online(cpu)) {
 			pr_crit("CPU%u: failed to come online\n", cpu);
@@ -268,6 +285,11 @@ static void __cpuinit smp_store_cpu_info(unsigned int cpuid)
 	struct cpuinfo_arm *cpu_info = &per_cpu(cpu_data, cpuid);
 
 	cpu_info->loops_per_jiffy = loops_per_jiffy;
+<<<<<<< HEAD
+=======
+
+	store_cpu_topology(cpuid);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -307,6 +329,7 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	 */
 	platform_secondary_init(cpu);
 
+<<<<<<< HEAD
 	/*
 	 * Enable local interrupts.
 	 */
@@ -318,6 +341,9 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	 * Setup the percpu timer for this CPU.
 	 */
 	percpu_timer_setup();
+=======
+	notify_cpu_starting(cpu);
+>>>>>>> upstream/4.3_primoc
 
 	calibrate_delay();
 
@@ -326,11 +352,26 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	/*
 	 * OK, now it's safe to let the boot CPU continue.  Wait for
 	 * the CPU migration code to notice that the CPU is online
+<<<<<<< HEAD
 	 * before we continue.
 	 */
 	set_cpu_online(cpu, true);
 	while (!cpu_active(cpu))
 		cpu_relax();
+=======
+	 * before we continue - which happens after __cpu_up returns.
+	 */
+	set_cpu_online(cpu, true);
+	complete(&cpu_running);
+
+	/*
+	 * Setup the percpu timer for this CPU.
+	 */
+	percpu_timer_setup();
+
+	local_irq_enable();
+	local_fiq_enable();
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * OK, it's off to the idle thread for us
@@ -364,6 +405,11 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 {
 	unsigned int ncores = num_possible_cpus();
 
+<<<<<<< HEAD
+=======
+	init_cpu_topology();
+
+>>>>>>> upstream/4.3_primoc
 	smp_store_cpu_info(smp_processor_id());
 
 	/*
@@ -552,7 +598,11 @@ static void ipi_cpu_stop(unsigned int cpu)
 		spin_unlock(&stop_lock);
 	}
 
+<<<<<<< HEAD
 	set_cpu_online(cpu, false);
+=======
+	set_cpu_active(cpu, false);
+>>>>>>> upstream/4.3_primoc
 
 	local_fiq_disable();
 	local_irq_disable();
@@ -627,10 +677,17 @@ void smp_send_stop(void)
 
 	/* Wait up to one second for other CPUs to stop */
 	timeout = USEC_PER_SEC;
+<<<<<<< HEAD
 	while (num_online_cpus() > 1 && timeout--)
 		udelay(1);
 
 	if (num_online_cpus() > 1)
+=======
+	while (num_active_cpus() > 1 && timeout--)
+		udelay(1);
+
+	if (num_active_cpus() > 1)
+>>>>>>> upstream/4.3_primoc
 		pr_warning("SMP: failed to stop secondary CPUs\n");
 }
 

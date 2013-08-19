@@ -273,6 +273,7 @@ static int pfkey_broadcast(struct sk_buff *skb, gfp_t allocation,
 	if (one_sk != NULL)
 		err = pfkey_broadcast_one(skb, &skb2, allocation, one_sk);
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (!IS_ERR(skb2) && (skb2))
 		kfree_skb(skb2);
@@ -286,6 +287,10 @@ static int pfkey_broadcast(struct sk_buff *skb, gfp_t allocation,
 #else
 	kfree_skb(skb);
 #endif
+=======
+	kfree_skb(skb2);
+	kfree_skb(skb);
+>>>>>>> upstream/4.3_primoc
 
 	return err;
 }
@@ -1332,12 +1337,15 @@ static int pfkey_getspi(struct sock *sk, struct sk_buff *skb, const struct sadb_
 	}
 
 	if (hdr->sadb_msg_seq) {
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(xdaddr) || (!xdaddr))
 		printk(KERN_ERR "[NET] xdaddr is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 		x = xfrm_find_acq_byseq(net, DUMMY_MARK, hdr->sadb_msg_seq);
 		if (x && xfrm_addr_cmp(&x->id.daddr, xdaddr, family)) {
 			xfrm_state_put(x);
@@ -1723,6 +1731,10 @@ static int key_notify_sa_flush(const struct km_event *c)
 	hdr->sadb_msg_version = PF_KEY_V2;
 	hdr->sadb_msg_errno = (uint8_t) 0;
 	hdr->sadb_msg_len = (sizeof(struct sadb_msg) / sizeof(uint64_t));
+<<<<<<< HEAD
+=======
+	hdr->sadb_msg_reserved = 0;
+>>>>>>> upstream/4.3_primoc
 
 	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, c->net);
 
@@ -2704,6 +2716,10 @@ static int key_notify_policy_flush(const struct km_event *c)
 	hdr->sadb_msg_version = PF_KEY_V2;
 	hdr->sadb_msg_errno = (uint8_t) 0;
 	hdr->sadb_msg_len = (sizeof(struct sadb_msg) / sizeof(uint64_t));
+<<<<<<< HEAD
+=======
+	hdr->sadb_msg_reserved = 0;
+>>>>>>> upstream/4.3_primoc
 	pfkey_broadcast(skb_out, GFP_ATOMIC, BROADCAST_ALL, NULL, c->net);
 	return 0;
 
@@ -3589,6 +3605,7 @@ out:
 	if (err && hdr && pfkey_error(hdr, err, sk) == 0)
 		err = 0;
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (!IS_ERR(skb) && (skb))
 		kfree_skb(skb);
@@ -3596,6 +3613,9 @@ out:
 	kfree_skb(skb);
 #endif
 
+=======
+	kfree_skb(skb);
+>>>>>>> upstream/4.3_primoc
 
 	return err ? : len;
 }

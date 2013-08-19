@@ -287,6 +287,11 @@ struct usb_composite_driver {
 
 	int			(*unbind)(struct usb_composite_dev *);
 
+<<<<<<< HEAD
+=======
+	void			(*disconnect)(struct usb_composite_dev *);
+
+>>>>>>> upstream/4.3_primoc
 	/* global suspend hooks */
 	void			(*suspend)(struct usb_composite_dev *);
 	void			(*resume)(struct usb_composite_dev *);

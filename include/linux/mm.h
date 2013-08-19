@@ -15,6 +15,10 @@
 #include <linux/range.h>
 #include <linux/pfn.h>
 #include <linux/bit_spinlock.h>
+<<<<<<< HEAD
+=======
+#include <linux/shrinker.h>
+>>>>>>> upstream/4.3_primoc
 
 struct mempolicy;
 struct anon_vma;
@@ -157,6 +161,10 @@ extern pgprot_t protection_map[16];
 #define FAULT_FLAG_ALLOW_RETRY	0x08	/* Retry fault if blocking */
 #define FAULT_FLAG_RETRY_NOWAIT	0x10	/* Don't drop mmap_sem and wait when retrying */
 #define FAULT_FLAG_KILLABLE	0x20	/* The fault task is in SIGKILL killable region */
+<<<<<<< HEAD
+=======
+#define FAULT_FLAG_TRIED	0x40	/* second try */
+>>>>>>> upstream/4.3_primoc
 
 /*
  * This interface is used by x86 PAT code to identify a pfn mapping that is
@@ -653,7 +661,11 @@ static inline pte_t maybe_mkwrite(pte_t pte, struct vm_area_struct *vma)
 #define SECTIONS_MASK		((1UL << SECTIONS_WIDTH) - 1)
 #define ZONEID_MASK		((1UL << ZONEID_SHIFT) - 1)
 
+<<<<<<< HEAD
 static inline enum zone_type page_zonenum(struct page *page)
+=======
+static inline enum zone_type page_zonenum(const struct page *page)
+>>>>>>> upstream/4.3_primoc
 {
 	return (page->flags >> ZONES_PGSHIFT) & ZONES_MASK;
 }
@@ -681,15 +693,25 @@ static inline int zone_to_nid(struct zone *zone)
 }
 
 #ifdef NODE_NOT_IN_PAGE_FLAGS
+<<<<<<< HEAD
 extern int page_to_nid(struct page *page);
 #else
 static inline int page_to_nid(struct page *page)
+=======
+extern int page_to_nid(const struct page *page);
+#else
+static inline int page_to_nid(const struct page *page)
+>>>>>>> upstream/4.3_primoc
 {
 	return (page->flags >> NODES_PGSHIFT) & NODES_MASK;
 }
 #endif
 
+<<<<<<< HEAD
 static inline struct zone *page_zone(struct page *page)
+=======
+static inline struct zone *page_zone(const struct page *page)
+>>>>>>> upstream/4.3_primoc
 {
 	return &NODE_DATA(page_to_nid(page))->node_zones[page_zonenum(page)];
 }
@@ -701,7 +723,11 @@ static inline void set_page_section(struct page *page, unsigned long section)
 	page->flags |= (section & SECTIONS_MASK) << SECTIONS_PGSHIFT;
 }
 
+<<<<<<< HEAD
 static inline unsigned long page_to_section(struct page *page)
+=======
+static inline unsigned long page_to_section(const struct page *page)
+>>>>>>> upstream/4.3_primoc
 {
 	return (page->flags >> SECTIONS_PGSHIFT) & SECTIONS_MASK;
 }
@@ -734,9 +760,15 @@ static inline void set_page_links(struct page *page, enum zone_type zone,
  */
 #include <linux/vmstat.h>
 
+<<<<<<< HEAD
 static __always_inline void *lowmem_page_address(struct page *page)
 {
 	return __va(PFN_PHYS(page_to_pfn(page)));
+=======
+static __always_inline void *lowmem_page_address(const struct page *page)
+{
+	return __va(PFN_PHYS(page_to_pfn((struct page *)page)));
+>>>>>>> upstream/4.3_primoc
 }
 
 #if defined(CONFIG_HIGHMEM) && !defined(WANT_PAGE_VIRTUAL)
@@ -753,7 +785,11 @@ static __always_inline void *lowmem_page_address(struct page *page)
 #endif
 
 #if defined(HASHED_PAGE_VIRTUAL)
+<<<<<<< HEAD
 void *page_address(struct page *page);
+=======
+void *page_address(const struct page *page);
+>>>>>>> upstream/4.3_primoc
 void set_page_address(struct page *page, void *virtual);
 void page_address_init(void);
 #endif
@@ -1134,6 +1170,7 @@ static inline void sync_mm_rss(struct task_struct *task, struct mm_struct *mm)
 }
 #endif
 
+<<<<<<< HEAD
 /*
  * This struct is used to pass information from page reclaim to the shrinkers.
  * We consolidate the values for easier extention later.
@@ -1172,6 +1209,8 @@ struct shrinker {
 extern void register_shrinker(struct shrinker *);
 extern void unregister_shrinker(struct shrinker *);
 
+=======
+>>>>>>> upstream/4.3_primoc
 int vma_wants_writenotify(struct vm_area_struct *vma);
 
 extern pte_t *__get_locked_pte(struct mm_struct *mm, unsigned long addr,
@@ -1320,12 +1359,20 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
  * CONFIG_ARCH_POPULATES_NODE_MAP
  */
 extern void free_area_init_nodes(unsigned long *max_zone_pfn);
+<<<<<<< HEAD
+=======
+#ifndef CONFIG_HAVE_MEMBLOCK_NODE_MAP
+>>>>>>> upstream/4.3_primoc
 extern void add_active_range(unsigned int nid, unsigned long start_pfn,
 					unsigned long end_pfn);
 extern void remove_active_range(unsigned int nid, unsigned long start_pfn,
 					unsigned long end_pfn);
 extern void remove_all_active_ranges(void);
 void sort_node_map(void);
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 unsigned long __absent_pages_in_range(int nid, unsigned long start_pfn,
 						unsigned long end_pfn);
 extern unsigned long absent_pages_in_range(unsigned long start_pfn,
@@ -1371,7 +1418,12 @@ extern void si_meminfo(struct sysinfo * val);
 extern void si_meminfo_node(struct sysinfo *val, int nid);
 extern int after_bootmem;
 
+<<<<<<< HEAD
 extern void warn_alloc_failed(gfp_t gfp_mask, int order, const char *fmt, ...);
+=======
+extern __printf(3, 4)
+void warn_alloc_failed(gfp_t gfp_mask, int order, const char *fmt, ...);
+>>>>>>> upstream/4.3_primoc
 
 extern void setup_per_cpu_pageset(void);
 
@@ -1475,6 +1527,11 @@ void task_dirty_inc(struct task_struct *tsk);
 #define VM_MAX_READAHEAD	1024	/* kbytes */
 #define VM_MIN_READAHEAD	16	/* kbytes (includes current page) */
 
+<<<<<<< HEAD
+=======
+extern unsigned long max_readahead_pages;
+
+>>>>>>> upstream/4.3_primoc
 int force_page_cache_readahead(struct address_space *mapping, struct file *filp,
 			pgoff_t offset, unsigned long nr_to_read);
 
@@ -1546,6 +1603,11 @@ int vm_insert_pfn(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
 int vm_insert_mixed(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
+<<<<<<< HEAD
+=======
+int vm_iomap_memory(struct vm_area_struct *vma, phys_addr_t start, unsigned long len);
+
+>>>>>>> upstream/4.3_primoc
 
 struct page *follow_page(struct vm_area_struct *, unsigned long address,
 			unsigned int foll_flags);

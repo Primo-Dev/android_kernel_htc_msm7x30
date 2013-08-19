@@ -273,7 +273,11 @@ void invalidate_bdev(struct block_device *bdev)
 	/* 99% of the time, we don't need to flush the cleancache on the bdev.
 	 * But, for the strange corners, lets be cautious
 	 */
+<<<<<<< HEAD
 	cleancache_flush_inode(mapping);
+=======
+	cleancache_invalidate_inode(mapping);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(invalidate_bdev);
 
@@ -285,7 +289,11 @@ static void free_more_memory(void)
 	struct zone *zone;
 	int nid;
 
+<<<<<<< HEAD
 	wakeup_flusher_threads(1024);
+=======
+	wakeup_flusher_threads(1024, WB_REASON_FREE_MORE_MEM);
+>>>>>>> upstream/4.3_primoc
 	yield();
 
 	for_each_online_node(nid) {
@@ -1431,10 +1439,38 @@ static void invalidate_bh_lru(void *arg)
 	}
 	put_cpu_var(bh_lrus);
 }
+<<<<<<< HEAD
 	
 void invalidate_bh_lrus(void)
 {
 	on_each_cpu(invalidate_bh_lru, NULL, 1);
+=======
+
+/*
+ * Invalidate all buffers in LRUs. Since we have to signal all CPUs to
+ * invalidate their per-cpu local LRU lists this is rather expensive operation.
+ * So we optimize the case of several parallel calls to invalidate_bh_lrus()
+ * which happens from partitioning code when lots of disks appear in the
+ * system during boot.
+ */
+void invalidate_bh_lrus(void)
+{
+	static DEFINE_MUTEX(bh_invalidate_mutex);
+	static long bh_invalidate_sequence;
+
+	long my_bh_invalidate_sequence = bh_invalidate_sequence;
+
+	mutex_lock(&bh_invalidate_mutex);
+	/* Someone did bh invalidation while we were sleeping? */
+	if (my_bh_invalidate_sequence != bh_invalidate_sequence)
+		goto out;
+	bh_invalidate_sequence++;
+	/* Inc of bh_invalidate_sequence must happen before we invalidate bhs */
+	smp_wmb();
+	on_each_cpu(invalidate_bh_lru, NULL, 1);
+out:
+	mutex_unlock(&bh_invalidate_mutex);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(invalidate_bh_lrus);
 

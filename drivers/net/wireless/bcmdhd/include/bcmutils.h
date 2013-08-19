@@ -21,7 +21,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: bcmutils.h 275703 2011-08-04 20:20:27Z $
+=======
+ * $Id: bcmutils.h 294991 2011-11-09 00:17:28Z $
+>>>>>>> upstream/4.3_primoc
  */
 
 
@@ -221,7 +225,13 @@ extern uint16 pktpool_avail(pktpool_t *pktp);
 extern int pktpool_avail_register(pktpool_t *pktp, pktpool_cb_t cb, void *arg);
 extern int pktpool_empty_register(pktpool_t *pktp, pktpool_cb_t cb, void *arg);
 extern int pktpool_setmaxlen(pktpool_t *pktp, uint16 maxlen);
+<<<<<<< HEAD
 extern void pktpool_emptycb_disable(pktpool_t *pktp, bool disable);
+=======
+extern int pktpool_setmaxlen_strict(osl_t *osh, pktpool_t *pktp, uint16 maxlen);
+extern void pktpool_emptycb_disable(pktpool_t *pktp, bool disable);
+extern bool pktpool_emptycb_disabled(pktpool_t *pktp);
+>>>>>>> upstream/4.3_primoc
 
 #define POOLPTR(pp)			((pktpool_t *)(pp))
 #define pktpool_len(pp)			(POOLPTR(pp)->len - 1)
@@ -332,7 +342,10 @@ extern void bcm_mdelay(uint ms);
 
 #define NVRAM_RECLAIM_CHECK(name)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 extern char *getvar(char *vars, const char *name);
 extern int getintvar(char *vars, const char *name);
 extern int getintvararray(char *vars, const char *name, int index);
@@ -537,9 +550,23 @@ extern int bcm_format_ssid(char* buf, const uchar ssid[], uint ssid_len);
 	                                         & ~((boundary) - 1))
 #define	ISPOWEROF2(x)		((((x)-1)&(x)) == 0)
 #define VALID_MASK(mask)	!((mask) & ((mask) + 1))
+<<<<<<< HEAD
 #ifndef OFFSETOF
 #define	OFFSETOF(type, member)	((uint)(uintptr)&((type *)0)->member)
 #endif 
+=======
+
+#ifndef OFFSETOF
+#ifdef __ARMCC_VERSION
+
+#include <stddef.h>
+#define	OFFSETOF(type, member)	offsetof(type, member)
+#else
+#define	OFFSETOF(type, member)	((uint)(uintptr)&((type *)0)->member)
+#endif 
+#endif 
+
+>>>>>>> upstream/4.3_primoc
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(a)		(sizeof(a)/sizeof(a[0]))
 #endif
@@ -594,6 +621,11 @@ extern void *_bcmutils_dummy_fn;
 #define CRC32_INIT_VALUE 0xffffffff	
 #define CRC32_GOOD_VALUE 0xdebb20e3	
 
+<<<<<<< HEAD
+=======
+#define MACDBG "%02x:%02x:%02x:%02x:%02x:%02x"
+#define MAC2STRDBG(ea) (ea)[0], (ea)[1], (ea)[2], (ea)[3], (ea)[4], (ea)[5]
+>>>>>>> upstream/4.3_primoc
 
 typedef struct bcm_bit_desc {
 	uint32	bit;

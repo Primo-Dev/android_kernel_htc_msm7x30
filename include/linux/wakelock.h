@@ -85,9 +85,12 @@ static inline long has_wake_lock(int type) { return 0; }
 
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_ARCH_MSM8X60_LTE
 extern void htc_print_active_wake_locks(int type);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 #endif
 

@@ -41,11 +41,18 @@ static int __init parse_tag_bt(const struct tag *tag)
 	memcpy((void *)bt_bd_ram, (void *)dptr, size);
 
 	#ifdef ATAG_BT_DEBUG
+<<<<<<< HEAD
 	printk(KERN_INFO "BT Data size= %d, 0x%x,",
 			tag->hdr.size, tag->hdr.tag);
 
 	for (i = 0; i < size; i++)
 		printk(KERN_INFO "%02x,", bt_bd_ram[i]);
+=======
+	printk("BT Data size= %d, 0x%x,", tag->hdr.size, tag->hdr.tag);
+
+	for (i = 0; i < size; i++)
+		printk("%02x,", bt_bd_ram[i]);
+>>>>>>> upstream/4.3_primoc
 	#endif
 
 	return 0;

@@ -93,7 +93,11 @@ struct inode *ramfs_get_inode(struct super_block *sb,
  */
 /* SMP-safe */
 static int
+<<<<<<< HEAD
 ramfs_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev)
+=======
+ramfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode * inode = ramfs_get_inode(dir->i_sb, dir, mode, dev);
 	int error = -ENOSPC;
@@ -115,7 +119,11 @@ static int ramfs_mkdir(struct inode * dir, struct dentry * dentry, int mode)
 	return retval;
 }
 
+<<<<<<< HEAD
 static int ramfs_create(struct inode *dir, struct dentry *dentry, int mode, struct nameidata *nd)
+=======
+static int ramfs_create(struct inode *dir, struct dentry *dentry, umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	return ramfs_mknod(dir, dentry, mode | S_IFREG, 0);
 }

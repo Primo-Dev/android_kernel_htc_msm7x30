@@ -137,6 +137,42 @@ static void microp_led_jogball_brightness_set(struct led_classdev *led_cdev,
 		pr_err("%s failed on set jogball mode:0x%2.2X\n", __func__, data[0]);
 }
 
+<<<<<<< HEAD
+=======
+static void microp_led_sharekey_brightness_set(struct led_classdev *led_cdev,
+			       enum led_brightness brightness)
+{
+	struct microp_led_data *ldata;
+	unsigned long flags;
+	uint8_t data[3] = {0, 0, 0};
+	int ret = 0;
+	printk("%s\n",__func__);
+	ldata = container_of(led_cdev, struct microp_led_data, ldev);
+
+	spin_lock_irqsave(&ldata->brightness_lock, flags);
+	ldata->brightness = brightness;
+	spin_unlock_irqrestore(&ldata->brightness_lock, flags);
+
+	switch ((int)brightness) {
+	case 0:
+		printk(KERN_INFO "%s stop\n",__func__);
+		data[0] = 0;
+		break;
+	case 1:
+		printk(KERN_INFO "%s brightness\n",__func__);
+		data[0] = 0x5;
+		data[1] = data[2] = 0x0;
+		break;
+	default:
+		pr_warning("%s: unknown value: %d\n", __func__, brightness);
+		break;
+	}
+	ret = microp_i2c_write(MICROP_I2C_WCMD_JOGBALL_LED_MODE, data, 3);
+	if (ret < 0)
+		pr_err("%s failed on set sharekey mode:0x%2.2X\n", __func__, data[0]);
+}
+
+>>>>>>> upstream/4.3_primoc
 static void microp_led_mobeam_brightness_set(struct led_classdev *led_cdev,
 			       enum led_brightness brightness)
 {
@@ -555,7 +591,11 @@ static int microp_led_probe(struct platform_device *pdev)
 	struct microp_led_platform_data *pdata;
 	struct microp_led_data *ldata;
 	int i, ret;
+<<<<<<< HEAD
 printk("MATT");
+=======
+
+>>>>>>> upstream/4.3_primoc
 	pdata = pdev->dev.platform_data;
 	if (pdata == NULL) {
 		pr_err("%s: platform data is NULL\n", __func__);
@@ -592,6 +632,12 @@ printk("MATT");
 		else if (pdata->led_config[i].type == LED_MOBEAM)
 			ldata[i].ldev.brightness_set
 				= microp_led_mobeam_brightness_set;
+<<<<<<< HEAD
+=======
+		else if (pdata->led_config[i].type == LED_SKEY)
+			ldata[i].ldev.brightness_set
+				= microp_led_sharekey_brightness_set;
+>>>>>>> upstream/4.3_primoc
 
 		mutex_init(&ldata[i].led_data_mutex);
 		spin_lock_init(&ldata[i].brightness_lock);

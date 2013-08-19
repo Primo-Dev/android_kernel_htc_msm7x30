@@ -1917,6 +1917,13 @@ static void cxt5051_init_mic_port(struct hda_codec *codec, hda_nid_t nid,
 	snd_hda_codec_write(codec, nid, 0,
 			    AC_VERB_SET_UNSOLICITED_ENABLE,
 			    AC_USRSP_EN | event);
+<<<<<<< HEAD
+=======
+}
+
+static void cxt5051_init_mic_jack(struct hda_codec *codec, hda_nid_t nid)
+{
+>>>>>>> upstream/4.3_primoc
 	snd_hda_input_jack_add(codec, nid, SND_JACK_MICROPHONE, NULL);
 	snd_hda_input_jack_report(codec, nid);
 }
@@ -1934,7 +1941,10 @@ static int cxt5051_init(struct hda_codec *codec)
 	struct conexant_spec *spec = codec->spec;
 
 	conexant_init(codec);
+<<<<<<< HEAD
 	conexant_init_jacks(codec);
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (spec->auto_mic & AUTO_MIC_PORTB)
 		cxt5051_init_mic_port(codec, 0x17, CXT5051_PORTB_EVENT);
@@ -2067,6 +2077,15 @@ static int patch_cxt5051(struct hda_codec *codec)
 	if (spec->beep_amp)
 		snd_hda_attach_beep_device(codec, spec->beep_amp);
 
+<<<<<<< HEAD
+=======
+	conexant_init_jacks(codec);
+	if (spec->auto_mic & AUTO_MIC_PORTB)
+		cxt5051_init_mic_jack(codec, 0x17);
+	if (spec->auto_mic & AUTO_MIC_PORTC)
+		cxt5051_init_mic_jack(codec, 0x18);
+
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -4123,7 +4142,12 @@ static int cx_auto_add_volume_idx(struct hda_codec *codec, const char *basename,
 		err = snd_hda_ctl_add(codec, nid, kctl);
 		if (err < 0)
 			return err;
+<<<<<<< HEAD
 		if (!(query_amp_caps(codec, nid, hda_dir) & AC_AMPCAP_MUTE))
+=======
+		if (!(query_amp_caps(codec, nid, hda_dir) &
+		      (AC_AMPCAP_MUTE | AC_AMPCAP_MIN_MUTE)))
+>>>>>>> upstream/4.3_primoc
 			break;
 	}
 	return 0;
@@ -4368,6 +4392,25 @@ static const struct hda_codec_ops cx_auto_patch_ops = {
 	.reboot_notify = snd_hda_shutup_pins,
 };
 
+<<<<<<< HEAD
+=======
+/* add "fake" mute amp-caps to DACs on cx5051 so that mixer mute switches
+ * can be created (bko#42825)
+ */
+static void add_cx5051_fake_mutes(struct hda_codec *codec)
+{
+	static hda_nid_t out_nids[] = {
+		0x10, 0x11, 0
+	};
+	hda_nid_t *p;
+
+	for (p = out_nids; *p; p++)
+		snd_hda_override_amp_caps(codec, *p, HDA_OUTPUT,
+					  AC_AMPCAP_MIN_MUTE |
+					  query_amp_caps(codec, *p, HDA_OUTPUT));
+}
+
+>>>>>>> upstream/4.3_primoc
 static int patch_conexant_auto(struct hda_codec *codec)
 {
 	struct conexant_spec *spec;
@@ -4386,6 +4429,12 @@ static int patch_conexant_auto(struct hda_codec *codec)
 	case 0x14f15045:
 		spec->single_adc_amp = 1;
 		break;
+<<<<<<< HEAD
+=======
+	case 0x14f15051:
+		add_cx5051_fake_mutes(codec);
+		break;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	err = cx_auto_search_adcs(codec);

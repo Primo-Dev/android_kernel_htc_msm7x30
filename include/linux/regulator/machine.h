@@ -191,13 +191,24 @@ int regulator_suspend_finish(void);
 
 #ifdef CONFIG_REGULATOR
 void regulator_has_full_constraints(void);
+<<<<<<< HEAD
+=======
+void regulator_has_full_constraints_listed(struct regulator_init_data **);
+>>>>>>> upstream/4.3_primoc
 void regulator_use_dummy_regulator(void);
 void regulator_suppress_info_printing(void);
 #else
 static inline void regulator_has_full_constraints(void)
 {
 }
+<<<<<<< HEAD
 
+=======
+static inline void regulator_has_full_constraints_listed(
+	struct regulator_init_data *)
+{
+}
+>>>>>>> upstream/4.3_primoc
 static inline void regulator_use_dummy_regulator(void)
 {
 }

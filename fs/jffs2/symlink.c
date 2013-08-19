@@ -20,7 +20,11 @@ const struct inode_operations jffs2_symlink_inode_operations =
 {
 	.readlink =	generic_readlink,
 	.follow_link =	jffs2_follow_link,
+<<<<<<< HEAD
 	.check_acl =	jffs2_check_acl,
+=======
+	.get_acl =	jffs2_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.setattr =	jffs2_setattr,
 	.setxattr =	jffs2_setxattr,
 	.getxattr =	jffs2_getxattr,

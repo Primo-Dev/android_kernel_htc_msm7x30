@@ -2542,6 +2542,7 @@ void vidc_720p_decode_setpassthrough_start(u32 pass_startaddr);
 #define DDL_720P_REG_BASE VIDC_720P_WRAPPER_REG_BASE
 #define VIDC_BUSY_WAIT(n) udelay(n)
 
+<<<<<<< HEAD
 #undef VIDC_REGISTER_LOG_INTO_BUFFER
 
 #undef VIDC_REGISTER_LOG_INTO_BUFFER
@@ -2562,6 +2563,20 @@ extern u32 vidc_msg_register;
 		printk(KERN_INFO msg_format, a, b, c);	\
 	}
 /*HTC_END*/
+=======
+#undef VIDC_REGISTER_LOG_MSG
+#undef VIDC_REGISTER_LOG_INTO_BUFFER
+
+#ifdef VIDC_REGISTER_LOG_MSG
+#define VIDC_MSG1(msg_format, a) printk(KERN_INFO msg_format, a)
+#define VIDC_MSG2(msg_format, a, b) printk(KERN_INFO msg_format, a, b)
+#define VIDC_MSG3(msg_format, a, b, c) printk(KERN_INFO msg_format, a, b, c)
+#else
+#define VIDC_MSG1(msg_format, a)
+#define VIDC_MSG2(msg_format, a, b)
+#define VIDC_MSG3(msg_format, a, b, c)
+#endif
+>>>>>>> upstream/4.3_primoc
 
 #ifdef VIDC_REGISTER_LOG_INTO_BUFFER
 

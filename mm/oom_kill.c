@@ -26,18 +26,54 @@
 #include <linux/timex.h>
 #include <linux/jiffies.h>
 #include <linux/cpuset.h>
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+#include <linux/export.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/notifier.h>
 #include <linux/memcontrol.h>
 #include <linux/mempolicy.h>
 #include <linux/security.h>
 #include <linux/ptrace.h>
+<<<<<<< HEAD
+=======
+#include <linux/freezer.h>
+#include <linux/ftrace.h>
+#include <linux/ratelimit.h>
+
+#define CREATE_TRACE_POINTS
+#include <trace/events/oom.h>
+>>>>>>> upstream/4.3_primoc
 
 int sysctl_panic_on_oom;
 int sysctl_oom_kill_allocating_task;
 int sysctl_oom_dump_tasks = 1;
 static DEFINE_SPINLOCK(zone_scan_lock);
 
+<<<<<<< HEAD
+=======
+/*
+ * compare_swap_oom_score_adj() - compare and swap current's oom_score_adj
+ * @old_val: old oom_score_adj for compare
+ * @new_val: new oom_score_adj for swap
+ *
+ * Sets the oom_score_adj value for current to @new_val iff its present value is
+ * @old_val.  Usually used to reinstate a previous value to prevent racing with
+ * userspacing tuning the value in the interim.
+ */
+void compare_swap_oom_score_adj(int old_val, int new_val)
+{
+	struct sighand_struct *sighand = current->sighand;
+
+	spin_lock_irq(&sighand->siglock);
+	if (current->signal->oom_score_adj == old_val)
+		current->signal->oom_score_adj = new_val;
+	trace_oom_score_adj_update(current);
+	spin_unlock_irq(&sighand->siglock);
+}
+
+>>>>>>> upstream/4.3_primoc
 /**
  * test_set_oom_score_adj() - set current's oom_score_adj and return old value
  * @new_val: new oom_score_adj value
@@ -53,6 +89,7 @@ int test_set_oom_score_adj(int new_val)
 
 	spin_lock_irq(&sighand->siglock);
 	old_val = current->signal->oom_score_adj;
+<<<<<<< HEAD
 	if (new_val != old_val) {
 		if (new_val == OOM_SCORE_ADJ_MIN)
 			atomic_inc(&current->mm->oom_disable_count);
@@ -60,6 +97,10 @@ int test_set_oom_score_adj(int new_val)
 			atomic_dec(&current->mm->oom_disable_count);
 		current->signal->oom_score_adj = new_val;
 	}
+=======
+	current->signal->oom_score_adj = new_val;
+	trace_oom_score_adj_update(current);
+>>>>>>> upstream/4.3_primoc
 	spin_unlock_irq(&sighand->siglock);
 
 	return old_val;
@@ -132,7 +173,11 @@ struct task_struct *find_lock_task_mm(struct task_struct *p)
 
 /* return true if the task is not adequate as candidate victim task. */
 static bool oom_unkillable_task(struct task_struct *p,
+<<<<<<< HEAD
 		const struct mem_cgroup *mem, const nodemask_t *nodemask)
+=======
+		const struct mem_cgroup *memcg, const nodemask_t *nodemask)
+>>>>>>> upstream/4.3_primoc
 {
 	if (is_global_init(p))
 		return true;
@@ -140,7 +185,11 @@ static bool oom_unkillable_task(struct task_struct *p,
 		return true;
 
 	/* When mem_cgroup_out_of_memory() and p is not member of the group */
+<<<<<<< HEAD
 	if (mem && !task_in_mem_cgroup(p, mem))
+=======
+	if (memcg && !task_in_mem_cgroup(p, memcg))
+>>>>>>> upstream/4.3_primoc
 		return true;
 
 	/* p may not have freeable memory in nodemask */
@@ -159,24 +208,36 @@ static bool oom_unkillable_task(struct task_struct *p,
  * predictable as possible.  The goal is to return the highest value for the
  * task consuming the most memory to avoid subsequent oom failures.
  */
+<<<<<<< HEAD
 unsigned int oom_badness(struct task_struct *p, struct mem_cgroup *mem,
+=======
+unsigned int oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
+>>>>>>> upstream/4.3_primoc
 		      const nodemask_t *nodemask, unsigned long totalpages)
 {
 	long points;
 
+<<<<<<< HEAD
 	if (oom_unkillable_task(p, mem, nodemask))
+=======
+	if (oom_unkillable_task(p, memcg, nodemask))
+>>>>>>> upstream/4.3_primoc
 		return 0;
 
 	p = find_lock_task_mm(p);
 	if (!p)
 		return 0;
 
+<<<<<<< HEAD
 	/*
 	 * Shortcut check for a thread sharing p->mm that is OOM_SCORE_ADJ_MIN
 	 * so the entire heuristic doesn't need to be executed for something
 	 * that cannot be killed.
 	 */
 	if (atomic_read(&p->mm->oom_disable_count)) {
+=======
+	if (p->signal->oom_score_adj == OOM_SCORE_ADJ_MIN) {
+>>>>>>> upstream/4.3_primoc
 		task_unlock(p);
 		return 0;
 	}
@@ -293,8 +354,13 @@ static enum oom_constraint constrained_alloc(struct zonelist *zonelist,
  * (not docbooked, we don't want this one cluttering up the manual)
  */
 static struct task_struct *select_bad_process(unsigned int *ppoints,
+<<<<<<< HEAD
 		unsigned long totalpages, struct mem_cgroup *mem,
 		const nodemask_t *nodemask)
+=======
+		unsigned long totalpages, struct mem_cgroup *memcg,
+		const nodemask_t *nodemask, bool force_kill)
+>>>>>>> upstream/4.3_primoc
 {
 	struct task_struct *g, *p;
 	struct task_struct *chosen = NULL;
@@ -305,7 +371,11 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 
 		if (p->exit_state)
 			continue;
+<<<<<<< HEAD
 		if (oom_unkillable_task(p, mem, nodemask))
+=======
+		if (oom_unkillable_task(p, memcg, nodemask))
+>>>>>>> upstream/4.3_primoc
 			continue;
 
 		/*
@@ -317,8 +387,17 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 		 * blocked waiting for another task which itself is waiting
 		 * for memory. Is there a better alternative?
 		 */
+<<<<<<< HEAD
 		if (test_tsk_thread_flag(p, TIF_MEMDIE))
 			return ERR_PTR(-1UL);
+=======
+		if (test_tsk_thread_flag(p, TIF_MEMDIE)) {
+			if (unlikely(frozen(p)))
+				__thaw_task(p);
+			if (!force_kill)
+				return ERR_PTR(-1UL);
+		}
+>>>>>>> upstream/4.3_primoc
 		if (!p->mm)
 			continue;
 
@@ -335,19 +414,31 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 			if (p == current) {
 				chosen = p;
 				*ppoints = 1000;
+<<<<<<< HEAD
 			} else {
+=======
+			} else if (!force_kill) {
+>>>>>>> upstream/4.3_primoc
 				/*
 				 * If this task is not being ptraced on exit,
 				 * then wait for it to finish before killing
 				 * some other task unnecessarily.
 				 */
+<<<<<<< HEAD
 				if (!(task_ptrace(p->group_leader) &
 							PT_TRACE_EXIT))
+=======
+				if (!(p->group_leader->ptrace & PT_TRACE_EXIT))
+>>>>>>> upstream/4.3_primoc
 					return ERR_PTR(-1UL);
 			}
 		}
 
+<<<<<<< HEAD
 		points = oom_badness(p, mem, nodemask, totalpages);
+=======
+		points = oom_badness(p, memcg, nodemask, totalpages);
+>>>>>>> upstream/4.3_primoc
 		if (points > *ppoints) {
 			chosen = p;
 			*ppoints = points;
@@ -370,14 +461,22 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
  *
  * Call with tasklist_lock read-locked.
  */
+<<<<<<< HEAD
 static void dump_tasks(const struct mem_cgroup *mem, const nodemask_t *nodemask)
+=======
+static void dump_tasks(const struct mem_cgroup *memcg, const nodemask_t *nodemask)
+>>>>>>> upstream/4.3_primoc
 {
 	struct task_struct *p;
 	struct task_struct *task;
 
 	pr_info("[ pid ]   uid  tgid total_vm      rss cpu oom_adj oom_score_adj name\n");
 	for_each_process(p) {
+<<<<<<< HEAD
 		if (oom_unkillable_task(p, mem, nodemask))
+=======
+		if (oom_unkillable_task(p, memcg, nodemask))
+>>>>>>> upstream/4.3_primoc
 			continue;
 
 		task = find_lock_task_mm(p);
@@ -400,7 +499,11 @@ static void dump_tasks(const struct mem_cgroup *mem, const nodemask_t *nodemask)
 }
 
 static void dump_header(struct task_struct *p, gfp_t gfp_mask, int order,
+<<<<<<< HEAD
 			struct mem_cgroup *mem, const nodemask_t *nodemask)
+=======
+			struct mem_cgroup *memcg, const nodemask_t *nodemask)
+>>>>>>> upstream/4.3_primoc
 {
 	task_lock(current);
 	pr_warning("%s invoked oom-killer: gfp_mask=0x%x, order=%d, "
@@ -410,6 +513,7 @@ static void dump_header(struct task_struct *p, gfp_t gfp_mask, int order,
 	cpuset_print_task_mems_allowed(current);
 	task_unlock(current);
 	dump_stack();
+<<<<<<< HEAD
 	mem_cgroup_print_oom_info(mem, p);
 	show_mem(SHOW_MEM_FILTER_NODES);
 	if (sysctl_oom_dump_tasks)
@@ -465,14 +569,34 @@ static int oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
 			    unsigned int points, unsigned long totalpages,
 			    struct mem_cgroup *mem, nodemask_t *nodemask,
 			    const char *message)
+=======
+	mem_cgroup_print_oom_info(memcg, p);
+	show_mem(SHOW_MEM_FILTER_NODES);
+	if (sysctl_oom_dump_tasks)
+		dump_tasks(memcg, nodemask);
+}
+
+#define K(x) ((x) << (PAGE_SHIFT-10))
+static void oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
+			     unsigned int points, unsigned long totalpages,
+			     struct mem_cgroup *memcg, nodemask_t *nodemask,
+			     const char *message)
+>>>>>>> upstream/4.3_primoc
 {
 	struct task_struct *victim = p;
 	struct task_struct *child;
 	struct task_struct *t = p;
+<<<<<<< HEAD
 	unsigned int victim_points = 0;
 
 	if (printk_ratelimit())
 		dump_header(p, gfp_mask, order, mem, nodemask);
+=======
+	struct mm_struct *mm;
+	unsigned int victim_points = 0;
+	static DEFINE_RATELIMIT_STATE(oom_rs, DEFAULT_RATELIMIT_INTERVAL,
+					      DEFAULT_RATELIMIT_BURST);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * If the task is already exiting, don't alarm the sysadmin or kill
@@ -480,9 +604,18 @@ static int oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
 	 */
 	if (p->flags & PF_EXITING) {
 		set_tsk_thread_flag(p, TIF_MEMDIE);
+<<<<<<< HEAD
 		return 0;
 	}
 
+=======
+		return;
+	}
+
+	if (__ratelimit(&oom_rs))
+		dump_header(p, gfp_mask, order, memcg, nodemask);
+
+>>>>>>> upstream/4.3_primoc
 	task_lock(p);
 	pr_err("%s: Kill process %d (%s) score %d or sacrifice child\n",
 		message, task_pid_nr(p), p->comm, points);
@@ -490,7 +623,11 @@ static int oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
 
 	/*
 	 * If any of p's children has a different mm and is eligible for kill,
+<<<<<<< HEAD
 	 * the one with the highest badness() score is sacrificed for its
+=======
+	 * the one with the highest oom_badness() score is sacrificed for its
+>>>>>>> upstream/4.3_primoc
 	 * parent.  This attempts to lose the minimal amount of work done while
 	 * still freeing memory.
 	 */
@@ -503,7 +640,11 @@ static int oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
 			/*
 			 * oom_badness() returns 0 if the thread is unkillable
 			 */
+<<<<<<< HEAD
 			child_points = oom_badness(child, mem, nodemask,
+=======
+			child_points = oom_badness(child, memcg, nodemask,
+>>>>>>> upstream/4.3_primoc
 								totalpages);
 			if (child_points > victim_points) {
 				victim = child;
@@ -512,8 +653,49 @@ static int oom_kill_process(struct task_struct *p, gfp_t gfp_mask, int order,
 		}
 	} while_each_thread(p, t);
 
+<<<<<<< HEAD
 	return oom_kill_task(victim, mem);
 }
+=======
+	victim = find_lock_task_mm(victim);
+	if (!victim)
+		return;
+
+	/* mm cannot safely be dereferenced after task_unlock(victim) */
+	mm = victim->mm;
+	pr_err("Killed process %d (%s) total-vm:%lukB, anon-rss:%lukB, file-rss:%lukB\n",
+		task_pid_nr(victim), victim->comm, K(victim->mm->total_vm),
+		K(get_mm_counter(victim->mm, MM_ANONPAGES)),
+		K(get_mm_counter(victim->mm, MM_FILEPAGES)));
+	task_unlock(victim);
+
+	/*
+	 * Kill all user processes sharing victim->mm in other thread groups, if
+	 * any.  They don't get access to memory reserves, though, to avoid
+	 * depletion of all memory.  This prevents mm->mmap_sem livelock when an
+	 * oom killed thread cannot exit because it requires the semaphore and
+	 * its contended by another thread trying to allocate memory itself.
+	 * That thread will now get access to memory reserves since it has a
+	 * pending fatal signal.
+	 */
+	for_each_process(p)
+		if (p->mm == mm && !same_thread_group(p, victim) &&
+		    !(p->flags & PF_KTHREAD)) {
+			if (p->signal->oom_score_adj == OOM_SCORE_ADJ_MIN)
+				continue;
+
+			task_lock(p);	/* Protect ->comm from prctl() */
+			pr_err("Kill process %d (%s) sharing same memory\n",
+				task_pid_nr(p), p->comm);
+			task_unlock(p);
+			do_send_sig_info(SIGKILL, SEND_SIG_FORCED, p, true);
+		}
+
+	set_tsk_thread_flag(victim, TIF_MEMDIE);
+	do_send_sig_info(SIGKILL, SEND_SIG_FORCED, victim, true);
+}
+#undef K
+>>>>>>> upstream/4.3_primoc
 
 /*
  * Determines whether the kernel must panic because of the panic_on_oom sysctl.
@@ -540,7 +722,12 @@ static void check_panic_on_oom(enum oom_constraint constraint, gfp_t gfp_mask,
 }
 
 #ifdef CONFIG_CGROUP_MEM_RES_CTLR
+<<<<<<< HEAD
 void mem_cgroup_out_of_memory(struct mem_cgroup *mem, gfp_t gfp_mask)
+=======
+void mem_cgroup_out_of_memory(struct mem_cgroup *memcg, gfp_t gfp_mask,
+			      int order)
+>>>>>>> upstream/4.3_primoc
 {
 	unsigned long limit;
 	unsigned int points = 0;
@@ -556,6 +743,7 @@ void mem_cgroup_out_of_memory(struct mem_cgroup *mem, gfp_t gfp_mask)
 		return;
 	}
 
+<<<<<<< HEAD
 	check_panic_on_oom(CONSTRAINT_MEMCG, gfp_mask, 0, NULL);
 	limit = mem_cgroup_get_limit(mem) >> PAGE_SHIFT;
 	read_lock(&tasklist_lock);
@@ -568,6 +756,15 @@ retry:
 				"Memory cgroup out of memory"))
 		goto retry;
 out:
+=======
+	check_panic_on_oom(CONSTRAINT_MEMCG, gfp_mask, order, NULL);
+	limit = mem_cgroup_get_limit(memcg) >> PAGE_SHIFT;
+	read_lock(&tasklist_lock);
+	p = select_bad_process(&points, limit, memcg, NULL, false);
+	if (p && PTR_ERR(p) != -1UL)
+		oom_kill_process(p, gfp_mask, order, points, limit, memcg, NULL,
+				 "Memory cgroup out of memory");
+>>>>>>> upstream/4.3_primoc
 	read_unlock(&tasklist_lock);
 }
 #endif
@@ -679,6 +876,10 @@ static void clear_system_oom(void)
  * @gfp_mask: memory allocation flags
  * @order: amount of memory being requested as a power of 2
  * @nodemask: nodemask passed to page allocator
+<<<<<<< HEAD
+=======
+ * @force_kill: true if a task must be killed, even if others are exiting
+>>>>>>> upstream/4.3_primoc
  *
  * If we run out of memory, we have the choice between either
  * killing a random task (bad), letting the system crash (worse)
@@ -686,7 +887,11 @@ static void clear_system_oom(void)
  * don't have to be perfect here, we just have to be good.
  */
 void out_of_memory(struct zonelist *zonelist, gfp_t gfp_mask,
+<<<<<<< HEAD
 		int order, nodemask_t *nodemask)
+=======
+		int order, nodemask_t *nodemask, bool force_kill)
+>>>>>>> upstream/4.3_primoc
 {
 	const nodemask_t *mpol_mask;
 	struct task_struct *p;
@@ -721,6 +926,7 @@ void out_of_memory(struct zonelist *zonelist, gfp_t gfp_mask,
 	check_panic_on_oom(constraint, gfp_mask, order, mpol_mask);
 
 	read_lock(&tasklist_lock);
+<<<<<<< HEAD
 	if (sysctl_oom_kill_allocating_task &&
 	    !oom_unkillable_task(current, NULL, nodemask) &&
 	    current->mm && !atomic_read(&current->mm->oom_disable_count)) {
@@ -740,6 +946,19 @@ retry:
 	if (PTR_ERR(p) == -1UL)
 		goto out;
 
+=======
+	if (sysctl_oom_kill_allocating_task && current->mm &&
+	    !oom_unkillable_task(current, NULL, nodemask) &&
+	    current->signal->oom_score_adj != OOM_SCORE_ADJ_MIN) {
+		oom_kill_process(current, gfp_mask, order, 0, totalpages, NULL,
+						 nodemask,
+						 "Out of memory (oom_kill_allocating_task)");
+		goto out;
+	}
+
+	p = select_bad_process(&points, totalpages, NULL, mpol_mask,
+			       force_kill);
+>>>>>>> upstream/4.3_primoc
 	/* Found nothing?!?! Either we hang forever, or we panic. */
 	if (!p) {
 		dump_header(NULL, gfp_mask, order, NULL, mpol_mask);
@@ -747,10 +966,18 @@ retry:
 		panic("Out of memory and no killable processes...\n");
 	}
 
+<<<<<<< HEAD
 	if (oom_kill_process(p, gfp_mask, order, points, totalpages, NULL,
 				nodemask, "Out of memory"))
 		goto retry;
 	killed = 1;
+=======
+	if (PTR_ERR(p) != -1UL) {
+		oom_kill_process(p, gfp_mask, order, points, totalpages, NULL,
+						 nodemask, "Out of memory");
+		killed = 1;
+	}
+>>>>>>> upstream/4.3_primoc
 out:
 	read_unlock(&tasklist_lock);
 
@@ -771,7 +998,11 @@ out:
 void pagefault_out_of_memory(void)
 {
 	if (try_set_system_oom()) {
+<<<<<<< HEAD
 		out_of_memory(NULL, 0, 0, NULL);
+=======
+		out_of_memory(NULL, 0, 0, NULL, false);
+>>>>>>> upstream/4.3_primoc
 		clear_system_oom();
 	}
 	if (!test_thread_flag(TIF_MEMDIE))

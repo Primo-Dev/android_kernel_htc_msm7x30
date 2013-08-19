@@ -1224,6 +1224,11 @@ int gfs2_setattr_size(struct inode *inode, u64 newsize)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+=======
+	inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 	oldsize = inode->i_size;
 	if (newsize >= oldsize)
 		return do_grow(inode, newsize);

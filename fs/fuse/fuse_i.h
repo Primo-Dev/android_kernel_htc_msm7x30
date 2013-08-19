@@ -138,6 +138,12 @@ struct fuse_file {
 
 	/** Wait queue head for poll */
 	wait_queue_head_t poll_wait;
+<<<<<<< HEAD
+=======
+
+	/** Has flock been performed on this file? */
+	bool flock:1;
+>>>>>>> upstream/4.3_primoc
 };
 
 /** One input argument of a request */
@@ -293,8 +299,21 @@ struct fuse_req {
 	/** number of pages in vector */
 	unsigned num_pages;
 
+<<<<<<< HEAD
 	/** offset of data on first page */
 	unsigned page_offset;
+=======
+	/** If set, it describes layout of user-data in pages[] */
+	const struct iovec *iovec;
+
+	union {
+		/** offset of data on first page */
+		unsigned page_offset;
+
+		/** or in first iovec */
+		unsigned iov_offset;
+	};
+>>>>>>> upstream/4.3_primoc
 
 	/** File used in the request (or NULL) */
 	struct fuse_file *ff;
@@ -451,7 +470,11 @@ struct fuse_conn {
 	/** Is removexattr not implemented by fs? */
 	unsigned no_removexattr:1;
 
+<<<<<<< HEAD
 	/** Are file locking primitives not implemented by fs? */
+=======
+	/** Are posix file locking primitives not implemented by fs? */
+>>>>>>> upstream/4.3_primoc
 	unsigned no_lock:1;
 
 	/** Is access not implemented by fs? */
@@ -475,6 +498,12 @@ struct fuse_conn {
 	/** Don't apply umask to creation modes */
 	unsigned dont_mask:1;
 
+<<<<<<< HEAD
+=======
+	/** Are BSD file locking primitives not implemented by fs? */
+	unsigned no_flock:1;
+
+>>>>>>> upstream/4.3_primoc
 	/** The number of requests waiting for completion */
 	atomic_t num_waiting;
 
@@ -592,7 +621,12 @@ void fuse_release_common(struct file *file, int opcode);
 /**
  * Send FSYNC or FSYNCDIR request
  */
+<<<<<<< HEAD
 int fuse_fsync_common(struct file *file, int datasync, int isdir);
+=======
+int fuse_fsync_common(struct file *file, loff_t start, loff_t end,
+		      int datasync, int isdir);
+>>>>>>> upstream/4.3_primoc
 
 /**
  * Notify poll wakeup
@@ -751,9 +785,21 @@ int fuse_reverse_inval_inode(struct super_block *sb, u64 nodeid,
 /**
  * File-system tells the kernel to invalidate parent attributes and
  * the dentry matching parent/name.
+<<<<<<< HEAD
  */
 int fuse_reverse_inval_entry(struct super_block *sb, u64 parent_nodeid,
 			     struct qstr *name);
+=======
+ *
+ * If the child_nodeid is non-zero and:
+ *    - matches the inode number for the dentry matching parent/name,
+ *    - is not a mount point
+ *    - is a file or oan empty directory
+ * then the dentry is unhashed (d_delete()).
+ */
+int fuse_reverse_inval_entry(struct super_block *sb, u64 parent_nodeid,
+			     u64 child_nodeid, struct qstr *name);
+>>>>>>> upstream/4.3_primoc
 
 int fuse_do_open(struct fuse_conn *fc, u64 nodeid, struct file *file,
 		 bool isdir);
@@ -761,6 +807,11 @@ ssize_t fuse_direct_io(struct file *file, const char __user *buf,
 		       size_t count, loff_t *ppos, int write);
 long fuse_do_ioctl(struct file *file, unsigned int cmd, unsigned long arg,
 		   unsigned int flags);
+<<<<<<< HEAD
+=======
+long fuse_ioctl_common(struct file *file, unsigned int cmd,
+		       unsigned long arg, unsigned int flags);
+>>>>>>> upstream/4.3_primoc
 unsigned fuse_file_poll(struct file *file, poll_table *wait);
 int fuse_dev_release(struct inode *inode, struct file *file);
 

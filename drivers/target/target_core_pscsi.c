@@ -1210,7 +1210,10 @@ static int __pscsi_map_task_SG(
 				bio = NULL;
 			}
 
+<<<<<<< HEAD
 			page++;
+=======
+>>>>>>> upstream/4.3_primoc
 			len -= bytes;
 			data_len -= bytes;
 			off = 0;

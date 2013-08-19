@@ -129,6 +129,12 @@ struct input_keymap_entry {
 
 #define EVIOCGRAB		_IOW('E', 0x90, int)			/* Grab/Release device */
 
+<<<<<<< HEAD
+=======
+#define EVIOCGSUSPENDBLOCK	_IOR('E', 0x91, int)			/* get suspend block enable */
+#define EVIOCSSUSPENDBLOCK	_IOW('E', 0x91, int)			/* set suspend block enable */
+
+>>>>>>> upstream/4.3_primoc
 /*
  * Device properties and quirks
  */
@@ -1141,6 +1147,21 @@ struct ff_effect {
 #include <linux/mod_devicetable.h>
 
 /**
+<<<<<<< HEAD
+=======
+ * struct input_value - input value representation
+ * @type: type of value (EV_KEY, EV_ABS, etc)
+ * @code: the value code
+ * @value: the value
+ */
+struct input_value {
+	__u16 type;
+	__u16 code;
+	__s32 value;
+};
+
+/**
+>>>>>>> upstream/4.3_primoc
  * struct input_dev - represents an input device
  * @name: name of the device
  * @phys: physical path to the device in the system hierarchy
@@ -1216,7 +1237,10 @@ struct ff_effect {
  *	last user closes the device
  * @going_away: marks devices that are in a middle of unregistering and
  *	causes input_open_device*() fail with -ENODEV.
+<<<<<<< HEAD
  * @sync: set to %true when there were no new events since last EV_SYN
+=======
+>>>>>>> upstream/4.3_primoc
  * @dev: driver model's view of this device
  * @h_list: list of input handles associated with the device. When
  *	accessing the list dev->mutex must be held
@@ -1284,12 +1308,22 @@ struct input_dev {
 	unsigned int users;
 	bool going_away;
 
+<<<<<<< HEAD
 	bool sync;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	struct device dev;
 
 	struct list_head	h_list;
 	struct list_head	node;
+<<<<<<< HEAD
+=======
+
+	unsigned int num_vals;
+	unsigned int max_vals;
+	struct input_value *vals;
+>>>>>>> upstream/4.3_primoc
 };
 #define to_input_dev(d) container_of(d, struct input_dev, dev)
 
@@ -1350,6 +1384,12 @@ struct input_handle;
  * @event: event handler. This method is being called by input core with
  *	interrupts disabled and dev->event_lock spinlock held and so
  *	it may not sleep
+<<<<<<< HEAD
+=======
+ * @events: event sequence handler. This method is being called by
+ *	input core with interrupts disabled and dev->event_lock
+ *	spinlock held and so it may not sleep
+>>>>>>> upstream/4.3_primoc
  * @filter: similar to @event; separates normal event handlers from
  *	"filters".
  * @match: called after comparing device's id with handler's id_table
@@ -1386,6 +1426,11 @@ struct input_handler {
 	void *private;
 
 	void (*event)(struct input_handle *handle, unsigned int type, unsigned int code, int value);
+<<<<<<< HEAD
+=======
+	void (*events)(struct input_handle *handle,
+		       const struct input_value *vals, unsigned int count);
+>>>>>>> upstream/4.3_primoc
 	bool (*filter)(struct input_handle *handle, unsigned int type, unsigned int code, int value);
 	bool (*match)(struct input_handler *handler, struct input_dev *dev);
 	int (*connect)(struct input_handler *handler, struct input_dev *dev, const struct input_device_id *id);

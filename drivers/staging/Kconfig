@@ -104,12 +104,23 @@ source "drivers/staging/iio/Kconfig"
 
 source "drivers/staging/cs5535_gpio/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/staging/zram/Kconfig"
 
 source "drivers/staging/snappy/Kconfig"
 
 source "drivers/staging/zcache/Kconfig"
 
+=======
+source "drivers/staging/snappy/Kconfig"
+
+source "drivers/staging/zram/Kconfig"
+
+source "drivers/staging/zcache/Kconfig"
+
+source "drivers/staging/zsmalloc/Kconfig"
+
+>>>>>>> upstream/4.3_primoc
 source "drivers/staging/wlags49_h2/Kconfig"
 
 source "drivers/staging/wlags49_h25/Kconfig"

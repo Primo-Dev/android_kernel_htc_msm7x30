@@ -21,7 +21,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: linux_osl.c 281175 2011-09-01 09:46:46Z $
+=======
+ * $Id: linux_osl.c,v 1.168.2.7 2011-01-27 17:01:13 $
+>>>>>>> upstream/4.3_primoc
  */
 
 
@@ -47,7 +51,11 @@
 #define OS_HANDLE_MAGIC		0x1234abcd	
 #define BCM_MEM_FILENAME_LEN 	24		
 
+<<<<<<< HEAD
 #ifdef DHD_USE_STATIC_BUF
+=======
+#ifdef CONFIG_DHD_USE_STATIC_BUF
+>>>>>>> upstream/4.3_primoc
 #define STATIC_BUF_MAX_NUM	16
 #define STATIC_BUF_SIZE		(PAGE_SIZE * 2)
 #define STATIC_BUF_TOTAL_LEN	(STATIC_BUF_MAX_NUM * STATIC_BUF_SIZE)
@@ -70,7 +78,11 @@ typedef struct bcm_static_pkt {
 } bcm_static_pkt_t;
 
 static bcm_static_pkt_t *bcm_static_skb = 0;
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 typedef struct bcm_mem_link {
 	struct bcm_mem_link *prev;
@@ -179,12 +191,16 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 	osh = kmalloc(sizeof(osl_t), GFP_ATOMIC);
 #endif 
 	ASSERT(osh);
+<<<<<<< HEAD
 #ifdef HTC_KlocWork
     if(osh == NULL) {
         printf("[HTCKW] osl_attach: osh == NULL\n");
         return NULL;
     }
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 	bzero(osh, sizeof(osl_t));
 
 	
@@ -216,6 +232,7 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 			break;
 	}
 
+<<<<<<< HEAD
 #if defined(DHD_USE_STATIC_BUF)
 	if (!bcm_static_buf) {
 		if (!(bcm_static_buf = (bcm_static_buf_t *)dhd_os_prealloc(osh, 3, STATIC_BUF_SIZE+
@@ -228,6 +245,16 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 		else
 			printf("alloc static buf at %x!\n", (unsigned int)bcm_static_buf);
 
+=======
+#if defined(CONFIG_DHD_USE_STATIC_BUF)
+	if (!bcm_static_buf) {
+		if (!(bcm_static_buf = (bcm_static_buf_t *)dhd_os_prealloc(osh, 3, STATIC_BUF_SIZE+
+			STATIC_BUF_TOTAL_LEN))) {
+			printk("can not alloc static buf!\n");
+		}
+		else
+			printk("alloc static buf at %x!\n", (unsigned int)bcm_static_buf);
+>>>>>>> upstream/4.3_primoc
 
 		sema_init(&bcm_static_buf->static_sem, 1);
 
@@ -240,16 +267,23 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 		bcm_static_skb = (bcm_static_pkt_t *)((char *)bcm_static_buf + 2048);
 		skb_buff_ptr = dhd_os_prealloc(osh, 4, 0);
 
+<<<<<<< HEAD
 #ifdef HTC_KlocWork
     if(skb_buff_ptr != NULL)
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 		bcopy(skb_buff_ptr, bcm_static_skb, sizeof(struct sk_buff *) * 16);
 		for (i = 0; i < STATIC_PKT_MAX_NUM * 2; i++)
 			bcm_static_skb->pkt_use[i] = 0;
 
 		sema_init(&bcm_static_skb->osl_pkt_sem, 1);
 	}
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 	return osh;
 }
@@ -399,7 +433,11 @@ osl_ctfpool_stats(osl_t *osh, void *b)
 	if ((osh == NULL) || (osh->ctfpool == NULL))
 		return;
 
+<<<<<<< HEAD
 #ifdef DHD_USE_STATIC_BUF
+=======
+#ifdef CONFIG_DHD_USE_STATIC_BUF
+>>>>>>> upstream/4.3_primoc
 	if (bcm_static_buf) {
 		bcm_static_buf = 0;
 	}
@@ -462,7 +500,11 @@ osl_pktfastget(osl_t *osh, uint len)
 
 	return skb;
 }
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 
 void * BCMFASTPATH
@@ -471,6 +513,7 @@ osl_pktget(osl_t *osh, uint len)
 	struct sk_buff *skb;
 
 #ifdef CTFPOOL
+<<<<<<< HEAD
 	
 	skb = osl_pktfastget(osh, len);
 	if ((skb != NULL) || ((skb = osl_alloc_skb(len)) != NULL)) {
@@ -481,6 +524,16 @@ osl_pktget(osl_t *osh, uint len)
 		skb->priority = 0;
 
 
+=======
+	skb = osl_pktfastget(osh, len);
+	if ((skb != NULL) || ((skb = osl_alloc_skb(len)) != NULL)) {
+#else
+	if ((skb = osl_alloc_skb(len))) {
+#endif
+		skb_put(skb, len);
+		skb->priority = 0;
+
+>>>>>>> upstream/4.3_primoc
 		osh->pub.pktalloced++;
 	}
 
@@ -561,15 +614,24 @@ osl_pktfree(osl_t *osh, void *p, bool send)
 	}
 }
 
+<<<<<<< HEAD
 #ifdef DHD_USE_STATIC_BUF
+=======
+#ifdef CONFIG_DHD_USE_STATIC_BUF
+>>>>>>> upstream/4.3_primoc
 void *
 osl_pktget_static(osl_t *osh, uint len)
 {
 	int i;
 	struct sk_buff *skb;
 
+<<<<<<< HEAD
 	if (len > (PAGE_SIZE * 2)) {
 		printf("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+=======
+	if (!bcm_static_skb || (len > (PAGE_SIZE * 2))) {
+		printk("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+>>>>>>> upstream/4.3_primoc
 		return osl_pktget(osh, len);
 	}
 
@@ -583,10 +645,17 @@ osl_pktget_static(osl_t *osh, uint len)
 
 		if (i != STATIC_PKT_MAX_NUM) {
 			bcm_static_skb->pkt_use[i] = 1;
+<<<<<<< HEAD
 			up(&bcm_static_skb->osl_pkt_sem);
 			skb = bcm_static_skb->skb_4k[i];
 			skb->tail = skb->data + len;
 			skb->len = len;
+=======
+			skb = bcm_static_skb->skb_4k[i];
+			skb->tail = skb->data + len;
+			skb->len = len;
+			up(&bcm_static_skb->osl_pkt_sem);
+>>>>>>> upstream/4.3_primoc
 			return skb;
 		}
 	}
@@ -599,15 +668,26 @@ osl_pktget_static(osl_t *osh, uint len)
 
 	if (i != STATIC_PKT_MAX_NUM) {
 		bcm_static_skb->pkt_use[i+STATIC_PKT_MAX_NUM] = 1;
+<<<<<<< HEAD
 		up(&bcm_static_skb->osl_pkt_sem);
 		skb = bcm_static_skb->skb_8k[i];
 		skb->tail = skb->data + len;
 		skb->len = len;
+=======
+		skb = bcm_static_skb->skb_8k[i];
+		skb->tail = skb->data + len;
+		skb->len = len;
+		up(&bcm_static_skb->osl_pkt_sem);
+>>>>>>> upstream/4.3_primoc
 		return skb;
 	}
 
 	up(&bcm_static_skb->osl_pkt_sem);
+<<<<<<< HEAD
 	printf("%s: all static pkt in use!\n", __FUNCTION__);
+=======
+	printk("%s: all static pkt in use!\n", __FUNCTION__);
+>>>>>>> upstream/4.3_primoc
 	return osl_pktget(osh, len);
 }
 
@@ -616,9 +696,20 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 {
 	int i;
 
+<<<<<<< HEAD
 	for (i = 0; i < STATIC_PKT_MAX_NUM; i++) {
 		if (p == bcm_static_skb->skb_4k[i]) {
 			down(&bcm_static_skb->osl_pkt_sem);
+=======
+	if (!bcm_static_skb) {
+		osl_pktfree(osh, p, send);
+		return;
+	}
+
+	down(&bcm_static_skb->osl_pkt_sem);
+	for (i = 0; i < STATIC_PKT_MAX_NUM; i++) {
+		if (p == bcm_static_skb->skb_4k[i]) {
+>>>>>>> upstream/4.3_primoc
 			bcm_static_skb->pkt_use[i] = 0;
 			up(&bcm_static_skb->osl_pkt_sem);
 			return;
@@ -627,14 +718,24 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 
 	for (i = 0; i < STATIC_PKT_MAX_NUM; i++) {
 		if (p == bcm_static_skb->skb_8k[i]) {
+<<<<<<< HEAD
 			down(&bcm_static_skb->osl_pkt_sem);
+=======
+>>>>>>> upstream/4.3_primoc
 			bcm_static_skb->pkt_use[i + STATIC_PKT_MAX_NUM] = 0;
 			up(&bcm_static_skb->osl_pkt_sem);
 			return;
 		}
 	}
+<<<<<<< HEAD
 
 	return osl_pktfree(osh, p, send);
+=======
+	up(&bcm_static_skb->osl_pkt_sem);
+
+	osl_pktfree(osh, p, send);
+	return;
+>>>>>>> upstream/4.3_primoc
 }
 #endif 
 

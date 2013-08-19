@@ -87,10 +87,21 @@ int btree_lock_page_hook(struct page *page);
 
 
 #ifdef CONFIG_DEBUG_LOCK_ALLOC
+<<<<<<< HEAD
 void btrfs_set_buffer_lockdep_class(struct extent_buffer *eb, int level);
 #else
 static inline void btrfs_set_buffer_lockdep_class(struct extent_buffer *eb,
 						 int level)
+=======
+void btrfs_init_lockdep(void);
+void btrfs_set_buffer_lockdep_class(u64 objectid,
+			            struct extent_buffer *eb, int level);
+#else
+static inline void btrfs_init_lockdep(void)
+{ }
+static inline void btrfs_set_buffer_lockdep_class(u64 objectid,
+					struct extent_buffer *eb, int level)
+>>>>>>> upstream/4.3_primoc
 {
 }
 #endif

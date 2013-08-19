@@ -27,6 +27,9 @@ obj-$(CONFIG_AMD_NUMA)		+= amdtopology.o
 obj-$(CONFIG_ACPI_NUMA)		+= srat.o
 obj-$(CONFIG_NUMA_EMU)		+= numa_emulation.o
 
+<<<<<<< HEAD
 obj-$(CONFIG_HAVE_MEMBLOCK)		+= memblock.o
 
+=======
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_MEMTEST)		+= memtest.o

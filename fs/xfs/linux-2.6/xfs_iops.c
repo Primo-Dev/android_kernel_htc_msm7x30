@@ -101,18 +101,43 @@ xfs_mark_inode_dirty(
 
 }
 
+<<<<<<< HEAD
+=======
+
+int xfs_initxattrs(struct inode *inode, const struct xattr *xattr_array,
+		   void *fs_info)
+{
+	const struct xattr *xattr;
+	struct xfs_inode *ip = XFS_I(inode);
+	int error = 0;
+
+	for (xattr = xattr_array; xattr->name != NULL; xattr++) {
+		error = xfs_attr_set(ip, xattr->name, xattr->value,
+				     xattr->value_len, ATTR_SECURE);
+		if (error < 0)
+			break;
+	}
+	return error;
+}
+
+>>>>>>> upstream/4.3_primoc
 /*
  * Hook in SELinux.  This is not quite correct yet, what we really need
  * here (as we do for default ACLs) is a mechanism by which creation of
  * these attrs can be journalled at inode creation time (along with the
  * inode, of course, such that log replay can't cause these to be lost).
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 STATIC int
 xfs_init_security(
 	struct inode	*inode,
 	struct inode	*dir,
 	const struct qstr *qstr)
 {
+<<<<<<< HEAD
 	struct xfs_inode *ip = XFS_I(inode);
 	size_t		length;
 	void		*value;
@@ -132,6 +157,10 @@ xfs_init_security(
 	kfree(name);
 	kfree(value);
 	return error;
+=======
+	return security_inode_init_security(inode, dir, qstr,
+					    &xfs_initxattrs, NULL);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void
@@ -209,9 +238,15 @@ xfs_vn_mknod(
 
 	if (default_acl) {
 		error = -xfs_inherit_acl(inode, default_acl);
+<<<<<<< HEAD
 		if (unlikely(error))
 			goto out_cleanup_inode;
 		posix_acl_release(default_acl);
+=======
+		default_acl = NULL;
+		if (unlikely(error))
+			goto out_cleanup_inode;
+>>>>>>> upstream/4.3_primoc
 	}
 
 
@@ -599,7 +634,11 @@ xfs_vn_fiemap(
 }
 
 static const struct inode_operations xfs_inode_operations = {
+<<<<<<< HEAD
 	.check_acl		= xfs_check_acl,
+=======
+	.get_acl		= xfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.getattr		= xfs_vn_getattr,
 	.setattr		= xfs_vn_setattr,
 	.setxattr		= generic_setxattr,
@@ -625,7 +664,11 @@ static const struct inode_operations xfs_dir_inode_operations = {
 	.rmdir			= xfs_vn_unlink,
 	.mknod			= xfs_vn_mknod,
 	.rename			= xfs_vn_rename,
+<<<<<<< HEAD
 	.check_acl		= xfs_check_acl,
+=======
+	.get_acl		= xfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.getattr		= xfs_vn_getattr,
 	.setattr		= xfs_vn_setattr,
 	.setxattr		= generic_setxattr,
@@ -650,7 +693,11 @@ static const struct inode_operations xfs_dir_ci_inode_operations = {
 	.rmdir			= xfs_vn_unlink,
 	.mknod			= xfs_vn_mknod,
 	.rename			= xfs_vn_rename,
+<<<<<<< HEAD
 	.check_acl		= xfs_check_acl,
+=======
+	.get_acl		= xfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.getattr		= xfs_vn_getattr,
 	.setattr		= xfs_vn_setattr,
 	.setxattr		= generic_setxattr,
@@ -663,7 +710,11 @@ static const struct inode_operations xfs_symlink_inode_operations = {
 	.readlink		= generic_readlink,
 	.follow_link		= xfs_vn_follow_link,
 	.put_link		= xfs_vn_put_link,
+<<<<<<< HEAD
 	.check_acl		= xfs_check_acl,
+=======
+	.get_acl		= xfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.getattr		= xfs_vn_getattr,
 	.setattr		= xfs_vn_setattr,
 	.setxattr		= generic_setxattr,
@@ -771,6 +822,13 @@ xfs_setup_inode(
 		break;
 	}
 
+<<<<<<< HEAD
+=======
+	/* if there is no attribute fork no ACL can exist on this inode */
+	if (!XFS_IFORK_Q(ip))
+		cache_no_acl(inode);
+
+>>>>>>> upstream/4.3_primoc
 	xfs_iflags_clear(ip, XFS_INEW);
 	barrier();
 

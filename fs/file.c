@@ -22,10 +22,13 @@
 #include <linux/rcupdate.h>
 #include <linux/workqueue.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_DEBUG_FDLEAK
 #include <linux/mount.h>
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 struct fdtable_defer {
 	spinlock_t lock;
 	struct work_struct wq;
@@ -429,6 +432,7 @@ struct files_struct init_files = {
 	.file_lock	= __SPIN_LOCK_UNLOCKED(init_task.file_lock),
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_DEBUG_FDLEAK
 static void fd_print(struct files_struct *files, unsigned int fd)
 {
@@ -473,6 +477,8 @@ EXPORT_SYMBOL(fd_num_check);
 
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 /*
  * allocate a file descriptor, mark it busy.
  */
@@ -524,9 +530,12 @@ repeat:
 
 out:
 	spin_unlock(&files->file_lock);
+<<<<<<< HEAD
 #ifdef CONFIG_DEBUG_FDLEAK
 	fd_num_check(files, fd);
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	return error;
 }
 

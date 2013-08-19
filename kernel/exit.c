@@ -51,6 +51,10 @@
 #include <trace/events/sched.h>
 #include <linux/hw_breakpoint.h>
 #include <linux/oom.h>
+<<<<<<< HEAD
+=======
+#include <linux/writeback.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -85,7 +89,10 @@ static void __exit_signal(struct task_struct *tsk)
 	struct tty_struct *uninitialized_var(tty);
 
 	sighand = rcu_dereference_check(tsk->sighand,
+<<<<<<< HEAD
 					rcu_read_lock_held() ||
+=======
+>>>>>>> upstream/4.3_primoc
 					lockdep_tasklist_lock_is_held());
 	spin_lock(&sighand->siglock);
 
@@ -695,8 +702,11 @@ static void exit_mm(struct task_struct * tsk)
 	enter_lazy_tlb(mm, current);
 	/* We don't want this task to be frozen prematurely */
 	clear_freeze_flag(tsk);
+<<<<<<< HEAD
 	if (tsk->signal->oom_score_adj == OOM_SCORE_ADJ_MIN)
 		atomic_dec(&mm->oom_disable_count);
+=======
+>>>>>>> upstream/4.3_primoc
 	task_unlock(tsk);
 	mm_update_next_owner(mm);
 	mmput(mm);
@@ -908,7 +918,10 @@ NORET_TYPE void do_exit(long code)
 
 	profile_task_exit(tsk);
 
+<<<<<<< HEAD
 	WARN_ON(atomic_read(&tsk->fs_excl));
+=======
+>>>>>>> upstream/4.3_primoc
 	WARN_ON(blk_needs_flush_plug(tsk));
 
 	if (unlikely(in_interrupt()))
@@ -1050,6 +1063,11 @@ NORET_TYPE void do_exit(long code)
 	validate_creds_for_do_exit(tsk);
 
 	preempt_disable();
+<<<<<<< HEAD
+=======
+	if (tsk->nr_dirtied)
+		__this_cpu_add(dirty_throttle_leaks, tsk->nr_dirtied);
+>>>>>>> upstream/4.3_primoc
 	exit_rcu();
 
 	/*

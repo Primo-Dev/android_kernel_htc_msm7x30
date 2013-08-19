@@ -211,7 +211,10 @@ static unsigned int htc_usb_get_func_combine_value(void)
 	return val;
 }
 static DEFINE_MUTEX(function_bind_sem);
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 int htc_usb_enable_function(char *name, int ebl)
 {
 	int i;
@@ -302,8 +305,11 @@ int android_switch_function(unsigned func)
 		return 0;
 	}
 
+<<<<<<< HEAD
 	is_mtp_enabled = false;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	usb_gadget_disconnect(dev->cdev->gadget);
 	usb_remove_config(dev->cdev, &android_config_driver);
 
@@ -346,10 +352,15 @@ int android_switch_function(unsigned func)
 			}
 			list_add_tail(&f->enabled_list, &dev->enabled_functions);
 		} else if ((func & (1 << USB_FUNCTION_MTP)) &&
+<<<<<<< HEAD
 				!strcmp(f->name, "mtp")) {
 			list_add_tail(&f->enabled_list, &dev->enabled_functions);
 			is_mtp_enabled = true;
 		}
+=======
+				!strcmp(f->name, "mtp"))
+			list_add_tail(&f->enabled_list, &dev->enabled_functions);
+>>>>>>> upstream/4.3_primoc
 		else if ((func & (1 << USB_FUNCTION_ACCESSORY)) &&
 				!strcmp(f->name, "accessory"))
 			list_add_tail(&f->enabled_list, &dev->enabled_functions);

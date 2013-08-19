@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
+=======
+/* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -126,7 +130,11 @@ static int __gpuclk_store(int max, struct device *dev,
 	if (pwr->pwrlevels[pwr->active_pwrlevel].gpu_freq >
 	    pwr->pwrlevels[pwr->thermal_pwrlevel].gpu_freq)
 		kgsl_pwrctrl_pwrlevel_change(device, pwr->thermal_pwrlevel);
+<<<<<<< HEAD
 	else if (!max)
+=======
+	else if (!max || (NULL == device->pwrscale.policy))
+>>>>>>> upstream/4.3_primoc
 		kgsl_pwrctrl_pwrlevel_change(device, i);
 
 done:
@@ -856,6 +864,10 @@ void kgsl_pwrctrl_wake(struct kgsl_device *device)
 			pm_qos_update_request(&device->pm_qos_req_dma,
 						GPU_SWFI_LATENCY);
 	case KGSL_STATE_ACTIVE:
+<<<<<<< HEAD
+=======
+		kgsl_pwrctrl_request_state(device, KGSL_STATE_NONE);
+>>>>>>> upstream/4.3_primoc
 		break;
 	default:
 		KGSL_PWR_WARN(device, "unhandled state %s\n",

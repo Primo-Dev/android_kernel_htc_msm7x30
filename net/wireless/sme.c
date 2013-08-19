@@ -658,12 +658,21 @@ void __cfg80211_disconnected(struct net_device *dev, const u8 *ie,
 	if (WARN_ON(wdev->iftype != NL80211_IFTYPE_STATION &&
 		    wdev->iftype != NL80211_IFTYPE_P2P_CLIENT))
 		return;
+<<<<<<< HEAD
 /*HTC_WIFI_START*/
 /*we need send hang to supplicant
 	if (wdev->sme_state != CFG80211_SME_CONNECTED)
 		return;
 */
 /*HTC_WIFI_END*/
+=======
+
+#ifndef CONFIG_CFG80211_ALLOW_RECONNECT
+	if (wdev->sme_state != CFG80211_SME_CONNECTED)
+		return;
+#endif
+
+>>>>>>> upstream/4.3_primoc
 	if (wdev->current_bss) {
 		cfg80211_unhold_bss(wdev->current_bss);
 		cfg80211_put_bss(&wdev->current_bss->pub);
@@ -759,6 +768,10 @@ int __cfg80211_connect(struct cfg80211_registered_device *rdev,
 	int err;
 
 	ASSERT_WDEV_LOCK(wdev);
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 #ifndef CONFIG_CFG80211_ALLOW_RECONNECT
 	if (wdev->sme_state != CFG80211_SME_IDLE)
 		return -EALREADY;

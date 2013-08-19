@@ -103,8 +103,13 @@ int i2c_himax_read(struct i2c_client *client, uint8_t command, uint8_t *data, ui
 		msleep(10);
 	}
 	if (retry == toRetry) {
+<<<<<<< HEAD
 		printk(KERN_INFO "[TP]%s: i2c_read_block retry over %d\n",
 			__func__, toRetry);
+=======
+		printk(KERN_INFO "[TP]i2c_read_block retry over %d\n",
+			toRetry);
+>>>>>>> upstream/4.3_primoc
 		return -EIO;
 	}
 	return 0;
@@ -137,8 +142,13 @@ int i2c_himax_write(struct i2c_client *client, uint8_t command, uint8_t *data, u
 	}
 
 	if (retry == toRetry) {
+<<<<<<< HEAD
 		printk(KERN_INFO "[TP]%s: i2c_write_block retry over %d\n",
 			__func__, toRetry);
+=======
+		printk(KERN_ERR "[TP]i2c_write_block retry over %d\n",
+			toRetry);
+>>>>>>> upstream/4.3_primoc
 		return -EIO;
 	}
 	return 0;
@@ -174,8 +184,13 @@ int i2c_himax_master_write(struct i2c_client *client, uint8_t *data, uint8_t len
 	}
 
 	if (retry == toRetry) {
+<<<<<<< HEAD
 		printk(KERN_INFO "[TP]%s: i2c_write_block retry over %d\n",
 		       __func__, toRetry);
+=======
+		printk(KERN_ERR "[TP]i2c_write_block retry over %d\n",
+		       toRetry);
+>>>>>>> upstream/4.3_primoc
 		return -EIO;
 	}
 	return 0;
@@ -199,13 +214,19 @@ int i2c_himax_read_command(struct i2c_client *client, uint8_t length, uint8_t *d
 		msleep(10);
 	}
 	if (retry == toRetry) {
+<<<<<<< HEAD
 		printk(KERN_INFO "[TP]%s: i2c_read_block retry over %d\n",
 		       __func__, toRetry);
+=======
+		printk(KERN_INFO "[TP]i2c_read_block retry over %d\n",
+		       toRetry);
+>>>>>>> upstream/4.3_primoc
 		return -EIO;
 	}
 	return 0;
 }
 
+<<<<<<< HEAD
 #define CC(pa) do { \
 	i2c_himax_master_write(client, pa , sizeof(pa), normalRetry); \
 } while (0)
@@ -425,6 +446,8 @@ start:
 	return result;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static uint8_t himax_command;
 
 static ssize_t himax_register_show(struct device *dev,
@@ -873,51 +896,87 @@ static int himax_touch_sysfs_init(void)
 	int ret;
 	android_touch_kobj = kobject_create_and_add("android_touch", NULL);
 	if (android_touch_kobj == NULL) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: subsystem_register failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: subsystem_register failed\n");
+>>>>>>> upstream/4.3_primoc
 		ret = -ENOMEM;
 		return ret;
 	}
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_debug_level.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: create_file debug_level failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: create_file debug_level failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	himax_command = 0;
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_register.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: create_file register failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: create_file register failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_vendor.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_diag.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_htc_event.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_reset.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_attn.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 #ifdef FAKE_EVENT
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_fake_event.attr);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: sysfs_create_file failed\n");
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 #endif
@@ -952,7 +1011,11 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 
 	if (i2c_himax_read(ts->client, 0x86, buf, ts->diag_command ? 128 : 24,
 		 HIMAX_I2C_RETRY_TIMES)) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: can't read data from chip!\n", __func__);
+=======
+		printk(KERN_ERR "[TP]%s: can't read data from chip!\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		goto err_workqueue_out;
 	} else {
 #ifdef ESD_WORKAROUND
@@ -963,7 +1026,11 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 
 		if (checksum == 0 && !reset_activate) {
 			if (i2c_himax_read(ts->client, 0x84, hw_reset_check, 2, HIMAX_I2C_RETRY_TIMES)) {
+<<<<<<< HEAD
 				printk(KERN_ERR "[TP][TOUCH_ERR]%s: can't read data from chip!\n", __func__);
+=======
+				printk(KERN_ERR "[TP]%s: can't read data from chip!\n", __func__);
+>>>>>>> upstream/4.3_primoc
 				goto err_workqueue_out;
 			}
 			if (hw_reset_check[1] == 0x03 && ts->first_pressed > 0)
@@ -971,16 +1038,24 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 			else {
 				msleep(20);
 				printk(KERN_INFO "[TP]%s: ESD reset detected, load sensor config.\n", __func__);
+<<<<<<< HEAD
 				if (ts->pdata->loadSensorConfig)
 					ts->pdata->loadSensorConfig(ts->client, ts->pdata, &(ts->i2c_api));
 				else
 					himax_loadSensorConfig(ts->client, ts->pdata);
+=======
+				ts->pdata->loadSensorConfig(ts->client, ts->pdata, &(ts->i2c_api));
+>>>>>>> upstream/4.3_primoc
 				reset_activate = 1;
 				goto workqueue_out;
 			}
 		} else if (checksum == 0 && reset_activate) {
 			if (i2c_himax_read(ts->client, 0x84, hw_reset_check, 2, HIMAX_I2C_RETRY_TIMES)) {
+<<<<<<< HEAD
 				printk(KERN_ERR "[TP][TOUCH_ERR]%s: can't read data from chip!\n", __func__);
+=======
+				printk(KERN_ERR "[TP]%s: can't read data from chip!\n", __func__);
+>>>>>>> upstream/4.3_primoc
 				goto err_workqueue_out;
 			}
 			if (hw_reset_check[1] == 0x03 && ts->first_pressed > 0)
@@ -988,10 +1063,14 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 			else {
 				msleep(20);
 				printk(KERN_INFO "[TP]%s: back from ESD reset, but reset by ESD again.\n", __func__);
+<<<<<<< HEAD
 				if (ts->pdata->loadSensorConfig)
 					ts->pdata->loadSensorConfig(ts->client, ts->pdata, &(ts->i2c_api));
 				else
 					himax_loadSensorConfig(ts->client, ts->pdata);
+=======
+				ts->pdata->loadSensorConfig(ts->client, ts->pdata, &(ts->i2c_api));
+>>>>>>> upstream/4.3_primoc
 				goto workqueue_out;
 			}
 		} else if (checksum == 0xFF && reset_activate && buf[0] == 0xFF) {
@@ -1211,14 +1290,22 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 	reset_activate = 0;
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: i2c check functionality error\n", __func__);
+=======
+		printk(KERN_ERR "[TP]%s: i2c check functionality error\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		err = -ENODEV;
 		goto err_check_functionality_failed;
 	}
 
 	ts = kzalloc(sizeof(struct himax_ts_data), GFP_KERNEL);
 	if (ts == NULL) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: allocate himax_ts_data failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]%s: allocate himax_ts_data failed\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		err = -ENOMEM;
 		goto err_alloc_data_failed;
 	}
@@ -1230,18 +1317,27 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 	i2c_set_clientdata(client, ts);
 	pdata = client->dev.platform_data;
 	if (!pdata) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: platform data is null.\n", __func__);
+=======
+		printk(KERN_ERR "[TP]%s: platform data is null.\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		goto err_platform_data_null;
 	}
 	if (pdata->power) {
 		ret = pdata->power(1);
 		if (ret < 0) {
+<<<<<<< HEAD
 			printk(KERN_ERR "[TP][TOUCH_ERR]%s: power on failed\n", __func__);
+=======
+			printk(KERN_ERR "[TP]power on failed\n");
+>>>>>>> upstream/4.3_primoc
 			goto err_power_failed;
 		}
 	}
 	ts->usb_connected = 0x00;
 
+<<<<<<< HEAD
 	if (pdata->loadSensorConfig) {
 		if (pdata->loadSensorConfig(client, pdata, &(ts->i2c_api)) < 0) {
 			printk(KERN_INFO "[TP]%s: Load Sesnsor configuration failed, unload driver.\n", __func__);
@@ -1254,6 +1350,12 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 		}
 	}
 
+=======
+	if (pdata->loadSensorConfig(client, pdata, &(ts->i2c_api)) < 0) {
+		printk(KERN_ERR "[TP]%s: Load Sesnsor configuration failed, unload driver.\n", __func__);
+		goto err_detect_failed;
+	}
+>>>>>>> upstream/4.3_primoc
 	ts->power = pdata->power;
 	ts->pdata = pdata;
 	if (pdata->event_htc_enable)
@@ -1274,7 +1376,11 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 	ts->diag_mutual = kzalloc(ts->x_channel * ts->y_channel * sizeof(uint16_t),
 		GFP_KERNEL);
 	if (ts->diag_mutual == NULL) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: allocate diag_mutual failed\n", __func__);
+=======
+		printk(KERN_ERR "[TP]%s: allocate diag_mutual failed\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		err = -ENOMEM;
 		goto err_alloc_diag_mutual_failed;
 	}
@@ -1287,7 +1393,11 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 	ts->input_dev = input_allocate_device();
 	if (ts->input_dev == NULL) {
 		ret = -ENOMEM;
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: Failed to allocate input device\n", __func__);
+=======
+		printk(KERN_ERR "[TP]Failed to allocate input device\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_input_dev_alloc_failed;
 	}
 	ts->input_dev->name = "himax-touchscreen";
@@ -1318,6 +1428,7 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 		pdata->abs_x_min, pdata->abs_x_max, pdata->abs_y_min, pdata->abs_y_max);
 
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_X,
+<<<<<<< HEAD
 		pdata->abs_x_min, pdata->abs_x_max, pdata->abs_x_fuzz, 0);
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y,
 		pdata->abs_y_min, pdata->abs_y_max, pdata->abs_y_fuzz, 0);
@@ -1327,6 +1438,17 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 		pdata->abs_pressure_min, pdata->abs_pressure_max, pdata->abs_pressure_fuzz, 0);
 	input_set_abs_params(ts->input_dev, ABS_MT_WIDTH_MAJOR,
 		pdata->abs_width_min, pdata->abs_width_max, pdata->abs_pressure_fuzz, 0);
+=======
+		pdata->abs_x_min, pdata->abs_x_max, 1, 0);
+	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y,
+		pdata->abs_y_min, pdata->abs_y_max, 1, 0);
+	input_set_abs_params(ts->input_dev, ABS_MT_TOUCH_MAJOR,
+		pdata->abs_pressure_min, pdata->abs_pressure_max, 0, 0);
+	input_set_abs_params(ts->input_dev, ABS_MT_PRESSURE,
+		pdata->abs_pressure_min, pdata->abs_pressure_max, 0, 0);
+	input_set_abs_params(ts->input_dev, ABS_MT_WIDTH_MAJOR,
+		pdata->abs_width_min, pdata->abs_width_max, 0, 0);
+>>>>>>> upstream/4.3_primoc
 
 	input_set_abs_params(ts->input_dev, ABS_MT_AMPLITUDE,
 		0, ((pdata->abs_pressure_max << 16) | pdata->abs_width_max), 0, 0);
@@ -1336,7 +1458,11 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 
 	ret = input_register_device(ts->input_dev);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: Unable to register %s input device\n",
+=======
+		printk(KERN_ERR "[TP]%s: Unable to register %s input device\n",
+>>>>>>> upstream/4.3_primoc
 			__func__, ts->input_dev->name);
 		goto err_input_register_device_failed;
 	}
@@ -1369,7 +1495,11 @@ static int himax8526a_probe(struct i2c_client *client, const struct i2c_device_i
 			ts->irq = pdata->gpio_irq;
 		} else {
 			ts->use_irq = 0;
+<<<<<<< HEAD
 			printk(KERN_ERR "[TP][TOUCH_ERR]%s: request_irq failed\n", __func__);
+=======
+			printk(KERN_ERR "[TP]request_irq failed\n");
+>>>>>>> upstream/4.3_primoc
 		}
 	} else {
 		printk(KERN_INFO "[TP]%s: client->irq is empty, use polling mode.\n", __func__);

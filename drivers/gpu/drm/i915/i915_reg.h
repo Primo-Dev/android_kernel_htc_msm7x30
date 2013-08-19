@@ -2277,7 +2277,10 @@
 #define   PIPECONF_DISABLE	0
 #define   PIPECONF_DOUBLE_WIDE	(1<<30)
 #define   I965_PIPECONF_ACTIVE	(1<<30)
+<<<<<<< HEAD
 #define   PIPECONF_FRAME_START_DELAY_MASK (3<<27)
+=======
+>>>>>>> upstream/4.3_primoc
 #define   PIPECONF_SINGLE_WIDE	0
 #define   PIPECONF_PIPE_UNLOCKED 0
 #define   PIPECONF_PIPE_LOCKED	(1<<25)
@@ -2548,18 +2551,24 @@
 #define _CURBBASE		0x700c4
 #define _CURBPOS			0x700c8
 
+<<<<<<< HEAD
 #define _CURBCNTR_IVB		0x71080
 #define _CURBBASE_IVB		0x71084
 #define _CURBPOS_IVB		0x71088
 
+=======
+>>>>>>> upstream/4.3_primoc
 #define CURCNTR(pipe) _PIPE(pipe, _CURACNTR, _CURBCNTR)
 #define CURBASE(pipe) _PIPE(pipe, _CURABASE, _CURBBASE)
 #define CURPOS(pipe) _PIPE(pipe, _CURAPOS, _CURBPOS)
 
+<<<<<<< HEAD
 #define CURCNTR_IVB(pipe) _PIPE(pipe, _CURACNTR, _CURBCNTR_IVB)
 #define CURBASE_IVB(pipe) _PIPE(pipe, _CURABASE, _CURBBASE_IVB)
 #define CURPOS_IVB(pipe) _PIPE(pipe, _CURAPOS, _CURBPOS_IVB)
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* Display A control */
 #define _DSPACNTR                0x70180
 #define   DISPLAY_PLANE_ENABLE			(1<<31)
@@ -2853,6 +2862,7 @@
 #define  DISP_TILE_SURFACE_SWIZZLING	(1<<13)
 #define  DISP_FBC_WM_DIS		(1<<15)
 
+<<<<<<< HEAD
 /* GEN7 chicken */
 #define GEN7_COMMON_SLICE_CHICKEN1		0x7010
 # define GEN7_CSC1_RHWO_OPT_DISABLE_IN_RCC	((1<<10) | (1<<26))
@@ -2867,6 +2877,8 @@
 #define GEN7_SQ_CHICKEN_MBCUNIT_CONFIG		0x9030
 #define  GEN7_SQ_CHICKEN_MBCUNIT_SQINTMOB	(1<<11)
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* PCH */
 
 /* south display engine interrupt */
@@ -3103,6 +3115,14 @@
 #define  TRANS_6BPC             (2<<5)
 #define  TRANS_12BPC            (3<<5)
 
+<<<<<<< HEAD
+=======
+#define _TRANSA_CHICKEN2	 0xf0064
+#define _TRANSB_CHICKEN2	 0xf1064
+#define TRANS_CHICKEN2(pipe) _PIPE(pipe, _TRANSA_CHICKEN2, _TRANSB_CHICKEN2)
+#define   TRANS_AUTOTRAIN_GEN_STALL_DIS	(1<<31)
+
+>>>>>>> upstream/4.3_primoc
 #define SOUTH_CHICKEN2		0xc2004
 #define  DPLS_EDP_PPS_FIX_DIS	(1<<0)
 
@@ -3161,7 +3181,10 @@
 #define  FDI_LINK_TRAIN_NONE_IVB            (3<<8)
 
 /* both Tx and Rx */
+<<<<<<< HEAD
 #define  FDI_COMPOSITE_SYNC		(1<<11)
+=======
+>>>>>>> upstream/4.3_primoc
 #define  FDI_LINK_TRAIN_AUTO		(1<<10)
 #define  FDI_SCRAMBLING_ENABLE          (0<<7)
 #define  FDI_SCRAMBLING_DISABLE         (1<<7)
@@ -3390,11 +3413,14 @@
 
 #define  GT_FIFO_FREE_ENTRIES			0x120008
 
+<<<<<<< HEAD
 #define GEN6_UCGCTL2				0x9404
 # define GEN6_RCZUNIT_CLOCK_GATE_DISABLE		(1 << 13)
 # define GEN6_RCPBUNIT_CLOCK_GATE_DISABLE		(1 << 12)
 # define GEN6_RCCUNIT_CLOCK_GATE_DISABLE		(1 << 11)
 
+=======
+>>>>>>> upstream/4.3_primoc
 #define GEN6_RPNSWREQ				0xA008
 #define   GEN6_TURBO_DISABLE			(1<<31)
 #define   GEN6_FREQUENCY(x)			((x)<<25)

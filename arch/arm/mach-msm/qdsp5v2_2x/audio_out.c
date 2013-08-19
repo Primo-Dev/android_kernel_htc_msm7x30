@@ -28,6 +28,10 @@
 #include <linux/wakelock.h>
 
 #include <linux/msm_audio_7X30.h>
+<<<<<<< HEAD
+=======
+#include <linux/android_pmem.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/atomic.h>
 #include <asm/ioctls.h>
@@ -386,6 +390,10 @@ static long audio_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	mutex_lock(&audio->lock);
 	switch (cmd) {
 	case AUDIO_START:
+<<<<<<< HEAD
+=======
+		pr_aud_info("AUDIO_START\n");
+>>>>>>> upstream/4.3_primoc
 		rc = audio_enable(audio);
 		break;
 	case AUDIO_STOP:
@@ -611,7 +619,11 @@ static int audio_open(struct inode *inode, struct file *file)
 	int rc;
 
 	mutex_lock(&audio->lock);
+<<<<<<< HEAD
 
+=======
+	pr_aud_info("host pcm open\n");
+>>>>>>> upstream/4.3_primoc
 	if (audio->opened) {
 		pr_aud_err("busy\n");
 		rc = -EBUSY;
@@ -619,13 +631,32 @@ static int audio_open(struct inode *inode, struct file *file)
 	}
 
 	if (!audio->data) {
+<<<<<<< HEAD
 		audio->data = dma_alloc_coherent(NULL, DMASZ,
 						 &audio->phys, GFP_KERNEL);
 		if (!audio->data) {
+=======
+		audio->phys = pmem_kalloc(DMASZ, PMEM_MEMTYPE_EBI1|
+						PMEM_ALIGNMENT_4K);
+		if (!IS_ERR((void *)audio->phys)) {
+			audio->data = ioremap(audio->phys, DMASZ);
+			if (!audio->data) {
+				pr_aud_err("could not allocate DMA buffers\n");
+				rc = -ENOMEM;
+				pmem_kfree(audio->phys);
+				goto done;
+			}
+		} else {
+>>>>>>> upstream/4.3_primoc
 			pr_aud_err("could not allocate DMA buffers\n");
 			rc = -ENOMEM;
 			goto done;
 		}
+<<<<<<< HEAD
+=======
+		MM_DBG("Memory addr = 0x%8x  phy addr = 0x%8x\n",\
+			(int) audio->data, (int) audio->phys);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	audio->dec_id = HOSTPCM_STREAM_ID;

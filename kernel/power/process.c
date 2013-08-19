@@ -128,6 +128,7 @@ static int try_to_freeze_tasks(bool sig_only)
 		}
 		thaw_workqueues();
 
+<<<<<<< HEAD
 		read_lock(&tasklist_lock);
 		do_each_thread(g, p) {
 			task_lock(p);
@@ -138,6 +139,21 @@ static int try_to_freeze_tasks(bool sig_only)
 			task_unlock(p);
 		} while_each_thread(g, p);
 		read_unlock(&tasklist_lock);
+=======
+		if (!wakeup) {
+			read_lock(&tasklist_lock);
+			do_each_thread(g, p) {
+			task_lock(p);
+		        if (p != current && !freezer_should_skip(p)
+			    && freezing(p) && !frozen(p) &&
+                               elapsed_csecs > 100)
+			       sched_show_task(p);
+			cancel_freezing(p);
+			task_unlock(p);
+			} while_each_thread(g, p);
+			read_unlock(&tasklist_lock);
+		}
+>>>>>>> upstream/4.3_primoc
 	} else {
 		printk("(elapsed %d.%02d seconds) ", elapsed_csecs / 100,
 			elapsed_csecs % 100);
@@ -192,7 +208,11 @@ static void thaw_tasks(bool nosig_only)
 		if (cgroup_freezing_or_frozen(p))
 			continue;
 
+<<<<<<< HEAD
 		thaw_process(p);
+=======
+		__thaw_task(p);
+>>>>>>> upstream/4.3_primoc
 	} while_each_thread(g, p);
 	read_unlock(&tasklist_lock);
 }

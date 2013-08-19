@@ -1444,7 +1444,11 @@ void reiserfs_read_locked_inode(struct inode *inode,
 		/* a stale NFS handle can trigger this without it being an error */
 		pathrelse(&path_to_sd);
 		reiserfs_make_bad_inode(inode);
+<<<<<<< HEAD
 		inode->i_nlink = 0;
+=======
+		clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		return;
 	}
 
@@ -1475,6 +1479,14 @@ void reiserfs_read_locked_inode(struct inode *inode,
 
 	reiserfs_check_path(&path_to_sd);	/* init inode should be relsing */
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Stat data v1 doesn't support ACLs.
+	 */
+	if (get_inode_sd_version(inode) == STAT_DATA_V1)
+		cache_no_acl(inode);
+>>>>>>> upstream/4.3_primoc
 }
 
 /**
@@ -1568,8 +1580,15 @@ struct dentry *reiserfs_fh_to_dentry(struct super_block *sb, struct fid *fid,
 			reiserfs_warning(sb, "reiserfs-13077",
 				"nfsd/reiserfs, fhtype=%d, len=%d - odd",
 				fh_type, fh_len);
+<<<<<<< HEAD
 		fh_type = 5;
 	}
+=======
+		fh_type = fh_len;
+	}
+	if (fh_len < 2)
+		return NULL;
+>>>>>>> upstream/4.3_primoc
 
 	return reiserfs_get_dentry(sb, fid->raw[0], fid->raw[1],
 		(fh_type == 3 || fh_type >= 5) ? fid->raw[2] : 0);
@@ -1578,6 +1597,11 @@ struct dentry *reiserfs_fh_to_dentry(struct super_block *sb, struct fid *fid,
 struct dentry *reiserfs_fh_to_parent(struct super_block *sb, struct fid *fid,
 		int fh_len, int fh_type)
 {
+<<<<<<< HEAD
+=======
+	if (fh_type > fh_len)
+		fh_type = fh_len;
+>>>>>>> upstream/4.3_primoc
 	if (fh_type < 4)
 		return NULL;
 
@@ -1985,7 +2009,11 @@ int reiserfs_new_inode(struct reiserfs_transaction_handle *th,
 	make_bad_inode(inode);
 
       out_inserted_sd:
+<<<<<<< HEAD
 	inode->i_nlink = 0;
+=======
+	clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 	th->t_trans_id = 0;	/* so the caller can't use this handle later */
 	unlock_new_inode(inode); /* OK to do even if we hadn't locked it */
 	iput(inode);
@@ -3071,9 +3099,14 @@ static ssize_t reiserfs_direct_IO(int rw, struct kiocb *iocb,
 	struct inode *inode = file->f_mapping->host;
 	ssize_t ret;
 
+<<<<<<< HEAD
 	ret = blockdev_direct_IO(rw, iocb, inode, inode->i_sb->s_bdev, iov,
 				  offset, nr_segs,
 				  reiserfs_get_blocks_direct_io, NULL);
+=======
+	ret = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
+				  reiserfs_get_blocks_direct_io);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * In case of error extending write may have instantiated a few
@@ -3116,6 +3149,12 @@ int reiserfs_setattr(struct dentry *dentry, struct iattr *attr)
 			error = -EFBIG;
 			goto out;
 		}
+<<<<<<< HEAD
+=======
+
+		inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 		/* fill in hole pointers in the expanding truncate case. */
 		if (attr->ia_size > inode->i_size) {
 			error = generic_cont_expand_simple(inode, attr->ia_size);

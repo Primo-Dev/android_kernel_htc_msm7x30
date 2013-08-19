@@ -776,6 +776,10 @@ char *zconftext;
 #include <string.h>
 #include <unistd.h>
 
+<<<<<<< HEAD
+=======
+#define LKC_DIRECT_LINK
+>>>>>>> upstream/4.3_primoc
 #include "lkc.h"
 
 #define START_STRSIZE	16

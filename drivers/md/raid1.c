@@ -712,7 +712,11 @@ do_sync_io:
 	PRINTK("%dB behind alloc failed, doing sync I/O\n", bio->bi_size);
 }
 
+<<<<<<< HEAD
 static int make_request(mddev_t *mddev, struct bio * bio)
+=======
+static void make_request(mddev_t *mddev, struct bio * bio)
+>>>>>>> upstream/4.3_primoc
 {
 	conf_t *conf = mddev->private;
 	mirror_info_t *mirror;
@@ -781,7 +785,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		if (rdisk < 0) {
 			/* couldn't find anywhere to read from */
 			raid_end_bio_io(r1_bio);
+<<<<<<< HEAD
 			return 0;
+=======
+			return;
+>>>>>>> upstream/4.3_primoc
 		}
 		mirror = conf->mirrors + rdisk;
 
@@ -807,7 +815,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		read_bio->bi_private = r1_bio;
 
 		generic_make_request(read_bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	/*
@@ -924,8 +936,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 
 	if (do_sync || !bitmap || !plugged)
 		md_wakeup_thread(mddev->thread);
+<<<<<<< HEAD
 
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void status(struct seq_file *seq, mddev_t *mddev)
@@ -1725,7 +1740,10 @@ static sector_t sync_request(mddev_t *mddev, sector_t sector_nr, int *skipped, i
 		bio->bi_next = NULL;
 		bio->bi_flags &= ~(BIO_POOL_MASK-1);
 		bio->bi_flags |= 1 << BIO_UPTODATE;
+<<<<<<< HEAD
 		bio->bi_comp_cpu = -1;
+=======
+>>>>>>> upstream/4.3_primoc
 		bio->bi_rw = READ;
 		bio->bi_vcnt = 0;
 		bio->bi_idx = 0;

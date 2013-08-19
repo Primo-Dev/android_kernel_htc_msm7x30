@@ -59,11 +59,15 @@ extern const struct xattr_handler reiserfs_posix_acl_access_handler;
 #else
 
 #define reiserfs_cache_default_acl(inode) 0
+<<<<<<< HEAD
 
 static inline struct posix_acl *reiserfs_get_acl(struct inode *inode, int type)
 {
 	return NULL;
 }
+=======
+#define reiserfs_get_acl NULL
+>>>>>>> upstream/4.3_primoc
 
 static inline int reiserfs_acl_chmod(struct inode *inode)
 {

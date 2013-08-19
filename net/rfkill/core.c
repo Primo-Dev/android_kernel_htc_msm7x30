@@ -783,17 +783,27 @@ EXPORT_SYMBOL(rfkill_resume_polling);
 
 static int rfkill_suspend(struct device *dev, pm_message_t state)
 {
+<<<<<<< HEAD
 #if 0
 	struct rfkill *rfkill = to_rfkill(dev);
 
 	rfkill_pause_polling(rfkill);
 #endif
+=======
+	struct rfkill *rfkill = to_rfkill(dev);
+
+	rfkill_pause_polling(rfkill);
+
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
 static int rfkill_resume(struct device *dev)
 {
+<<<<<<< HEAD
 #if 0
+=======
+>>>>>>> upstream/4.3_primoc
 	struct rfkill *rfkill = to_rfkill(dev);
 	bool cur;
 
@@ -803,7 +813,11 @@ static int rfkill_resume(struct device *dev)
 	}
 
 	rfkill_resume_polling(rfkill);
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 #endif

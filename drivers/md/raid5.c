@@ -3928,7 +3928,11 @@ static struct stripe_head *__get_priority_stripe(raid5_conf_t *conf)
 	return sh;
 }
 
+<<<<<<< HEAD
 static int make_request(mddev_t *mddev, struct bio * bi)
+=======
+static void make_request(mddev_t *mddev, struct bio * bi)
+>>>>>>> upstream/4.3_primoc
 {
 	raid5_conf_t *conf = mddev->private;
 	int dd_idx;
@@ -3941,7 +3945,11 @@ static int make_request(mddev_t *mddev, struct bio * bi)
 
 	if (unlikely(bi->bi_rw & REQ_FLUSH)) {
 		md_flush_request(mddev, bi);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	md_write_start(mddev, bi);
@@ -3949,7 +3957,11 @@ static int make_request(mddev_t *mddev, struct bio * bi)
 	if (rw == READ &&
 	     mddev->reshape_position == MaxSector &&
 	     chunk_aligned_read(mddev,bi))
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 
 	logical_sector = bi->bi_sector & ~((sector_t)STRIPE_SECTORS-1);
 	last_sector = bi->bi_sector + (bi->bi_size>>9);
@@ -4084,8 +4096,11 @@ static int make_request(mddev_t *mddev, struct bio * bi)
 
 		bio_endio(bi, 0);
 	}
+<<<<<<< HEAD
 
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static sector_t raid5_size(mddev_t *mddev, sector_t sectors, int raid_disks);

@@ -84,7 +84,11 @@ const struct file_operations bfs_dir_operations = {
 
 extern void dump_imap(const char *, struct super_block *);
 
+<<<<<<< HEAD
 static int bfs_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int bfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 						struct nameidata *nd)
 {
 	int err;

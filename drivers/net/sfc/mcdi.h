@@ -126,5 +126,9 @@ extern int efx_mcdi_wol_filter_set_magic(struct efx_nic *efx,
 extern int efx_mcdi_wol_filter_get_magic(struct efx_nic *efx, int *id_out);
 extern int efx_mcdi_wol_filter_remove(struct efx_nic *efx, int id);
 extern int efx_mcdi_wol_filter_reset(struct efx_nic *efx);
+<<<<<<< HEAD
+=======
+extern int efx_mcdi_set_mac(struct efx_nic *efx);
+>>>>>>> upstream/4.3_primoc
 
 #endif /* EFX_MCDI_H */

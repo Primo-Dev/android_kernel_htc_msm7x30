@@ -49,11 +49,19 @@ obj-$(CONFIG_TPS65023)		+= tps65023.o
 
 obj-$(CONFIG_TIMPANI_CODEC)	+= timpani-codec.o
 
+<<<<<<< HEAD
 ifdef CONFIG_TIMPANI_CODEC
 obj-$(CONFIG_TIMPANI_CODEC) += msm-adie-codec.o
 else ifdef CONFIG_MARIMBA_CODEC
 obj-$(CONFIG_MARIMBA_CODEC) += msm-adie-codec.o
 endif
+=======
+#ifdef CONFIG_TIMPANI_CODEC
+#obj-$(CONFIG_TIMPANI_CODEC) += msm-adie-codec.o
+#else ifdef CONFIG_MARIMBA_CODEC
+#obj-$(CONFIG_MARIMBA_CODEC) += msm-adie-codec.o
+#endif
+>>>>>>> upstream/4.3_primoc
 
 obj-$(CONFIG_TWL6030_PWM)	+= twl6030-pwm.o
 obj-$(CONFIG_TWL6040_CORE)	+= twl6040-core.o twl6040-irq.o

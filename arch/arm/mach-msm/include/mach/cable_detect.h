@@ -53,7 +53,10 @@ struct usb_id_mpp_config_data {
 struct cable_detect_platform_data {
 	int vbus_mpp_gpio;
 	int vbus_mpp_irq;
+<<<<<<< HEAD
 	int vbus_uevent;
+=======
+>>>>>>> upstream/4.3_primoc
 	void (*vbus_mpp_config)(void);
 	/* 1 : uart, 0 : usb */
 	void (*usb_uart_switch)(int);
@@ -68,6 +71,10 @@ struct cable_detect_platform_data {
 	bool mhl_version_ctrl_flag;
 	struct usb_id_mpp_config_data mpp_data;
 	void (*config_usb_id_gpios)(bool enable);
+<<<<<<< HEAD
+=======
+	void (*usb_mhl_switch)(bool);
+>>>>>>> upstream/4.3_primoc
 	void (*mhl_1v2_power)(bool enable);
 	int (*is_wireless_charger)(void);
 	int64_t (*get_adc_cb)(void);
@@ -81,7 +88,10 @@ struct cable_detect_platform_data {
 	int dock_pin_gpio;
 #endif
 	int idpin_irq;
+<<<<<<< HEAD
 	int carkit_only;
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 /* -----------------------------------------------------------------------------

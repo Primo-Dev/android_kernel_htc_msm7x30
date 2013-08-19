@@ -206,8 +206,13 @@ struct xhci_op_regs {
 /* bits 12:31 are reserved (and should be preserved on writes). */
 
 /* IMAN - Interrupt Management Register */
+<<<<<<< HEAD
 #define IMAN_IP		(1 << 1)
 #define IMAN_IE		(1 << 0)
+=======
+#define IMAN_IE		(1 << 1)
+#define IMAN_IP		(1 << 0)
+>>>>>>> upstream/4.3_primoc
 
 /* USBSTS - USB status - status bitmasks */
 /* HC not running - set to 1 when run/stop bit is cleared. */
@@ -831,6 +836,13 @@ struct xhci_transfer_event {
 	__le32	flags;
 };
 
+<<<<<<< HEAD
+=======
+/* Transfer event TRB length bit mask */
+/* bits 0:23 */
+#define	EVENT_TRB_LEN(p)		((p) & 0xffffff)
+
+>>>>>>> upstream/4.3_primoc
 /** Transfer Event bit fields **/
 #define	TRB_TO_EP_ID(p)	(((p) >> 16) & 0x1f)
 
@@ -904,7 +916,10 @@ struct xhci_transfer_event {
 /* Invalid Stream ID Error */
 #define COMP_STRID_ERR	34
 /* Secondary Bandwidth Error - may be returned by a Configure Endpoint cmd */
+<<<<<<< HEAD
 /* FIXME - check for this */
+=======
+>>>>>>> upstream/4.3_primoc
 #define COMP_2ND_BW_ERR	35
 /* Split Transaction Error */
 #define	COMP_SPLIT_ERR	36
@@ -1071,6 +1086,12 @@ union xhci_trb {
 #define TRB_MFINDEX_WRAP	39
 /* TRB IDs 40-47 reserved, 48-63 is vendor-defined */
 
+<<<<<<< HEAD
+=======
+#define TRB_TYPE_LINK_LE32(x)   (((x) & cpu_to_le32(TRB_TYPE_BITMASK)) == \
+		cpu_to_le32(TRB_TYPE(TRB_LINK)))
+
+>>>>>>> upstream/4.3_primoc
 /* Nec vendor-specific command completion event. */
 #define	TRB_NEC_CMD_COMP	48
 /* Get NEC firmware revision. */
@@ -1112,6 +1133,19 @@ struct xhci_td {
 	union xhci_trb		*last_trb;
 };
 
+<<<<<<< HEAD
+=======
+/* xHCI command default timeout value */
+#define XHCI_CMD_DEFAULT_TIMEOUT       (5 * HZ)
+
+/* command descriptor */
+struct xhci_cd {
+	struct list_head	cancel_cmd_list;
+	struct xhci_command	*command;
+	union xhci_trb		*cmd_trb;
+};
+
+>>>>>>> upstream/4.3_primoc
 struct xhci_dequeue_state {
 	struct xhci_segment *new_deq_seg;
 	union xhci_trb *new_deq_ptr;
@@ -1253,6 +1287,14 @@ struct xhci_hcd {
 	/* data structures */
 	struct xhci_device_context_array *dcbaa;
 	struct xhci_ring	*cmd_ring;
+<<<<<<< HEAD
+=======
+	unsigned int            cmd_ring_state;
+#define CMD_RING_STATE_RUNNING         (1 << 0)
+#define CMD_RING_STATE_ABORTED         (1 << 1)
+#define CMD_RING_STATE_STOPPED         (1 << 2)
+	struct list_head        cancel_cmd_list;
+>>>>>>> upstream/4.3_primoc
 	unsigned int		cmd_ring_reserved_trbs;
 	struct xhci_ring	*event_ring;
 	struct xhci_erst	erst;
@@ -1487,6 +1529,11 @@ void xhci_unregister_pci(void);
 #endif
 
 /* xHCI host controller glue */
+<<<<<<< HEAD
+=======
+int handshake(struct xhci_hcd *xhci, void __iomem *ptr,
+		u32 mask, u32 done, int usec);
+>>>>>>> upstream/4.3_primoc
 void xhci_quiesce(struct xhci_hcd *xhci);
 int xhci_halt(struct xhci_hcd *xhci);
 int xhci_reset(struct xhci_hcd *xhci);
@@ -1569,6 +1616,11 @@ void xhci_queue_config_ep_quirk(struct xhci_hcd *xhci,
 		unsigned int slot_id, unsigned int ep_index,
 		struct xhci_dequeue_state *deq_state);
 void xhci_stop_endpoint_command_watchdog(unsigned long arg);
+<<<<<<< HEAD
+=======
+int xhci_cancel_cmd(struct xhci_hcd *xhci, struct xhci_command *command,
+		union xhci_trb *cmd_trb);
+>>>>>>> upstream/4.3_primoc
 void xhci_ring_ep_doorbell(struct xhci_hcd *xhci, unsigned int slot_id,
 		unsigned int ep_index, unsigned int stream_id);
 

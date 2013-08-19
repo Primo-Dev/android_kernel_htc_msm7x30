@@ -203,6 +203,7 @@ __irq_svc:
 #ifdef CONFIG_TRACE_IRQFLAGS
 	bl	trace_hardirqs_off
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_PREEMPT
 	get_thread_info tsk
 	ldr	r8, [tsk, #TI_PREEMPT]		@ get preempt count
@@ -213,6 +214,14 @@ __irq_svc:
 	irq_handler
 #ifdef CONFIG_PREEMPT
 	str	r8, [tsk, #TI_PREEMPT]		@ restore preempt count
+=======
+
+	irq_handler
+
+#ifdef CONFIG_PREEMPT
+	get_thread_info tsk
+	ldr	r8, [tsk, #TI_PREEMPT]		@ get preempt count
+>>>>>>> upstream/4.3_primoc
 	ldr	r0, [tsk, #TI_FLAGS]		@ get flags
 	teq	r8, #0				@ if preempt count != 0
 	movne	r0, #0				@ force flags to 0
@@ -438,6 +447,7 @@ __irq_usr:
 	bl	trace_hardirqs_off
 #endif
 
+<<<<<<< HEAD
 	get_thread_info tsk
 #ifdef CONFIG_PREEMPT
 	ldr	r8, [tsk, #TI_PREEMPT]		@ get preempt count
@@ -455,6 +465,10 @@ __irq_usr:
  THUMB(	strne	r0, [r0]	)
 #endif
 
+=======
+	irq_handler
+	get_thread_info tsk
+>>>>>>> upstream/4.3_primoc
 	mov	why, #0
 	b	ret_to_user_from_irq
  UNWIND(.fnend		)

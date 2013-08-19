@@ -28,6 +28,7 @@
 
 #include <wlioctl.h>
 
+<<<<<<< HEAD
 #define DEF_COUNTRY_CODE	"XX"
 
 //BRCM APSTA START
@@ -37,6 +38,8 @@ typedef struct {
 } bss_setbuf_t;
 //BRCM APSTA END
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* wl_dev_ioctl - get/set IOCTLs, will call net_device's do_ioctl (or
  *  netdev_ops->ndo_do_ioctl in new kernels)
  *  @dev: the net_device handle
@@ -49,14 +52,22 @@ s32 wldev_ioctl(
  */
 s32 wldev_iovar_getbuf(
 	struct net_device *dev, s8 *iovar_name,
+<<<<<<< HEAD
 	void *param, s32 paramlen, void *buf, s32 buflen, struct mutex *buf_sync);
+=======
+	void *param, s32 paramlen, void *buf, s32 buflen, struct mutex* buf_sync);
+>>>>>>> upstream/4.3_primoc
 
 /** Set named IOVARs, this function calls wl_dev_ioctl with
  *  WLC_SET_VAR IOCTL code
  */
 s32 wldev_iovar_setbuf(
 	struct net_device *dev, s8 *iovar_name,
+<<<<<<< HEAD
 	void *param, s32 paramlen, void *buf, s32 buflen, struct mutex *buf_sync);
+=======
+	void *param, s32 paramlen, void *buf, s32 buflen, struct mutex* buf_sync);
+>>>>>>> upstream/4.3_primoc
 
 s32 wldev_iovar_setint(
 	struct net_device *dev, s8 *iovar, s32 val);
@@ -77,14 +88,22 @@ s32 wldev_mkiovar_bsscfg(
  */
 s32 wldev_iovar_getbuf_bsscfg(
 	struct net_device *dev, s8 *iovar_name, void *param, s32 paramlen,
+<<<<<<< HEAD
 	void *buf, s32 buflen, s32 bsscfg_idx, struct mutex *buf_sync);
+=======
+	void *buf, s32 buflen, s32 bsscfg_idx, struct mutex* buf_sync);
+>>>>>>> upstream/4.3_primoc
 
 /** Set named and bsscfg indexed IOVARs, this function calls wl_dev_ioctl with
  *  WLC_SET_VAR IOCTL code
  */
 s32 wldev_iovar_setbuf_bsscfg(
 	struct net_device *dev, s8 *iovar_name, void *param, s32 paramlen,
+<<<<<<< HEAD
 	void *buf, s32 buflen, s32 bsscfg_idx, struct mutex *buf_sync);
+=======
+	void *buf, s32 buflen, s32 bsscfg_idx, struct mutex* buf_sync);
+>>>>>>> upstream/4.3_primoc
 
 s32 wldev_iovar_getint_bsscfg(
 	struct net_device *dev, s8 *iovar, s32 *pval, s32 bssidx);
@@ -94,6 +113,10 @@ s32 wldev_iovar_setint_bsscfg(
 
 extern void get_customized_country_code(char *country_iso_code, wl_country_t *cspec);
 extern void dhd_bus_country_set(struct net_device *dev, wl_country_t *cspec);
+<<<<<<< HEAD
+=======
+extern void dhd_bus_band_set(struct net_device *dev, uint band);
+>>>>>>> upstream/4.3_primoc
 extern int wldev_set_country(struct net_device *dev, char *country_code);
 extern int net_os_wake_lock(struct net_device *dev);
 extern int net_os_wake_unlock(struct net_device *dev);
@@ -101,7 +124,11 @@ extern int net_os_wake_lock_timeout(struct net_device *dev);
 extern int net_os_wake_lock_timeout_enable(struct net_device *dev, int val);
 extern int net_os_set_dtim_skip(struct net_device *dev, int val);
 extern int net_os_set_suspend_disable(struct net_device *dev, int val);
+<<<<<<< HEAD
 extern int net_os_set_suspend(struct net_device *dev, int val);
+=======
+extern int net_os_set_suspend(struct net_device *dev, int val, int force);
+>>>>>>> upstream/4.3_primoc
 extern int wl_iw_parse_ssid_list_tlv(char** list_str, wlc_ssid_t* ssid,
 	int max, int *bytes_left);
 
@@ -116,6 +143,7 @@ int wldev_get_band(struct net_device *dev, uint *pband);
 
 int wldev_set_band(struct net_device *dev, uint band);
 
+<<<<<<< HEAD
 #ifdef APSTA_CONCURRENT
 int wldev_set_pktfilter_enable(struct net_device *dev, int enable);
 int wldev_set_apsta_cfg(struct net_device *dev, char *param_str);
@@ -132,5 +160,8 @@ int wldev_set_scansuppress(struct net_device *dev,int enable);
 int wldev_set_ap_sta_registra_wsec(struct net_device *dev, char *command, int total_len);
 #endif
 //BRCM WPSAP END
+=======
+int wldev_get_auto_channel(struct net_device *dev, int *chan);
+>>>>>>> upstream/4.3_primoc
 
 #endif /* __WLDEV_COMMON_H__ */

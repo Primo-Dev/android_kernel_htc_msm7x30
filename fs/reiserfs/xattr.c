@@ -187,8 +187,13 @@ fill_with_dentries(void *buf, const char *name, int namelen, loff_t offset,
 	if (dbuf->count == ARRAY_SIZE(dbuf->dentries))
 		return -ENOSPC;
 
+<<<<<<< HEAD
 	if (name[0] == '.' && (name[1] == '\0' ||
 			       (name[1] == '.' && name[2] == '\0')))
+=======
+	if (name[0] == '.' && (namelen < 2 ||
+			       (namelen == 2 && name[1] == '.')))
+>>>>>>> upstream/4.3_primoc
 		return 0;
 
 	dentry = lookup_one_len(name, dbuf->xadir, namelen);
@@ -555,11 +560,18 @@ reiserfs_xattr_set_handle(struct reiserfs_transaction_handle *th,
 
 		reiserfs_write_unlock(inode->i_sb);
 		mutex_lock_nested(&dentry->d_inode->i_mutex, I_MUTEX_XATTR);
+<<<<<<< HEAD
 		down_write(&dentry->d_inode->i_alloc_sem);
 		reiserfs_write_lock(inode->i_sb);
 
 		err = reiserfs_setattr(dentry, &newattrs);
 		up_write(&dentry->d_inode->i_alloc_sem);
+=======
+		inode_dio_wait(dentry->d_inode);
+		reiserfs_write_lock(inode->i_sb);
+
+		err = reiserfs_setattr(dentry, &newattrs);
+>>>>>>> upstream/4.3_primoc
 		mutex_unlock(&dentry->d_inode->i_mutex);
 	} else
 		update_ctime(inode);
@@ -868,6 +880,7 @@ out:
 	return err;
 }
 
+<<<<<<< HEAD
 static int reiserfs_check_acl(struct inode *inode, int mask, unsigned int flags)
 {
 	struct posix_acl *acl;
@@ -889,6 +902,8 @@ static int reiserfs_check_acl(struct inode *inode, int mask, unsigned int flags)
 	return error;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int create_privroot(struct dentry *dentry)
 {
 	int err;
@@ -952,7 +967,11 @@ static int xattr_mount_check(struct super_block *s)
 	return 0;
 }
 
+<<<<<<< HEAD
 int reiserfs_permission(struct inode *inode, int mask, unsigned int flags)
+=======
+int reiserfs_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	/*
 	 * We don't do permission checks on the internal objects.
@@ -961,6 +980,7 @@ int reiserfs_permission(struct inode *inode, int mask, unsigned int flags)
 	if (IS_PRIVATE(inode))
 		return 0;
 
+<<<<<<< HEAD
 #ifdef CONFIG_REISERFS_FS_XATTR
 	/*
 	 * Stat data v1 doesn't support ACLs.
@@ -970,6 +990,9 @@ int reiserfs_permission(struct inode *inode, int mask, unsigned int flags)
 					reiserfs_check_acl);
 #endif
 	return generic_permission(inode, mask, flags, NULL);
+=======
+	return generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 }
 
 static int xattr_hide_revalidate(struct dentry *dentry, struct nameidata *nd)

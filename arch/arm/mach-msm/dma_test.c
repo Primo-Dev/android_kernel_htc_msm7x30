@@ -163,7 +163,11 @@ static int dma_test_open(struct inode *inode, struct file *file)
 {
 	struct private *priv;
 
+<<<<<<< HEAD
 	printk(KERN_ALERT "[K] %s\n", __func__);
+=======
+	printk(KERN_ALERT "%s\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 	priv = kmalloc(sizeof(struct private), GFP_KERNEL);
 	if (priv == NULL)
@@ -198,7 +202,11 @@ static int dma_test_release(struct inode *inode, struct file *file)
 {
 	struct private *priv;
 
+<<<<<<< HEAD
 	printk(KERN_ALERT "[K] %s\n", __func__);
+=======
+	printk(KERN_ALERT "%s\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 	if (file->private_data != NULL) {
 		priv = file->private_data;
@@ -340,7 +348,11 @@ static int dma_test_init(void)
 	for (i = 0; i < MAX_TEST_BUFFERS; i++)
 		sema_init(&buffer_sems[i], 1);
 
+<<<<<<< HEAD
 	printk(KERN_ALERT "[K] %s, minor number %d\n", __func__, dma_test_dev.minor);
+=======
+	printk(KERN_ALERT "%s, minor number %d\n", __func__, dma_test_dev.minor);
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -348,7 +360,11 @@ static void dma_test_exit(void)
 {
 	free_buffers();
 	misc_deregister(&dma_test_dev);
+<<<<<<< HEAD
 	printk(KERN_ALERT "[K] %s\n", __func__);
+=======
+	printk(KERN_ALERT "%s\n", __func__);
+>>>>>>> upstream/4.3_primoc
 }
 
 MODULE_LICENSE("GPL v2");

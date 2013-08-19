@@ -30,7 +30,11 @@
 
 int set_task_ioprio(struct task_struct *task, int ioprio)
 {
+<<<<<<< HEAD
 	int err, i;
+=======
+	int err;
+>>>>>>> upstream/4.3_primoc
 	struct io_context *ioc;
 	const struct cred *cred = current_cred(), *tcred;
 
@@ -47,6 +51,7 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
 	if (err)
 		return err;
 
+<<<<<<< HEAD
 	task_lock(task);
 	do {
 		ioc = task->io_context;
@@ -74,6 +79,14 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
 	}
 
 	task_unlock(task);
+=======
+	ioc = get_task_io_context(task, GFP_ATOMIC, NUMA_NO_NODE);
+	if (ioc) {
+		ioc_ioprio_changed(ioc, ioprio);
+		put_io_context(ioc);
+	}
+
+>>>>>>> upstream/4.3_primoc
 	return err;
 }
 EXPORT_SYMBOL_GPL(set_task_ioprio);

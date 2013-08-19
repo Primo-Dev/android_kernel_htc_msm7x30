@@ -132,9 +132,15 @@
  */
 
 #ifdef CONFIG_DEBUG_SLAB
+<<<<<<< HEAD
 #define	DEBUG		1
 #define	STATS		1
 #define	FORCED_DEBUG	1
+=======
+#define	DEBUG		0
+#define	STATS		0
+#define	FORCED_DEBUG	0
+>>>>>>> upstream/4.3_primoc
 #else
 #define	DEBUG		0
 #define	STATS		0
@@ -593,6 +599,10 @@ static enum {
 	PARTIAL_AC,
 	PARTIAL_L3,
 	EARLY,
+<<<<<<< HEAD
+=======
+	LATE,
+>>>>>>> upstream/4.3_primoc
 	FULL
 } g_cpucache_up;
 
@@ -624,7 +634,11 @@ static void init_node_lock_keys(int q)
 {
 	struct cache_sizes *s = malloc_sizes;
 
+<<<<<<< HEAD
 	if (g_cpucache_up != FULL)
+=======
+	if (g_cpucache_up < LATE)
+>>>>>>> upstream/4.3_primoc
 		return;
 
 	for (s = malloc_sizes; s->cs_size != ULONG_MAX; s++) {
@@ -1625,6 +1639,11 @@ void __init kmem_cache_init_late(void)
 {
 	struct kmem_cache *cachep;
 
+<<<<<<< HEAD
+=======
+	g_cpucache_up = LATE;
+
+>>>>>>> upstream/4.3_primoc
 	/* 6) resize the head arrays to their final sizes */
 	mutex_lock(&cache_chain_mutex);
 	list_for_each_entry(cachep, &cache_chain, next)
@@ -1632,12 +1651,21 @@ void __init kmem_cache_init_late(void)
 			BUG();
 	mutex_unlock(&cache_chain_mutex);
 
+<<<<<<< HEAD
 	/* Done! */
 	g_cpucache_up = FULL;
 
 	/* Annotate slab for lockdep -- annotate the malloc caches */
 	init_lock_keys();
 
+=======
+	/* Annotate slab for lockdep -- annotate the malloc caches */
+	init_lock_keys();
+
+	/* Done! */
+	g_cpucache_up = FULL;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Register a cpu startup notifier callback that initializes
 	 * cpu_cache_get for all new cpus
@@ -3153,17 +3181,30 @@ static void *cache_alloc_debugcheck_after(struct kmem_cache *cachep,
 	objp += obj_offset(cachep);
 	if (cachep->ctor && cachep->flags & SLAB_POISON)
 		cachep->ctor(objp);
+<<<<<<< HEAD
 #if ARCH_SLAB_MINALIGN
 	if ((u32)objp & (ARCH_SLAB_MINALIGN-1)) {
+=======
+	if (ARCH_SLAB_MINALIGN &&
+	    ((unsigned long)objp & (ARCH_SLAB_MINALIGN-1))) {
+>>>>>>> upstream/4.3_primoc
 		printk(KERN_ERR "0x%p: not aligned to ARCH_SLAB_MINALIGN=%d\n",
 		       objp, ARCH_SLAB_MINALIGN);
 	}
 #endif
+<<<<<<< HEAD
 	return objp;
 }
 #else
 #define cache_alloc_debugcheck_after(a,b,objp,d) (objp)
 #endif
+=======
+//	return objp;
+//}
+//#else
+#define cache_alloc_debugcheck_after(a,b,objp,d) (objp)
+//#endif
+>>>>>>> upstream/4.3_primoc
 
 static bool slab_should_failslab(struct kmem_cache *cachep, gfp_t flags)
 {
@@ -3218,12 +3259,18 @@ static void *alternate_node_alloc(struct kmem_cache *cachep, gfp_t flags)
 	if (in_interrupt() || (flags & __GFP_THISNODE))
 		return NULL;
 	nid_alloc = nid_here = numa_mem_id();
+<<<<<<< HEAD
 	get_mems_allowed();
+=======
+>>>>>>> upstream/4.3_primoc
 	if (cpuset_do_slab_mem_spread() && (cachep->flags & SLAB_MEM_SPREAD))
 		nid_alloc = cpuset_slab_spread_node();
 	else if (current->mempolicy)
 		nid_alloc = slab_node(current->mempolicy);
+<<<<<<< HEAD
 	put_mems_allowed();
+=======
+>>>>>>> upstream/4.3_primoc
 	if (nid_alloc != nid_here)
 		return ____cache_alloc_node(cachep, flags, nid_alloc);
 	return NULL;
@@ -3246,14 +3293,27 @@ static void *fallback_alloc(struct kmem_cache *cache, gfp_t flags)
 	enum zone_type high_zoneidx = gfp_zone(flags);
 	void *obj = NULL;
 	int nid;
+<<<<<<< HEAD
+=======
+	unsigned int cpuset_mems_cookie;
+>>>>>>> upstream/4.3_primoc
 
 	if (flags & __GFP_THISNODE)
 		return NULL;
 
+<<<<<<< HEAD
 	get_mems_allowed();
 	zonelist = node_zonelist(slab_node(current->mempolicy), flags);
 	local_flags = flags & (GFP_CONSTRAINT_MASK|GFP_RECLAIM_MASK);
 
+=======
+	local_flags = flags & (GFP_CONSTRAINT_MASK|GFP_RECLAIM_MASK);
+
+retry_cpuset:
+	cpuset_mems_cookie = get_mems_allowed();
+	zonelist = node_zonelist(slab_node(current->mempolicy), flags);
+
+>>>>>>> upstream/4.3_primoc
 retry:
 	/*
 	 * Look through allowed nodes for objects available
@@ -3306,7 +3366,13 @@ retry:
 			}
 		}
 	}
+<<<<<<< HEAD
 	put_mems_allowed();
+=======
+
+	if (unlikely(!put_mems_allowed(cpuset_mems_cookie) && !obj))
+		goto retry_cpuset;
+>>>>>>> upstream/4.3_primoc
 	return obj;
 }
 
@@ -4532,7 +4598,11 @@ static const struct file_operations proc_slabstats_operations = {
 
 static int __init slab_proc_init(void)
 {
+<<<<<<< HEAD
 	proc_create("slabinfo",S_IWUSR|S_IRUGO,NULL,&proc_slabinfo_operations);
+=======
+	proc_create("slabinfo",S_IWUSR|S_IRUSR,NULL,&proc_slabinfo_operations);
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_DEBUG_SLAB_LEAK
 	proc_create("slab_allocators", 0, NULL, &proc_slabstats_operations);
 #endif

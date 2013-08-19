@@ -343,7 +343,11 @@ static struct sysrq_key_op sysrq_term_op = {
 
 static void moom_callback(struct work_struct *ignored)
 {
+<<<<<<< HEAD
 	out_of_memory(node_zonelist(0, GFP_KERNEL), GFP_KERNEL, 0, NULL);
+=======
+	out_of_memory(node_zonelist(0, GFP_KERNEL), GFP_KERNEL, 0, NULL, true);
+>>>>>>> upstream/4.3_primoc
 }
 
 static DECLARE_WORK(moom_work, moom_callback);
@@ -508,7 +512,11 @@ void __handle_sysrq(int key, bool check_mask)
 	 */
 	orig_log_level = console_loglevel;
 	console_loglevel = 7;
+<<<<<<< HEAD
 	printk(KERN_INFO "[K] SysRq : ");
+=======
+	printk(KERN_INFO "SysRq : ");
+>>>>>>> upstream/4.3_primoc
 
         op_p = __sysrq_get_key_op(key);
         if (op_p) {

@@ -58,21 +58,31 @@ static void set_wake_locked(int wake)
 		return;
 	bt_lpm.wake = wake;
 
+<<<<<<< HEAD
 	printk(KERN_ERR "[BT] %s wake=%d\n", __func__, wake);
 
 	gpio_set_value(bt_lpm.gpio_wake, wake);
+=======
+>>>>>>> upstream/4.3_primoc
 	if (wake || bt_lpm.host_wake)
 		bt_lpm.request_clock_on_locked(bt_lpm.uport);
 	else
 		bt_lpm.request_clock_off_locked(bt_lpm.uport);
 
+<<<<<<< HEAD
+=======
+	gpio_set_value(bt_lpm.gpio_wake, wake);
+>>>>>>> upstream/4.3_primoc
 }
 
 static enum hrtimer_restart enter_lpm(struct hrtimer *timer) {
 	unsigned long flags;
 
+<<<<<<< HEAD
 	printk(KERN_ERR "[BT] %s\n", __func__);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	spin_lock_irqsave(&bt_lpm.uport->lock, flags);
 	set_wake_locked(0);
 	spin_unlock_irqrestore(&bt_lpm.uport->lock, flags);
@@ -81,8 +91,11 @@ static enum hrtimer_restart enter_lpm(struct hrtimer *timer) {
 }
 
 void bcm_bt_lpm_exit_lpm_locked(struct uart_port *uport) {
+<<<<<<< HEAD
 	printk(KERN_ERR "[BT] %s\n", __func__);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	bt_lpm.uport = uport;
 
 	hrtimer_try_to_cancel(&bt_lpm.enter_lpm_timer);
@@ -92,12 +105,18 @@ void bcm_bt_lpm_exit_lpm_locked(struct uart_port *uport) {
 	hrtimer_start(&bt_lpm.enter_lpm_timer, bt_lpm.enter_lpm_delay,
 			HRTIMER_MODE_REL);
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(bcm_bt_lpm_exit_lpm_locked);
 
 static void update_host_wake_locked(int host_wake)
 {
+<<<<<<< HEAD
 	printk(KERN_ERR "[BT] %s\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	if (host_wake == bt_lpm.host_wake)
 		return;
 	bt_lpm.host_wake = host_wake;
@@ -114,8 +133,11 @@ static irqreturn_t host_wake_isr(int irq, void *dev)
 	unsigned long flags;
 
 	host_wake = gpio_get_value(bt_lpm.gpio_host_wake);
+<<<<<<< HEAD
 
 	printk(KERN_INFO "[BT] %s host_wake=%d\n", __func__, host_wake);
+=======
+>>>>>>> upstream/4.3_primoc
 	irq_set_irq_type(irq, host_wake ? IRQF_TRIGGER_LOW : IRQF_TRIGGER_HIGH);
 
 	if (!bt_lpm.uport) {

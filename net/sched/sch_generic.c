@@ -675,7 +675,11 @@ struct Qdisc *dev_graft_qdisc(struct netdev_queue *dev_queue,
 	if (qdisc == NULL)
 		qdisc = &noop_qdisc;
 	dev_queue->qdisc_sleeping = qdisc;
+<<<<<<< HEAD
 	rcu_assign_pointer_nonull(dev_queue->qdisc, &noop_qdisc);
+=======
+	rcu_assign_pointer(dev_queue->qdisc, &noop_qdisc);
+>>>>>>> upstream/4.3_primoc
 
 	spin_unlock_bh(root_lock);
 

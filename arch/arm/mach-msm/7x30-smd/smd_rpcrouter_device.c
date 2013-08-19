@@ -70,7 +70,11 @@ static void *msm_rpcrouter_load_modem(void)
 
 	pil = pil_get("modem");
 	if (IS_ERR(pil))
+<<<<<<< HEAD
 		pr_err("[K] %s: modem load failed\n", __func__);
+=======
+		pr_err("%s: modem load failed\n", __func__);
+>>>>>>> upstream/4.3_primoc
 	else {
 		rc = wait_for_completion_interruptible_timeout(
 						&rpc_remote_router_up,
@@ -78,7 +82,11 @@ static void *msm_rpcrouter_load_modem(void)
 		if (!rc)
 			rc = -ETIMEDOUT;
 		if (rc < 0) {
+<<<<<<< HEAD
 			pr_err("[K] %s: wait for remote router failed %d\n",
+=======
+			pr_err("%s: wait for remote router failed %d\n",
+>>>>>>> upstream/4.3_primoc
 			       __func__, rc);
 			msm_rpcrouter_unload_modem(pil);
 			pil = ERR_PTR(rc);
@@ -169,7 +177,11 @@ static ssize_t rpcrouter_read(struct file *filp, char __user *buf,
 	while (frag != NULL) {
 		if (copy_to_user(buf, frag->data, frag->length)) {
 			printk(KERN_ERR
+<<<<<<< HEAD
 			       "[K] rpcrouter: could not copy all read data to user!\n");
+=======
+			       "rpcrouter: could not copy all read data to user!\n");
+>>>>>>> upstream/4.3_primoc
 			rc = -EFAULT;
 		}
 		buf += frag->length;
@@ -332,7 +344,11 @@ int msm_rpcrouter_create_server_cdev(struct rr_server *server)
 
 	if (next_minor == RPCROUTER_MAX_REMOTE_SERVERS) {
 		printk(KERN_ERR
+<<<<<<< HEAD
 		       "[K] rpcrouter: Minor numbers exhausted - Increase "
+=======
+		       "rpcrouter: Minor numbers exhausted - Increase "
+>>>>>>> upstream/4.3_primoc
 		       "RPCROUTER_MAX_REMOTE_SERVERS\n");
 		return -ENOBUFS;
 	}
@@ -357,7 +373,11 @@ int msm_rpcrouter_create_server_cdev(struct rr_server *server)
 			      server->prog, dev_vers);
 	if (IS_ERR(server->device)) {
 		printk(KERN_ERR
+<<<<<<< HEAD
 		       "[K] rpcrouter: Unable to create device (%ld)\n",
+=======
+		       "rpcrouter: Unable to create device (%ld)\n",
+>>>>>>> upstream/4.3_primoc
 		       PTR_ERR(server->device));
 		return PTR_ERR(server->device);;
 	}
@@ -368,7 +388,11 @@ int msm_rpcrouter_create_server_cdev(struct rr_server *server)
 	rc = cdev_add(&server->cdev, server->device_number, 1);
 	if (rc < 0) {
 		printk(KERN_ERR
+<<<<<<< HEAD
 		       "[K] rpcrouter: Unable to add chrdev (%d)\n", rc);
+=======
+		       "rpcrouter: Unable to add chrdev (%d)\n", rc);
+>>>>>>> upstream/4.3_primoc
 		device_destroy(msm_rpcrouter_class, server->device_number);
 		return rc;
 	}
@@ -411,7 +435,11 @@ int msm_rpcrouter_init_devices(void)
 	if (IS_ERR(msm_rpcrouter_class)) {
 		rc = -ENOMEM;
 		printk(KERN_ERR
+<<<<<<< HEAD
 		       "[K] rpcrouter: failed to create oncrpc class\n");
+=======
+		       "rpcrouter: failed to create oncrpc class\n");
+>>>>>>> upstream/4.3_primoc
 		goto fail;
 	}
 
@@ -420,7 +448,11 @@ int msm_rpcrouter_init_devices(void)
 				 "oncrpc");
 	if (rc < 0) {
 		printk(KERN_ERR
+<<<<<<< HEAD
 		       "[K] rpcrouter: Failed to alloc chardev region (%d)\n", rc);
+=======
+		       "rpcrouter: Failed to alloc chardev region (%d)\n", rc);
+>>>>>>> upstream/4.3_primoc
 		goto fail_destroy_class;
 	}
 

@@ -28,7 +28,10 @@
 #include <linux/miscdevice.h>
 
 #include <mach/board_htc.h>
+<<<<<<< HEAD
 #include <linux/wakelock.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 #define ADB_IOCTL_MAGIC 's'
 #define ADB_ERR_PAYLOAD_STUCK       _IOW(ADB_IOCTL_MAGIC, 0, unsigned)
@@ -37,6 +40,7 @@
 #define ADB_BULK_BUFFER_SIZE           4096
 
 /* number of tx requests to allocate */
+<<<<<<< HEAD
 #define ADB_TX_REQ_MAX 4
 #define ADB_RX_REQ_MAX 32
 #define ADB_PERF_TIMEOUT (jiffies + msecs_to_jiffies(5000))
@@ -46,6 +50,11 @@ static struct wake_lock adb_idle_wake_lock;
 #ifdef CONFIG_PERFLOCK
 static struct perf_lock adb_xfer_perf_lock;
 #endif
+=======
+#define TX_REQ_MAX 4
+
+static const char adb_shortname[] = "android_adb";
+>>>>>>> upstream/4.3_primoc
 
 struct adb_dev {
 	struct usb_function function;
@@ -63,6 +72,7 @@ struct adb_dev {
 	atomic_t open_excl;
 
 	struct list_head tx_idle;
+<<<<<<< HEAD
 	struct list_head rx_idle;
 	struct list_head rx_done;
 
@@ -79,6 +89,13 @@ struct adb_dev {
 #ifdef CONFIG_PERFLOCK
 	struct timer_list perf_timer;
 #endif
+=======
+
+	wait_queue_head_t read_wq;
+	wait_queue_head_t write_wq;
+	struct usb_request *rx_req;
+	int rx_done;
+>>>>>>> upstream/4.3_primoc
 };
 
 static struct usb_interface_descriptor adb_interface_desc = {
@@ -140,6 +157,7 @@ static struct usb_descriptor_header *hs_adb_descs[] = {
 static struct adb_dev *_adb_dev;
 int board_get_usb_ats(void);
 
+<<<<<<< HEAD
 static void adb_perf_lock_disable(unsigned long data)
 {
 #ifdef CONFIG_PERFLOCK
@@ -148,6 +166,8 @@ static void adb_perf_lock_disable(unsigned long data)
 #endif
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static inline struct adb_dev *func_to_adb(struct usb_function *f)
 {
 	return container_of(f, struct adb_dev, function);
@@ -238,6 +258,7 @@ static void adb_complete_out(struct usb_ep *ep, struct usb_request *req)
 {
 	struct adb_dev *dev = _adb_dev;
 
+<<<<<<< HEAD
 	if (req->status != 0) {
 		printk(KERN_INFO "[USB] %s: err (%d)\n", __func__, req->status);
 		atomic_set(&dev->error, 1);
@@ -245,6 +266,13 @@ static void adb_complete_out(struct usb_ep *ep, struct usb_request *req)
 	} else
 		adb_req_put(dev, &dev->rx_done, req);
 
+=======
+	dev->rx_done = 1;
+	if (req->status != 0) {
+		printk(KERN_INFO "[USB] %s: err (%d)\n", __func__, req->status);
+		atomic_set(&dev->error, 1);
+	}
+>>>>>>> upstream/4.3_primoc
 	wake_up(&dev->read_wq);
 }
 
@@ -278,6 +306,7 @@ static int adb_create_bulk_endpoints(struct adb_dev *dev,
 	dev->ep_out = ep;
 
 	/* now allocate requests for our endpoints */
+<<<<<<< HEAD
 	for (i = 0; i < ADB_RX_REQ_MAX; i++) {
 		req = adb_request_new(dev->ep_out, 512);
 		if (!req)
@@ -287,6 +316,15 @@ static int adb_create_bulk_endpoints(struct adb_dev *dev,
 	}
 
 	for (i = 0; i < ADB_TX_REQ_MAX; i++) {
+=======
+	req = adb_request_new(dev->ep_out, ADB_BULK_BUFFER_SIZE);
+	if (!req)
+		goto fail;
+	req->complete = adb_complete_out;
+	dev->rx_req = req;
+
+	for (i = 0; i < TX_REQ_MAX; i++) {
+>>>>>>> upstream/4.3_primoc
 		req = adb_request_new(dev->ep_in, ADB_BULK_BUFFER_SIZE);
 		if (!req)
 			goto fail;
@@ -315,6 +353,7 @@ static ssize_t adb_read(struct file *fp, char __user *buf,
 
 	if (count > ADB_BULK_BUFFER_SIZE)
 		return -EINVAL;
+<<<<<<< HEAD
 #ifdef CONFIG_PERFLOCK
 	else if (dev->adb_perf_lock_on && count == ADB_BULK_BUFFER_SIZE) {
 		if (!is_perf_lock_active(&adb_xfer_perf_lock))
@@ -323,6 +362,8 @@ static ssize_t adb_read(struct file *fp, char __user *buf,
 			mod_timer(&dev->perf_timer, ADB_PERF_TIMEOUT);
 	}
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (adb_lock(&dev->read_excl))
 		return -EBUSY;
@@ -342,6 +383,7 @@ static ssize_t adb_read(struct file *fp, char __user *buf,
 		r = -EIO;
 		goto done;
 	}
+<<<<<<< HEAD
 	while (count > 0) {
 		if (atomic_read(&dev->error)) {
 			r = -EIO;
@@ -407,6 +449,44 @@ requeue_req:
 			break;
 		}
 	}
+=======
+
+requeue_req:
+	/* queue a request */
+	req = dev->rx_req;
+	req->length = count;
+	dev->rx_done = 0;
+	ret = usb_ep_queue(dev->ep_out, req, GFP_ATOMIC);
+	if (ret < 0) {
+		pr_debug("adb_read: failed to queue req %p (%d)\n", req, ret);
+		r = -EIO;
+		atomic_set(&dev->error, 1);
+		goto done;
+	} else {
+		pr_debug("rx %p queue\n", req);
+	}
+
+	/* wait for a request to complete */
+	ret = wait_event_interruptible(dev->read_wq, dev->rx_done);
+	if (ret < 0) {
+		atomic_set(&dev->error, 1);
+		r = ret;
+		usb_ep_dequeue(dev->ep_out, req);
+		goto done;
+	}
+	if (!atomic_read(&dev->error)) {
+		/* If we got a 0-len packet, throw it back and try again. */
+		if (req->actual == 0)
+			goto requeue_req;
+
+		pr_debug("rx %p %d\n", req, req->actual);
+		xfer = (req->actual < count) ? req->actual : count;
+		if (copy_to_user(buf, req->buf, xfer))
+			r = -EFAULT;
+
+	} else
+		r = -EIO;
+>>>>>>> upstream/4.3_primoc
 
 done:
 	adb_unlock(&dev->read_excl);
@@ -465,7 +545,10 @@ static ssize_t adb_write(struct file *fp, const char __user *buf,
 				r = -EIO;
 				break;
 			}
+<<<<<<< HEAD
 			wake_lock_timeout(&adb_idle_wake_lock, HZ / 2);
+=======
+>>>>>>> upstream/4.3_primoc
 
 			buf += xfer;
 			count -= xfer;
@@ -506,7 +589,10 @@ static int adb_release(struct inode *ip, struct file *fp)
 	printk(KERN_INFO "adb_release: %s(parent:%s): tgid=%d\n",
 			current->comm, current->parent->comm, current->tgid);
 	adb_unlock(&_adb_dev->open_excl);
+<<<<<<< HEAD
 	adb_perf_lock_disable((unsigned long)&_adb_dev);
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -626,10 +712,14 @@ adb_function_unbind(struct usb_configuration *c, struct usb_function *f)
 
 	wake_up(&dev->read_wq);
 
+<<<<<<< HEAD
 	while ((req = adb_req_get(dev, &dev->rx_done)))
 		adb_request_free(req, dev->ep_out);
 	while ((req = adb_req_get(dev, &dev->rx_idle)))
 		adb_request_free(req, dev->ep_out);
+=======
+	adb_request_free(dev->rx_req, dev->ep_out);
+>>>>>>> upstream/4.3_primoc
 	while ((req = adb_req_get(dev, &dev->tx_idle)))
 		adb_request_free(req, dev->ep_in);
 }
@@ -640,7 +730,10 @@ static int adb_function_set_alt(struct usb_function *f,
 	struct adb_dev	*dev = func_to_adb(f);
 	struct usb_composite_dev *cdev = f->config->cdev;
 	int ret;
+<<<<<<< HEAD
 	struct usb_request *req;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	DBG(cdev, "adb_function_set_alt intf: %d alt: %d\n", intf, alt);
 	ret = usb_ep_enable(dev->ep_in,
@@ -657,6 +750,7 @@ static int adb_function_set_alt(struct usb_function *f,
 		usb_ep_disable(dev->ep_in);
 		return ret;
 	}
+<<<<<<< HEAD
 	if (cdev->gadget->speed == USB_SPEED_FULL)
 		dev->maxsize = 64;
 	else
@@ -666,6 +760,8 @@ static int adb_function_set_alt(struct usb_function *f,
 	/* retire any completed rx requests from previous session */
 	while ((req = adb_req_get(dev, &dev->rx_done)))
 		adb_req_put(dev, &dev->rx_idle, req);
+=======
+>>>>>>> upstream/4.3_primoc
 	atomic_set(&dev->online, 1);
 
 	/* readers may be blocked waiting for us to go online */
@@ -708,7 +804,11 @@ static int adb_bind_config(struct usb_configuration *c)
 	return usb_add_function(c, &dev->function);
 }
 
+<<<<<<< HEAD
 static int adb_setup(bool adb_perf_lock_on)
+=======
+static int adb_setup(void)
+>>>>>>> upstream/4.3_primoc
 {
 	struct adb_dev *dev;
 	int ret;
@@ -727,6 +827,7 @@ static int adb_setup(bool adb_perf_lock_on)
 	atomic_set(&dev->write_excl, 0);
 
 	INIT_LIST_HEAD(&dev->tx_idle);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&dev->rx_idle);
 	INIT_LIST_HEAD(&dev->rx_done);
 
@@ -736,6 +837,8 @@ static int adb_setup(bool adb_perf_lock_on)
 	setup_timer(&dev->perf_timer, adb_perf_lock_disable, (unsigned long)dev);
 #endif
 	dev->adb_perf_lock_on = adb_perf_lock_on;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	_adb_dev = dev;
 

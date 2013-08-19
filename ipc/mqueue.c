@@ -243,7 +243,10 @@ static struct inode *mqueue_alloc_inode(struct super_block *sb)
 static void mqueue_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(mqueue_inode_cachep, MQUEUE_I(inode));
 }
 
@@ -296,7 +299,11 @@ static void mqueue_evict_inode(struct inode *inode)
 }
 
 static int mqueue_create(struct inode *dir, struct dentry *dentry,
+<<<<<<< HEAD
 				int mode, struct nameidata *nd)
+=======
+				umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode;
 	struct mq_attr *attr = dentry->d_fsdata;
@@ -449,8 +456,13 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
 		set_current_state(TASK_INTERRUPTIBLE);
 
 		spin_unlock(&info->lock);
+<<<<<<< HEAD
 		time = schedule_hrtimeout_range_clock(timeout,
 		    HRTIMER_MODE_ABS, 0, CLOCK_REALTIME);
+=======
+ 		time = schedule_hrtimeout_range_clock(timeout, 0,
+		        HRTIMER_MODE_ABS, CLOCK_REALTIME, NULL);
+>>>>>>> upstream/4.3_primoc
 
 		while (ewp->state == STATE_PENDING)
 			cpu_relax();
@@ -611,7 +623,11 @@ static int mq_attr_ok(struct ipc_namespace *ipc_ns, struct mq_attr *attr)
  * Invoked when creating a new queue via sys_mq_open
  */
 static struct file *do_create(struct ipc_namespace *ipc_ns, struct dentry *dir,
+<<<<<<< HEAD
 			struct dentry *dentry, int oflag, mode_t mode,
+=======
+			struct dentry *dentry, int oflag, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 			struct mq_attr *attr)
 {
 	const struct cred *cred = current_cred();

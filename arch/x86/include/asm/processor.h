@@ -452,6 +452,10 @@ struct thread_struct {
 	unsigned long		trap_no;
 	unsigned long		error_code;
 	/* floating point and extended processor state */
+<<<<<<< HEAD
+=======
+	unsigned long		has_fpu;
+>>>>>>> upstream/4.3_primoc
 	struct fpu		fpu;
 #ifdef CONFIG_X86_32
 	/* Virtual 86 mode info */

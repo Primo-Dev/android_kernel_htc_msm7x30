@@ -169,7 +169,11 @@ static void add_sector(conf_t *conf, sector_t start, int mode)
 		conf->nfaults = n+1;
 }
 
+<<<<<<< HEAD
 static int make_request(mddev_t *mddev, struct bio *bio)
+=======
+static void make_request(mddev_t *mddev, struct bio *bio)
+>>>>>>> upstream/4.3_primoc
 {
 	conf_t *conf = mddev->private;
 	int failit = 0;
@@ -181,7 +185,11 @@ static int make_request(mddev_t *mddev, struct bio *bio)
 			 * just fail immediately
 			 */
 			bio_endio(bio, -EIO);
+<<<<<<< HEAD
 			return 0;
+=======
+			return;
+>>>>>>> upstream/4.3_primoc
 		}
 
 		if (check_sector(conf, bio->bi_sector, bio->bi_sector+(bio->bi_size>>9),
@@ -211,6 +219,7 @@ static int make_request(mddev_t *mddev, struct bio *bio)
 	}
 	if (failit) {
 		struct bio *b = bio_clone_mddev(bio, GFP_NOIO, mddev);
+<<<<<<< HEAD
 		b->bi_bdev = conf->rdev->bdev;
 		b->bi_private = bio;
 		b->bi_end_io = faulty_fail;
@@ -220,6 +229,17 @@ static int make_request(mddev_t *mddev, struct bio *bio)
 		bio->bi_bdev = conf->rdev->bdev;
 		return 1;
 	}
+=======
+
+		b->bi_bdev = conf->rdev->bdev;
+		b->bi_private = bio;
+		b->bi_end_io = faulty_fail;
+		bio = b;
+	} else
+		bio->bi_bdev = conf->rdev->bdev;
+
+	generic_make_request(bio);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void status(struct seq_file *seq, mddev_t *mddev)

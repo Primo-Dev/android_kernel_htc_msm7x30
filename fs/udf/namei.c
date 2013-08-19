@@ -552,7 +552,11 @@ static int udf_delete_entry(struct inode *inode, struct fileIdentDesc *fi,
 	return udf_write_fi(inode, cfi, fi, fibh, NULL, NULL);
 }
 
+<<<<<<< HEAD
 static int udf_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int udf_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		      struct nameidata *nd)
 {
 	struct udf_fileident_bh fibh;
@@ -577,8 +581,12 @@ static int udf_create(struct inode *dir, struct dentry *dentry, int mode,
 
 	fi = udf_add_entry(dir, dentry, &fibh, &cfi, &err);
 	if (!fi) {
+<<<<<<< HEAD
 		inode->i_nlink--;
 		mark_inode_dirty(inode);
+=======
+		inode_dec_link_count(inode);
+>>>>>>> upstream/4.3_primoc
 		iput(inode);
 		return err;
 	}
@@ -597,7 +605,11 @@ static int udf_create(struct inode *dir, struct dentry *dentry, int mode,
 	return 0;
 }
 
+<<<<<<< HEAD
 static int udf_mknod(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int udf_mknod(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		     dev_t rdev)
 {
 	struct inode *inode;
@@ -618,8 +630,12 @@ static int udf_mknod(struct inode *dir, struct dentry *dentry, int mode,
 	init_special_inode(inode, mode, rdev);
 	fi = udf_add_entry(dir, dentry, &fibh, &cfi, &err);
 	if (!fi) {
+<<<<<<< HEAD
 		inode->i_nlink--;
 		mark_inode_dirty(inode);
+=======
+		inode_dec_link_count(inode);
+>>>>>>> upstream/4.3_primoc
 		iput(inode);
 		return err;
 	}
@@ -665,8 +681,12 @@ static int udf_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 	inode->i_fop = &udf_dir_operations;
 	fi = udf_add_entry(inode, NULL, &fibh, &cfi, &err);
 	if (!fi) {
+<<<<<<< HEAD
 		inode->i_nlink--;
 		mark_inode_dirty(inode);
+=======
+		inode_dec_link_count(inode);
+>>>>>>> upstream/4.3_primoc
 		iput(inode);
 		goto out;
 	}
@@ -683,7 +703,11 @@ static int udf_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 
 	fi = udf_add_entry(dir, dentry, &fibh, &cfi, &err);
 	if (!fi) {
+<<<<<<< HEAD
 		inode->i_nlink = 0;
+=======
+		clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		mark_inode_dirty(inode);
 		iput(inode);
 		goto out;
@@ -1297,6 +1321,10 @@ static int udf_encode_fh(struct dentry *de, __u32 *fh, int *lenp,
 	*lenp = 3;
 	fid->udf.block = location.logicalBlockNum;
 	fid->udf.partref = location.partitionReferenceNum;
+<<<<<<< HEAD
+=======
+	fid->udf.parent_partref = 0;
+>>>>>>> upstream/4.3_primoc
 	fid->udf.generation = inode->i_generation;
 
 	if (connectable && !S_ISDIR(inode->i_mode)) {

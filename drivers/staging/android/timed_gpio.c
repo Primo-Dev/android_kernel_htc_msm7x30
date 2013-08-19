@@ -62,6 +62,7 @@ static void gpio_enable(struct timed_output_dev *dev, int value)
 		container_of(dev, struct timed_gpio_data, dev);
 	unsigned long	flags;
 
+<<<<<<< HEAD
 	/* cancel previous timer and set GPIO according to value */
 retry:
 	spin_lock_irqsave(&data->lock, flags);
@@ -71,6 +72,12 @@ retry:
 		goto retry;
 	}
 
+=======
+	spin_lock_irqsave(&data->lock, flags);
+
+	/* cancel previous timer and set GPIO according to value */
+	hrtimer_cancel(&data->timer);
+>>>>>>> upstream/4.3_primoc
 	gpio_direction_output(data->gpio, data->active_low ? !value : !!value);
 
 	if (value > 0) {
@@ -90,7 +97,11 @@ static int timed_gpio_probe(struct platform_device *pdev)
 	struct timed_gpio_platform_data *pdata = pdev->dev.platform_data;
 	struct timed_gpio *cur_gpio;
 	struct timed_gpio_data *gpio_data, *gpio_dat;
+<<<<<<< HEAD
 	int i, j, ret = 0;
+=======
+	int i, ret;
+>>>>>>> upstream/4.3_primoc
 
 	if (!pdata)
 		return -EBUSY;
@@ -113,6 +124,7 @@ static int timed_gpio_probe(struct platform_device *pdev)
 		gpio_dat->dev.get_time = gpio_get_time;
 		gpio_dat->dev.enable = gpio_enable;
 		ret = gpio_request(cur_gpio->gpio, cur_gpio->name);
+<<<<<<< HEAD
 		if (ret >= 0) {
 			ret = timed_output_dev_register(&gpio_dat->dev);
 			if (ret < 0)
@@ -125,6 +137,14 @@ static int timed_gpio_probe(struct platform_device *pdev)
 			}
 			kfree(gpio_data);
 			return ret;
+=======
+		if (ret < 0)
+			goto err_out;
+		ret = timed_output_dev_register(&gpio_dat->dev);
+		if (ret < 0) {
+			gpio_free(cur_gpio->gpio);
+			goto err_out;
+>>>>>>> upstream/4.3_primoc
 		}
 
 		gpio_dat->gpio = cur_gpio->gpio;
@@ -136,6 +156,18 @@ static int timed_gpio_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, gpio_data);
 
 	return 0;
+<<<<<<< HEAD
+=======
+
+err_out:
+	while (--i >= 0) {
+		timed_output_dev_unregister(&gpio_data[i].dev);
+		gpio_free(gpio_data[i].gpio);
+	}
+	kfree(gpio_data);
+
+	return ret;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int timed_gpio_remove(struct platform_device *pdev)

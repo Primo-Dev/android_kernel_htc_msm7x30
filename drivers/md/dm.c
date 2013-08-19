@@ -179,9 +179,12 @@ struct mapped_device {
 	/* forced geometry settings */
 	struct hd_geometry geometry;
 
+<<<<<<< HEAD
 	/* For saving the address of __make_request for request based dm */
 	make_request_fn *saved_make_request_fn;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* sysfs handle */
 	struct kobject kobj;
 
@@ -1052,6 +1055,10 @@ static struct bio *split_bvec(struct bio *bio, sector_t sector,
 {
 	struct bio *clone;
 	struct bio_vec *bv = bio->bi_io_vec + idx;
+<<<<<<< HEAD
+=======
+	int rc;
+>>>>>>> upstream/4.3_primoc
 
 	clone = bio_alloc_bioset(GFP_NOIO, 1, bs);
 	if (!clone) {
@@ -1072,7 +1079,11 @@ static struct bio *split_bvec(struct bio *bio, sector_t sector,
 	clone->bi_flags |= 1 << BIO_CLONED;
 
 	if (bio_integrity(bio)) {
+<<<<<<< HEAD
 		(void) bio_integrity_clone(clone, bio, GFP_NOIO, bs);
+=======
+		rc = bio_integrity_clone(clone, bio, GFP_NOIO, bs);
+>>>>>>> upstream/4.3_primoc
 		bio_integrity_trim(clone,
 				   bio_sector_offset(bio, idx, offset), len);
 	}
@@ -1088,6 +1099,10 @@ static struct bio *clone_bio(struct bio *bio, sector_t sector,
 			     unsigned int len, struct bio_set *bs)
 {
 	struct bio *clone;
+<<<<<<< HEAD
+=======
+	int rc;
+>>>>>>> upstream/4.3_primoc
 
 	clone = bio_alloc_bioset(GFP_NOIO, bio->bi_max_vecs, bs);
 	if (!clone) {
@@ -1103,7 +1118,11 @@ static struct bio *clone_bio(struct bio *bio, sector_t sector,
 	clone->bi_flags &= ~(1 << BIO_SEG_VALID);
 
 	if (bio_integrity(bio)) {
+<<<<<<< HEAD
 		(void) bio_integrity_clone(clone, bio, GFP_NOIO, bs);
+=======
+		rc = bio_integrity_clone(clone, bio, GFP_NOIO, bs);
+>>>>>>> upstream/4.3_primoc
 
 		if (idx != bio->bi_idx || clone->bi_size < bio->bi_size)
 			bio_integrity_trim(clone,
@@ -1412,7 +1431,11 @@ out:
  * The request function that just remaps the bio built up by
  * dm_merge_bvec.
  */
+<<<<<<< HEAD
 static int _dm_request(struct request_queue *q, struct bio *bio)
+=======
+static void _dm_request(struct request_queue *q, struct bio *bio)
+>>>>>>> upstream/4.3_primoc
 {
 	int rw = bio_data_dir(bio);
 	struct mapped_device *md = q->queuedata;
@@ -1433,11 +1456,16 @@ static int _dm_request(struct request_queue *q, struct bio *bio)
 			queue_io(md, bio);
 		else
 			bio_io_error(bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	__split_and_process_bio(md, bio);
 	up_read(&md->io_lock);
+<<<<<<< HEAD
 	return 0;
 }
 
@@ -1446,6 +1474,9 @@ static int dm_make_request(struct request_queue *q, struct bio *bio)
 	struct mapped_device *md = q->queuedata;
 
 	return md->saved_make_request_fn(q, bio); /* call __make_request() */
+=======
+	return;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int dm_request_based(struct mapped_device *md)
@@ -1453,14 +1484,24 @@ static int dm_request_based(struct mapped_device *md)
 	return blk_queue_stackable(md->queue);
 }
 
+<<<<<<< HEAD
 static int dm_request(struct request_queue *q, struct bio *bio)
+=======
+static void dm_request(struct request_queue *q, struct bio *bio)
+>>>>>>> upstream/4.3_primoc
 {
 	struct mapped_device *md = q->queuedata;
 
 	if (dm_request_based(md))
+<<<<<<< HEAD
 		return dm_make_request(q, bio);
 
 	return _dm_request(q, bio);
+=======
+		blk_queue_bio(q, bio);
+	else
+		_dm_request(q, bio);
+>>>>>>> upstream/4.3_primoc
 }
 
 void dm_dispatch_request(struct request *rq)
@@ -2150,7 +2191,10 @@ static int dm_init_request_based_queue(struct mapped_device *md)
 		return 0;
 
 	md->queue = q;
+<<<<<<< HEAD
 	md->saved_make_request_fn = md->queue->make_request_fn;
+=======
+>>>>>>> upstream/4.3_primoc
 	dm_init_md_queue(md);
 	blk_queue_softirq_done(md->queue, dm_softirq_done);
 	blk_queue_prep_rq(md->queue, dm_prep_fn);

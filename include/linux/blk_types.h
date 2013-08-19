@@ -59,8 +59,11 @@ struct bio {
 
 	unsigned int		bi_max_vecs;	/* max bvl_vecs we can hold */
 
+<<<<<<< HEAD
 	unsigned int		bi_comp_cpu;	/* completion CPU */
 
+=======
+>>>>>>> upstream/4.3_primoc
 	atomic_t		bi_cnt;		/* pin count */
 
 	struct bio_vec		*bi_io_vec;	/* the actual vec list */
@@ -93,11 +96,18 @@ struct bio {
 #define BIO_BOUNCED	5	/* bio is a bounce bio */
 #define BIO_USER_MAPPED 6	/* contains user pages */
 #define BIO_EOPNOTSUPP	7	/* not supported */
+<<<<<<< HEAD
 #define BIO_CPU_AFFINE	8	/* complete bio on same CPU as submitted */
 #define BIO_NULL_MAPPED 9	/* contains invalid user pages */
 #define BIO_FS_INTEGRITY 10	/* fs owns integrity data, not block layer */
 #define BIO_QUIET	11	/* Make BIO Quiet */
 #define BIO_MAPPED_INTEGRITY 12/* integrity metadata has been remapped */
+=======
+#define BIO_NULL_MAPPED 8	/* contains invalid user pages */
+#define BIO_FS_INTEGRITY 9	/* fs owns integrity data, not block layer */
+#define BIO_QUIET	10	/* Make BIO Quiet */
+#define BIO_MAPPED_INTEGRITY 11/* integrity metadata has been remapped */
+>>>>>>> upstream/4.3_primoc
 #define bio_flagged(bio, flag)	((bio)->bi_flags & (1 << (flag)))
 
 /*
@@ -124,6 +134,10 @@ enum rq_flag_bits {
 
 	__REQ_SYNC,		/* request is sync (sync write or read) */
 	__REQ_META,		/* metadata io request */
+<<<<<<< HEAD
+=======
+	__REQ_PRIO,		/* boost priority in cfq */
+>>>>>>> upstream/4.3_primoc
 	__REQ_DISCARD,		/* request to discard sectors */
 	__REQ_NOIDLE,		/* don't anticipate more IO after this one */
 
@@ -133,7 +147,11 @@ enum rq_flag_bits {
 				 * throttling rules. Don't do it again. */
 
 	/* request only flags */
+<<<<<<< HEAD
 	__REQ_SORTED,		/* elevator knows about this request */
+=======
+	__REQ_SORTED = __REQ_RAHEAD,	/* elevator knows about this request */
+>>>>>>> upstream/4.3_primoc
 	__REQ_SOFTBARRIER,	/* may not be passed by ioscheduler */
 	__REQ_FUA,		/* forced unit access */
 	__REQ_NOMERGE,		/* don't touch this for merging */
@@ -155,6 +173,10 @@ enum rq_flag_bits {
 #if defined(CONFIG_ZIMMER)
 	__REQ_SWAPIN_DMPG,	/* request to swap-in page from swap area or demand paging */
 #endif
+<<<<<<< HEAD
+=======
+	__REQ_URGENT,		/* urgent request */
+>>>>>>> upstream/4.3_primoc
 	__REQ_NR_BITS,		/* stops here */
 };
 
@@ -164,14 +186,25 @@ enum rq_flag_bits {
 #define REQ_FAILFAST_DRIVER	(1 << __REQ_FAILFAST_DRIVER)
 #define REQ_SYNC		(1 << __REQ_SYNC)
 #define REQ_META		(1 << __REQ_META)
+<<<<<<< HEAD
 #define REQ_DISCARD		(1 << __REQ_DISCARD)
+=======
+#define REQ_PRIO		(1 << __REQ_PRIO)
+#define REQ_DISCARD		(1 << __REQ_DISCARD)
+#define REQ_URGENT		(1 << __REQ_URGENT)
+>>>>>>> upstream/4.3_primoc
 #define REQ_NOIDLE		(1 << __REQ_NOIDLE)
 
 #define REQ_FAILFAST_MASK \
 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 #define REQ_COMMON_MASK \
+<<<<<<< HEAD
 	(REQ_WRITE | REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_DISCARD | \
 	 REQ_NOIDLE | REQ_FLUSH | REQ_FUA | REQ_SECURE)
+=======
+	(REQ_WRITE | REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | \
+	 REQ_DISCARD | REQ_NOIDLE | REQ_FLUSH | REQ_FUA | REQ_SECURE)
+>>>>>>> upstream/4.3_primoc
 #define REQ_CLONE_MASK		REQ_COMMON_MASK
 
 #define REQ_RAHEAD		(1 << __REQ_RAHEAD)

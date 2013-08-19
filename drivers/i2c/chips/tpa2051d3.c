@@ -25,7 +25,11 @@
 #include <linux/input.h>
 #include <linux/workqueue.h>
 #include <linux/freezer.h>
+<<<<<<< HEAD
 #include <mach/tpa2051d3.h>
+=======
+#include <linux/tpa2051d3.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/mutex.h>
 
 #include <linux/gpio.h>
@@ -62,6 +66,21 @@ static char LINEOUT_AMP_ON[] =
 			{0x00, 0x8C, 0x25, 0x57, 0x73, 0x4D, 0x0D};
 static char AMP_0FF[] = {0x00, 0x90};
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SOUND_CONTROL_HAX_GPL
+char *htc_speaker_vol_control = SPK_AMP_ON;
+char *htc_headset_vol_control = HEADSET_AMP_ON;
+char *htc_ring_vol_control = RING_AMP_ON;
+char *htc_handset_vol_control = HANDSET_AMP_ON;
+char *htc_lineout_vol_control = LINEOUT_AMP_ON;
+#ifdef CONFIG_SND_CONTROL_HAS_BEATS
+char *htc_beats_on_vol_control = BEATS_AMP_ON;
+char *htc_beats_off_vol_control = BEATS_AMP_OFF;
+#endif
+#endif
+
+>>>>>>> upstream/4.3_primoc
 static int tpa2051_write_reg(u8 reg, u8 val)
 {
 	int err;

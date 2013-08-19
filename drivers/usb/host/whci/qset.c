@@ -443,7 +443,11 @@ static int qset_add_urb_sg(struct whc *whc, struct whc_qset *qset, struct urb *u
 
 	remaining = urb->transfer_buffer_length;
 
+<<<<<<< HEAD
 	for_each_sg(urb->sg, sg, urb->num_sgs, i) {
+=======
+	for_each_sg(urb->sg, sg, urb->num_mapped_sgs, i) {
+>>>>>>> upstream/4.3_primoc
 		dma_addr_t dma_addr;
 		size_t dma_remaining;
 		dma_addr_t sp, ep;
@@ -561,7 +565,11 @@ static int qset_add_urb_sg_linearize(struct whc *whc, struct whc_qset *qset,
 
 	remaining = urb->transfer_buffer_length;
 
+<<<<<<< HEAD
 	for_each_sg(urb->sg, sg, urb->num_sgs, i) {
+=======
+	for_each_sg(urb->sg, sg, urb->num_mapped_sgs, i) {
+>>>>>>> upstream/4.3_primoc
 		size_t len;
 		size_t sg_remaining;
 		void *orig;

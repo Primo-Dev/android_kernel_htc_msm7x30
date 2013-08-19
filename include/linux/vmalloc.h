@@ -131,6 +131,10 @@ extern long vwrite(char *buf, char *addr, unsigned long count);
  */
 extern rwlock_t vmlist_lock;
 extern struct vm_struct *vmlist;
+<<<<<<< HEAD
+=======
+extern __init void vm_area_add_early(struct vm_struct *vm);
+>>>>>>> upstream/4.3_primoc
 extern __init void vm_area_register_early(struct vm_struct *vm, size_t align);
 
 #ifdef CONFIG_SMP

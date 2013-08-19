@@ -1273,6 +1273,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
 	return;
 
  drop:
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (!IS_ERR(skb) && (skb))
 		kfree_skb(skb);
@@ -1281,6 +1282,9 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
 #else
 	kfree_skb(skb);
 #endif
+=======
+	kfree_skb(skb);
+>>>>>>> upstream/4.3_primoc
 
 	++ppp->dev->stats.tx_errors;
 }
@@ -1580,11 +1584,14 @@ ppp_channel_push(struct channel *pch)
 		while (!skb_queue_empty(&pch->file.xq)) {
 			skb = skb_dequeue(&pch->file.xq);
 			if (!pch->chan->ops->start_xmit(pch->chan, skb)) {
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 				if (IS_ERR(skb) || (!skb))
 					printk(KERN_ERR "[PPP] skb is NULL in %s!\n", __func__);
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 				/* put the packet back and try again later */
 				skb_queue_head(&pch->file.xq, skb);
 				break;

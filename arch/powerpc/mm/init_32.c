@@ -126,7 +126,10 @@ void __init MMU_init(void)
 	if (memblock.memory.cnt > 1) {
 #ifndef CONFIG_WII
 		memblock.memory.cnt = 1;
+<<<<<<< HEAD
 		memblock_analyze();
+=======
+>>>>>>> upstream/4.3_primoc
 		printk(KERN_WARNING "Only using first contiguous memory region");
 #else
 		wii_memory_fixups();
@@ -149,7 +152,10 @@ void __init MMU_init(void)
 #ifndef CONFIG_HIGHMEM
 		total_memory = total_lowmem;
 		memblock_enforce_memory_limit(total_lowmem);
+<<<<<<< HEAD
 		memblock_analyze();
+=======
+>>>>>>> upstream/4.3_primoc
 #endif /* CONFIG_HIGHMEM */
 	}
 

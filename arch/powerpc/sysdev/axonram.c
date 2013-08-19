@@ -104,7 +104,11 @@ axon_ram_irq_handler(int irq, void *dev)
  * axon_ram_make_request - make_request() method for block device
  * @queue, @bio: see blk_queue_make_request()
  */
+<<<<<<< HEAD
 static int
+=======
+static void
+>>>>>>> upstream/4.3_primoc
 axon_ram_make_request(struct request_queue *queue, struct bio *bio)
 {
 	struct axon_ram_bank *bank = bio->bi_bdev->bd_disk->private_data;
@@ -113,7 +117,10 @@ axon_ram_make_request(struct request_queue *queue, struct bio *bio)
 	struct bio_vec *vec;
 	unsigned int transfered;
 	unsigned short idx;
+<<<<<<< HEAD
 	int rc = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	phys_mem = bank->io_addr + (bio->bi_sector << AXON_RAM_SECTOR_SHIFT);
 	phys_end = bank->io_addr + bank->size;
@@ -121,8 +128,12 @@ axon_ram_make_request(struct request_queue *queue, struct bio *bio)
 	bio_for_each_segment(vec, bio, idx) {
 		if (unlikely(phys_mem + vec->bv_len > phys_end)) {
 			bio_io_error(bio);
+<<<<<<< HEAD
 			rc = -ERANGE;
 			break;
+=======
+			return;
+>>>>>>> upstream/4.3_primoc
 		}
 
 		user_mem = page_address(vec->bv_page) + vec->bv_offset;
@@ -135,8 +146,11 @@ axon_ram_make_request(struct request_queue *queue, struct bio *bio)
 		transfered += vec->bv_len;
 	}
 	bio_endio(bio, 0);
+<<<<<<< HEAD
 
 	return rc;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 /**

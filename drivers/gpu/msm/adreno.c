@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2002,2007-2012, Code Aurora Forum. All rights reserved.
+=======
+/* Copyright (c) 2002,2007-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1004,10 +1008,19 @@ static unsigned int adreno_isidle(struct kgsl_device *device)
 		GSL_RB_GET_READPTR(rb, &rb->rptr);
 		if (!device->active_cnt && (rb->rptr == rb->wptr)) {
 			/* Is the core idle? */
+<<<<<<< HEAD
 			adreno_regread(device, REG_RBBM_STATUS,
 					    &rbbm_status);
 			if (rbbm_status == 0x110)
 				status = true;
+=======
+			if (adreno_dev->gpudev->irq_pending(adreno_dev) == 0) {
+				adreno_regread(device, REG_RBBM_STATUS,
+							&rbbm_status);
+				if (rbbm_status == 0x110)
+					status = true;
+			}
+>>>>>>> upstream/4.3_primoc
 		}
 	} else {
 		status = true;
@@ -1145,6 +1158,57 @@ void adreno_regwrite(struct kgsl_device *device, unsigned int offsetwords,
 	__raw_writel(value, reg);
 }
 
+<<<<<<< HEAD
+=======
+static int adreno_next_event(struct kgsl_device *device,
+	struct kgsl_event *event)
+{
+	int status;
+	unsigned int ref_ts, enableflag;
+
+	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
+
+	status = kgsl_check_timestamp(device, event->timestamp);
+	if (!status) {
+		kgsl_sharedmem_readl(&device->memstore, &enableflag,
+			KGSL_DEVICE_MEMSTORE_OFFSET(ts_cmp_enable));
+		mb();
+
+		if (enableflag) {
+			kgsl_sharedmem_readl(&device->memstore, &ref_ts,
+				KGSL_DEVICE_MEMSTORE_OFFSET(ref_wait_ts));
+			mb();
+			if (timestamp_cmp(ref_ts, event->timestamp) >= 0) {
+				kgsl_sharedmem_writel(&device->memstore,
+				KGSL_DEVICE_MEMSTORE_OFFSET(ref_wait_ts),
+				event->timestamp);
+				wmb();
+			}
+		} else {
+			unsigned int cmds[2];
+			kgsl_sharedmem_writel(&device->memstore,
+				KGSL_DEVICE_MEMSTORE_OFFSET(ref_wait_ts),
+				event->timestamp);
+			enableflag = 1;
+			kgsl_sharedmem_writel(&device->memstore,
+				KGSL_DEVICE_MEMSTORE_OFFSET(ts_cmp_enable),
+				enableflag);
+			wmb();
+			/* submit a dummy packet so that even if all
+			* commands upto timestamp get executed we will still
+			* get an interrupt */
+			cmds[0] = cp_type3_packet(CP_NOP, 1);
+			cmds[1] = 0;
+
+			adreno_ringbuffer_issuecmds(device,
+					adreno_dev->drawctxt_active,
+					KGSL_CMD_FLAGS_NONE, &cmds[0], 2);
+		}
+	}
+	return status;
+}
+
+>>>>>>> upstream/4.3_primoc
 static int kgsl_check_interrupt_timestamp(struct kgsl_device *device,
 					unsigned int timestamp)
 {
@@ -1357,8 +1421,13 @@ static long adreno_ioctl(struct kgsl_device_private *dev_priv,
 
 static inline s64 adreno_ticks_to_us(u32 ticks, u32 gpu_freq)
 {
+<<<<<<< HEAD
 	gpu_freq /= 1000000;
 	return ticks / gpu_freq;
+=======
+	s64 ticksus = (s64)ticks*1000000;
+	return div_u64(ticksus, gpu_freq);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void adreno_power_stats(struct kgsl_device *device,
@@ -1446,6 +1515,10 @@ static const struct kgsl_functable adreno_functable = {
 	.setstate = adreno_setstate,
 	.drawctxt_create = adreno_drawctxt_create,
 	.drawctxt_destroy = adreno_drawctxt_destroy,
+<<<<<<< HEAD
+=======
+	.next_event = adreno_next_event,
+>>>>>>> upstream/4.3_primoc
 };
 
 static struct platform_device_id adreno_id_table[] = {

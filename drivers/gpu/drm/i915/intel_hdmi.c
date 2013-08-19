@@ -158,10 +158,13 @@ static void intel_hdmi_dpms(struct drm_encoder *encoder, int mode)
 	struct drm_i915_private *dev_priv = dev->dev_private;
 	struct intel_hdmi *intel_hdmi = enc_to_intel_hdmi(encoder);
 	u32 temp;
+<<<<<<< HEAD
 	u32 enable_bits = SDVO_ENABLE;
 
 	if (intel_hdmi->has_audio)
 		enable_bits |= SDVO_AUDIO_ENABLE;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	temp = I915_READ(intel_hdmi->sdvox_reg);
 
@@ -174,9 +177,15 @@ static void intel_hdmi_dpms(struct drm_encoder *encoder, int mode)
 	}
 
 	if (mode != DRM_MODE_DPMS_ON) {
+<<<<<<< HEAD
 		temp &= ~enable_bits;
 	} else {
 		temp |= enable_bits;
+=======
+		temp &= ~SDVO_ENABLE;
+	} else {
+		temp |= SDVO_ENABLE;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	I915_WRITE(intel_hdmi->sdvox_reg, temp);

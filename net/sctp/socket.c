@@ -3809,6 +3809,15 @@ SCTP_STATIC void sctp_destroy_sock(struct sock *sk)
 
 	/* Release our hold on the endpoint. */
 	ep = sctp_sk(sk)->ep;
+<<<<<<< HEAD
+=======
+	/* This could happen during socket init, thus we bail out
+	 * early, since the rest of the below is not setup either.
+	 */
+	if (ep == NULL)
+		return;
+
+>>>>>>> upstream/4.3_primoc
 	sctp_endpoint_free(ep);
 	local_bh_disable();
 	percpu_counter_dec(&sctp_sockets_allocated);

@@ -213,11 +213,19 @@ static u32 vcd_decode_frame_cmn
 	return vcd_handle_input_frame(cctxt, input_frame);
 }
 
+<<<<<<< HEAD
 static u32 vcd_pause_in_run(struct vcd_clnt_ctxt *cctxt)
 {
 	u32 rc = VCD_S_SUCCESS;
 
 	VCD_MSG_LOW("vcd_pause_in_run:");
+=======
+static u32 vcd_pause_cmn(struct vcd_clnt_ctxt *cctxt)
+{
+	u32 rc = VCD_S_SUCCESS;
+
+	VCD_MSG_LOW("vcd_pause_cmn:");
+>>>>>>> upstream/4.3_primoc
 
 	if (cctxt->sched_clnt_hdl) {
 		rc = vcd_sched_suspend_resume_clnt(cctxt, false);
@@ -342,6 +350,10 @@ static u32 vcd_flush_in_flushing
 static u32 vcd_flush_in_eos(struct vcd_clnt_ctxt *cctxt,
 	u32 mode)
 {
+<<<<<<< HEAD
+=======
+	u32 rc = VCD_S_SUCCESS;
+>>>>>>> upstream/4.3_primoc
 	VCD_MSG_LOW("vcd_flush_in_eos:");
 
 	if (mode > VCD_FLUSH_ALL || !mode) {
@@ -351,10 +363,25 @@ static u32 vcd_flush_in_eos(struct vcd_clnt_ctxt *cctxt,
 	}
 
 	VCD_MSG_MED("Flush mode requested %d", mode);
+<<<<<<< HEAD
 
 	cctxt->status.mask |= (mode & VCD_FLUSH_ALL);
 
 	return VCD_S_SUCCESS;
+=======
+	if (!(cctxt->status.frame_submitted) &&
+		(!cctxt->decoding)) {
+		rc = vcd_flush_buffers(cctxt, mode);
+		if (!VCD_FAILED(rc)) {
+			VCD_MSG_HIGH("All buffers are flushed");
+			cctxt->status.mask |= (mode & VCD_FLUSH_ALL);
+			vcd_send_flush_done(cctxt, VCD_S_SUCCESS);
+		}
+	} else
+		cctxt->status.mask |= (mode & VCD_FLUSH_ALL);
+
+	return rc;
+>>>>>>> upstream/4.3_primoc
 }
 
 static u32 vcd_flush_in_invalid(struct vcd_clnt_ctxt *cctxt,
@@ -493,7 +520,16 @@ static u32 vcd_set_property_cmn
 	}
 
 	rc = ddl_set_property(cctxt->ddl_handle, prop_hdr, prop_val);
+<<<<<<< HEAD
 	VCD_FAILED_RETURN(rc, "Failed: ddl_set_property");
+=======
+	if (rc) {
+		/* Some properties aren't known to ddl that we can handle */
+		if (prop_hdr->prop_id != VCD_I_VOP_TIMING_CONSTANT_DELTA)
+			VCD_FAILED_RETURN(rc, "Failed: ddl_set_property");
+	}
+
+>>>>>>> upstream/4.3_primoc
 	switch (prop_hdr->prop_id) {
 	case VCD_I_META_BUFFER_MODE:
 		{
@@ -534,6 +570,27 @@ static u32 vcd_set_property_cmn
 		  cctxt->bframe = iperiod->b_frames;
 		  break;
 	   }
+<<<<<<< HEAD
+=======
+	case VCD_REQ_PERF_LEVEL:
+		rc = vcd_req_perf_level(cctxt,
+			(struct vcd_property_perf_level *)prop_val);
+		break;
+	case VCD_I_VOP_TIMING_CONSTANT_DELTA:
+	   {
+		   struct vcd_property_vop_timing_constant_delta *delta =
+			   (struct vcd_property_vop_timing_constant_delta *)
+			   prop_val;
+		   if (delta->constant_delta > 0) {
+			cctxt->time_frame_delta = delta->constant_delta;
+			rc = VCD_S_SUCCESS;
+		   } else {
+			VCD_MSG_ERROR("Frame delta must be positive");
+			rc = VCD_ERR_ILLEGAL_PARM;
+		   }
+		   break;
+	   }
+>>>>>>> upstream/4.3_primoc
 	default:
 		{
 			break;
@@ -546,6 +603,10 @@ static u32 vcd_get_property_cmn
     (struct vcd_clnt_ctxt *cctxt,
      struct vcd_property_hdr *prop_hdr, void *prop_val)
 {
+<<<<<<< HEAD
+=======
+	int rc;
+>>>>>>> upstream/4.3_primoc
 	VCD_MSG_LOW("vcd_get_property_cmn in %d:", cctxt->clnt_state.state);
 	VCD_MSG_LOW("property Id = %d", prop_hdr->prop_id);
 	if (!prop_hdr->sz || !prop_hdr->prop_id) {
@@ -553,7 +614,28 @@ static u32 vcd_get_property_cmn
 
 		return VCD_ERR_ILLEGAL_PARM;
 	}
+<<<<<<< HEAD
 	return ddl_get_property(cctxt->ddl_handle, prop_hdr, prop_val);
+=======
+	rc = ddl_get_property(cctxt->ddl_handle, prop_hdr, prop_val);
+	if (rc) {
+		/* Some properties aren't known to ddl that we can handle */
+		if (prop_hdr->prop_id != VCD_I_VOP_TIMING_CONSTANT_DELTA)
+			VCD_FAILED_RETURN(rc, "Failed: ddl_set_property");
+	}
+
+	switch (prop_hdr->prop_id) {
+	case VCD_I_VOP_TIMING_CONSTANT_DELTA:
+	{
+		struct vcd_property_vop_timing_constant_delta *delta =
+			(struct vcd_property_vop_timing_constant_delta *)
+			prop_val;
+		delta->constant_delta = cctxt->time_frame_delta;
+		rc = VCD_S_SUCCESS;
+	}
+	}
+	return rc;
+>>>>>>> upstream/4.3_primoc
 }
 
 static u32 vcd_set_buffer_requirements_cmn
@@ -1568,6 +1650,7 @@ void vcd_do_client_state_transition(struct vcd_clnt_ctxt *cctxt,
 			      cctxt, to_state);
 	}
 
+<<<<<<< HEAD
     if (!cctxt)
 		return;
 
@@ -1582,6 +1665,16 @@ void vcd_do_client_state_transition(struct vcd_clnt_ctxt *cctxt,
         }
 	}
     /* HTC_END */
+=======
+	state_ctxt = &cctxt->clnt_state;
+
+	if (state_ctxt->state == to_state) {
+		VCD_MSG_HIGH("Client already in requested to_state=%d",
+			     to_state);
+
+		return;
+	}
+>>>>>>> upstream/4.3_primoc
 
 	VCD_MSG_MED("vcd_do_client_state_transition: C%d -> C%d, for api %d",
 		    (int)state_ctxt->state, (int)to_state, ev_code);
@@ -1659,7 +1752,11 @@ static const struct vcd_clnt_state_table vcd_clnt_table_run = {
 	 vcd_encode_frame_cmn,
 	 vcd_decode_start_in_run,
 	 vcd_decode_frame_cmn,
+<<<<<<< HEAD
 	 vcd_pause_in_run,
+=======
+	 vcd_pause_cmn,
+>>>>>>> upstream/4.3_primoc
 	 NULL,
 	 vcd_flush_cmn,
 	 vcd_stop_in_run,
@@ -1734,7 +1831,11 @@ static const struct vcd_clnt_state_table vcd_clnt_table_eos = {
 	 vcd_encode_frame_cmn,
 	 NULL,
 	 vcd_decode_frame_cmn,
+<<<<<<< HEAD
 	 NULL,
+=======
+	 vcd_pause_cmn,
+>>>>>>> upstream/4.3_primoc
 	 NULL,
 	 vcd_flush_in_eos,
 	 vcd_stop_in_eos,

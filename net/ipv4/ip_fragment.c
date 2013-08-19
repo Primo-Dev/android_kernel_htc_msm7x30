@@ -20,6 +20,11 @@
  *		Patrick McHardy :	LRU queue of frag heads for evictor.
  */
 
+<<<<<<< HEAD
+=======
+#define pr_fmt(fmt) "IPv4: " fmt
+
+>>>>>>> upstream/4.3_primoc
 #include <linux/compiler.h>
 #include <linux/module.h>
 #include <linux/types.h>
@@ -249,8 +254,12 @@ static void ip_expire(unsigned long arg)
 		if (!head->dev)
 			goto out_rcu_unlock;
 
+<<<<<<< HEAD
 		/* skb dst is stale, drop it, and perform route lookup again */
 		skb_dst_drop(head);
+=======
+		/* skb has no dst, perform route lookup again */
+>>>>>>> upstream/4.3_primoc
 		iph = ip_hdr(head);
 		err = ip_route_input_noref(head, iph->daddr, iph->saddr,
 					   iph->tos, head->dev);
@@ -292,6 +301,7 @@ static inline struct ipq *ip_find(struct net *net, struct iphdr *iph, u32 user)
 	hash = ipqhashfn(iph->id, iph->saddr, iph->daddr, iph->protocol);
 
 	q = inet_frag_find(&net->ipv4.frags, &ip4_frags, &arg, hash);
+<<<<<<< HEAD
 	if (q == NULL)
 		goto out_nomem;
 
@@ -300,6 +310,14 @@ static inline struct ipq *ip_find(struct net *net, struct iphdr *iph, u32 user)
 out_nomem:
 	LIMIT_NETDEBUG(KERN_ERR "ip_frag_create: no memory left !\n");
 	return NULL;
+=======
+	if (IS_ERR_OR_NULL(q)) {
+		inet_frag_maybe_warn_overflow(q, pr_fmt());
+		return NULL;
+	}
+
+	return container_of(q, struct ipq, q);
+>>>>>>> upstream/4.3_primoc
 }
 
 /* Is the fragment too far ahead to be part of ipq? */
@@ -517,8 +535,21 @@ found:
 		qp->q.last_in |= INET_FRAG_FIRST_IN;
 
 	if (qp->q.last_in == (INET_FRAG_FIRST_IN | INET_FRAG_LAST_IN) &&
+<<<<<<< HEAD
 	    qp->q.meat == qp->q.len)
 		return ip_frag_reasm(qp, prev, dev);
+=======
+	    qp->q.meat == qp->q.len) {
+		unsigned long orefdst = skb->_skb_refdst;
+
+		skb->_skb_refdst = 0UL;
+		err = ip_frag_reasm(qp, prev, dev);
+		skb->_skb_refdst = orefdst;
+		return err;
+	}
+
+	skb_dst_drop(skb);
+>>>>>>> upstream/4.3_primoc
 
 	write_lock(&ip4_frags.lock);
 	list_move_tail(&qp->q.lru_list, &qp->q.net->lru_list);

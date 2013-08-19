@@ -22,7 +22,10 @@
 #include <linux/anon_inodes.h>
 #include <linux/miscdevice.h>
 #include <linux/genlock.h>
+<<<<<<< HEAD
 #include <linux/hardirq.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 /* Lock states - can either be unlocked, held as an exclusive write lock or a
  * shared read lock
@@ -780,7 +783,11 @@ static long genlock_dev_ioctl(struct file *filep, unsigned int cmd,
 		 * Locks should only be released when the handle is
 		 * destroyed
 		 */
+<<<<<<< HEAD
 		GENLOCK_LOG_ERR("Deprecated RELEASE ioctl called\n");
+=======
+		//GENLOCK_LOG_ERR("Deprecated RELEASE ioctl called\n");
+>>>>>>> upstream/4.3_primoc
 		return -EINVAL;
 	}
 	default:

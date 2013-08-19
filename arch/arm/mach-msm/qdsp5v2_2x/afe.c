@@ -145,7 +145,11 @@ int afe_enable(u8 path_id, struct msm_afe_config *config)
 				afe->aux_conf_flag = 0;
 			}
 		}
+<<<<<<< HEAD
 		BUG();
+=======
+//		BUG();
+>>>>>>> upstream/4.3_primoc
 	} else {
 		rc = 0;
 		afe->in_use++;

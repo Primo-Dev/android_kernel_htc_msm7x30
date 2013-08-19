@@ -378,11 +378,28 @@ static struct ctl_table kern_table[] = {
 		.data		= &sysctl_sched_autogroup_enabled,
 		.maxlen		= sizeof(unsigned int),
 		.mode		= 0644,
+<<<<<<< HEAD
 		.proc_handler	= proc_dointvec_minmax,
+=======
+		.proc_handler	= proc_dointvec,
+>>>>>>> upstream/4.3_primoc
 		.extra1		= &zero,
 		.extra2		= &one,
 	},
 #endif
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CFS_BANDWIDTH
+        {
+                .procname       = "sched_cfs_bandwidth_slice_us",
+                .data           = &sysctl_sched_cfs_bandwidth_slice,
+                .maxlen         = sizeof(unsigned int),
+                .mode           = 0644,
+                .proc_handler   = proc_dointvec_minmax,
+                .extra1         = &one,
+        },
+#endif
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_PROVE_LOCKING
 	{
 		.procname	= "prove_locking",
@@ -2308,13 +2325,22 @@ static int __do_proc_dointvec(void *tbl_data, struct ctl_table *table,
 	int *i, vleft, first = 1, err = 0;
 	unsigned long page = 0;
 	size_t left;
+<<<<<<< HEAD
 	char *kbuf;
 	
+=======
+	char *kbuf = 0;
+
+>>>>>>> upstream/4.3_primoc
 	if (!tbl_data || !table->maxlen || !*lenp || (*ppos && !write)) {
 		*lenp = 0;
 		return 0;
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> upstream/4.3_primoc
 	i = (int *) tbl_data;
 	vleft = table->maxlen / sizeof(*i);
 	left = *lenp;
@@ -2526,7 +2552,11 @@ static int __do_proc_doulongvec_minmax(void *data, struct ctl_table *table, int 
 	int vleft, first = 1, err = 0;
 	unsigned long page = 0;
 	size_t left;
+<<<<<<< HEAD
 	char *kbuf;
+=======
+	char *kbuf = NULL;
+>>>>>>> upstream/4.3_primoc
 
 	if (!data || !table->maxlen || !*lenp || (*ppos && !write)) {
 		*lenp = 0;

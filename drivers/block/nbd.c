@@ -658,7 +658,12 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *lo,
 
 		mutex_unlock(&lo->tx_lock);
 
+<<<<<<< HEAD
 		thread = kthread_create(nbd_thread, lo, lo->disk->disk_name);
+=======
+		thread = kthread_create(nbd_thread, lo, "%s",
+					lo->disk->disk_name);
+>>>>>>> upstream/4.3_primoc
 		if (IS_ERR(thread)) {
 			mutex_lock(&lo->tx_lock);
 			return PTR_ERR(thread);

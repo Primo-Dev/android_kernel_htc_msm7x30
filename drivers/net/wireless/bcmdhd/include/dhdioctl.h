@@ -25,7 +25,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: dhdioctl.h 275703 2011-08-04 20:20:27Z $
+=======
+ * $Id: dhdioctl.h 323572 2012-03-26 06:28:14Z $
+>>>>>>> upstream/4.3_primoc
  */
 
 #ifndef _dhdioctl_h_
@@ -87,6 +91,11 @@ enum {
 #define DHD_BTA_VAL	0x1000
 #define DHD_ISCAN_VAL	0x2000
 #define DHD_ARPOE_VAL	0x4000
+<<<<<<< HEAD
+=======
+#define DHD_REORDER_VAL 0x8000
+#define DHD_WL_VAL	0x10000
+>>>>>>> upstream/4.3_primoc
 
 #ifdef SDTEST
 /* For pktgen iovar */

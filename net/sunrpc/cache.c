@@ -1404,11 +1404,19 @@ static ssize_t read_flush(struct file *file, char __user *buf,
 			  size_t count, loff_t *ppos,
 			  struct cache_detail *cd)
 {
+<<<<<<< HEAD
 	char tbuf[20];
 	unsigned long p = *ppos;
 	size_t len;
 
 	sprintf(tbuf, "%lu\n", convert_to_wallclock(cd->flush_time));
+=======
+	char tbuf[22];
+	unsigned long p = *ppos;
+	size_t len;
+
+	snprintf(tbuf, sizeof(tbuf), "%lu\n", convert_to_wallclock(cd->flush_time));
+>>>>>>> upstream/4.3_primoc
 	len = strlen(tbuf);
 	if (p >= len)
 		return 0;

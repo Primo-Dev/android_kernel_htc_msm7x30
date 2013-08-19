@@ -33,11 +33,19 @@
  *
  * inode->i_lock protects:
  *   inode->i_state, inode->i_hash, __iget()
+<<<<<<< HEAD
  * inode_lru_lock protects:
  *   inode_lru, inode->i_lru
  * inode_sb_list_lock protects:
  *   sb->s_inodes, inode->i_sb_list
  * inode_wb_list_lock protects:
+=======
+ * inode->i_sb->s_inode_lru_lock protects:
+ *   inode->i_sb->s_inode_lru, inode->i_lru
+ * inode_sb_list_lock protects:
+ *   sb->s_inodes, inode->i_sb_list
+ * bdi->wb.list_lock protects:
+>>>>>>> upstream/4.3_primoc
  *   bdi->wb.b_{dirty,io,more_io}, inode->i_wb_list
  * inode_hash_lock protects:
  *   inode_hashtable, inode->i_hash
@@ -46,9 +54,15 @@
  *
  * inode_sb_list_lock
  *   inode->i_lock
+<<<<<<< HEAD
  *     inode_lru_lock
  *
  * inode_wb_list_lock
+=======
+ *     inode->i_sb->s_inode_lru_lock
+ *
+ * bdi->wb.list_lock
+>>>>>>> upstream/4.3_primoc
  *   inode->i_lock
  *
  * inode_hash_lock
@@ -64,11 +78,15 @@ static unsigned int i_hash_shift __read_mostly;
 static struct hlist_head *inode_hashtable __read_mostly;
 static __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_hash_lock);
 
+<<<<<<< HEAD
 static LIST_HEAD(inode_lru);
 static DEFINE_SPINLOCK(inode_lru_lock);
 
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_sb_list_lock);
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_wb_list_lock);
+=======
+__cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_sb_list_lock);
+>>>>>>> upstream/4.3_primoc
 
 /*
  * iprune_sem provides exclusion between the icache shrinking and the
@@ -76,7 +94,11 @@ __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_wb_list_lock);
  *
  * We don't actually need it to protect anything in the umount path,
  * but only need to cycle through it to make sure any inode that
+<<<<<<< HEAD
  * prune_icache took off the LRU list has been fully torn down by the
+=======
+ * prune_icache_sb took off the LRU list has been fully torn down by the
+>>>>>>> upstream/4.3_primoc
  * time we are past evict_inodes.
  */
 static DECLARE_RWSEM(iprune_sem);
@@ -95,6 +117,10 @@ EXPORT_SYMBOL(empty_aops);
 struct inodes_stat_t inodes_stat;
 
 static DEFINE_PER_CPU(unsigned int, nr_inodes);
+<<<<<<< HEAD
+=======
+static DEFINE_PER_CPU(unsigned int, nr_unused);
+>>>>>>> upstream/4.3_primoc
 
 static struct kmem_cache *inode_cachep __read_mostly;
 
@@ -109,7 +135,15 @@ static int get_nr_inodes(void)
 
 static inline int get_nr_inodes_unused(void)
 {
+<<<<<<< HEAD
 	return inodes_stat.nr_unused;
+=======
+	int i;
+	int sum = 0;
+	for_each_possible_cpu(i)
+		sum += per_cpu(nr_unused, i);
+	return sum < 0 ? 0 : sum;
+>>>>>>> upstream/4.3_primoc
 }
 
 int get_nr_dirty_inodes(void)
@@ -127,6 +161,10 @@ int proc_nr_inodes(ctl_table *table, int write,
 		   void __user *buffer, size_t *lenp, loff_t *ppos)
 {
 	inodes_stat.nr_inodes = get_nr_inodes();
+<<<<<<< HEAD
+=======
+	inodes_stat.nr_unused = get_nr_inodes_unused();
+>>>>>>> upstream/4.3_primoc
 	return proc_dointvec(table, write, buffer, lenp, ppos);
 }
 #endif
@@ -152,6 +190,10 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
 	inode->i_op = &empty_iops;
 	inode->i_fop = &empty_fops;
 	inode->i_nlink = 1;
+<<<<<<< HEAD
+=======
+	inode->i_opflags = 0;
+>>>>>>> upstream/4.3_primoc
 	inode->i_uid = 0;
 	inode->i_gid = 0;
 	atomic_set(&inode->i_writecount, 0);
@@ -176,8 +218,12 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
 	mutex_init(&inode->i_mutex);
 	lockdep_set_class(&inode->i_mutex, &sb->s_type->i_mutex_key);
 
+<<<<<<< HEAD
 	init_rwsem(&inode->i_alloc_sem);
 	lockdep_set_class(&inode->i_alloc_sem, &sb->s_type->i_alloc_sem_key);
+=======
+	atomic_set(&inode->i_dio_count, 0);
+>>>>>>> upstream/4.3_primoc
 
 	mapping->a_ops = &empty_aops;
 	mapping->host = inode;
@@ -200,6 +246,10 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
 	}
 	inode->i_private = NULL;
 	inode->i_mapping = mapping;
+<<<<<<< HEAD
+=======
+	INIT_LIST_HEAD(&inode->i_dentry);	/* buggered by rcu freeing */
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_FS_POSIX_ACL
 	inode->i_acl = inode->i_default_acl = ACL_NOT_CACHED;
 #endif
@@ -263,7 +313,10 @@ EXPORT_SYMBOL(__destroy_inode);
 static void i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(inode_cachep, inode);
 }
 
@@ -299,7 +352,10 @@ void inode_init_once(struct inode *inode)
 {
 	memset(inode, 0, sizeof(*inode));
 	INIT_HLIST_NODE(&inode->i_hash);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	INIT_LIST_HEAD(&inode->i_devices);
 	INIT_LIST_HEAD(&inode->i_wb_list);
 	INIT_LIST_HEAD(&inode->i_lru);
@@ -337,22 +393,42 @@ EXPORT_SYMBOL(ihold);
 
 static void inode_lru_list_add(struct inode *inode)
 {
+<<<<<<< HEAD
 	spin_lock(&inode_lru_lock);
 	if (list_empty(&inode->i_lru)) {
 		list_add(&inode->i_lru, &inode_lru);
 		inodes_stat.nr_unused++;
 	}
 	spin_unlock(&inode_lru_lock);
+=======
+	spin_lock(&inode->i_sb->s_inode_lru_lock);
+	if (list_empty(&inode->i_lru)) {
+		list_add(&inode->i_lru, &inode->i_sb->s_inode_lru);
+		inode->i_sb->s_nr_inodes_unused++;
+		this_cpu_inc(nr_unused);
+	}
+	spin_unlock(&inode->i_sb->s_inode_lru_lock);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void inode_lru_list_del(struct inode *inode)
 {
+<<<<<<< HEAD
 	spin_lock(&inode_lru_lock);
 	if (!list_empty(&inode->i_lru)) {
 		list_del_init(&inode->i_lru);
 		inodes_stat.nr_unused--;
 	}
 	spin_unlock(&inode_lru_lock);
+=======
+	spin_lock(&inode->i_sb->s_inode_lru_lock);
+	if (!list_empty(&inode->i_lru)) {
+		list_del_init(&inode->i_lru);
+		inode->i_sb->s_nr_inodes_unused--;
+		this_cpu_dec(nr_unused);
+	}
+	spin_unlock(&inode->i_sb->s_inode_lru_lock);
+>>>>>>> upstream/4.3_primoc
 }
 
 /**
@@ -369,9 +445,17 @@ EXPORT_SYMBOL_GPL(inode_sb_list_add);
 
 static inline void inode_sb_list_del(struct inode *inode)
 {
+<<<<<<< HEAD
 	spin_lock(&inode_sb_list_lock);
 	list_del_init(&inode->i_sb_list);
 	spin_unlock(&inode_sb_list_lock);
+=======
+	if (!list_empty(&inode->i_sb_list)) {
+		spin_lock(&inode_sb_list_lock);
+		list_del_init(&inode->i_sb_list);
+		spin_unlock(&inode_sb_list_lock);
+	}
+>>>>>>> upstream/4.3_primoc
 }
 
 static unsigned long hash(struct super_block *sb, unsigned long hashval)
@@ -539,7 +623,11 @@ void evict_inodes(struct super_block *sb)
 	dispose_list(&dispose);
 
 	/*
+<<<<<<< HEAD
 	 * Cycle through iprune_sem to make sure any inode that prune_icache
+=======
+	 * Cycle through iprune_sem to make sure any inode that prune_icache_sb
+>>>>>>> upstream/4.3_primoc
 	 * moved off the list before we took the lock has been fully torn
 	 * down.
 	 */
@@ -607,8 +695,15 @@ static int can_unuse(struct inode *inode)
 }
 
 /*
+<<<<<<< HEAD
  * Scan `goal' inodes on the unused list for freeable ones. They are moved to a
  * temporary list and then are freed outside inode_lru_lock by dispose_list().
+=======
+ * Walk the superblock inode LRU for freeable inodes and attempt to free them.
+ * This is called from the superblock shrinker function with a number of inodes
+ * to trim from the LRU. Inodes to be freed are moved to a temporary list and
+ * then are freed outside inode_lock by dispose_list().
+>>>>>>> upstream/4.3_primoc
  *
  * Any inodes which are pinned purely because of attached pagecache have their
  * pagecache removed.  If the inode has metadata buffers attached to
@@ -622,13 +717,18 @@ static int can_unuse(struct inode *inode)
  * LRU does not have strict ordering. Hence we don't want to reclaim inodes
  * with this flag set because they are the inodes that are out of order.
  */
+<<<<<<< HEAD
 static void prune_icache(int nr_to_scan)
+=======
+void prune_icache_sb(struct super_block *sb, int nr_to_scan)
+>>>>>>> upstream/4.3_primoc
 {
 	LIST_HEAD(freeable);
 	int nr_scanned;
 	unsigned long reap = 0;
 
 	down_read(&iprune_sem);
+<<<<<<< HEAD
 	spin_lock(&inode_lru_lock);
 	for (nr_scanned = 0; nr_scanned < nr_to_scan; nr_scanned++) {
 		struct inode *inode;
@@ -640,11 +740,28 @@ static void prune_icache(int nr_to_scan)
 
 		/*
 		 * we are inverting the inode_lru_lock/inode->i_lock here,
+=======
+	spin_lock(&sb->s_inode_lru_lock);
+	for (nr_scanned = nr_to_scan; nr_scanned >= 0; nr_scanned--) {
+		struct inode *inode;
+
+		if (list_empty(&sb->s_inode_lru))
+			break;
+
+		inode = list_entry(sb->s_inode_lru.prev, struct inode, i_lru);
+
+		/*
+		 * we are inverting the sb->s_inode_lru_lock/inode->i_lock here,
+>>>>>>> upstream/4.3_primoc
 		 * so use a trylock. If we fail to get the lock, just move the
 		 * inode to the back of the list so we don't spin on it.
 		 */
 		if (!spin_trylock(&inode->i_lock)) {
+<<<<<<< HEAD
 			list_move(&inode->i_lru, &inode_lru);
+=======
+			list_move(&inode->i_lru, &sb->s_inode_lru);
+>>>>>>> upstream/4.3_primoc
 			continue;
 		}
 
@@ -656,28 +773,47 @@ static void prune_icache(int nr_to_scan)
 		    (inode->i_state & ~I_REFERENCED)) {
 			list_del_init(&inode->i_lru);
 			spin_unlock(&inode->i_lock);
+<<<<<<< HEAD
 			inodes_stat.nr_unused--;
+=======
+			sb->s_nr_inodes_unused--;
+			this_cpu_dec(nr_unused);
+>>>>>>> upstream/4.3_primoc
 			continue;
 		}
 
 		/* recently referenced inodes get one more pass */
 		if (inode->i_state & I_REFERENCED) {
 			inode->i_state &= ~I_REFERENCED;
+<<<<<<< HEAD
 			list_move(&inode->i_lru, &inode_lru);
+=======
+			list_move(&inode->i_lru, &sb->s_inode_lru);
+>>>>>>> upstream/4.3_primoc
 			spin_unlock(&inode->i_lock);
 			continue;
 		}
 		if (inode_has_buffers(inode) || inode->i_data.nrpages) {
 			__iget(inode);
 			spin_unlock(&inode->i_lock);
+<<<<<<< HEAD
 			spin_unlock(&inode_lru_lock);
+=======
+			spin_unlock(&sb->s_inode_lru_lock);
+>>>>>>> upstream/4.3_primoc
 			if (remove_inode_buffers(inode))
 				reap += invalidate_mapping_pages(&inode->i_data,
 								0, -1);
 			iput(inode);
+<<<<<<< HEAD
 			spin_lock(&inode_lru_lock);
 
 			if (inode != list_entry(inode_lru.next,
+=======
+			spin_lock(&sb->s_inode_lru_lock);
+
+			if (inode != list_entry(sb->s_inode_lru.next,
+>>>>>>> upstream/4.3_primoc
 						struct inode, i_lru))
 				continue;	/* wrong inode or list_empty */
 			/* avoid lock inversions with trylock */
@@ -693,18 +829,28 @@ static void prune_icache(int nr_to_scan)
 		spin_unlock(&inode->i_lock);
 
 		list_move(&inode->i_lru, &freeable);
+<<<<<<< HEAD
 		inodes_stat.nr_unused--;
+=======
+		sb->s_nr_inodes_unused--;
+		this_cpu_dec(nr_unused);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (current_is_kswapd())
 		__count_vm_events(KSWAPD_INODESTEAL, reap);
 	else
 		__count_vm_events(PGINODESTEAL, reap);
+<<<<<<< HEAD
 	spin_unlock(&inode_lru_lock);
+=======
+	spin_unlock(&sb->s_inode_lru_lock);
+>>>>>>> upstream/4.3_primoc
 
 	dispose_list(&freeable);
 	up_read(&iprune_sem);
 }
 
+<<<<<<< HEAD
 /*
  * shrink_icache_memory() will attempt to reclaim some unused inodes.  Here,
  * "unused" means that no dentries are referring to the inodes: the files are
@@ -738,6 +884,8 @@ static struct shrinker icache_shrinker = {
 	.seeks = DEFAULT_SEEKS,
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 static void __wait_on_freeing_inode(struct inode *inode);
 /*
  * Called with the inode lock held.
@@ -843,6 +991,32 @@ unsigned int get_next_ino(void)
 EXPORT_SYMBOL(get_next_ino);
 
 /**
+<<<<<<< HEAD
+=======
+ *	new_inode_pseudo 	- obtain an inode
+ *	@sb: superblock
+ *
+ *	Allocates a new inode for given superblock.
+ *	Inode wont be chained in superblock s_inodes list
+ *	This means :
+ *	- fs can't be unmount
+ *	- quotas, fsnotify, writeback can't work
+ */
+struct inode *new_inode_pseudo(struct super_block *sb)
+{
+	struct inode *inode = alloc_inode(sb);
+
+	if (inode) {
+		spin_lock(&inode->i_lock);
+		inode->i_state = 0;
+		spin_unlock(&inode->i_lock);
+		INIT_LIST_HEAD(&inode->i_sb_list);
+	}
+	return inode;
+}
+
+/**
+>>>>>>> upstream/4.3_primoc
  *	new_inode 	- obtain an inode
  *	@sb: superblock
  *
@@ -860,6 +1034,7 @@ struct inode *new_inode(struct super_block *sb)
 
 	spin_lock_prefetch(&inode_sb_list_lock);
 
+<<<<<<< HEAD
 	inode = alloc_inode(sb);
 	if (inode) {
 		spin_lock(&inode->i_lock);
@@ -867,6 +1042,11 @@ struct inode *new_inode(struct super_block *sb)
 		spin_unlock(&inode->i_lock);
 		inode_sb_list_add(inode);
 	}
+=======
+	inode = new_inode_pseudo(sb);
+	if (inode)
+		inode_sb_list_add(inode);
+>>>>>>> upstream/4.3_primoc
 	return inode;
 }
 EXPORT_SYMBOL(new_inode);
@@ -1331,7 +1511,11 @@ static void iput_final(struct inode *inode)
 
 	WARN_ON(inode->i_state & I_NEW);
 
+<<<<<<< HEAD
 	if (op && op->drop_inode)
+=======
+	if (op->drop_inode)
+>>>>>>> upstream/4.3_primoc
 		drop = op->drop_inode(inode);
 	else
 		drop = generic_drop_inode(inode);
@@ -1617,7 +1801,10 @@ void __init inode_init(void)
 					 (SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|
 					 SLAB_MEM_SPREAD),
 					 init_once);
+<<<<<<< HEAD
 	register_shrinker(&icache_shrinker);
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/* Hash may have been set up in inode_init_early */
 	if (!hashdist)

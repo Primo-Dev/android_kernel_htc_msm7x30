@@ -68,7 +68,11 @@ struct pcie_link_state {
 	struct aspm_latency acceptable[8];
 };
 
+<<<<<<< HEAD
 static int aspm_disabled, aspm_force, aspm_clear_state;
+=======
+static int aspm_disabled, aspm_force;
+>>>>>>> upstream/4.3_primoc
 static bool aspm_support_enabled = true;
 static DEFINE_MUTEX(aspm_lock);
 static LIST_HEAD(link_list);
@@ -500,9 +504,12 @@ static int pcie_aspm_sanity_check(struct pci_dev *pdev)
 	int pos;
 	u32 reg32;
 
+<<<<<<< HEAD
 	if (aspm_clear_state)
 		return -EINVAL;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Some functions in a slot might not all be PCIe functions,
 	 * very strange. Disable ASPM for the whole slot
@@ -584,9 +591,12 @@ void pcie_aspm_init_link_state(struct pci_dev *pdev)
 	    pdev->pcie_type != PCI_EXP_TYPE_DOWNSTREAM)
 		return;
 
+<<<<<<< HEAD
 	if (aspm_disabled && !aspm_clear_state)
 		return;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* VIA has a strange chipset, root port is under a bridge */
 	if (pdev->pcie_type == PCI_EXP_TYPE_ROOT_PORT &&
 	    pdev->bus->self)
@@ -610,9 +620,12 @@ void pcie_aspm_init_link_state(struct pci_dev *pdev)
 	/* Setup initial Clock PM state */
 	pcie_clkpm_cap_init(link, blacklist);
 
+<<<<<<< HEAD
 	if (aspm_force)
 		return;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * At this stage drivers haven't had an opportunity to change the
 	 * link policy setting. Enabling ASPM on broken hardware can cripple
@@ -621,7 +634,11 @@ void pcie_aspm_init_link_state(struct pci_dev *pdev)
 	 * the BIOS's expectation, we'll do so once pci_enable_device() is
 	 * called.
 	 */
+<<<<<<< HEAD
 	if (aspm_policy != POLICY_POWERSAVE || aspm_clear_state) {
+=======
+	if (aspm_policy != POLICY_POWERSAVE) {
+>>>>>>> upstream/4.3_primoc
 		pcie_config_aspm_path(link);
 		pcie_set_clkpm(link, policy_to_clkpm_state(link));
 	}
@@ -662,8 +679,12 @@ void pcie_aspm_exit_link_state(struct pci_dev *pdev)
 	struct pci_dev *parent = pdev->bus->self;
 	struct pcie_link_state *link, *root, *parent_link;
 
+<<<<<<< HEAD
 	if ((aspm_disabled && !aspm_clear_state) || !pci_is_pcie(pdev) ||
 	    !parent || !parent->link_state)
+=======
+	if (!pci_is_pcie(pdev) || !parent || !parent->link_state)
+>>>>>>> upstream/4.3_primoc
 		return;
 	if ((parent->pcie_type != PCI_EXP_TYPE_ROOT_PORT) &&
 	    (parent->pcie_type != PCI_EXP_TYPE_DOWNSTREAM))
@@ -747,13 +768,27 @@ void pcie_aspm_powersave_config_link(struct pci_dev *pdev)
  * pci_disable_link_state - disable pci device's link state, so the link will
  * never enter specific states
  */
+<<<<<<< HEAD
 static void __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
+=======
+static void __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem,
+				     bool force)
+>>>>>>> upstream/4.3_primoc
 {
 	struct pci_dev *parent = pdev->bus->self;
 	struct pcie_link_state *link;
 
+<<<<<<< HEAD
 	if (aspm_disabled || !pci_is_pcie(pdev))
 		return;
+=======
+	if (aspm_disabled && !force)
+		return;
+
+	if (!pci_is_pcie(pdev))
+		return;
+
+>>>>>>> upstream/4.3_primoc
 	if (pdev->pcie_type == PCI_EXP_TYPE_ROOT_PORT ||
 	    pdev->pcie_type == PCI_EXP_TYPE_DOWNSTREAM)
 		parent = pdev;
@@ -781,16 +816,45 @@ static void __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
 
 void pci_disable_link_state_locked(struct pci_dev *pdev, int state)
 {
+<<<<<<< HEAD
 	__pci_disable_link_state(pdev, state, false);
+=======
+	__pci_disable_link_state(pdev, state, false, false);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(pci_disable_link_state_locked);
 
 void pci_disable_link_state(struct pci_dev *pdev, int state)
 {
+<<<<<<< HEAD
 	__pci_disable_link_state(pdev, state, true);
 }
 EXPORT_SYMBOL(pci_disable_link_state);
 
+=======
+	__pci_disable_link_state(pdev, state, true, false);
+}
+EXPORT_SYMBOL(pci_disable_link_state);
+
+void pcie_clear_aspm(struct pci_bus *bus)
+{
+	struct pci_dev *child;
+
+	if (aspm_force)
+		return;
+
+	/*
+	 * Clear any ASPM setup that the firmware has carried out on this bus
+	 */
+	list_for_each_entry(child, &bus->devices, bus_list) {
+		__pci_disable_link_state(child, PCIE_LINK_STATE_L0S |
+					 PCIE_LINK_STATE_L1 |
+					 PCIE_LINK_STATE_CLKPM,
+					 false, true);
+	}
+}
+
+>>>>>>> upstream/4.3_primoc
 static int pcie_aspm_set_policy(const char *val, struct kernel_param *kp)
 {
 	int i;
@@ -948,6 +1012,10 @@ void pcie_aspm_remove_sysfs_dev_files(struct pci_dev *pdev)
 static int __init pcie_aspm_disable(char *str)
 {
 	if (!strcmp(str, "off")) {
+<<<<<<< HEAD
+=======
+		aspm_policy = POLICY_DEFAULT;
+>>>>>>> upstream/4.3_primoc
 		aspm_disabled = 1;
 		aspm_support_enabled = false;
 		printk(KERN_INFO "PCIe ASPM is disabled\n");
@@ -960,6 +1028,7 @@ static int __init pcie_aspm_disable(char *str)
 
 __setup("pcie_aspm=", pcie_aspm_disable);
 
+<<<<<<< HEAD
 void pcie_clear_aspm(void)
 {
 	if (!aspm_force)
@@ -970,6 +1039,20 @@ void pcie_no_aspm(void)
 {
 	if (!aspm_force)
 		aspm_disabled = 1;
+=======
+void pcie_no_aspm(void)
+{
+	/*
+	 * Disabling ASPM is intended to prevent the kernel from modifying
+	 * existing hardware state, not to clear existing state. To that end:
+	 * (a) set policy to POLICY_DEFAULT in order to avoid changing state
+	 * (b) prevent userspace from changing policy
+	 */
+	if (!aspm_force) {
+		aspm_policy = POLICY_DEFAULT;
+		aspm_disabled = 1;
+	}
+>>>>>>> upstream/4.3_primoc
 }
 
 /**

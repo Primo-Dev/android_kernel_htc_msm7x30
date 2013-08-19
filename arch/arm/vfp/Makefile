@@ -7,7 +7,11 @@
 # ccflags-y := -DDEBUG
 # asflags-y := -DDEBUG
 
+<<<<<<< HEAD
 KBUILD_AFLAGS	:=$(KBUILD_AFLAGS:-msoft-float=-Wa,-mfpu=softvfp+vfp)
+=======
+KBUILD_AFLAGS	:=$(KBUILD_AFLAGS:-msoft-float=-Wa,-mfpu=neon)
+>>>>>>> upstream/4.3_primoc
 LDFLAGS		+=--no-warn-mismatch
 
 obj-y			+= vfp.o

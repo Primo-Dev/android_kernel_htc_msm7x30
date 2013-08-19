@@ -691,7 +691,11 @@ STATIC int INIT bunzip2(unsigned char *buf, int len,
 		outbuf = malloc(BZIP2_IOBUF_SIZE);
 
 	if (!outbuf) {
+<<<<<<< HEAD
 		error("Could not allocate output bufer");
+=======
+		error("Could not allocate output buffer");
+>>>>>>> upstream/4.3_primoc
 		return RETVAL_OUT_OF_MEMORY;
 	}
 	if (buf)
@@ -699,7 +703,11 @@ STATIC int INIT bunzip2(unsigned char *buf, int len,
 	else
 		inbuf = malloc(BZIP2_IOBUF_SIZE);
 	if (!inbuf) {
+<<<<<<< HEAD
 		error("Could not allocate input bufer");
+=======
+		error("Could not allocate input buffer");
+>>>>>>> upstream/4.3_primoc
 		i = RETVAL_OUT_OF_MEMORY;
 		goto exit_0;
 	}

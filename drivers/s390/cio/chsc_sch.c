@@ -8,6 +8,10 @@
  */
 
 #include <linux/slab.h>
+<<<<<<< HEAD
+=======
+#include <linux/compat.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>

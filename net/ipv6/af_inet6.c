@@ -49,6 +49,10 @@
 #include <net/udplite.h>
 #include <net/tcp.h>
 #include <net/ipip.h>
+<<<<<<< HEAD
+=======
+#include <net/ping.h>
+>>>>>>> upstream/4.3_primoc
 #include <net/protocol.h>
 #include <net/inet_common.h>
 #include <net/route.h>
@@ -712,11 +716,14 @@ int inet6_sk_rebuild_header(struct sock *sk)
 			return PTR_ERR(dst);
 		}
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(dst) || (!dst))
 		printk(KERN_ERR "[NET] dst is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 		__ip6_dst_store(sk, dst, NULL, NULL);
 	}
 
@@ -1135,6 +1142,12 @@ static int __init inet6_init(void)
 	if (err)
 		goto out_unregister_udplite_proto;
 
+<<<<<<< HEAD
+=======
+	err = proto_register(&pingv6_prot, 1);
+	if (err)
+		goto out_unregister_ping_proto;
+>>>>>>> upstream/4.3_primoc
 
 	/* We MUST register RAW sockets before we create the ICMP6,
 	 * IGMP6, or NDISC control sockets.
@@ -1228,6 +1241,13 @@ static int __init inet6_init(void)
 	if (err)
 		goto ipv6_packet_fail;
 
+<<<<<<< HEAD
+=======
+	err = pingv6_init();
+	if (err)
+		goto pingv6_fail;
+
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_SYSCTL
 	err = ipv6_sysctl_register();
 	if (err)
@@ -1240,6 +1260,11 @@ out:
 sysctl_fail:
 	ipv6_packet_cleanup();
 #endif
+<<<<<<< HEAD
+=======
+pingv6_fail:
+	pingv6_exit();
+>>>>>>> upstream/4.3_primoc
 ipv6_packet_fail:
 	tcpv6_exit();
 tcpv6_fail:
@@ -1287,6 +1312,11 @@ static_sysctl_fail:
 	rtnl_unregister_all(PF_INET6);
 out_sock_register_fail:
 	rawv6_exit();
+<<<<<<< HEAD
+=======
+out_unregister_ping_proto:
+	proto_unregister(&pingv6_prot);
+>>>>>>> upstream/4.3_primoc
 out_unregister_raw_proto:
 	proto_unregister(&rawv6_prot);
 out_unregister_udplite_proto:

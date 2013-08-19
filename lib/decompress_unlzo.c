@@ -31,7 +31,11 @@
  */
 
 #ifdef STATIC
+<<<<<<< HEAD
 #include "lzo/lzo1x_decompress.c"
+=======
+#include "lzo/lzo1x_decompress_safe.c"
+>>>>>>> upstream/4.3_primoc
 #else
 #include <linux/decompress/unlzo.h>
 #endif
@@ -279,7 +283,11 @@ STATIC inline int INIT unlzo(u8 *input, int in_len,
 	ret = 0;
 exit_2:
 	if (!input)
+<<<<<<< HEAD
 		free(in_buf);
+=======
+		free(in_buf_save);
+>>>>>>> upstream/4.3_primoc
 exit_1:
 	if (!output)
 		free(out_buf);

@@ -447,7 +447,10 @@ struct radeon_connector {
 	struct edid *edid;
 	void *con_priv;
 	bool dac_load_detect;
+<<<<<<< HEAD
 	bool detected_by_load; /* if the connection status was determined by load */
+=======
+>>>>>>> upstream/4.3_primoc
 	uint16_t connector_object_id;
 	struct radeon_hpd hpd;
 	struct radeon_router router;

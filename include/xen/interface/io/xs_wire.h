@@ -84,4 +84,10 @@ struct xenstore_domain_interface {
     XENSTORE_RING_IDX rsp_cons, rsp_prod;
 };
 
+<<<<<<< HEAD
+=======
+/* Violating this is very bad.  See docs/misc/xenstore.txt. */
+#define XENSTORE_PAYLOAD_MAX 4096
+
+>>>>>>> upstream/4.3_primoc
 #endif /* _XS_WIRE_H */

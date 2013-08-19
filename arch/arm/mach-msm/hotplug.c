@@ -12,6 +12,10 @@
 
 #include <asm/cacheflush.h>
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+>>>>>>> upstream/4.3_primoc
 extern volatile int pen_release;
 
 static inline void cpu_enter_lowpower(void)
@@ -55,6 +59,10 @@ static inline void platform_do_lowpower(unsigned int cpu)
 		pr_debug("CPU%u: spurious wakeup call\n", cpu);
 	}
 }
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 int platform_cpu_kill(unsigned int cpu)
 {
@@ -68,6 +76,10 @@ int platform_cpu_kill(unsigned int cpu)
  */
 void platform_cpu_die(unsigned int cpu)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * we're ready for shutdown now, so do it
 	 */
@@ -79,6 +91,10 @@ void platform_cpu_die(unsigned int cpu)
 	 * coherency, and then restore interrupts
 	 */
 	cpu_leave_lowpower();
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 }
 
 int platform_cpu_disable(unsigned int cpu)

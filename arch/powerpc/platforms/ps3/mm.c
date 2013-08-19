@@ -319,7 +319,10 @@ static int __init ps3_mm_add_memory(void)
 	}
 
 	memblock_add(start_addr, map.r1.size);
+<<<<<<< HEAD
 	memblock_analyze();
+=======
+>>>>>>> upstream/4.3_primoc
 
 	result = online_pages(start_pfn, nr_pages);
 

@@ -20,7 +20,11 @@
  *      Notwithstanding the above, under no circumstances may you combine this
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
+<<<<<<< HEAD
  * $Id: bcmutils.c 275693 2011-08-04 19:59:34Z $
+=======
+ * $Id: bcmutils.c,v 1.277.2.18 2011-01-26 02:32:08 $
+>>>>>>> upstream/4.3_primoc
  */
 
 #include <typedefs.h>
@@ -286,6 +290,7 @@ pktq_pflush(osl_t *osh, struct pktq *pq, int prec, bool dir, ifpkt_cb_t fn, int 
 			bool head = (p == q->head);
 			if (head)
 				q->head = PKTLINK(p);
+<<<<<<< HEAD
 			else {
 #ifdef HTC_KlocWork
 				if(!prev) {
@@ -295,6 +300,10 @@ pktq_pflush(osl_t *osh, struct pktq *pq, int prec, bool dir, ifpkt_cb_t fn, int 
 #endif
 				PKTSETLINK(prev, PKTLINK(p));
 			}
+=======
+			else
+				PKTSETLINK(prev, PKTLINK(p));
+>>>>>>> upstream/4.3_primoc
 			PKTSETLINK(p, NULL);
 			PKTFREE(osh, p, dir);
 			q->len--;
@@ -507,11 +516,14 @@ pktq_mdeq(struct pktq *pq, uint prec_bmp, int *prec_out)
 	if (pq->len == 0)
 		return NULL;
 
+<<<<<<< HEAD
 #ifdef HTC_KlocWork
     while (pq->hi_prec >= PKTQ_MAX_PREC)
 		pq->hi_prec--;
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	while ((prec = pq->hi_prec) > 0 && pq->q[prec].head == NULL)
 		pq->hi_prec--;
 
@@ -999,7 +1011,10 @@ pktsetprio(void *pkt, bool update_vtag)
 	return (rc | priority);
 }
 
+<<<<<<< HEAD
 #ifndef BCM_BOOTLOADER
+=======
+>>>>>>> upstream/4.3_primoc
 
 static char bcm_undeferrstr[32];
 static const char *bcmerrorstrtable[] = BCMERRSTRINGTABLE;
@@ -1021,7 +1036,10 @@ bcmerrorstr(int bcmerror)
 	return bcmerrorstrtable[-bcmerror];
 }
 
+<<<<<<< HEAD
 #endif /* !BCM_BOOTLOADER */
+=======
+>>>>>>> upstream/4.3_primoc
 
 
 
@@ -1604,9 +1622,12 @@ static const char *crypto_algo_names[] = {
 	"UNDEF",
 	"UNDEF",
 	"UNDEF",
+<<<<<<< HEAD
 #ifdef BCMWAPI_WPI
 	"WAPI",
 #endif /* BCMWAPI_WPI */
+=======
+>>>>>>> upstream/4.3_primoc
 	"UNDEF"
 };
 

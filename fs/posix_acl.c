@@ -24,6 +24,7 @@
 
 EXPORT_SYMBOL(posix_acl_init);
 EXPORT_SYMBOL(posix_acl_alloc);
+<<<<<<< HEAD
 EXPORT_SYMBOL(posix_acl_clone);
 EXPORT_SYMBOL(posix_acl_valid);
 EXPORT_SYMBOL(posix_acl_equiv_mode);
@@ -31,6 +32,11 @@ EXPORT_SYMBOL(posix_acl_from_mode);
 EXPORT_SYMBOL(posix_acl_create_masq);
 EXPORT_SYMBOL(posix_acl_chmod_masq);
 EXPORT_SYMBOL(posix_acl_permission);
+=======
+EXPORT_SYMBOL(posix_acl_valid);
+EXPORT_SYMBOL(posix_acl_equiv_mode);
+EXPORT_SYMBOL(posix_acl_from_mode);
+>>>>>>> upstream/4.3_primoc
 
 /*
  * Init a fresh posix_acl
@@ -59,7 +65,11 @@ posix_acl_alloc(int count, gfp_t flags)
 /*
  * Clone an ACL.
  */
+<<<<<<< HEAD
 struct posix_acl *
+=======
+static struct posix_acl *
+>>>>>>> upstream/4.3_primoc
 posix_acl_clone(const struct posix_acl *acl, gfp_t flags)
 {
 	struct posix_acl *clone = NULL;
@@ -153,10 +163,17 @@ posix_acl_valid(const struct posix_acl *acl)
  * file mode permission bits, or else 1. Returns -E... on error.
  */
 int
+<<<<<<< HEAD
 posix_acl_equiv_mode(const struct posix_acl *acl, mode_t *mode_p)
 {
 	const struct posix_acl_entry *pa, *pe;
 	mode_t mode = 0;
+=======
+posix_acl_equiv_mode(const struct posix_acl *acl, umode_t *mode_p)
+{
+	const struct posix_acl_entry *pa, *pe;
+	umode_t mode = 0;
+>>>>>>> upstream/4.3_primoc
 	int not_equiv = 0;
 
 	FOREACH_ACL_ENTRY(pa, acl, pe) {
@@ -283,12 +300,20 @@ check_perm:
  * system calls. All permissions that are not granted by the acl are removed.
  * The permissions in the acl are changed to reflect the mode_p parameter.
  */
+<<<<<<< HEAD
 int
 posix_acl_create_masq(struct posix_acl *acl, mode_t *mode_p)
 {
 	struct posix_acl_entry *pa, *pe;
 	struct posix_acl_entry *group_obj = NULL, *mask_obj = NULL;
 	mode_t mode = *mode_p;
+=======
+static int posix_acl_create_masq(struct posix_acl *acl, umode_t *mode_p)
+{
+	struct posix_acl_entry *pa, *pe;
+	struct posix_acl_entry *group_obj = NULL, *mask_obj = NULL;
+	umode_t mode = *mode_p;
+>>>>>>> upstream/4.3_primoc
 	int not_equiv = 0;
 
 	/* assert(atomic_read(acl->a_refcount) == 1); */
@@ -341,8 +366,12 @@ posix_acl_create_masq(struct posix_acl *acl, mode_t *mode_p)
 /*
  * Modify the ACL for the chmod syscall.
  */
+<<<<<<< HEAD
 int
 posix_acl_chmod_masq(struct posix_acl *acl, mode_t mode)
+=======
+static int posix_acl_chmod_masq(struct posix_acl *acl, mode_t mode)
+>>>>>>> upstream/4.3_primoc
 {
 	struct posix_acl_entry *group_obj = NULL, *mask_obj = NULL;
 	struct posix_acl_entry *pa, *pe;
@@ -386,3 +415,42 @@ posix_acl_chmod_masq(struct posix_acl *acl, mode_t mode)
 
 	return 0;
 }
+<<<<<<< HEAD
+=======
+
+int
+posix_acl_create(struct posix_acl **acl, gfp_t gfp, umode_t *mode_p)
+{
+	struct posix_acl *clone = posix_acl_clone(*acl, gfp);
+	int err = -ENOMEM;
+	if (clone) {
+		err = posix_acl_create_masq(clone, mode_p);
+		if (err < 0) {
+			posix_acl_release(clone);
+			clone = NULL;
+		}
+	}
+	posix_acl_release(*acl);
+	*acl = clone;
+	return err;
+}
+EXPORT_SYMBOL(posix_acl_create);
+
+int
+posix_acl_chmod(struct posix_acl **acl, gfp_t gfp, mode_t mode)
+{
+	struct posix_acl *clone = posix_acl_clone(*acl, gfp);
+	int err = -ENOMEM;
+	if (clone) {
+		err = posix_acl_chmod_masq(clone, mode);
+		if (err) {
+			posix_acl_release(clone);
+			clone = NULL;
+		}
+	}
+	posix_acl_release(*acl);
+	*acl = clone;
+	return err;
+}
+EXPORT_SYMBOL(posix_acl_chmod);
+>>>>>>> upstream/4.3_primoc

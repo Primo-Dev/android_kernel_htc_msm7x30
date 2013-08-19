@@ -257,6 +257,7 @@ void intel_fbdev_fini(struct drm_device *dev)
 	kfree(dev_priv->fbdev);
 	dev_priv->fbdev = NULL;
 }
+<<<<<<< HEAD
 
 void intel_fbdev_set_suspend(struct drm_device *dev, int state)
 {
@@ -267,6 +268,8 @@ void intel_fbdev_set_suspend(struct drm_device *dev, int state)
 	fb_set_suspend(dev_priv->fbdev->helper.fbdev, state);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 MODULE_LICENSE("GPL and additional rights");
 
 void intel_fb_output_poll_changed(struct drm_device *dev)

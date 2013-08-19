@@ -721,6 +721,21 @@ struct timewait_sock_ops;
 struct inet_hashinfo;
 struct raw_hashinfo;
 
+<<<<<<< HEAD
+=======
+/*
+ * caches using SLAB_DESTROY_BY_RCU should let .next pointer from nulls nodes
+ * un-modified. Special care is taken when initializing object to zero.
+ */
+static inline void sk_prot_clear_nulls(struct sock *sk, int size)
+{
+	if (offsetof(struct sock, sk_node.next) != 0)
+		memset(sk, 0, offsetof(struct sock, sk_node.next));
+	memset(&sk->sk_node.pprev, 0,
+	       size - offsetof(struct sock, sk_node.pprev));
+}
+
+>>>>>>> upstream/4.3_primoc
 /* Networking protocol blocks we attach to sockets.
  * socket layer -> transport layer interface
  * transport -> network interface is defined by struct inet_proto
@@ -1303,8 +1318,12 @@ extern unsigned long sock_i_ino(struct sock *sk);
 static inline struct dst_entry *
 __sk_dst_get(struct sock *sk)
 {
+<<<<<<< HEAD
 	return rcu_dereference_check(sk->sk_dst_cache, rcu_read_lock_held() ||
 						       sock_owned_by_user(sk) ||
+=======
+	return rcu_dereference_check(sk->sk_dst_cache, sock_owned_by_user(sk) ||
+>>>>>>> upstream/4.3_primoc
 						       lockdep_is_held(&sk->sk_lock.slock));
 }
 

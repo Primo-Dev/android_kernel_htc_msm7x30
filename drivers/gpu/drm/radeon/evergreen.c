@@ -82,7 +82,10 @@ u32 evergreen_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base)
 {
 	struct radeon_crtc *radeon_crtc = rdev->mode_info.crtcs[crtc_id];
 	u32 tmp = RREG32(EVERGREEN_GRPH_UPDATE + radeon_crtc->crtc_offset);
+<<<<<<< HEAD
 	int i;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/* Lock the graphics update lock */
 	tmp |= EVERGREEN_GRPH_UPDATE_LOCK;
@@ -100,11 +103,15 @@ u32 evergreen_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base)
 	       (u32)crtc_base);
 
 	/* Wait for update_pending to go high. */
+<<<<<<< HEAD
 	for (i = 0; i < rdev->usec_timeout; i++) {
 		if (RREG32(EVERGREEN_GRPH_UPDATE + radeon_crtc->crtc_offset) & EVERGREEN_GRPH_SURFACE_UPDATE_PENDING)
 			break;
 		udelay(1);
 	}
+=======
+	while (!(RREG32(EVERGREEN_GRPH_UPDATE + radeon_crtc->crtc_offset) & EVERGREEN_GRPH_SURFACE_UPDATE_PENDING));
+>>>>>>> upstream/4.3_primoc
 	DRM_DEBUG("Update pending now high. Unlocking vupdate_lock.\n");
 
 	/* Unlock the lock, so double-buffering can take place inside vblank */
@@ -330,6 +337,19 @@ void evergreen_hpd_init(struct radeon_device *rdev)
 
 	list_for_each_entry(connector, &dev->mode_config.connector_list, head) {
 		struct radeon_connector *radeon_connector = to_radeon_connector(connector);
+<<<<<<< HEAD
+=======
+
+		if (connector->connector_type == DRM_MODE_CONNECTOR_eDP ||
+		    connector->connector_type == DRM_MODE_CONNECTOR_LVDS) {
+			/* don't try to enable hpd on eDP or LVDS avoid breaking the
+			 * aux dp channel on imac and help (but not completely fix)
+			 * https://bugzilla.redhat.com/show_bug.cgi?id=726143
+			 * also avoid interrupt storms during dpms.
+			 */
+			continue;
+		}
+>>>>>>> upstream/4.3_primoc
 		switch (radeon_connector->hpd.hpd) {
 		case RADEON_HPD_1:
 			WREG32(DC_HPD1_CONTROL, tmp);
@@ -358,7 +378,10 @@ void evergreen_hpd_init(struct radeon_device *rdev)
 		default:
 			break;
 		}
+<<<<<<< HEAD
 		radeon_hpd_set_polarity(rdev, radeon_connector->hpd.hpd);
+=======
+>>>>>>> upstream/4.3_primoc
 	}
 	if (rdev->irq.installed)
 		evergreen_irq_set(rdev);
@@ -1014,6 +1037,7 @@ void evergreen_agp_enable(struct radeon_device *rdev)
 
 void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *save)
 {
+<<<<<<< HEAD
 	save->vga_control[0] = RREG32(D1VGA_CONTROL);
 	save->vga_control[1] = RREG32(D2VGA_CONTROL);
 	save->vga_render_control = RREG32(VGA_RENDER_CONTROL);
@@ -1032,6 +1056,10 @@ void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *sav
 		save->crtc_control[4] = RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC4_REGISTER_OFFSET);
 		save->crtc_control[5] = RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC5_REGISTER_OFFSET);
 	}
+=======
+	save->vga_render_control = RREG32(VGA_RENDER_CONTROL);
+	save->vga_hdp_control = RREG32(VGA_HDP_CONTROL);
+>>>>>>> upstream/4.3_primoc
 
 	/* Stop all video */
 	WREG32(VGA_RENDER_CONTROL, 0);
@@ -1144,6 +1172,7 @@ void evergreen_mc_resume(struct radeon_device *rdev, struct evergreen_mc_save *s
 	/* Unlock host access */
 	WREG32(VGA_HDP_CONTROL, save->vga_hdp_control);
 	mdelay(1);
+<<<<<<< HEAD
 	/* Restore video state */
 	WREG32(D1VGA_CONTROL, save->vga_control[0]);
 	WREG32(D2VGA_CONTROL, save->vga_control[1]);
@@ -1185,6 +1214,8 @@ void evergreen_mc_resume(struct radeon_device *rdev, struct evergreen_mc_save *s
 		WREG32(EVERGREEN_CRTC_UPDATE_LOCK + EVERGREEN_CRTC4_REGISTER_OFFSET, 0);
 		WREG32(EVERGREEN_CRTC_UPDATE_LOCK + EVERGREEN_CRTC5_REGISTER_OFFSET, 0);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	WREG32(VGA_RENDER_CONTROL, save->vga_render_control);
 }
 
@@ -3259,6 +3290,7 @@ int evergreen_init(struct radeon_device *rdev)
 			rdev->accel_working = false;
 		}
 	}
+<<<<<<< HEAD
 
 	/* Don't start up if the MC ucode is missing on BTC parts.
 	 * The default clocks and voltages before the MC ucode
@@ -3271,6 +3303,8 @@ int evergreen_init(struct radeon_device *rdev)
 		}
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 

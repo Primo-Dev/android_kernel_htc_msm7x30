@@ -948,7 +948,11 @@ static void __vmx_load_host_state(struct vcpu_vmx *vmx)
 #ifdef CONFIG_X86_64
 	wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_host_kernel_gs_base);
 #endif
+<<<<<<< HEAD
 	if (current_thread_info()->status & TS_USEDFPU)
+=======
+	if (__thread_has_fpu(current))
+>>>>>>> upstream/4.3_primoc
 		clts();
 	load_gdt(&__get_cpu_var(host_gdt));
 }
@@ -3836,6 +3840,15 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
 		if (err != EMULATE_DONE)
 			return 0;
 
+<<<<<<< HEAD
+=======
+		if (vcpu->arch.halt_request) {
+			vcpu->arch.halt_request = 0;
+			ret = kvm_emulate_halt(vcpu);
+			goto out;
+		}
+
+>>>>>>> upstream/4.3_primoc
 		if (signal_pending(current))
 			goto out;
 		if (need_resched())

@@ -30,7 +30,11 @@
 #include <linux/mutex.h>
 #include <linux/timer.h>
 #include <linux/remote_spinlock.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/gpio.h>
 
 
@@ -663,7 +667,11 @@ msm_i2c_probe(struct platform_device *pdev)
 	spin_lock_init(&dev->lock);
 	platform_set_drvdata(pdev, dev);
 
+<<<<<<< HEAD
 	clk_enable(clk);
+=======
+	clk_prepare_enable(clk);
+>>>>>>> upstream/4.3_primoc
 
 	if (pdata->rmutex) {
 		struct remote_mutex_id rmid;
@@ -724,7 +732,12 @@ msm_i2c_probe(struct platform_device *pdev)
 	/* Config GPIOs for primary and secondary lines */
 	pdata->msm_i2c_config_gpio(dev->adap_pri.nr, 1);
 	pdata->msm_i2c_config_gpio(dev->adap_aux.nr, 1);
+<<<<<<< HEAD
 	clk_disable(dev->clk);
+=======
+	clk_disable_unprepare(dev->clk);
+	clk_prepare(dev->clk);
+>>>>>>> upstream/4.3_primoc
 	setup_timer(&dev->pwr_timer, msm_i2c_pwr_timer, (unsigned long) dev);
 
 	return 0;
@@ -733,7 +746,11 @@ err_request_irq_failed:
 	i2c_del_adapter(&dev->adap_pri);
 	i2c_del_adapter(&dev->adap_aux);
 err_i2c_add_adapter_failed:
+<<<<<<< HEAD
 	clk_disable(clk);
+=======
+	clk_disable_unprepare(clk);
+>>>>>>> upstream/4.3_primoc
 	iounmap(dev->base);
 err_ioremap_failed:
 	kfree(dev);
@@ -763,6 +780,10 @@ msm_i2c_remove(struct platform_device *pdev)
 	free_irq(dev->irq, dev);
 	i2c_del_adapter(&dev->adap_pri);
 	i2c_del_adapter(&dev->adap_aux);
+<<<<<<< HEAD
+=======
+	clk_unprepare(dev->clk);
+>>>>>>> upstream/4.3_primoc
 	clk_put(dev->clk);
 	iounmap(dev->base);
 	kfree(dev);
@@ -786,6 +807,10 @@ static int msm_i2c_suspend(struct platform_device *pdev, pm_message_t state)
 		del_timer_sync(&dev->pwr_timer);
 		if (dev->clk_state != 0)
 			msm_i2c_pwr_mgmt(dev, 0);
+<<<<<<< HEAD
+=======
+		clk_unprepare(dev->clk);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	return 0;
@@ -794,6 +819,10 @@ static int msm_i2c_suspend(struct platform_device *pdev, pm_message_t state)
 static int msm_i2c_resume(struct platform_device *pdev)
 {
 	struct msm_i2c_dev *dev = platform_get_drvdata(pdev);
+<<<<<<< HEAD
+=======
+	clk_prepare(dev->clk);
+>>>>>>> upstream/4.3_primoc
 	dev->suspended = 0;
 	return 0;
 }

@@ -313,7 +313,11 @@ void note_interrupt(unsigned int irq, struct irq_desc *desc,
 		/*
 		 * Now kill the IRQ
 		 */
+<<<<<<< HEAD
 		printk(KERN_EMERG "[K] Disabling IRQ #%d\n", irq);
+=======
+		printk(KERN_EMERG "Disabling IRQ #%d\n", irq);
+>>>>>>> upstream/4.3_primoc
 		desc->istate |= IRQS_SPURIOUS_DISABLED;
 		desc->depth++;
 		irq_disable(desc);

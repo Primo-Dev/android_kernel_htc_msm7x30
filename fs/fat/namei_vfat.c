@@ -784,7 +784,11 @@ error:
 	return ERR_PTR(err);
 }
 
+<<<<<<< HEAD
 static int vfat_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int vfat_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		       struct nameidata *nd)
 {
 	struct super_block *sb = dir->i_sb;
@@ -866,7 +870,10 @@ static int vfat_unlink(struct inode *dir, struct dentry *dentry)
 		goto out;
 	clear_nlink(inode);
 	inode->i_mtime = inode->i_atime = CURRENT_TIME_SEC;
+<<<<<<< HEAD
 	fat_detach(inode);
+=======
+>>>>>>> upstream/4.3_primoc
 out:
 	unlock_super(sb);
 

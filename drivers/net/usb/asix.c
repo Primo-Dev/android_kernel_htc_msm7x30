@@ -371,7 +371,11 @@ static int asix_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 
 		skb_pull(skb, (size + 1) & 0xfffe);
 
+<<<<<<< HEAD
 		if (skb->len == 0)
+=======
+		if (skb->len < sizeof(header))
+>>>>>>> upstream/4.3_primoc
 			break;
 
 		head = (u8 *) skb->data;
@@ -1568,6 +1572,13 @@ static const struct usb_device_id	products [] = {
 	// ASIX 88772a
 	USB_DEVICE(0x0db0, 0xa877),
 	.driver_info = (unsigned long) &ax88772_info,
+<<<<<<< HEAD
+=======
+}, {
+	// Asus USB Ethernet Adapter
+	USB_DEVICE (0x0b95, 0x7e2b),
+	.driver_info = (unsigned long) &ax88772_info,
+>>>>>>> upstream/4.3_primoc
 },
 	{ },		// END
 };

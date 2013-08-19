@@ -20,6 +20,7 @@ struct path;
  * block_dev.c
  */
 #ifdef CONFIG_BLOCK
+<<<<<<< HEAD
 extern struct super_block *blockdev_superblock;
 extern void __init bdev_cache_init(void);
 
@@ -28,6 +29,10 @@ static inline int sb_is_blkdev_sb(struct super_block *sb)
 	return sb == blockdev_superblock;
 }
 
+=======
+extern void __init bdev_cache_init(void);
+
+>>>>>>> upstream/4.3_primoc
 extern int __sync_blockdev(struct block_device *bdev, int wait);
 
 #else
@@ -35,11 +40,14 @@ static inline void bdev_cache_init(void)
 {
 }
 
+<<<<<<< HEAD
 static inline int sb_is_blkdev_sb(struct super_block *sb)
 {
 	return 0;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static inline int __sync_blockdev(struct block_device *bdev, int wait)
 {
 	return 0;
@@ -52,16 +60,20 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
 extern void __init chrdev_init(void);
 
 /*
+<<<<<<< HEAD
  * exec.c
  */
 extern int check_unsafe_exec(struct linux_binprm *);
 
 /*
+=======
+>>>>>>> upstream/4.3_primoc
  * namespace.c
  */
 extern int copy_mount_options(const void __user *, unsigned long *);
 extern int copy_mount_string(const void __user *, char **);
 
+<<<<<<< HEAD
 extern unsigned int mnt_get_count(struct vfsmount *mnt);
 extern struct vfsmount *__lookup_mnt(struct vfsmount *, struct dentry *, int);
 extern struct vfsmount *lookup_mnt(struct path *);
@@ -70,6 +82,10 @@ extern void mnt_set_mountpoint(struct vfsmount *, struct dentry *,
 extern void release_mounts(struct list_head *);
 extern void umount_tree(struct vfsmount *, int, struct list_head *);
 extern struct vfsmount *copy_tree(struct vfsmount *, struct dentry *, int);
+=======
+extern struct vfsmount *__lookup_mnt(struct vfsmount *, struct dentry *, int);
+extern struct vfsmount *lookup_mnt(struct path *);
+>>>>>>> upstream/4.3_primoc
 extern int finish_automount(struct vfsmount *, struct path *);
 
 extern void mnt_make_longterm(struct vfsmount *);
@@ -97,8 +113,12 @@ extern struct file *get_empty_filp(void);
  * super.c
  */
 extern int do_remount_sb(struct super_block *, int, void *, int);
+<<<<<<< HEAD
 extern void __put_super(struct super_block *sb);
 extern void put_super(struct super_block *sb);
+=======
+extern bool grab_super_passive(struct super_block *sb);
+>>>>>>> upstream/4.3_primoc
 extern struct dentry *mount_fs(struct file_system_type *,
 			       int, const char *, void *);
 
@@ -135,3 +155,11 @@ extern void inode_wb_list_del(struct inode *inode);
 extern int get_nr_dirty_inodes(void);
 extern void evict_inodes(struct super_block *);
 extern int invalidate_inodes(struct super_block *, bool);
+<<<<<<< HEAD
+=======
+
+/*
+ * dcache.c
+ */
+extern struct dentry *__d_alloc(struct super_block *, const struct qstr *);
+>>>>>>> upstream/4.3_primoc

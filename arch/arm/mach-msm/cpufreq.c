@@ -19,6 +19,10 @@
 
 #include <linux/earlysuspend.h>
 #include <linux/init.h>
+<<<<<<< HEAD
+=======
+#include <linux/module.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/cpufreq.h>
 #include <linux/workqueue.h>
 #include <linux/completion.h>
@@ -27,6 +31,10 @@
 #include <linux/sched.h>
 #include <linux/suspend.h>
 #include <mach/socinfo.h>
+<<<<<<< HEAD
+=======
+#include <mach/cpufreq.h>
+>>>>>>> upstream/4.3_primoc
 
 #include "acpuclock.h"
 
@@ -52,10 +60,43 @@ static DEFINE_PER_CPU(struct cpufreq_suspend_t, cpufreq_suspend);
 
 static int override_cpu;
 
+<<<<<<< HEAD
 static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq)
 {
 	int ret = 0;
 	struct cpufreq_freqs freqs;
+=======
+struct cpu_freq {
+	uint32_t max;
+	uint32_t min;
+	uint32_t allowed_max;
+	uint32_t allowed_min;
+	uint32_t limits_init;
+};
+
+static DEFINE_PER_CPU(struct cpu_freq, cpu_freq_info);
+
+static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq)
+{
+	int ret = 0;
+	int saved_sched_policy = -EINVAL;
+	int saved_sched_rt_prio = -EINVAL;
+	struct cpufreq_freqs freqs;
+	struct cpu_freq *limit = &per_cpu(cpu_freq_info, policy->cpu);
+	struct sched_param param = { .sched_priority = MAX_RT_PRIO-1 };
+
+	if (limit->limits_init) {
+		if (new_freq > limit->allowed_max) {
+			new_freq = limit->allowed_max;
+			pr_debug("max: limiting freq to %d\n", new_freq);
+		}
+
+		if (new_freq < limit->allowed_min) {
+			new_freq = limit->allowed_min;
+			pr_debug("min: limiting freq to %d\n", new_freq);
+		}
+	}
+>>>>>>> upstream/4.3_primoc
 
 	freqs.old = policy->cur;
 	if (override_cpu) {
@@ -66,11 +107,36 @@ static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq)
 	} else
 		freqs.new = new_freq;
 	freqs.cpu = policy->cpu;
+<<<<<<< HEAD
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 	ret = acpuclk_set_rate(policy->cpu, new_freq, SETRATE_CPUFREQ);
 	if (!ret)
 		cpufreq_notify_transition(&freqs, CPUFREQ_POSTCHANGE);
 
+=======
+
+	/*
+	 * Put the caller into SCHED_FIFO priority to avoid cpu starvation
+	 * in the acpuclk_set_rate path while increasing frequencies
+	 */
+
+	if (freqs.new > freqs.old && current->policy != SCHED_FIFO) {
+		saved_sched_policy = current->policy;
+		saved_sched_rt_prio = current->rt_priority;
+		sched_setscheduler_nocheck(current, SCHED_FIFO, &param);
+	}
+
+	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
+	ret = acpuclk_set_rate(policy->cpu, freqs.new, SETRATE_CPUFREQ);
+	if (!ret)
+		cpufreq_notify_transition(&freqs, CPUFREQ_POSTCHANGE);
+
+	/* Restore priority after clock ramp-up */
+	if (freqs.new > freqs.old && saved_sched_policy >= 0) {
+		param.sched_priority = saved_sched_rt_prio;
+		sched_setscheduler_nocheck(current, saved_sched_policy, &param);
+	}
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 
@@ -96,13 +162,22 @@ static int msm_cpufreq_target(struct cpufreq_policy *policy,
 	struct cpufreq_work_struct *cpu_work = NULL;
 	cpumask_var_t mask;
 
+<<<<<<< HEAD
 	if (!alloc_cpumask_var(&mask, GFP_KERNEL))
 		return -ENOMEM;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!cpu_active(policy->cpu)) {
 		pr_info("cpufreq: cpu %d is not active.\n", policy->cpu);
 		return -ENODEV;
 	}
+<<<<<<< HEAD
+=======
+
+	if (!alloc_cpumask_var(&mask, GFP_KERNEL))
+		return -ENOMEM;
+>>>>>>> upstream/4.3_primoc
 #endif
 
 	mutex_lock(&per_cpu(cpufreq_suspend, policy->cpu).suspend_mutex);
@@ -146,13 +221,22 @@ static int msm_cpufreq_target(struct cpufreq_policy *policy,
 		wait_for_completion(&cpu_work->complete);
 	}
 
+<<<<<<< HEAD
 	free_cpumask_var(mask);
+=======
+>>>>>>> upstream/4.3_primoc
 	ret = cpu_work->status;
 #else
 	ret = set_cpu_freq(policy, table[index].frequency);
 #endif
 
 done:
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+	free_cpumask_var(mask);
+#endif
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&per_cpu(cpufreq_suspend, policy->cpu).suspend_mutex);
 	return ret;
 }
@@ -164,6 +248,75 @@ static int msm_cpufreq_verify(struct cpufreq_policy *policy)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static unsigned int msm_cpufreq_get_freq(unsigned int cpu)
+{
+	return acpuclk_get_rate(cpu);
+}
+
+static inline int msm_cpufreq_limits_init(void)
+{
+	int cpu = 0;
+	int i = 0;
+	struct cpufreq_frequency_table *table = NULL;
+	uint32_t min = (uint32_t) -1;
+	uint32_t max = 0;
+	struct cpu_freq *limit = NULL;
+
+	for_each_possible_cpu(cpu) {
+		limit = &per_cpu(cpu_freq_info, cpu);
+		table = cpufreq_frequency_get_table(cpu);
+		if (table == NULL) {
+			pr_err("%s: error reading cpufreq table for cpu %d\n",
+					__func__, cpu);
+			continue;
+		}
+		for (i = 0; (table[i].frequency != CPUFREQ_TABLE_END); i++) {
+			if (table[i].frequency > max)
+				max = table[i].frequency;
+			if (table[i].frequency < min)
+				min = table[i].frequency;
+		}
+		limit->allowed_min = min;
+		limit->allowed_max = max;
+		limit->min = min;
+		limit->max = max;
+		limit->limits_init = 1;
+	}
+
+	return 0;
+}
+
+int msm_cpufreq_set_freq_limits(uint32_t cpu, uint32_t min, uint32_t max)
+{
+	struct cpu_freq *limit = &per_cpu(cpu_freq_info, cpu);
+
+	if (!limit->limits_init)
+		msm_cpufreq_limits_init();
+
+	if ((min != MSM_CPUFREQ_NO_LIMIT) &&
+		min >= limit->min && min <= limit->max)
+		limit->allowed_min = min;
+	else
+		limit->allowed_min = limit->min;
+
+
+	if ((max != MSM_CPUFREQ_NO_LIMIT) &&
+		max <= limit->max && max >= limit->min)
+		limit->allowed_max = max;
+	else
+		limit->allowed_max = limit->max;
+
+	pr_debug("%s: Limiting cpu %d min = %d, max = %d\n",
+			__func__, cpu,
+			limit->allowed_min, limit->allowed_max);
+
+	return 0;
+}
+EXPORT_SYMBOL(msm_cpufreq_set_freq_limits);
+
+>>>>>>> upstream/4.3_primoc
 static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 {
 	int cur_freq;
@@ -219,16 +372,30 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	init_completion(&cpu_work->complete);
 #endif
 
+<<<<<<< HEAD
         policy->min = 245760;
         policy->max = 1024000;
 	return 0;
 }
 
 static int msm_cpufreq_suspend(void)
+=======
+	return 0;
+}
+
+/*
+ * Define suspend/resume for cpufreq_driver. Kernel will call
+ * these during suspend/resume with interrupts disabled. This
+ * helps the suspend/resume variable get's updated before cpufreq
+ * governor tries to change the frequency after coming out of suspend.
+ */
+static int msm_cpufreq_suspend(struct cpufreq_policy *policy)
+>>>>>>> upstream/4.3_primoc
 {
 	int cpu;
 
 	for_each_possible_cpu(cpu) {
+<<<<<<< HEAD
 		mutex_lock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
 		per_cpu(cpufreq_suspend, cpu).device_suspended = 1;
 		mutex_unlock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
@@ -238,6 +405,15 @@ static int msm_cpufreq_suspend(void)
 }
 
 static int msm_cpufreq_resume(void)
+=======
+		per_cpu(cpufreq_suspend, cpu).device_suspended = 1;
+	}
+
+	return 0;
+}
+
+static int msm_cpufreq_resume(struct cpufreq_policy *policy)
+>>>>>>> upstream/4.3_primoc
 {
 	int cpu;
 
@@ -245,6 +421,7 @@ static int msm_cpufreq_resume(void)
 		per_cpu(cpufreq_suspend, cpu).device_suspended = 0;
 	}
 
+<<<<<<< HEAD
 	return NOTIFY_DONE;
 }
 
@@ -261,6 +438,9 @@ static int msm_cpufreq_pm_event(struct notifier_block *this,
 	default:
 		return NOTIFY_DONE;
 	}
+=======
+	return 0;
+>>>>>>> upstream/4.3_primoc
 }
 
 static ssize_t store_mfreq(struct sysdev_class *class,
@@ -293,14 +473,23 @@ static struct cpufreq_driver msm_cpufreq_driver = {
 	.init		= msm_cpufreq_init,
 	.verify		= msm_cpufreq_verify,
 	.target		= msm_cpufreq_target,
+<<<<<<< HEAD
+=======
+	.suspend	= msm_cpufreq_suspend,
+	.resume		= msm_cpufreq_resume,
+	.get		= msm_cpufreq_get_freq,
+>>>>>>> upstream/4.3_primoc
 	.name		= "msm",
 	.attr		= msm_freq_attr,
 };
 
+<<<<<<< HEAD
 static struct notifier_block msm_cpufreq_pm_notifier = {
 	.notifier_call = msm_cpufreq_pm_event,
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int __init msm_cpufreq_register(void)
 {
 	int cpu;
@@ -319,9 +508,15 @@ static int __init msm_cpufreq_register(void)
 	msm_cpufreq_wq = create_workqueue("msm-cpufreq");
 #endif
 
+<<<<<<< HEAD
 	register_pm_notifier(&msm_cpufreq_pm_notifier);
+=======
+>>>>>>> upstream/4.3_primoc
 	return cpufreq_register_driver(&msm_cpufreq_driver);
 }
 
 late_initcall(msm_cpufreq_register);
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc

@@ -341,7 +341,11 @@ cg_found:
 
 fail_remove_inode:
 	unlock_super(sb);
+<<<<<<< HEAD
 	inode->i_nlink = 0;
+=======
+	clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 	iput(inode);
 	UFSD("EXIT (FAILED): err %d\n", err);
 	return ERR_PTR(err);

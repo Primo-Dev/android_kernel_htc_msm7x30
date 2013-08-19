@@ -10,3 +10,7 @@ header-y += video/
 header-y += drm/
 header-y += xen/
 header-y += scsi/
+<<<<<<< HEAD
+=======
+header-y += media/
+>>>>>>> upstream/4.3_primoc

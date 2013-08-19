@@ -19,7 +19,11 @@
 #include <linux/if_arp.h>
 #include <linux/rtnetlink.h>
 #include <linux/bitmap.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/inetdevice.h>
 #include <net/net_namespace.h>
 #include <net/cfg80211.h>
@@ -910,6 +914,11 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 		wiphy_debug(local->hw.wiphy, "Failed to initialize wep: %d\n",
 			    result);
 
+<<<<<<< HEAD
+=======
+	ieee80211_led_init(local);
+
+>>>>>>> upstream/4.3_primoc
 	rtnl_lock();
 
 	result = ieee80211_init_rate_ctrl_alg(local,
@@ -931,8 +940,11 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 
 	rtnl_unlock();
 
+<<<<<<< HEAD
 	ieee80211_led_init(local);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	local->network_latency_notifier.notifier_call =
 		ieee80211_max_network_latency;
 	result = pm_qos_add_notifier(PM_QOS_NETWORK_LATENCY,

@@ -1370,6 +1370,10 @@ static int do_cancel_ioctl(struct comedi_device *dev, unsigned int arg,
 			   void *file)
 {
 	struct comedi_subdevice *s;
+<<<<<<< HEAD
+=======
+	int ret;
+>>>>>>> upstream/4.3_primoc
 
 	if (arg >= dev->n_subdevices)
 		return -EINVAL;
@@ -1386,7 +1390,15 @@ static int do_cancel_ioctl(struct comedi_device *dev, unsigned int arg,
 	if (s->busy != file)
 		return -EBUSY;
 
+<<<<<<< HEAD
 	return do_cancel(dev, s);
+=======
+	ret = do_cancel(dev, s);
+	if (comedi_get_subdevice_runflags(s) & SRF_USER)
+		wake_up_interruptible(&s->async->wait_head);
+
+	return ret;
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -1577,7 +1589,11 @@ static unsigned int comedi_poll(struct file *file, poll_table * wait)
 
 	mask = 0;
 	read_subdev = comedi_get_read_subdevice(dev_file_info);
+<<<<<<< HEAD
 	if (read_subdev) {
+=======
+	if (read_subdev && read_subdev->async) {
+>>>>>>> upstream/4.3_primoc
 		poll_wait(file, &read_subdev->async->wait_head, wait);
 		if (!read_subdev->busy
 		    || comedi_buf_read_n_available(read_subdev->async) > 0
@@ -1587,7 +1603,11 @@ static unsigned int comedi_poll(struct file *file, poll_table * wait)
 		}
 	}
 	write_subdev = comedi_get_write_subdevice(dev_file_info);
+<<<<<<< HEAD
 	if (write_subdev) {
+=======
+	if (write_subdev && write_subdev->async) {
+>>>>>>> upstream/4.3_primoc
 		poll_wait(file, &write_subdev->async->wait_head, wait);
 		comedi_buf_write_alloc(write_subdev->async,
 				       write_subdev->async->prealloc_bufsz);
@@ -1629,7 +1649,11 @@ static ssize_t comedi_write(struct file *file, const char __user *buf,
 	}
 
 	s = comedi_get_write_subdevice(dev_file_info);
+<<<<<<< HEAD
 	if (s == NULL) {
+=======
+	if (s == NULL || s->async == NULL) {
+>>>>>>> upstream/4.3_primoc
 		retval = -EIO;
 		goto done;
 	}
@@ -1740,7 +1764,11 @@ static ssize_t comedi_read(struct file *file, char __user *buf, size_t nbytes,
 	}
 
 	s = comedi_get_read_subdevice(dev_file_info);
+<<<<<<< HEAD
 	if (s == NULL) {
+=======
+	if (s == NULL || s->async == NULL) {
+>>>>>>> upstream/4.3_primoc
 		retval = -EIO;
 		goto done;
 	}

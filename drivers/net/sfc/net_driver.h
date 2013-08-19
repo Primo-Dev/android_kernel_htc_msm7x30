@@ -214,6 +214,10 @@ struct efx_tx_queue {
  *	If both this and page are %NULL, the buffer slot is currently free.
  * @page: The associated page buffer, if any.
  *	If both this and skb are %NULL, the buffer slot is currently free.
+<<<<<<< HEAD
+=======
+ * @page_offset: Offset within page. Valid iff @flags & %EFX_RX_BUF_PAGE.
+>>>>>>> upstream/4.3_primoc
  * @len: Buffer length, in bytes.
  * @is_page: Indicates if @page is valid. If false, @skb is valid.
  */
@@ -223,7 +227,12 @@ struct efx_rx_buffer {
 		struct sk_buff *skb;
 		struct page *page;
 	} u;
+<<<<<<< HEAD
 	unsigned int len;
+=======
+	u16 page_offset;
+	u16 len;
+>>>>>>> upstream/4.3_primoc
 	bool is_page;
 };
 
@@ -690,6 +699,12 @@ struct efx_filter_state;
  * @promiscuous: Promiscuous flag. Protected by netif_tx_lock.
  * @multicast_hash: Multicast hash table
  * @wanted_fc: Wanted flow control flags
+<<<<<<< HEAD
+=======
+ * @fc_disable: When non-zero flow control is disabled. Typically used to
+ *	ensure that network back pressure doesn't delay dma queue flushes.
+ *	Serialised by the rtnl lock.
+>>>>>>> upstream/4.3_primoc
  * @mac_work: Work item for changing MAC promiscuity and multicast hash
  * @loopback_mode: Loopback status
  * @loopback_modes: Supported loopback mode bitmask
@@ -783,6 +798,10 @@ struct efx_nic {
 	bool promiscuous;
 	union efx_multicast_hash multicast_hash;
 	u8 wanted_fc;
+<<<<<<< HEAD
+=======
+	unsigned fc_disable;
+>>>>>>> upstream/4.3_primoc
 
 	atomic_t rx_reset;
 	enum efx_loopback_mode loopback_mode;
@@ -834,6 +853,10 @@ static inline unsigned int efx_port_num(struct efx_nic *efx)
  * @remove_port: Free resources allocated by probe_port()
  * @handle_global_event: Handle a "global" event (may be %NULL)
  * @prepare_flush: Prepare the hardware for flushing the DMA queues
+<<<<<<< HEAD
+=======
+ * @finish_flush: Clean up after flushing the DMA queues
+>>>>>>> upstream/4.3_primoc
  * @update_stats: Update statistics not provided by event handling
  * @start_stats: Start the regular fetching of statistics
  * @stop_stats: Stop the regular fetching of statistics
@@ -879,6 +902,10 @@ struct efx_nic_type {
 	void (*remove_port)(struct efx_nic *efx);
 	bool (*handle_global_event)(struct efx_channel *channel, efx_qword_t *);
 	void (*prepare_flush)(struct efx_nic *efx);
+<<<<<<< HEAD
+=======
+	void (*finish_flush)(struct efx_nic *efx);
+>>>>>>> upstream/4.3_primoc
 	void (*update_stats)(struct efx_nic *efx);
 	void (*start_stats)(struct efx_nic *efx);
 	void (*stop_stats)(struct efx_nic *efx);

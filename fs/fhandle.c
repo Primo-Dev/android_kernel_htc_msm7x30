@@ -24,8 +24,13 @@ static long do_sys_name_to_handle(struct path *path,
 	 * We need t make sure wether the file system
 	 * support decoding of the file handle
 	 */
+<<<<<<< HEAD
 	if (!path->mnt->mnt_sb->s_export_op ||
 	    !path->mnt->mnt_sb->s_export_op->fh_to_dentry)
+=======
+	if (!path->dentry->d_sb->s_export_op ||
+	    !path->dentry->d_sb->s_export_op->fh_to_dentry)
+>>>>>>> upstream/4.3_primoc
 		return -EOPNOTSUPP;
 
 	if (copy_from_user(&f_handle, ufh, sizeof(struct file_handle)))

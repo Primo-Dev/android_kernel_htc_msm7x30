@@ -91,6 +91,7 @@ void logfs_crash_dump(struct super_block *sb)
 }
 
 /*
+<<<<<<< HEAD
  * TODO: move to lib/string.c
  */
 /**
@@ -113,6 +114,8 @@ void *memchr_inv(const void *s, int c, size_t n)
 }
 
 /*
+=======
+>>>>>>> upstream/4.3_primoc
  * FIXME: There should be a reserve for root, similar to ext2.
  */
 int logfs_statfs(struct dentry *dentry, struct kstatfs *stats)

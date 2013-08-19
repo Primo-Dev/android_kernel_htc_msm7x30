@@ -30,7 +30,11 @@ static const int async_read_expire  =  4 * HZ;	/* ditto for async, these limits 
 static const int async_write_expire = 16 * HZ;	/* ditto for async, these limits are SOFT! */
 
 static const int writes_starved = 2;		/* max times reads can starve a write */
+<<<<<<< HEAD
 static const int fifo_batch     = 1;		/* # of sequential requests treated as one
+=======
+static const int fifo_batch     = 8;		/* # of sequential requests treated as one
+>>>>>>> upstream/4.3_primoc
 						   by the above parameters. For throughput. */
 
 /* Elevator data */
@@ -82,18 +86,29 @@ sio_add_request(struct request_queue *q, struct request *rq)
 	list_add_tail(&rq->queuelist, &sd->fifo_list[sync][data_dir]);
 }
 
+<<<<<<< HEAD
 /*static int
+=======
+>>>>>>> upstream/4.3_primoc
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,38)
 static int
 sio_queue_empty(struct request_queue *q)
 {
 	struct sio_data *sd = q->elevator->elevator_data;
 
+<<<<<<< HEAD
 	 Check if fifo lists are empty 
 	return list_empty(&sd->fifo_list[SYNC]) &&
 	       list_empty(&sd->fifo_list[ASYNC]);
 } 
 #endif */
+=======
+	/* Check if fifo lists are empty */
+	return list_empty(&sd->fifo_list[SYNC][READ]) && list_empty(&sd->fifo_list[SYNC][WRITE]) &&
+	       list_empty(&sd->fifo_list[ASYNC][READ]) && list_empty(&sd->fifo_list[ASYNC][WRITE]);
+}
+#endif
+>>>>>>> upstream/4.3_primoc
 
 static struct request *
 sio_expired_request(struct sio_data *sd, int sync, int data_dir)
@@ -363,11 +378,17 @@ static struct elevator_type iosched_sio = {
 		.elevator_merge_req_fn		= sio_merged_requests,
 		.elevator_dispatch_fn		= sio_dispatch_requests,
 		.elevator_add_req_fn		= sio_add_request,
+<<<<<<< HEAD
 
 /*#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,38)
 		.elevator_queue_empty_fn sio_queue_empty,
 #endif*/
 
+=======
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,38)
+		.elevator_queue_empty_fn	= sio_queue_empty,
+#endif
+>>>>>>> upstream/4.3_primoc
 		.elevator_former_req_fn		= sio_former_request,
 		.elevator_latter_req_fn		= sio_latter_request,
 		.elevator_init_fn		= sio_init_queue,

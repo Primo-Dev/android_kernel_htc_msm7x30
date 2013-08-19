@@ -106,7 +106,11 @@ static void multipath_end_request(struct bio *bio, int error)
 	rdev_dec_pending(rdev, conf->mddev);
 }
 
+<<<<<<< HEAD
 static int multipath_make_request(mddev_t *mddev, struct bio * bio)
+=======
+static void multipath_make_request(mddev_t *mddev, struct bio * bio)
+>>>>>>> upstream/4.3_primoc
 {
 	multipath_conf_t *conf = mddev->private;
 	struct multipath_bh * mp_bh;
@@ -114,7 +118,11 @@ static int multipath_make_request(mddev_t *mddev, struct bio * bio)
 
 	if (unlikely(bio->bi_rw & REQ_FLUSH)) {
 		md_flush_request(mddev, bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	mp_bh = mempool_alloc(conf->pool, GFP_NOIO);
@@ -126,7 +134,11 @@ static int multipath_make_request(mddev_t *mddev, struct bio * bio)
 	if (mp_bh->path < 0) {
 		bio_endio(bio, -EIO);
 		mempool_free(mp_bh, conf->pool);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 	multipath = conf->multipaths + mp_bh->path;
 
@@ -137,7 +149,11 @@ static int multipath_make_request(mddev_t *mddev, struct bio * bio)
 	mp_bh->bio.bi_end_io = multipath_end_request;
 	mp_bh->bio.bi_private = mp_bh;
 	generic_make_request(&mp_bh->bio);
+<<<<<<< HEAD
 	return 0;
+=======
+	return;
+>>>>>>> upstream/4.3_primoc
 }
 
 static void multipath_status (struct seq_file *seq, mddev_t *mddev)

@@ -58,7 +58,11 @@ static inline unsigned long twd_fxsr_to_i387(struct user_fxsr_struct *fxsave)
 	unsigned long ret = 0xffff0000;
 	int i;
 
+<<<<<<< HEAD
 #define FPREG_ADDR(f, n)	((char *)&(f)->st_space + (n) * 16);
+=======
+#define FPREG_ADDR(f, n)	((char *)&(f)->st_space + (n) * 16)
+>>>>>>> upstream/4.3_primoc
 
 	for (i = 0; i < 8; i++) {
 		if (twd & 0x1) {

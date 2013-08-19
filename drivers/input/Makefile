@@ -25,3 +25,8 @@ obj-$(CONFIG_INPUT_MISC)	+= misc/
 
 obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power.o
 obj-$(CONFIG_INPUT_KEYRESET)	+= keyreset.o
+<<<<<<< HEAD
+=======
+
+obj-$(CONFIG_INPUT_OPTICALJOYSTICK)		+= opticaljoystick/
+>>>>>>> upstream/4.3_primoc

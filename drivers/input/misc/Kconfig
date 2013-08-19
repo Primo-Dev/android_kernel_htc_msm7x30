@@ -556,6 +556,21 @@ config BOSCH_BMA150
           If you say yes here you get support for Bosch Sensortec's
           acceleration sensors SMB380/BMA150.
 
+<<<<<<< HEAD
+=======
+config LIGHTSENSOR_MICROP
+        tristate "LIGHTSENSOR MICROP Driver"
+        depends on MICROP_COMMON
+        help
+          HTC LIGHTSENSOR Microp support.
+
+config INPUT_CAPELLA_CM3602
+	tristate "Capella CM3602 proximity and light sensor"
+	help
+	  Say Y here to enable the Capella CM3602 Short Distance Proximity
+	  Sensor with Ambient Light Sensor.
+
+>>>>>>> upstream/4.3_primoc
 config INPUT_DUMMY_KEYPAD
        tristate "Dummy Keypad driver support"
        help

@@ -733,7 +733,11 @@ static void unfreeze_array(conf_t *conf)
 	spin_unlock_irq(&conf->resync_lock);
 }
 
+<<<<<<< HEAD
 static int make_request(mddev_t *mddev, struct bio * bio)
+=======
+static void make_request(mddev_t *mddev, struct bio * bio)
+>>>>>>> upstream/4.3_primoc
 {
 	conf_t *conf = mddev->private;
 	mirror_info_t *mirror;
@@ -750,7 +754,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 
 	if (unlikely(bio->bi_rw & REQ_FLUSH)) {
 		md_flush_request(mddev, bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	/* If this request crosses a chunk boundary, we need to
@@ -782,10 +790,15 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		conf->nr_waiting++;
 		spin_unlock_irq(&conf->resync_lock);
 
+<<<<<<< HEAD
 		if (make_request(mddev, &bp->bio1))
 			generic_make_request(&bp->bio1);
 		if (make_request(mddev, &bp->bio2))
 			generic_make_request(&bp->bio2);
+=======
+		make_request(mddev, &bp->bio1);
+		make_request(mddev, &bp->bio2);
+>>>>>>> upstream/4.3_primoc
 
 		spin_lock_irq(&conf->resync_lock);
 		conf->nr_waiting--;
@@ -793,14 +806,22 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		spin_unlock_irq(&conf->resync_lock);
 
 		bio_pair_release(bp);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	bad_map:
 		printk("md/raid10:%s: make_request bug: can't convert block across chunks"
 		       " or bigger than %dk %llu %d\n", mdname(mddev), chunk_sects/2,
 		       (unsigned long long)bio->bi_sector, bio->bi_size >> 10);
 
 		bio_io_error(bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	md_write_start(mddev, bio);
@@ -829,7 +850,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		int slot = r10_bio->read_slot;
 		if (disk < 0) {
 			raid_end_bio_io(r10_bio);
+<<<<<<< HEAD
 			return 0;
+=======
+			return;
+>>>>>>> upstream/4.3_primoc
 		}
 		mirror = conf->mirrors + disk;
 
@@ -845,7 +870,11 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 		read_bio->bi_private = r10_bio;
 
 		generic_make_request(read_bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	/*
@@ -935,7 +964,10 @@ static int make_request(mddev_t *mddev, struct bio * bio)
 
 	if (do_sync || !mddev->bitmap || !plugged)
 		md_wakeup_thread(mddev->thread);
+<<<<<<< HEAD
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void status(struct seq_file *seq, mddev_t *mddev)

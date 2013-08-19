@@ -1913,7 +1913,11 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev)
 				 "but new slave device does not support netpoll.\n",
 				 bond_dev->name);
 			res = -EBUSY;
+<<<<<<< HEAD
 			goto err_close;
+=======
+			goto err_detach;
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 #endif
@@ -1922,7 +1926,11 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev)
 
 	res = bond_create_slave_symlinks(bond_dev, slave_dev);
 	if (res)
+<<<<<<< HEAD
 		goto err_close;
+=======
+		goto err_detach;
+>>>>>>> upstream/4.3_primoc
 
 	res = netdev_rx_handler_register(slave_dev, bond_handle_frame,
 					 new_slave);
@@ -1943,7 +1951,17 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev)
 err_dest_symlinks:
 	bond_destroy_slave_symlinks(bond_dev, slave_dev);
 
+<<<<<<< HEAD
 err_close:
+=======
+err_detach:
+	write_lock_bh(&bond->lock);
+	bond_detach_slave(bond, new_slave);
+	write_unlock_bh(&bond->lock);
+
+err_close:
+	slave_dev->priv_flags &= ~IFF_BONDING;
+>>>>>>> upstream/4.3_primoc
 	dev_close(slave_dev);
 
 err_unset_master:
@@ -2012,12 +2030,19 @@ int bond_release(struct net_device *bond_dev, struct net_device *slave_dev)
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	write_unlock_bh(&bond->lock);
+>>>>>>> upstream/4.3_primoc
 	/* unregister rx_handler early so bond_handle_frame wouldn't be called
 	 * for this slave anymore.
 	 */
 	netdev_rx_handler_unregister(slave_dev);
+<<<<<<< HEAD
 	write_unlock_bh(&bond->lock);
 	synchronize_net();
+=======
+>>>>>>> upstream/4.3_primoc
 	write_lock_bh(&bond->lock);
 
 	if (!bond->params.fail_over_mac) {

@@ -71,7 +71,10 @@ const struct file_operations ext3_file_operations = {
 };
 
 const struct inode_operations ext3_file_inode_operations = {
+<<<<<<< HEAD
 	.truncate	= ext3_truncate,
+=======
+>>>>>>> upstream/4.3_primoc
 	.setattr	= ext3_setattr,
 #ifdef CONFIG_EXT3_FS_XATTR
 	.setxattr	= generic_setxattr,
@@ -79,7 +82,11 @@ const struct inode_operations ext3_file_inode_operations = {
 	.listxattr	= ext3_listxattr,
 	.removexattr	= generic_removexattr,
 #endif
+<<<<<<< HEAD
 	.check_acl	= ext3_check_acl,
+=======
+	.get_acl	= ext3_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.fiemap		= ext3_fiemap,
 };
 

@@ -1,7 +1,11 @@
 /* arch/arm/mach-msm/include/mach/board.h
  *
  * Copyright (C) 2007 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2008-2012, Code Aurora Forum. All rights reserved.
+=======
+ * Copyright (c) 2008-2011, Code Aurora Forum. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  * Author: Brian Swetland <swetland@google.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -66,6 +70,7 @@ struct msm_camera_device_platform_data {
 	struct msm_camera_io_ext ioext;
 	struct msm_camera_io_clk ioclk;
 	uint8_t csid_core;
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 	uint8_t is_csiphy;
 	uint8_t is_csic;
@@ -77,6 +82,8 @@ struct msm_camera_device_platform_data {
 	int (*camera_csi_off) (void);
 //HTC_END
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	struct msm_bus_scale_pdata *cam_bus_scale_table;
 };
 enum msm_camera_csi_data_format {
@@ -162,7 +169,11 @@ struct msm_camera_sensor_flash_data {
 	struct msm_camera_sensor_flash_src *flash_src;
 };
 
+<<<<<<< HEAD
 /* Andrew_Cheng linear led 20111205 MB*/
+=======
+/* HTC_START linear led 20111011 */
+>>>>>>> upstream/4.3_primoc
 struct camera_led_info {
 	uint16_t enable;
 	uint16_t low_limit_led_state;
@@ -183,16 +194,25 @@ struct camera_flash_info {
 	struct camera_led_info *led_info;
 	struct camera_led_est *led_est_table;
 };
+<<<<<<< HEAD
 /* Andrew_Cheng linear led 20111205 ME */
+=======
+/* HTC_END */
+>>>>>>> upstream/4.3_primoc
 
 struct camera_flash_cfg {
 	int num_flash_levels;
 	int (*camera_flash)(int level);
 	uint16_t low_temp_limit;
 	uint16_t low_cap_limit;
+<<<<<<< HEAD
 	uint16_t low_cap_limit_dual;
 	uint8_t postpone_led_mode;
 	struct camera_flash_info *flash_info;	/* Andrew_Cheng linear led 20111205 */
+=======
+	uint8_t postpone_led_mode;
+	struct camera_flash_info *flash_info;	/* HTC linear led 20111011 */
+>>>>>>> upstream/4.3_primoc
 };
 
 struct msm_camera_sensor_strobe_flash_data {
@@ -219,6 +239,7 @@ struct msm_camera_rawchip_info {
 	int (*rawchip_use_ext_1v2)(void);
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 struct msm_cam_clk_info {
 	const char *clk_name;
@@ -226,12 +247,15 @@ struct msm_cam_clk_info {
 };
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 enum msm_camera_type {
 	BACK_CAMERA_2D,
 	FRONT_CAMERA_2D,
 	BACK_CAMERA_3D,
 	BACK_CAMERA_INT_3D,
 };
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 enum camera_vreg_type {
 	REG_LDO,
@@ -252,6 +276,9 @@ struct msm_gpio_set_tbl {
 	uint32_t delay;
 };
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 struct msm8960_privacy_light_cfg {
 	unsigned mpp;
 };
@@ -273,12 +300,15 @@ struct msm_camera_sensor_platform_info {
 	int privacy_light;
 	enum sensor_flip_mirror_info mirror_flip;
 	void *privacy_light_info;
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 	struct camera_vreg_t *cam_vreg;
 	int num_vreg;
 	int32_t (*ext_power_ctrl) (int enable);
 	struct msm_camera_gpio_conf *gpio_conf;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 struct msm_camera_gpio_conf {
@@ -286,6 +316,7 @@ struct msm_camera_gpio_conf {
 	uint8_t cam_gpiomux_conf_tbl_size;
 	uint16_t *cam_gpio_tbl;
 	uint8_t cam_gpio_tbl_size;
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 	struct gpio *cam_gpio_common_tbl;
 	uint8_t cam_gpio_common_tbl_size;
@@ -303,12 +334,19 @@ struct msm_camera_platform_info {
 };
 #endif
 
+=======
+};
+
+>>>>>>> upstream/4.3_primoc
 struct msm_actuator_info {
 	struct i2c_board_info const *board_info;
 	int bus_id;
 	int vcm_pwd;
 	int vcm_enable;
+<<<<<<< HEAD
 	int use_rawchip_af;
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 enum msm_camera_platform{
@@ -346,10 +384,15 @@ struct msm_camera_sensor_info {
 	int (*camera_power_off)(void);
 	int use_rawchip;
 	int (*sensor_version)(void);
+<<<<<<< HEAD
 	//HTC_CAM_START chuck
 	int (*camera_main_get_probe)(void);
 	void (*camera_main_set_probe)(int);
     //HTC_CAM_END
+=======
+	int (*camera_main_get_probe)(void);
+	void (*camera_main_set_probe)(int);
+>>>>>>> upstream/4.3_primoc
 #if 1 /* HTC to be removed */
 	/* HTC++ */
 	void(*camera_clk_switch)(void);
@@ -357,6 +400,11 @@ struct msm_camera_sensor_info {
 	int full_size_preview; /* if use full-size preview */
 	int cam_select_pin; /* for two sensors */
 	int mirror_mode; /* for sensor upside down */
+<<<<<<< HEAD
+=======
+	int zero_shutter_mode; /* for doing zero shutter lag on MIPI */
+	int sensor_lc_disable; /* for sensor lens correction support */
+>>>>>>> upstream/4.3_primoc
 	int(*camera_pm8058_power)(int); /* for express */
 	struct camera_flash_cfg* flash_cfg;
 	int gpio_set_value_force; /*true: force to set gpio  */
@@ -367,8 +415,11 @@ struct msm_camera_sensor_info {
 	uint32_t kpi_sensor_end;
 	uint8_t (*preview_skip_frame)(void);
 #endif
+<<<<<<< HEAD
 	int sensor_lc_disable; /* S5K4E1GX: for sensor lens correction support */
 	int zero_shutter_mode; /* S5K4E1GX: for doing zero shutter lag on MIPI */
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 int  msm_get_cam_resources(struct msm_camera_sensor_info *);
@@ -445,6 +496,11 @@ enum msm_mdp_hw_revision {
 	MDP_REV_40,
 	MDP_REV_41,
 	MDP_REV_42,
+<<<<<<< HEAD
+=======
+	MDP_REV_43,
+	MDP_REV_44,
+>>>>>>> upstream/4.3_primoc
 };
 
 struct msm_panel_common_pdata {
@@ -456,11 +512,15 @@ struct msm_panel_common_pdata {
 	void (*panel_config_gpio)(int);
 	int (*vga_switch)(int select_vga);
 	int *gpio_num;
+<<<<<<< HEAD
 	int mdp_core_clk_rate;
 	unsigned num_mdp_clk;
 	int *mdp_core_clk_table;
 	int (*rgb_format)(void);
 	unsigned char (*shrink_pwm)(int val);
+=======
+	u32 mdp_max_clk;
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_MSM_BUS_SCALING
 	struct msm_bus_scale_pdata *mdp_bus_scale_table;
 #endif
@@ -468,6 +528,7 @@ struct msm_panel_common_pdata {
 	u32 ov0_wb_size;  /* overlay0 writeback size */
 	u32 ov1_wb_size;  /* overlay1 writeback size */
 	u32 mem_hid;
+<<<<<<< HEAD
 	int (*writeback_offset)(void);
 	int (*mdp_color_enhance)(void);
 	int (*mdp_gamma)(void);
@@ -483,6 +544,9 @@ struct msm_panel_common_pdata {
 	int fpga_3d_config_addr;
 	struct gamma_curvy *abl_gamma_tbl;
 #endif
+=======
+	char cont_splash_enabled;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct lcdc_platform_data {
@@ -522,7 +586,12 @@ enum mipi_dsi_3d_ctrl {
 	FPGA_SPI_INTF,
 };
 
+<<<<<<< HEAD
 #if defined(CONFIG_FB_MSM8960) || (!defined(CONFIG_ARCH_MSM8X60) && !defined(CONFIG_ARCH_MSM7X27A))
+=======
+#ifndef CONFIG_ARCH_MSM8X60
+#ifndef CONFIG_ARCH_MSM7X27A
+>>>>>>> upstream/4.3_primoc
 /* DSI PHY configuration */
 struct mipi_dsi_phy_ctrl {
 	uint32_t regulator[5];
@@ -532,6 +601,10 @@ struct mipi_dsi_phy_ctrl {
 	uint32_t pll[21];
 };
 #endif
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 struct mipi_dsi_panel_platform_data {
 	int fpga_ctrl_mode;
@@ -540,10 +613,15 @@ struct mipi_dsi_panel_platform_data {
 	struct mipi_dsi_phy_ctrl *phy_ctrl_settings;
 };
 
+<<<<<<< HEAD
+=======
+#define PANEL_NAME_MAX_LEN 50
+>>>>>>> upstream/4.3_primoc
 struct msm_fb_platform_data {
 	int (*detect_client)(const char *name);
 	int mddi_prescan;
 	int (*allow_set_offset)(void);
+<<<<<<< HEAD
 	int blt_mode;
 	uint32_t width;
 	uint32_t height;
@@ -566,6 +644,13 @@ typedef struct
 }mhl_driving_params;
 #endif /* CONFIG_FB_MSM8960 */
 
+=======
+	bool     is_3d_panel;
+	char prim_panel_name[PANEL_NAME_MAX_LEN];
+	char ext_panel_name[PANEL_NAME_MAX_LEN];
+};
+
+>>>>>>> upstream/4.3_primoc
 struct msm_hdmi_platform_data {
 	int irq;
 	int (*cable_detect)(int insert);
@@ -575,10 +660,13 @@ struct msm_hdmi_platform_data {
 	int (*cec_power)(int on);
 	int (*init_irq)(void);
 	bool (*check_hdcp_hw_support)(void);
+<<<<<<< HEAD
 #ifdef CONFIG_FB_MSM8960
 	mhl_driving_params *driving_params;
 	int dirving_params_count;
 #endif /* CONFIG_FB_MSM8960 */
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 struct msm_i2c_platform_data {
@@ -608,9 +696,18 @@ struct msm_vidc_platform_data {
 	u32 enable_ion;
 	int disable_dmx;
 	int disable_fullhd;
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_BUS_SCALING
 	struct msm_bus_scale_pdata *vidc_bus_client_pdata;
 #endif
+=======
+	u32 cp_enabled;
+#ifdef CONFIG_MSM_BUS_SCALING
+	struct msm_bus_scale_pdata *vidc_bus_client_pdata;
+#endif
+	int disable_turbo;
+	int cont_mode_dpb_count;
+>>>>>>> upstream/4.3_primoc
 };
 
 #if defined(CONFIG_USB_PEHCI_HCD) || defined(CONFIG_USB_PEHCI_HCD_MODULE)
@@ -649,6 +746,28 @@ int  msm_add_sdcc(unsigned int controller,
 struct msm_usb_host_platform_data;
 int  msm_add_host(unsigned int host,
 		struct msm_usb_host_platform_data *plat);
+<<<<<<< HEAD
+=======
+
+#ifdef CONFIG_MSM_RMT_STORAGE_SERVER
+struct shared_ramfs_entry {
+	uint32_t client_id;   	/* Client id to uniquely identify a client */
+	uint32_t base_addr;	/* Base address of shared RAMFS memory */
+	uint32_t size;		/* Size of the shared RAMFS memory */
+	uint32_t server_status;	/* This will be initialized to 1 when
+				   remote storage RPC server is available */
+};
+struct shared_ramfs_table {
+	uint32_t magic_id;  	/* Identify RAMFS details in SMEM */
+	uint32_t version;	/* Version of shared_ramfs_table */
+	uint32_t entries;	/* Total number of valid entries   */
+	struct shared_ramfs_entry ramfs_entry[3];	/* List all entries */
+};
+
+int __init rmt_storage_add_ramfs(void);
+#endif
+
+>>>>>>> upstream/4.3_primoc
 #if defined(CONFIG_USB_FUNCTION_MSM_HSUSB) || defined(CONFIG_USB_MSM_72K) || defined(CONFIG_USB_MSM_72K_MODULE)    || defined(CONFIG_USB_CI13XXX_MSM)
 int usb_get_connect_type(void);
 void msm_otg_set_vbus_state(int online);

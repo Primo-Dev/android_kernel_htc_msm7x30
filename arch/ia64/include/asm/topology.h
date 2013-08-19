@@ -65,6 +65,10 @@ void build_cpu_to_node_map(void);
 				| SD_BALANCE_EXEC	\
 				| SD_BALANCE_FORK	\
 				| SD_WAKE_AFFINE,	\
+<<<<<<< HEAD
+=======
+				| arch_sd_share_power_line()		\
+>>>>>>> upstream/4.3_primoc
 	.last_balance		= jiffies,		\
 	.balance_interval	= 1,			\
 	.nr_balance_failed	= 0,			\

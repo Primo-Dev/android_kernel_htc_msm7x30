@@ -21,7 +21,10 @@
 #include <linux/interrupt.h>
 #include <linux/gpio.h>
 #include <linux/sched.h>
+<<<<<<< HEAD
 #include <linux/slab.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <mach/msm_fb.h>
 
 
@@ -60,6 +63,10 @@ struct panel_info {
 	struct msm_panel_data panel_data;
 	struct msmfb_callback *toshiba_callback;
 	int toshiba_got_int;
+<<<<<<< HEAD
+=======
+	int irq;
+>>>>>>> upstream/4.3_primoc
 };
 
 
@@ -175,6 +182,7 @@ irqreturn_t toshiba_vsync_interrupt(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+<<<<<<< HEAD
 static int setup_vsync(struct panel_info *panel,
 		       int init)
 {
@@ -216,6 +224,8 @@ err_request_gpio_failed:
 	return ret;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int mddi_toshiba_probe(struct platform_device *pdev)
 {
 	int ret;
@@ -232,10 +242,23 @@ static int mddi_toshiba_probe(struct platform_device *pdev)
 	client_data->remote_write(client_data, GPIOSEL_VWAKEINT, GPIOSEL);
 	client_data->remote_write(client_data, INTMASK_VWAKEOUT, INTMASK);
 
+<<<<<<< HEAD
 	ret = setup_vsync(panel, 1);
 	if (ret) {
 		dev_err(&pdev->dev, "mddi_bridge_setup_vsync failed\n");
 		return ret;
+=======
+	ret = platform_get_irq_byname(pdev, "vsync");
+	if (ret < 0)
+		goto err_plat_get_irq;
+
+	panel->irq = ret;
+	ret = request_irq(panel->irq, toshiba_vsync_interrupt,
+			  IRQF_TRIGGER_RISING, "vsync", panel);
+	if (ret) {
+		dev_err(&pdev->dev, "mddi_bridge_setup_vsync failed\n");
+		goto err_req_irq;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	panel->client_data = client_data;
@@ -258,13 +281,26 @@ static int mddi_toshiba_probe(struct platform_device *pdev)
 	platform_device_register(&panel->pdev);
 
 	return 0;
+<<<<<<< HEAD
+=======
+
+err_req_irq:
+err_plat_get_irq:
+	kfree(panel);
+	return ret;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int mddi_toshiba_remove(struct platform_device *pdev)
 {
 	struct panel_info *panel = platform_get_drvdata(pdev);
 
+<<<<<<< HEAD
 	setup_vsync(panel, 0);
+=======
+	platform_set_drvdata(pdev, NULL);
+	free_irq(panel->irq, panel);
+>>>>>>> upstream/4.3_primoc
 	kfree(panel);
 	return 0;
 }

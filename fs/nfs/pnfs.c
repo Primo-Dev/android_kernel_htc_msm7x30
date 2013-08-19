@@ -1119,6 +1119,17 @@ pnfs_ld_write_done(struct nfs_write_data *data)
 		data->mds_ops->rpc_release(data);
 		return 0;
 	}
+<<<<<<< HEAD
+=======
+	if (NFS_SERVER(data->inode)->pnfs_curr_ld->flags &
+					PNFS_LAYOUTRET_ON_ERROR) {
+		/* Don't lo_commit on error, Server will needs to
+		 * preform a file recovery.
+		 */
+		clear_bit(NFS_INO_LAYOUTCOMMIT, &NFS_I(data->inode)->flags);
+		pnfs_return_layout(data->inode);
+	}
+>>>>>>> upstream/4.3_primoc
 
 	dprintk("%s: pnfs_error=%d, retry via MDS\n", __func__,
 		data->pnfs_error);
@@ -1167,6 +1178,13 @@ pnfs_ld_read_done(struct nfs_read_data *data)
 		return 0;
 	}
 
+<<<<<<< HEAD
+=======
+	if (NFS_SERVER(data->inode)->pnfs_curr_ld->flags &
+						PNFS_LAYOUTRET_ON_ERROR)
+		pnfs_return_layout(data->inode);
+
+>>>>>>> upstream/4.3_primoc
 	dprintk("%s: pnfs_error=%d, retry via MDS\n", __func__,
 		data->pnfs_error);
 	status = nfs_initiate_read(data, NFS_CLIENT(data->inode),

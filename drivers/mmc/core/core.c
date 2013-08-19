@@ -1207,11 +1207,14 @@ int mmc_resume_bus(struct mmc_host *host)
 		host->bus_ops->detect(host);
 
 	mmc_bus_put(host);
+<<<<<<< HEAD
 	if (ret) {
 		spin_lock_irqsave(&host->lock, flags);
 		host->bus_resume_flags |= MMC_BUSRESUME_NEEDS_RESUME;
 		spin_unlock_irqrestore(&host->lock, flags);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	pr_info("%s: Deferred resume %s\n", mmc_hostname(host),
 		(ret == 0 ? "completed" : "Fail"));
 	return ret;
@@ -1385,6 +1388,7 @@ void mmc_init_erase(struct mmc_card *card)
 	}
 }
 
+<<<<<<< HEAD
 static unsigned int mmc_mmc_erase_timeout(struct mmc_card *card,
 				          unsigned int arg, unsigned int qty)
 {
@@ -1582,6 +1586,8 @@ out:
 	return err;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /**
  * mmc_erase - erase sectors.
  * @card: card to erase
@@ -1594,6 +1600,7 @@ out:
 int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
 	      unsigned int arg)
 {
+<<<<<<< HEAD
 	unsigned int rem, to = from + nr;
 
 	if (!(card->host->caps & MMC_CAP_ERASE) ||
@@ -1646,11 +1653,20 @@ int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
 	to -= 1;
 
 	return mmc_do_erase(card, from, to, arg);
+=======
+	printk("%s: mmc_erase() disabled for protection. from = %u, nr = %u, arg = %u\n",
+			__func__,from,nr,arg);
+	return -EOPNOTSUPP;
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(mmc_erase);
 
 int mmc_can_erase(struct mmc_card *card)
 {
+<<<<<<< HEAD
+=======
+	printk("%s: called\n",__func__);
+>>>>>>> upstream/4.3_primoc
 	if ((card->host->caps & MMC_CAP_ERASE) &&
 	    (card->csd.cmdclass & CCC_ERASE) && card->erase_size)
 		return 1;
@@ -2027,6 +2043,10 @@ int mmc_suspend_host(struct mmc_host *host)
 				err = 0;
 			}
 		}
+<<<<<<< HEAD
+=======
+		flush_delayed_work(&host->disable);
+>>>>>>> upstream/4.3_primoc
 	}
 #ifdef CONFIG_PM_RUNTIME
 	if (mmc_bus_manual_resume(host))
@@ -2121,11 +2141,18 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		if (!host->bus_ops || host->bus_ops->suspend)
 			break;
 
+<<<<<<< HEAD
 		mmc_claim_host(host);
 
 		if (host->bus_ops->remove)
 			host->bus_ops->remove(host);
 
+=======
+		if (host->bus_ops->remove)
+			host->bus_ops->remove(host);
+
+		mmc_claim_host(host);
+>>>>>>> upstream/4.3_primoc
 		mmc_detach_bus(host);
 		mmc_power_off(host);
 		mmc_release_host(host);

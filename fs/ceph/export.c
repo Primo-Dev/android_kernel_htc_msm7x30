@@ -84,7 +84,11 @@ static int ceph_encode_fh(struct dentry *dentry, u32 *rawfh, int *max_len,
  * FIXME: we should try harder by querying the mds for the ino.
  */
 static struct dentry *__fh_to_dentry(struct super_block *sb,
+<<<<<<< HEAD
 				     struct ceph_nfs_fh *fh)
+=======
+				     struct ceph_nfs_fh *fh, int fh_len)
+>>>>>>> upstream/4.3_primoc
 {
 	struct ceph_mds_client *mdsc = ceph_sb_to_client(sb)->mdsc;
 	struct inode *inode;
@@ -92,6 +96,12 @@ static struct dentry *__fh_to_dentry(struct super_block *sb,
 	struct ceph_vino vino;
 	int err;
 
+<<<<<<< HEAD
+=======
+	if (fh_len < sizeof(*fh) / 4)
+		return ERR_PTR(-ESTALE);
+
+>>>>>>> upstream/4.3_primoc
 	dout("__fh_to_dentry %llx\n", fh->ino);
 	vino.ino = fh->ino;
 	vino.snap = CEPH_NOSNAP;
@@ -136,7 +146,11 @@ static struct dentry *__fh_to_dentry(struct super_block *sb,
  * convert connectable fh to dentry
  */
 static struct dentry *__cfh_to_dentry(struct super_block *sb,
+<<<<<<< HEAD
 				      struct ceph_nfs_confh *cfh)
+=======
+				      struct ceph_nfs_confh *cfh, int fh_len)
+>>>>>>> upstream/4.3_primoc
 {
 	struct ceph_mds_client *mdsc = ceph_sb_to_client(sb)->mdsc;
 	struct inode *inode;
@@ -144,6 +158,12 @@ static struct dentry *__cfh_to_dentry(struct super_block *sb,
 	struct ceph_vino vino;
 	int err;
 
+<<<<<<< HEAD
+=======
+	if (fh_len < sizeof(*cfh) / 4)
+		return ERR_PTR(-ESTALE);
+
+>>>>>>> upstream/4.3_primoc
 	dout("__cfh_to_dentry %llx (%llx/%x)\n",
 	     cfh->ino, cfh->parent_ino, cfh->parent_name_hash);
 
@@ -193,9 +213,17 @@ static struct dentry *ceph_fh_to_dentry(struct super_block *sb, struct fid *fid,
 					int fh_len, int fh_type)
 {
 	if (fh_type == 1)
+<<<<<<< HEAD
 		return __fh_to_dentry(sb, (struct ceph_nfs_fh *)fid->raw);
 	else
 		return __cfh_to_dentry(sb, (struct ceph_nfs_confh *)fid->raw);
+=======
+		return __fh_to_dentry(sb, (struct ceph_nfs_fh *)fid->raw,
+								fh_len);
+	else
+		return __cfh_to_dentry(sb, (struct ceph_nfs_confh *)fid->raw,
+								fh_len);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -216,6 +244,11 @@ static struct dentry *ceph_fh_to_parent(struct super_block *sb,
 
 	if (fh_type == 1)
 		return ERR_PTR(-ESTALE);
+<<<<<<< HEAD
+=======
+	if (fh_len < sizeof(*cfh) / 4)
+		return ERR_PTR(-ESTALE);
+>>>>>>> upstream/4.3_primoc
 
 	pr_debug("fh_to_parent %llx/%d\n", cfh->parent_ino,
 		 cfh->parent_name_hash);

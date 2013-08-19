@@ -30,7 +30,11 @@
 #include "coda_int.h"
 
 /* dir inode-ops */
+<<<<<<< HEAD
 static int coda_create(struct inode *dir, struct dentry *new, int mode, struct nameidata *nd);
+=======
+static int coda_create(struct inode *dir, struct dentry *new, umode_t mode, struct nameidata *nd);
+>>>>>>> upstream/4.3_primoc
 static struct dentry *coda_lookup(struct inode *dir, struct dentry *target, struct nameidata *nd);
 static int coda_link(struct dentry *old_dentry, struct inode *dir_inode, 
 		     struct dentry *entry);
@@ -132,11 +136,19 @@ exit:
 }
 
 
+<<<<<<< HEAD
 int coda_permission(struct inode *inode, int mask, unsigned int flags)
 {
 	int error;
 
 	if (flags & IPERM_FLAG_RCU)
+=======
+int coda_permission(struct inode *inode, int mask)
+{
+	int error;
+
+	if (mask & MAY_NOT_BLOCK)
+>>>>>>> upstream/4.3_primoc
 		return -ECHILD;
 
 	mask &= MAY_READ | MAY_WRITE | MAY_EXEC;
@@ -191,7 +203,11 @@ static inline void coda_dir_drop_nlink(struct inode *dir)
 }
 
 /* creation routines: create, mknod, mkdir, link, symlink */
+<<<<<<< HEAD
 static int coda_create(struct inode *dir, struct dentry *de, int mode, struct nameidata *nd)
+=======
+static int coda_create(struct inode *dir, struct dentry *de, umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	int error;
 	const char *name=de->d_name.name;
@@ -340,7 +356,11 @@ static int coda_rmdir(struct inode *dir, struct dentry *de)
 	if (!error) {
 		/* VFS may delete the child */
 		if (de->d_inode)
+<<<<<<< HEAD
 		    de->d_inode->i_nlink = 0;
+=======
+			clear_nlink(de->d_inode);
+>>>>>>> upstream/4.3_primoc
 
 		/* fix the link count of the parent */
 		coda_dir_drop_nlink(dir);

@@ -149,5 +149,9 @@ struct security_class_mapping secclass_map[] = {
 	{ "kernel_service", { "use_as_override", "create_files_as", NULL } },
 	{ "tun_socket",
 	  { COMMON_SOCK_PERMS, NULL } },
+<<<<<<< HEAD
+=======
+	{ "binder", { "impersonate", "call", "set_context_mgr", "transfer", NULL } },
+>>>>>>> upstream/4.3_primoc
 	{ NULL }
   };

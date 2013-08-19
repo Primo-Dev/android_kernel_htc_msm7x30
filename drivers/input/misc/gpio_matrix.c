@@ -20,10 +20,20 @@
 #include <linux/interrupt.h>
 #include <linux/slab.h>
 #include <linux/wakelock.h>
+<<<<<<< HEAD
 #include <mach/board.h>
 
 struct gpio_kp {
 	int debug_log;
+=======
+
+#ifdef CONFIG_OPTICALJOYSTICK_CRUCIAL
+#include <asm/mach-types.h>
+#include <linux/curcial_oj.h>
+#endif
+
+struct gpio_kp {
+>>>>>>> upstream/4.3_primoc
 	struct gpio_event_input_devs *input_devs;
 	struct gpio_event_matrix_info *keypad_info;
 	struct hrtimer timer;
@@ -47,6 +57,7 @@ static void clear_phantom_key(struct gpio_kp *kp, int out, int in)
 
 	if (!test_bit(keycode, kp->input_devs->dev[dev]->key)) {
 		if (mi->flags & GPIOKPF_PRINT_PHANTOM_KEYS)
+<<<<<<< HEAD
 			if (kp->debug_log)
 				KEY_LOGD("gpiomatrix: phantom key %x, %d-%d (%d-%d) "
 					"cleared\n", keycode, out, in,
@@ -58,6 +69,17 @@ static void clear_phantom_key(struct gpio_kp *kp, int out, int in)
 				KEY_LOGD("gpiomatrix: phantom key %x, %d-%d (%d-%d) "
 					"not cleared\n", keycode, out, in,
 					mi->output_gpios[out], mi->input_gpios[in]);
+=======
+			pr_info("gpiomatrix: phantom key %x, %d-%d (%d-%d) "
+				"cleared\n", keycode, out, in,
+				mi->output_gpios[out], mi->input_gpios[in]);
+		__clear_bit(key_index, kp->keys_pressed);
+	} else {
+		if (mi->flags & GPIOKPF_PRINT_PHANTOM_KEYS)
+			pr_info("gpiomatrix: phantom key %x, %d-%d (%d-%d) "
+				"not cleared\n", keycode, out, in,
+				mi->output_gpios[out], mi->input_gpios[in]);
+>>>>>>> upstream/4.3_primoc
 	}
 }
 
@@ -115,15 +137,27 @@ static void report_key(struct gpio_kp *kp, int key_index, int out, int in)
 	unsigned short keyentry = mi->keymap[key_index];
 	unsigned short keycode = keyentry & MATRIX_KEY_MASK;
 	unsigned short dev = keyentry >> MATRIX_CODE_BITS;
+<<<<<<< HEAD
 
 	if (pressed != test_bit(keycode, kp->input_devs->dev[dev]->key)) {
 		if (keycode == KEY_RESERVED) {
 			if ((mi->flags & GPIOKPF_PRINT_UNMAPPED_KEYS) && (kp->debug_log))
 				KEY_LOGD("gpiomatrix: unmapped key, %d-%d "
+=======
+#ifdef CONFIG_OPTICALJOYSTICK_CRUCIAL
+	static unsigned need_send_spec_key = 1;
+#endif
+
+	if (pressed != test_bit(keycode, kp->input_devs->dev[dev]->key)) {
+		if (keycode == KEY_RESERVED) {
+			if (mi->flags & GPIOKPF_PRINT_UNMAPPED_KEYS)
+				pr_info("gpiomatrix: unmapped key, %d-%d "
+>>>>>>> upstream/4.3_primoc
 					"(%d-%d) changed to %d\n",
 					out, in, mi->output_gpios[out],
 					mi->input_gpios[in], pressed);
 		} else {
+<<<<<<< HEAD
 			if ((mi->flags & GPIOKPF_PRINT_MAPPED_KEYS) && (kp->debug_log))
 				KEY_LOGD("gpiomatrix: key %x, %d-%d (%d-%d) "
 					"changed to %d\n", keycode,
@@ -132,6 +166,31 @@ static void report_key(struct gpio_kp *kp, int key_index, int out, int in)
 			input_report_key(kp->input_devs->dev[dev], keycode, pressed);
 		}
 	}
+=======
+			if (mi->flags & GPIOKPF_PRINT_MAPPED_KEYS)
+				pr_info("gpiomatrix: key %x, %d-%d (%d-%d) "
+					"changed to %d\n", keycode,
+					out, in, mi->output_gpios[out],
+					mi->input_gpios[in], pressed);
+#ifdef CONFIG_OPTICALJOYSTICK_CRUCIAL
+			if (mi->info.oj_btn && keycode == BTN_MOUSE)
+			  ;
+			else
+#endif
+			  input_report_key(kp->input_devs->dev[dev], keycode, pressed);
+		}
+	}
+#ifdef CONFIG_OPTICALJOYSTICK_CRUCIAL
+	if (mi->info.oj_btn && keycode == BTN_MOUSE) {
+	  if (need_send_spec_key == pressed) {
+	    curcial_oj_send_key(keycode, pressed);
+	    need_send_spec_key = !pressed;
+	    pr_info("%s: send OJ action key, pressed: %d\n",
+		    __func__, pressed);
+	  }
+	}
+#endif
+>>>>>>> upstream/4.3_primoc
 }
 
 static void report_sync(struct gpio_kp *kp)
@@ -284,13 +343,21 @@ static int gpio_keypad_request_irqs(struct gpio_kp *kp)
 		err = request_irq(irq, gpio_keypad_irq_handler, request_flags,
 				  "gpio_kp", kp);
 		if (err) {
+<<<<<<< HEAD
 			KEY_LOGE("KEY_ERR: gpiomatrix: request_irq failed for input %d, "
+=======
+			pr_err("gpiomatrix: request_irq failed for input %d, "
+>>>>>>> upstream/4.3_primoc
 				"irq %d\n", mi->input_gpios[i], irq);
 			goto err_request_irq_failed;
 		}
 		err = enable_irq_wake(irq);
 		if (err) {
+<<<<<<< HEAD
 			KEY_LOGE("KEY_ERR: gpiomatrix: set_irq_wake failed for input %d, "
+=======
+			pr_err("gpiomatrix: set_irq_wake failed for input %d, "
+>>>>>>> upstream/4.3_primoc
 				"irq %d\n", mi->input_gpios[i], irq);
 		}
 		disable_irq(irq);
@@ -330,7 +397,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 		   mi->input_gpios == NULL ||
 		   mi->output_gpios == NULL) {
 			err = -ENODEV;
+<<<<<<< HEAD
 			KEY_LOGE("KEY_ERR: gpiomatrix: Incomplete pdata\n");
+=======
+			pr_err("gpiomatrix: Incomplete pdata\n");
+>>>>>>> upstream/4.3_primoc
 			goto err_invalid_platform_data;
 		}
 		key_count = mi->ninputs * mi->noutputs;
@@ -339,7 +410,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 				     BITS_TO_LONGS(key_count), GFP_KERNEL);
 		if (kp == NULL) {
 			err = -ENOMEM;
+<<<<<<< HEAD
 			KEY_LOGE("KEY_ERR: gpiomatrix: Failed to allocate private data\n");
+=======
+			pr_err("gpiomatrix: Failed to allocate private data\n");
+>>>>>>> upstream/4.3_primoc
 			goto err_kp_alloc_failed;
 		}
 		kp->input_devs = input_devs;
@@ -349,7 +424,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 			unsigned short keycode = keyentry & MATRIX_KEY_MASK;
 			unsigned short dev = keyentry >> MATRIX_CODE_BITS;
 			if (dev >= input_devs->count) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: bad device index %d >= "
+=======
+				pr_err("gpiomatrix: bad device index %d >= "
+>>>>>>> upstream/4.3_primoc
 					"%d for key code %d\n",
 					dev, input_devs->count, keycode);
 				err = -EINVAL;
@@ -359,20 +438,31 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 				input_set_capability(input_devs->dev[dev],
 							EV_KEY, keycode);
 		}
+<<<<<<< HEAD
 		if (board_build_flag() == 0)
 			kp->debug_log = 0;
 		else
 			kp->debug_log = 1;
+=======
+>>>>>>> upstream/4.3_primoc
 
 		for (i = 0; i < mi->noutputs; i++) {
 			err = gpio_request(mi->output_gpios[i], "gpio_kp_out");
 			if (err) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: gpio_request failed for "
+=======
+				pr_err("gpiomatrix: gpio_request failed for "
+>>>>>>> upstream/4.3_primoc
 					"output %d\n", mi->output_gpios[i]);
 				goto err_request_output_gpio_failed;
 			}
 			if (gpio_cansleep(mi->output_gpios[i])) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: unsupported output gpio %d,"
+=======
+				pr_err("gpiomatrix: unsupported output gpio %d,"
+>>>>>>> upstream/4.3_primoc
 					" can sleep\n", mi->output_gpios[i]);
 				err = -EINVAL;
 				goto err_output_gpio_configure_failed;
@@ -383,7 +473,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 			else
 				err = gpio_direction_input(mi->output_gpios[i]);
 			if (err) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: gpio_configure failed for "
+=======
+				pr_err("gpiomatrix: gpio_configure failed for "
+>>>>>>> upstream/4.3_primoc
 					"output %d\n", mi->output_gpios[i]);
 				goto err_output_gpio_configure_failed;
 			}
@@ -391,13 +485,21 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 		for (i = 0; i < mi->ninputs; i++) {
 			err = gpio_request(mi->input_gpios[i], "gpio_kp_in");
 			if (err) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: gpio_request failed for "
+=======
+				pr_err("gpiomatrix: gpio_request failed for "
+>>>>>>> upstream/4.3_primoc
 					"input %d\n", mi->input_gpios[i]);
 				goto err_request_input_gpio_failed;
 			}
 			err = gpio_direction_input(mi->input_gpios[i]);
 			if (err) {
+<<<<<<< HEAD
 				KEY_LOGE("KEY_ERR: gpiomatrix: gpio_direction_input failed"
+=======
+				pr_err("gpiomatrix: gpio_direction_input failed"
+>>>>>>> upstream/4.3_primoc
 					" for input %d\n", mi->input_gpios[i]);
 				goto err_gpio_direction_input_failed;
 			}
@@ -411,7 +513,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 		err = gpio_keypad_request_irqs(kp);
 		kp->use_irq = err == 0;
 
+<<<<<<< HEAD
 		KEY_LOGI("GPIO Matrix Keypad Driver: Start keypad matrix for "
+=======
+		pr_info("GPIO Matrix Keypad Driver: Start keypad matrix for "
+>>>>>>> upstream/4.3_primoc
 			"%s%s in %s mode\n", input_devs->dev[0]->name,
 			(input_devs->count > 1) ? "..." : "",
 			kp->use_irq ? "interrupt" : "polling");

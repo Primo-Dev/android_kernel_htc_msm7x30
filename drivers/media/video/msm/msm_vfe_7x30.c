@@ -290,6 +290,7 @@ static void vfe_addr_convert(struct msm_vfe_phy_info *pinfo,
 		break;
 	} /* switch */
 }
+<<<<<<< HEAD
 #if defined(CONFIG_MACH_KINGDOM)
 static int vfe_release=0;
 #endif
@@ -303,6 +304,14 @@ static void vfe31_proc_ops(enum VFE31_MESSAGE_ID id, void *msg, size_t len)
 		return;
 	}
 #endif
+=======
+
+
+static void vfe31_proc_ops(enum VFE31_MESSAGE_ID id, void *msg, size_t len)
+{
+	struct msm_vfe_resp *rp;
+
+>>>>>>> upstream/4.3_primoc
 	rp = vfe31_ctrl->resp->vfe_alloc(sizeof(struct msm_vfe_resp),
 		vfe31_ctrl->syncdata, GFP_ATOMIC);
 	if (!rp) {
@@ -422,6 +431,11 @@ static int vfe31_enable(struct camera_enable_cmd *enable)
 
 void vfe_stop(void)
 {
+<<<<<<< HEAD
+=======
+	uint8_t  axiBusyFlag = true;
+
+>>>>>>> upstream/4.3_primoc
 	pr_info("[CAM]vfe_stop()  enter\n");
 
 	if(!vfe31_ctrl)  return;
@@ -429,11 +443,14 @@ void vfe_stop(void)
 	atomic_set(&(vfe31_ctrl->vstate), 0);
 	atomic_set(&(vfe31_ctrl->stop_ack_pending), 1);
 
+<<<<<<< HEAD
 	/* in either continuous or snapshot mode, stop command can be issued
 	 * at any time. stop camif immediately. */
 	msm_io_w_mb(CAMIF_COMMAND_STOP_IMMEDIATELY,
 		vfe31_ctrl->vfebase + VFE_CAMIF_COMMAND);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* disable all interrupts.  */
 	msm_io_w(VFE_DISABLE_ALL_IRQS,
 		vfe31_ctrl->vfebase + VFE_IRQ_MASK_0);
@@ -450,16 +467,42 @@ void vfe_stop(void)
 	msm_io_w_mb(1,
 		vfe31_ctrl->vfebase + VFE_IRQ_CMD);
 
+<<<<<<< HEAD
+=======
+	/* in either continuous or snapshot mode, stop command can be issued
+	 * at any time. stop camif immediately. */
+	msm_io_w_mb(CAMIF_COMMAND_STOP_IMMEDIATELY,
+		vfe31_ctrl->vfebase + VFE_CAMIF_COMMAND);
+
+	/* then apply axi halt command. */
+	msm_io_w_mb(AXI_HALT,
+		vfe31_ctrl->vfebase + VFE_AXI_CMD);
+
+	wmb();
+	while (axiBusyFlag) {
+		if (msm_io_r(vfe31_ctrl->vfebase + VFE_AXI_STATUS) & 0x1)
+			axiBusyFlag = false;
+	}
+
+	/* Ensure the write order while writing
+	to the command register using the barrier */
+	msm_io_w_mb(AXI_HALT_CLEAR,
+			vfe31_ctrl->vfebase + VFE_AXI_CMD);
+
+>>>>>>> upstream/4.3_primoc
 	/* now enable only halt_irq & reset_irq */
 	msm_io_w(0xf0000000,          /* this is for async timer. */
 		vfe31_ctrl->vfebase + VFE_IRQ_MASK_0);
 	msm_io_w(VFE_IMASK_WHILE_STOPPING_1,
 		vfe31_ctrl->vfebase + VFE_IRQ_MASK_1);
 
+<<<<<<< HEAD
 	/* then apply axi halt command. */
 	msm_io_w_mb(AXI_HALT,
 		vfe31_ctrl->vfebase + VFE_AXI_CMD);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	pr_info("[CAM]vfe_stop()  exit\n");
 }
 
@@ -478,17 +521,25 @@ static void vfe31_release(struct platform_device *pdev)
 	struct msm_sensor_ctrl *sctrl =
 		&((struct msm_sync *)vfe_syncdata)->sctrl;
 	struct msm_camera_sensor_info *sinfo = pdev->dev.platform_data;
+<<<<<<< HEAD
 #if defined(CONFIG_MACH_KINGDOM)
 
 	vfe_release = 1;
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 	pr_info("[CAM] %s E\n", __func__);
 
 	if (!sinfo->csi_if) {
 		if (sctrl)
 			sctrl->s_release();
 	}
+<<<<<<< HEAD
 #if !defined(CONFIG_MACH_RUNNYMEDE)
+=======
+#if defined(CONFIG_MACH_PRIMOU) || defined(CONFIG_MACH_PRIMOC)
+>>>>>>> upstream/4.3_primoc
         vfe_stop();
 #endif
 	vfemem = vfe31_ctrl->vfemem;
@@ -2592,7 +2643,11 @@ static void vfe31_process_multishot_frame(void)
 
 static void vfe31_process_output_path_irq_1(void)
 {
+<<<<<<< HEAD
 	pr_info("[CAM] vfe31_process_output_path_irq_1, vfe_capture_count %d out1.free_buf.available %d\n",
+=======
+	CDBG("[CAM] vfe31_process_output_path_irq_1, vfe_capture_count %d out1.free_buf.available %d\n",
+>>>>>>> upstream/4.3_primoc
 				vfe31_ctrl->vfe_capture_count, vfe31_ctrl->outpath.out1.free_buf.available);
 
 	if ((vfe31_ctrl->operation_mode & 1)
@@ -3089,10 +3144,13 @@ static int vfe31_init(struct msm_vfe_callback *presp,
 	struct platform_device *dev)
 {
 	int rc = 0;
+<<<<<<< HEAD
 #if defined(CONFIG_MACH_KINGDOM)
 	
 	vfe_release = 0;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	pr_info("[CAM]vfe31_init\n");
 
 	ebi1_clk = clk_get(NULL, clk_name);

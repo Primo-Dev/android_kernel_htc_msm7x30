@@ -226,7 +226,11 @@ static int parse_uac2_sample_rate_range(struct audioformat *fp, int nr_triplets,
 		int min = combine_quad(&data[2 + 12 * i]);
 		int max = combine_quad(&data[6 + 12 * i]);
 		int res = combine_quad(&data[10 + 12 * i]);
+<<<<<<< HEAD
 		int rate;
+=======
+		unsigned int rate;
+>>>>>>> upstream/4.3_primoc
 
 		if ((max < 0) || (min < 0) || (res < 0) || (max < min))
 			continue;
@@ -253,6 +257,13 @@ static int parse_uac2_sample_rate_range(struct audioformat *fp, int nr_triplets,
 			fp->rates |= snd_pcm_rate_to_rate_bit(rate);
 
 			nr_rates++;
+<<<<<<< HEAD
+=======
+			if (nr_rates >= MAX_NR_RATES) {
+				snd_printk(KERN_ERR "invalid uac2 rates\n");
+				break;
+			}
+>>>>>>> upstream/4.3_primoc
 
 			/* avoid endless loop */
 			if (res == 0)

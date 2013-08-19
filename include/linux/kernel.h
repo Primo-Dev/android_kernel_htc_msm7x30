@@ -37,6 +37,11 @@
 
 #define STACK_MAGIC	0xdeadbeef
 
+<<<<<<< HEAD
+=======
+#define REPEAT_BYTE(x)	((~0ul / 0xff) * (x))
+
+>>>>>>> upstream/4.3_primoc
 #define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
 #define __ALIGN_MASK(x, mask)	__ALIGN_KERNEL_MASK((x), (mask))
 #define PTR_ALIGN(p, a)		((typeof(p))ALIGN((unsigned long)(p), (a)))
@@ -127,11 +132,26 @@ struct completion;
 struct pt_regs;
 struct user;
 
+<<<<<<< HEAD
 #ifdef CONFIG_PREEMPT_VOLUNTARY
 extern int _cond_resched(void);
 # define might_resched() _cond_resched()
 #else
 # define might_resched() do { } while (0)
+=======
+/* cannot bring in linux/rcupdate.h at this point */
+#ifdef CONFIG_JRCU
+extern void rcu_note_might_resched(void);
+#else
+#define rcu_note_might_resched()
+#endif /*JRCU */
+
+#ifdef CONFIG_PREEMPT_VOLUNTARY
+extern int _cond_resched(void);
+# define might_resched() do { _cond_resched(); rcu_note_might_resched(); } while (0)
+#else
+# define might_resched() do { rcu_note_might_resched(); } while (0)
+>>>>>>> upstream/4.3_primoc
 #endif
 
 #ifdef CONFIG_DEBUG_SPINLOCK_SLEEP
@@ -301,6 +321,11 @@ extern long long simple_strtoll(const char *,char **,unsigned int);
 #define strict_strtoull	kstrtoull
 #define strict_strtoll	kstrtoll
 
+<<<<<<< HEAD
+=======
+extern int num_to_str(char *buf, int size, unsigned long long num);
+
+>>>>>>> upstream/4.3_primoc
 extern int sprintf(char * buf, const char * fmt, ...)
 	__attribute__ ((format (printf, 2, 3)));
 extern int vsprintf(char *buf, const char *, va_list)
@@ -379,13 +404,25 @@ extern const char hex_asc[];
 #define hex_asc_lo(x)	hex_asc[((x) & 0x0f)]
 #define hex_asc_hi(x)	hex_asc[((x) & 0xf0) >> 4]
 
+<<<<<<< HEAD
 static inline char *pack_hex_byte(char *buf, u8 byte)
+=======
+static inline char *hex_byte_pack(char *buf, u8 byte)
+>>>>>>> upstream/4.3_primoc
 {
 	*buf++ = hex_asc_hi(byte);
 	*buf++ = hex_asc_lo(byte);
 	return buf;
 }
 
+<<<<<<< HEAD
+=======
+static inline char * __deprecated pack_hex_byte(char *buf, u8 byte)
+{
+	return hex_byte_pack(buf, byte);
+}
+
+>>>>>>> upstream/4.3_primoc
 extern int hex_to_bin(char ch);
 extern void hex2bin(u8 *dst, const char *src, size_t count);
 
@@ -395,10 +432,22 @@ extern void hex2bin(u8 *dst, const char *src, size_t count);
 			printk(KERN_ERR pr_aud_fmt(fmt), ##__VA_ARGS__)
 #define pr_aud_err1(fmt, ...) \
 			printk(KERN_ERR pr_aud_fmt1(fmt), ##__VA_ARGS__)
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_DEBUG_KERNEL
+>>>>>>> upstream/4.3_primoc
 #define pr_aud_info(fmt, ...) \
 			printk(KERN_INFO pr_aud_fmt(fmt), ##__VA_ARGS__)
 #define pr_aud_info1(fmt, ...) \
 			printk(KERN_INFO pr_aud_fmt1(fmt), ##__VA_ARGS__)
+<<<<<<< HEAD
+=======
+#else
+#define pr_aud_info(fmt, ...) do { } while (0)
+#define pr_aud_info1(fmt, ...) do { } while (0)
+#endif
+
+>>>>>>> upstream/4.3_primoc
 /*
  * General tracing related utility functions - trace_printk(),
  * tracing_on/tracing_off and tracing_start()/tracing_stop

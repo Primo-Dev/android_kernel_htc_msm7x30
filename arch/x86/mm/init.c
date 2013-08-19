@@ -44,11 +44,21 @@ static void __init find_early_table_space(struct map_range *mr, int nr_range)
 	int i;
 	unsigned long puds = 0, pmds = 0, ptes = 0, tables;
 	unsigned long start = 0, good_end;
+<<<<<<< HEAD
+=======
+	unsigned long pgd_extra = 0;
+>>>>>>> upstream/4.3_primoc
 	phys_addr_t base;
 
 	for (i = 0; i < nr_range; i++) {
 		unsigned long range, extra;
 
+<<<<<<< HEAD
+=======
+		if ((mr[i].end >> PGDIR_SHIFT) - (mr[i].start >> PGDIR_SHIFT))
+			pgd_extra++;
+
+>>>>>>> upstream/4.3_primoc
 		range = mr[i].end - mr[i].start;
 		puds += (range + PUD_SIZE - 1) >> PUD_SHIFT;
 
@@ -73,6 +83,10 @@ static void __init find_early_table_space(struct map_range *mr, int nr_range)
 	tables = roundup(puds * sizeof(pud_t), PAGE_SIZE);
 	tables += roundup(pmds * sizeof(pmd_t), PAGE_SIZE);
 	tables += roundup(ptes * sizeof(pte_t), PAGE_SIZE);
+<<<<<<< HEAD
+=======
+	tables += (pgd_extra * PAGE_SIZE);
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_X86_32
 	/* for fixmap */
@@ -81,7 +95,11 @@ static void __init find_early_table_space(struct map_range *mr, int nr_range)
 	good_end = max_pfn_mapped << PAGE_SHIFT;
 
 	base = memblock_find_in_range(start, good_end, tables, PAGE_SIZE);
+<<<<<<< HEAD
 	if (base == MEMBLOCK_ERROR)
+=======
+	if (!base)
+>>>>>>> upstream/4.3_primoc
 		panic("Cannot find space for the kernel page tables");
 
 	pgt_buf_start = base >> PAGE_SHIFT;
@@ -95,7 +113,11 @@ static void __init find_early_table_space(struct map_range *mr, int nr_range)
 
 void __init native_pagetable_reserve(u64 start, u64 end)
 {
+<<<<<<< HEAD
 	memblock_x86_reserve_range(start, end, "PGTABLE");
+=======
+	memblock_reserve(start, end - start);
+>>>>>>> upstream/4.3_primoc
 }
 
 #ifdef CONFIG_X86_32
@@ -288,8 +310,13 @@ unsigned long __init_refok init_memory_mapping(unsigned long start,
 	 * pgt_buf_end) and free the other ones (pgt_buf_end - pgt_buf_top)
 	 * so that they can be reused for other purposes.
 	 *
+<<<<<<< HEAD
 	 * On native it just means calling memblock_x86_reserve_range, on Xen it
 	 * also means marking RW the pagetable pages that we allocated before
+=======
+	 * On native it just means calling memblock_reserve, on Xen it also
+	 * means marking RW the pagetable pages that we allocated before
+>>>>>>> upstream/4.3_primoc
 	 * but that haven't been used.
 	 *
 	 * In fact on xen we mark RO the whole range pgt_buf_start -

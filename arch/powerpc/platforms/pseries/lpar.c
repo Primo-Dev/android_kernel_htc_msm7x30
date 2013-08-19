@@ -377,7 +377,17 @@ static long pSeries_lpar_hpte_remove(unsigned long hpte_group)
 					   (0x1UL << 4), &dummy1, &dummy2);
 		if (lpar_rc == H_SUCCESS)
 			return i;
+<<<<<<< HEAD
 		BUG_ON(lpar_rc != H_NOT_FOUND);
+=======
+
+		/*
+		 * The test for adjunct partition is performed before the
+		 * ANDCOND test.  H_RESOURCE may be returned, so we need to
+		 * check for that as well.
+		 */
+		BUG_ON(lpar_rc != H_NOT_FOUND && lpar_rc != H_RESOURCE);
+>>>>>>> upstream/4.3_primoc
 
 		slot_offset++;
 		slot_offset &= 0x7;
@@ -745,6 +755,10 @@ void __trace_hcall_entry(unsigned long opcode, unsigned long *args)
 		goto out;
 
 	(*depth)++;
+<<<<<<< HEAD
+=======
+	preempt_disable();
+>>>>>>> upstream/4.3_primoc
 	trace_hcall_entry(opcode, args);
 	(*depth)--;
 
@@ -767,6 +781,10 @@ void __trace_hcall_exit(long opcode, unsigned long retval,
 
 	(*depth)++;
 	trace_hcall_exit(opcode, retval, retbuf);
+<<<<<<< HEAD
+=======
+	preempt_enable();
+>>>>>>> upstream/4.3_primoc
 	(*depth)--;
 
 out:

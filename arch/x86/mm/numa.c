@@ -207,9 +207,12 @@ static void __init setup_node_data(int nid, u64 start, u64 end)
 	if (end && (end - start) < NODE_MIN_SIZE)
 		return;
 
+<<<<<<< HEAD
 	/* initialize remap allocator before aligning to ZONE_ALIGN */
 	init_alloc_remap(nid, start, end);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	start = roundup(start, ZONE_ALIGN);
 
 	printk(KERN_INFO "Initmem setup node %d %016Lx-%016Lx\n",
@@ -226,10 +229,17 @@ static void __init setup_node_data(int nid, u64 start, u64 end)
 	} else {
 		nd_pa = memblock_x86_find_in_range_node(nid, nd_low, nd_high,
 						nd_size, SMP_CACHE_BYTES);
+<<<<<<< HEAD
 		if (nd_pa == MEMBLOCK_ERROR)
 			nd_pa = memblock_find_in_range(nd_low, nd_high,
 						nd_size, SMP_CACHE_BYTES);
 		if (nd_pa == MEMBLOCK_ERROR) {
+=======
+		if (!nd_pa)
+			nd_pa = memblock_find_in_range(nd_low, nd_high,
+						nd_size, SMP_CACHE_BYTES);
+		if (!nd_pa) {
+>>>>>>> upstream/4.3_primoc
 			pr_err("Cannot find %zu bytes in node %d\n",
 			       nd_size, nid);
 			return;
@@ -371,8 +381,12 @@ void __init numa_reset_distance(void)
 
 	/* numa_distance could be 1LU marking allocation failure, test cnt */
 	if (numa_distance_cnt)
+<<<<<<< HEAD
 		memblock_x86_free_range(__pa(numa_distance),
 					__pa(numa_distance) + size);
+=======
+		memblock_free(__pa(numa_distance), size);
+>>>>>>> upstream/4.3_primoc
 	numa_distance_cnt = 0;
 	numa_distance = NULL;	/* enable table creation */
 }
@@ -395,13 +409,21 @@ static int __init numa_alloc_distance(void)
 
 	phys = memblock_find_in_range(0, PFN_PHYS(max_pfn_mapped),
 				      size, PAGE_SIZE);
+<<<<<<< HEAD
 	if (phys == MEMBLOCK_ERROR) {
+=======
+	if (!phys) {
+>>>>>>> upstream/4.3_primoc
 		pr_warning("NUMA: Warning: can't allocate distance table!\n");
 		/* don't retry until explicitly reset */
 		numa_distance = (void *)1LU;
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	memblock_x86_reserve_range(phys, phys + size, "NUMA DIST");
+=======
+	memblock_reserve(phys, size);
+>>>>>>> upstream/4.3_primoc
 
 	numa_distance = __va(phys);
 	numa_distance_cnt = cnt;

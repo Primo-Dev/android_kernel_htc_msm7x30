@@ -23,6 +23,10 @@ extern int fragmentation_index(struct zone *zone, unsigned int order);
 extern unsigned long try_to_compact_pages(struct zonelist *zonelist,
 			int order, gfp_t gfp_mask, nodemask_t *mask,
 			bool sync);
+<<<<<<< HEAD
+=======
+extern int compact_pgdat(pg_data_t *pgdat, int order);
+>>>>>>> upstream/4.3_primoc
 extern unsigned long compaction_suitable(struct zone *zone, int order);
 
 /* Do not skip compaction more than 64 times */
@@ -33,20 +37,40 @@ extern unsigned long compaction_suitable(struct zone *zone, int order);
  * allocation success. 1 << compact_defer_limit compactions are skipped up
  * to a limit of 1 << COMPACT_MAX_DEFER_SHIFT
  */
+<<<<<<< HEAD
 static inline void defer_compaction(struct zone *zone)
+=======
+static inline void defer_compaction(struct zone *zone, int order)
+>>>>>>> upstream/4.3_primoc
 {
 	zone->compact_considered = 0;
 	zone->compact_defer_shift++;
 
+<<<<<<< HEAD
+=======
+	if (order < zone->compact_order_failed)
+		zone->compact_order_failed = order;
+
+>>>>>>> upstream/4.3_primoc
 	if (zone->compact_defer_shift > COMPACT_MAX_DEFER_SHIFT)
 		zone->compact_defer_shift = COMPACT_MAX_DEFER_SHIFT;
 }
 
 /* Returns true if compaction should be skipped this time */
+<<<<<<< HEAD
 static inline bool compaction_deferred(struct zone *zone)
 {
 	unsigned long defer_limit = 1UL << zone->compact_defer_shift;
 
+=======
+static inline bool compaction_deferred(struct zone *zone, int order)
+{
+	unsigned long defer_limit = 1UL << zone->compact_defer_shift;
+
+	if (order < zone->compact_order_failed)
+		return false;
+
+>>>>>>> upstream/4.3_primoc
 	/* Avoid possible overflow */
 	if (++zone->compact_considered > defer_limit)
 		zone->compact_considered = defer_limit;
@@ -62,16 +86,32 @@ static inline unsigned long try_to_compact_pages(struct zonelist *zonelist,
 	return COMPACT_CONTINUE;
 }
 
+<<<<<<< HEAD
+=======
+static inline int compact_pgdat(pg_data_t *pgdat, int order)
+{
+	return COMPACT_CONTINUE;
+}
+
+>>>>>>> upstream/4.3_primoc
 static inline unsigned long compaction_suitable(struct zone *zone, int order)
 {
 	return COMPACT_SKIPPED;
 }
 
+<<<<<<< HEAD
 static inline void defer_compaction(struct zone *zone)
 {
 }
 
 static inline bool compaction_deferred(struct zone *zone)
+=======
+static inline void defer_compaction(struct zone *zone, int order)
+{
+}
+
+static inline bool compaction_deferred(struct zone *zone, int order)
+>>>>>>> upstream/4.3_primoc
 {
 	return 1;
 }

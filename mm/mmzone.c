@@ -8,7 +8,10 @@
 #include <linux/stddef.h>
 #include <linux/mm.h>
 #include <linux/mmzone.h>
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+>>>>>>> upstream/4.3_primoc
 
 struct pglist_data *first_online_pgdat(void)
 {

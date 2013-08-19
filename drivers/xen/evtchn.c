@@ -367,6 +367,7 @@ static long evtchn_ioctl(struct file *file,
 		if (unbind.port >= NR_EVENT_CHANNELS)
 			break;
 
+<<<<<<< HEAD
 		spin_lock_irq(&port_user_lock);
 
 		rc = -ENOTCONN;
@@ -379,6 +380,14 @@ static long evtchn_ioctl(struct file *file,
 
 		spin_unlock_irq(&port_user_lock);
 
+=======
+		rc = -ENOTCONN;
+		if (get_port_user(unbind.port) != u)
+			break;
+
+		disable_irq(irq_from_evtchn(unbind.port));
+
+>>>>>>> upstream/4.3_primoc
 		evtchn_unbind_from_user(u, unbind.port);
 
 		rc = 0;
@@ -478,15 +487,19 @@ static int evtchn_release(struct inode *inode, struct file *filp)
 	int i;
 	struct per_user_data *u = filp->private_data;
 
+<<<<<<< HEAD
 	spin_lock_irq(&port_user_lock);
 
 	free_page((unsigned long)u->ring);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < NR_EVENT_CHANNELS; i++) {
 		if (get_port_user(i) != u)
 			continue;
 
 		disable_irq(irq_from_evtchn(i));
+<<<<<<< HEAD
 	}
 
 	spin_unlock_irq(&port_user_lock);
@@ -498,6 +511,12 @@ static int evtchn_release(struct inode *inode, struct file *filp)
 		evtchn_unbind_from_user(get_port_user(i), i);
 	}
 
+=======
+		evtchn_unbind_from_user(get_port_user(i), i);
+	}
+
+	free_page((unsigned long)u->ring);
+>>>>>>> upstream/4.3_primoc
 	kfree(u->name);
 	kfree(u);
 

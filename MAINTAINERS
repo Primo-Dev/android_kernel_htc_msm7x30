@@ -5725,6 +5725,10 @@ P:	Vincent Sanders <vince@simtec.co.uk>
 M:	Simtec Linux Team <linux@simtec.co.uk>
 W:	http://www.simtec.co.uk/products/EB110ATX/
 S:	Supported
+<<<<<<< HEAD
+=======
+F:	Documentation/stable_kernel_rules.txt
+>>>>>>> upstream/4.3_primoc
 
 SIMTEC EB2410ITX (BAST)
 P:	Ben Dooks
@@ -6358,6 +6362,16 @@ S:	Maintained
 F:	Documentation/filesystems/ufs.txt
 F:	fs/ufs/
 
+<<<<<<< HEAD
+=======
+UHID USERSPACE HID IO DRIVER:
+M:	David Herrmann <dh.herrmann@googlemail.com>
+L:	linux-input@vger.kernel.org
+S:	Maintained
+F:	drivers/hid/uhid.c
+F:	include/linux/uhid.h
+
+>>>>>>> upstream/4.3_primoc
 ULTRA-WIDEBAND (UWB) SUBSYSTEM:
 L:	linux-usb@vger.kernel.org
 S:	Orphan

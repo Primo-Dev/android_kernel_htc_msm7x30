@@ -58,6 +58,12 @@ initrd_phys-$(CONFIG_MACH_BLISS)	:= 0x05400000
    zreladdr-$(CONFIG_MACH_SPADE)	:= 0x04008000
 params_phys-$(CONFIG_MACH_SPADE)	:= 0x04000100
 initrd_phys-$(CONFIG_MACH_SPADE)	:= 0x05000000
+<<<<<<< HEAD
+=======
+   zreladdr-$(CONFIG_MACH_VISION)	:= 0x04008000
+params_phys-$(CONFIG_MACH_VISION)	:= 0x04000100
+initrd_phys-$(CONFIG_MACH_VISION)	:= 0x05000000
+>>>>>>> upstream/4.3_primoc
    zreladdr-$(CONFIG_MACH_SAGA)	:= 0x04408000
 params_phys-$(CONFIG_MACH_SAGA)	:= 0x04400100
 initrd_phys-$(CONFIG_MACH_SAGA)	:= 0x05400000
@@ -70,12 +76,18 @@ initrd_phys-$(CONFIG_MACH_PRIMOU)	:= 0x14F00000
    zreladdr-$(CONFIG_MACH_PRIMOC)	:= 0x14308000
 params_phys-$(CONFIG_MACH_PRIMOC)	:= 0x14300100
 initrd_phys-$(CONFIG_MACH_PRIMOC)	:= 0x15300000
+<<<<<<< HEAD
    zreladdr-$(CONFIG_MACH_PRIMOTD)	:= 0x03F08000
 params_phys-$(CONFIG_MACH_PRIMOTD)	:= 0x03F00100
 initrd_phys-$(CONFIG_MACH_PRIMOTD)	:= 0x04F00000
    zreladdr-$(CONFIG_MACH_GOLFC)	:= 0x14308000
 params_phys-$(CONFIG_MACH_GOLFC)	:= 0x14300100
 initrd_phys-$(CONFIG_MACH_GOLFC)	:= 0x15300000
+=======
+   zreladdr-$(CONFIG_MACH_PRIMOTD)	:= 0x04408000
+params_phys-$(CONFIG_MACH_PRIMOTD)	:= 0x04400100
+initrd_phys-$(CONFIG_MACH_PRIMOTD)	:= 0x05400000
+>>>>>>> upstream/4.3_primoc
    zreladdr-$(CONFIG_MACH_VIVOW_EVM)	:= 0x05008000
 params_phys-$(CONFIG_MACH_VIVOW_EVM)	:= 0x05000100
 initrd_phys-$(CONFIG_MACH_VIVOW_EVM)	:= 0x06000000

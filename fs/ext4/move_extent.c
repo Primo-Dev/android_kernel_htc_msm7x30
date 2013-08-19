@@ -17,7 +17,10 @@
 #include <linux/quotaops.h>
 #include <linux/slab.h>
 #include "ext4_jbd2.h"
+<<<<<<< HEAD
 #include "ext4_extents.h"
+=======
+>>>>>>> upstream/4.3_primoc
 #include "ext4.h"
 
 /**

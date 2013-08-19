@@ -70,7 +70,11 @@
  */
 
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/clk.h>
 #include <mach/clk.h>
 #include <linux/io.h>

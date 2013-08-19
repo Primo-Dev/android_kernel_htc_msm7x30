@@ -138,6 +138,10 @@ sd_store_cache_type(struct device *dev, struct device_attribute *attr,
 	char *buffer_data;
 	struct scsi_mode_data data;
 	struct scsi_sense_hdr sshdr;
+<<<<<<< HEAD
+=======
+	static const char temp[] = "temporary ";
+>>>>>>> upstream/4.3_primoc
 	int len;
 
 	if (sdp->type != TYPE_DISK)
@@ -146,6 +150,16 @@ sd_store_cache_type(struct device *dev, struct device_attribute *attr,
 		 * it's not worth the risk */
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (strncmp(buf, temp, sizeof(temp) - 1) == 0) {
+		buf += sizeof(temp) - 1;
+		sdkp->cache_override = 1;
+	} else {
+		sdkp->cache_override = 0;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < ARRAY_SIZE(sd_cache_types); i++) {
 		len = strlen(sd_cache_types[i]);
 		if (strncmp(sd_cache_types[i], buf, len) == 0 &&
@@ -158,6 +172,16 @@ sd_store_cache_type(struct device *dev, struct device_attribute *attr,
 		return -EINVAL;
 	rcd = ct & 0x01 ? 1 : 0;
 	wce = ct & 0x02 ? 1 : 0;
+<<<<<<< HEAD
+=======
+
+	if (sdkp->cache_override) {
+		sdkp->WCE = wce;
+		sdkp->RCD = rcd;
+		return count;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	if (scsi_mode_sense(sdp, 0x08, 8, buffer, sizeof(buffer), SD_TIMEOUT,
 			    SD_MAX_RETRIES, &data, NULL))
 		return -EINVAL;
@@ -626,10 +650,23 @@ static int scsi_setup_flush_cmnd(struct scsi_device *sdp, struct request *rq)
 
 static void sd_unprep_fn(struct request_queue *q, struct request *rq)
 {
+<<<<<<< HEAD
+=======
+	struct scsi_cmnd *SCpnt = rq->special;
+
+>>>>>>> upstream/4.3_primoc
 	if (rq->cmd_flags & REQ_DISCARD) {
 		free_page((unsigned long)rq->buffer);
 		rq->buffer = NULL;
 	}
+<<<<<<< HEAD
+=======
+	if (SCpnt->cmnd != rq->cmd) {
+		mempool_free(SCpnt->cmnd, sd_cdb_pool);
+		SCpnt->cmnd = NULL;
+		SCpnt->cmd_len = 0;
+	}
+>>>>>>> upstream/4.3_primoc
 }
 
 /**
@@ -1073,6 +1110,13 @@ static int sd_ioctl(struct block_device *bdev, fmode_t mode,
 	SCSI_LOG_IOCTL(1, printk("sd_ioctl: disk=%s, cmd=0x%x\n",
 						disk->disk_name, cmd));
 
+<<<<<<< HEAD
+=======
+	error = scsi_verify_blk_ioctl(bdev, cmd);
+	if (error < 0)
+		return error;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * If we are in the middle of error recovery, don't let anyone
 	 * else try and use this device.  Also, if error recovery fails, it
@@ -1095,7 +1139,11 @@ static int sd_ioctl(struct block_device *bdev, fmode_t mode,
 			error = scsi_ioctl(sdp, cmd, p);
 			break;
 		default:
+<<<<<<< HEAD
 			error = scsi_cmd_ioctl(disk->queue, disk, mode, cmd, p);
+=======
+			error = scsi_cmd_blk_ioctl(bdev, mode, cmd, p);
+>>>>>>> upstream/4.3_primoc
 			if (error != -ENOTTY)
 				break;
 			error = scsi_ioctl(sdp, cmd, p);
@@ -1265,6 +1313,14 @@ static int sd_compat_ioctl(struct block_device *bdev, fmode_t mode,
 			   unsigned int cmd, unsigned long arg)
 {
 	struct scsi_device *sdev = scsi_disk(bdev->bd_disk)->device;
+<<<<<<< HEAD
+=======
+	int ret;
+
+	ret = scsi_verify_blk_ioctl(bdev, cmd);
+	if (ret < 0)
+		return -ENOIOCTLCMD;
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * If we are in the middle of error recovery, don't let anyone
@@ -1276,8 +1332,11 @@ static int sd_compat_ioctl(struct block_device *bdev, fmode_t mode,
 		return -ENODEV;
 	       
 	if (sdev->host->hostt->compat_ioctl) {
+<<<<<<< HEAD
 		int ret;
 
+=======
+>>>>>>> upstream/4.3_primoc
 		ret = sdev->host->hostt->compat_ioctl(sdev, cmd, (void __user *)arg);
 
 		return ret;
@@ -1429,6 +1488,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)
 	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt))
 		sd_dif_complete(SCpnt, good_bytes);
 
+<<<<<<< HEAD
 	if (scsi_host_dif_capable(sdkp->device->host, sdkp->protection_type)
 	    == SD_DIF_TYPE2_PROTECTION && SCpnt->cmnd != SCpnt->request->cmd) {
 
@@ -1444,6 +1504,8 @@ static int sd_done(struct scsi_cmnd *SCpnt)
 		SCpnt->cmd_len = 0;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return good_bytes;
 }
 
@@ -2029,6 +2091,13 @@ sd_read_cache_type(struct scsi_disk *sdkp, unsigned char *buffer)
 	int old_rcd = sdkp->RCD;
 	int old_dpofua = sdkp->DPOFUA;
 
+<<<<<<< HEAD
+=======
+
+	if (sdkp->cache_override)
+		return;
+
+>>>>>>> upstream/4.3_primoc
 	first_len = 4;
 	if (sdp->skip_ms_page_8) {
 		if (sdp->type == TYPE_RBC)
@@ -2510,6 +2579,10 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
 	sdkp->capacity = 0;
 	sdkp->media_present = 1;
 	sdkp->write_prot = 0;
+<<<<<<< HEAD
+=======
+	sdkp->cache_override = 0;
+>>>>>>> upstream/4.3_primoc
 	sdkp->WCE = 0;
 	sdkp->RCD = 0;
 	sdkp->ATO = 0;

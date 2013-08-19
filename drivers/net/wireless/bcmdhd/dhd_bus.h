@@ -24,7 +24,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: dhd_bus.h 285377 2011-09-21 17:57:59Z $
+=======
+ * $Id: dhd_bus.h,v 1.14.28.1 2010-12-23 01:13:17 Exp $
+>>>>>>> upstream/4.3_primoc
  */
 
 #ifndef _dhd_bus_h_
@@ -51,9 +55,14 @@ extern int dhd_bus_init(dhd_pub_t *dhdp, bool enforce_mutex);
 /* Get the Bus Idle Time */
 extern void dhd_bus_getidletime(dhd_pub_t *dhdp, int *idletime);
 
+<<<<<<< HEAD
 /* Set the Bus Idle Time */
 extern void dhd_bus_setidletime(dhd_pub_t *dhdp, int idle_time);
 
+=======
+/* Set the Bus Idle Time*/
+extern void dhd_bus_setidletime(dhd_pub_t *dhdp, int idle_time);
+>>>>>>> upstream/4.3_primoc
 /* Send a data frame to the dongle.  Callee disposes of txp. */
 extern int dhd_bus_txdata(struct dhd_bus *bus, void *txp);
 

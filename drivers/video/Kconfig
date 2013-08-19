@@ -19,8 +19,11 @@ source "drivers/char/agp/Kconfig"
 
 source "drivers/gpu/vga/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/video/msm/vidc/Kconfig"
 
+=======
+>>>>>>> upstream/4.3_primoc
 source "drivers/gpu/drm/Kconfig"
 
 source "drivers/gpu/stub/Kconfig"
@@ -2386,6 +2389,7 @@ if ARCH_MSM8X60
 #	source "drivers/video/msm_8x60/Kconfig"
 endif
 
+<<<<<<< HEAD
 if ARCH_MSM7X30
 	source "drivers/video/msm_7x30/Kconfig"
 endif
@@ -2394,6 +2398,26 @@ if (ARCH_MSM8960 || ARCH_MSM7X27A || ARCH_MSM8X60)
 #	source "drivers/video/msm/Kconfig"
 endif
 
+=======
+if ARCH_MSM7X30 && !FB_MSM_NEW
+   source "drivers/video/msm_7x30/Kconfig"
+endif
+
+if FB_MSM_NEW
+   source "drivers/video/msm/Kconfig"
+endif
+
+if (ARCH_MSM8960 || ARCH_MSM7X27A)
+#	source "drivers/video/msm/Kconfig"
+endif
+
+config FB_MSM_NEW
+       bool
+       prompt "Use new CAF msm_fb stuff"
+       depends on ARCH_MSM7X30
+       default n
+
+>>>>>>> upstream/4.3_primoc
 config FB_MSM_OVERLAY_LEGACY
 	bool
 	prompt "A small hack for ioctl backward compatible before ICS"

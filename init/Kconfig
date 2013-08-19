@@ -391,7 +391,11 @@ config TREE_RCU
 
 config TREE_PREEMPT_RCU
 	bool "Preemptible tree-based hierarchical RCU"
+<<<<<<< HEAD
 	depends on PREEMPT
+=======
+	depends on PREEMPT && SMP
+>>>>>>> upstream/4.3_primoc
 	help
 	  This option selects the RCU implementation that is
 	  designed for very large SMP systems with hundreds or
@@ -399,9 +403,33 @@ config TREE_PREEMPT_RCU
 	  is also required.  It also scales down nicely to
 	  smaller systems.
 
+<<<<<<< HEAD
 config TINY_RCU
 	bool "UP-only small-memory-footprint RCU"
 	depends on !SMP
+=======
+config JRCU
+       bool "An RCU suitable for small SMP systems"
+       depends on PREEMPT
+       depends on SMP
+       select PREEMPT_COUNT_CPU
+       help
+         This option selects a minimal-footprint RCU that is most suitable
+         for small SMP systems  -- 'small' in this case meaning all but
+         the largest NUMA systems.  It is not clear how big 'small' can
+         be, but it is known to work well on NUMA platforms having 80 CPUs.
+
+         jRCU may also be a good choice for systems with low latency
+         requirements.  It does RCU garbage collection from a single
+         CPU rather than have each CPU do its own.  This frees up all
+         but one CPU from interference by this periodic requirement.
+
+         Most users should say N here.
+
+config TINY_RCU
+	bool "UP-only small-memory-footprint RCU"
+	depends on !PREEMPT && !SMP
+>>>>>>> upstream/4.3_primoc
 	help
 	  This option selects the RCU implementation that is
 	  designed for UP systems from which real-time response
@@ -410,7 +438,11 @@ config TINY_RCU
 
 config TINY_PREEMPT_RCU
 	bool "Preemptible UP-only small-memory-footprint RCU"
+<<<<<<< HEAD
 	depends on !SMP && PREEMPT
+=======
+	depends on PREEMPT && !SMP
+>>>>>>> upstream/4.3_primoc
 	help
 	  This option selects the RCU implementation that is designed
 	  for real-time UP systems.  This option greatly reduces the
@@ -424,6 +456,60 @@ config PREEMPT_RCU
 	  This option enables preemptible-RCU code that is common between
 	  the TREE_PREEMPT_RCU and TINY_PREEMPT_RCU implementations.
 
+<<<<<<< HEAD
+=======
+config JRCU_DAEMON
+       bool
+       depends on JRCU
+       default y
+       help
+         Required. The context switch when leaving the daemon is needed
+         to get the CPU to reliably participate in end-of-batch processing.
+
+config JRCU_DAEMON_PRIO
+       int "JRCU Daemon priority"
+       depends on JRCU_DAEMON
+       default 0
+       help
+         The JRCU daemon priority. If 0 then the daemon runs SCHED_OTHER.
+         If >0 then the daemon runs SCHED_RR and its priority will be
+         the value selected.  If <0 then SCHED_RR is again selected,
+         but now its priority will be the biased downwards from the
+         maximum possible Posix priority.
+
+         If unsure, select 0.  The other values are useful only for those
+         rare setups where 100% of every CPU's utilization will be spent in
+         user SCHED_RR or SCHED_FIFO applications, for long periods of time.
+
+
+config JRCU_LAZY
+       bool "Should JRCU be lazy recognizing end-of-batch"
+       depends on JRCU
+       default n
+       help
+         If you say Y here, JRCU will on occasion fail to recognize
+         end-of-batch for an rcu period or two.
+
+         If you say N here, JRCU will be more aggressive; in fact it
+         will always recognize end-of-batch at the earliest possible time.
+
+         Being lazy should be fractionally more efficient in that JRCU
+         inserts fewer memory barriers along some high performance kernel
+         code paths.
+
+         If unsure, say N.
+
+config PREEMPT_COUNT_CPU
+       # bool "Let one CPU look at another CPUs preemption count"
+       bool
+       default n
+       help
+         If Y then the preempt_count_cpu() function will be compiled into
+         the kernel.  Its existance impacts kernel performance slightly,
+         so this option should be selected only if other kernel features
+         that use preempt_count_cpu() are also selected.
+
+>>>>>>> upstream/4.3_primoc
 config RCU_TRACE
 	bool "Enable tracing for RCU"
 	help
@@ -673,7 +759,11 @@ config CGROUP_MEM_RES_CTLR_SWAP
 	  be careful about enabling this. When memory resource controller
 	  is disabled by boot option, this will be automatically disabled and
 	  there will be no overhead from this. Even when you set this config=y,
+<<<<<<< HEAD
 	  if boot option "noswapaccount" is set, swap will not be accounted.
+=======
+	  if boot option "swapaccount=0" is set, swap will not be accounted.
+>>>>>>> upstream/4.3_primoc
 	  Now, memory usage of swap_cgroup is 2 bytes per entry. If swap page
 	  size is 4096bytes, 512k per 1Gbytes of swap.
 config CGROUP_MEM_RES_CTLR_SWAP_ENABLED
@@ -688,7 +778,11 @@ config CGROUP_MEM_RES_CTLR_SWAP_ENABLED
 	  parameter should have this option unselected.
 	  For those who want to have the feature enabled by default should
 	  select this option (if, for some reason, they need to disable it
+<<<<<<< HEAD
 	  then noswapaccount does the trick).
+=======
+	  then swapaccount=0 does the trick).
+>>>>>>> upstream/4.3_primoc
 
 config CGROUP_PERF
 	bool "Enable perf_event per-cpu per-container group (cgroup) monitoring"
@@ -702,7 +796,10 @@ config CGROUP_PERF
 
 menuconfig CGROUP_SCHED
 	bool "Group CPU scheduler"
+<<<<<<< HEAD
 	depends on EXPERIMENTAL
+=======
+>>>>>>> upstream/4.3_primoc
 	default n
 	help
 	  This feature lets CPU scheduler recognize task groups and control CPU
@@ -715,6 +812,21 @@ config FAIR_GROUP_SCHED
 	depends on CGROUP_SCHED
 	default CGROUP_SCHED
 
+<<<<<<< HEAD
+=======
+config CFS_BANDWIDTH
+	bool "CPU bandwidth provisioning for FAIR_GROUP_SCHED"
+	depends on EXPERIMENTAL
+	depends on FAIR_GROUP_SCHED
+	default n
+	help
+	  This option allows users to define CPU bandwidth rates (limits) for
+	  tasks running within the fair group scheduler.  Groups with no limit
+	  set are considered to be unconstrained and will run with no
+	  restriction.
+	  See tip/Documentation/scheduler/sched-bwc.txt for more information.
+
+>>>>>>> upstream/4.3_primoc
 config RT_GROUP_SCHED
 	bool "Group scheduling for SCHED_RR/FIFO"
 	depends on EXPERIMENTAL
@@ -909,6 +1021,21 @@ config CC_OPTIMIZE_FOR_SIZE
 
 	  If unsure, say Y.
 
+<<<<<<< HEAD
+=======
+config CC_GRAPHITE_OPTIMIZATION
+	bool "Enable graphite optimizations"
+	help
+	  Enabling this option will turn on -floop-interchange,
+	  -floop-strip-mine and -floop-block for KBUILD_CFLAGS.
+
+config CC_LINK_TIME_OPTIMIZATION
+	bool "Enable link-time optimization"
+	help
+	  Enabling this option will turn on -flto and
+	  -fno-toplevel-reorder for KBUILD_CFLAGS.
+
+>>>>>>> upstream/4.3_primoc
 config SYSCTL
 	bool
 
@@ -1222,7 +1349,11 @@ config COMPAT_BRK
 
 choice
 	prompt "Choose SLAB allocator"
+<<<<<<< HEAD
 	default SLUB
+=======
+	default SLQB
+>>>>>>> upstream/4.3_primoc
 	help
 	   This option allows to select a slab allocator.
 
@@ -1244,6 +1375,14 @@ config SLUB
 	   and has enhanced diagnostics. SLUB is the default choice for
 	   a slab allocator.
 
+<<<<<<< HEAD
+=======
+config SLQB
+	bool "SLQB (Queued allocator)"
+	help
+	   SLQB is a proposed new slab allocator.
+
+>>>>>>> upstream/4.3_primoc
 config SLOB
 	depends on EXPERT
 	bool "SLOB (Simple Allocator)"

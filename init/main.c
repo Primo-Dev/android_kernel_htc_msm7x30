@@ -163,7 +163,11 @@ static int __init obsolete_checksetup(char *line)
 	p = __setup_start;
 	do {
 		int n = strlen(p->str);
+<<<<<<< HEAD
 		if (!strncmp(line, p->str, n)) {
+=======
+		if (parameqn(line, p->str, n)) {
+>>>>>>> upstream/4.3_primoc
 			if (p->early) {
 				/* Already done in parse_early_param?
 				 * (Needs exact match on param part).
@@ -209,8 +213,24 @@ early_param("quiet", quiet_kernel);
 
 static int __init loglevel(char *str)
 {
+<<<<<<< HEAD
 	get_option(&str, &console_loglevel);
 	return 0;
+=======
+	int newlevel;
+
+	/*
+	 * Only update loglevel value when a correct setting was passed,
+	 * to prevent blind crashes (when loglevel being set to 0) that
+	 * are quite hard to debug
+	 */
+	if (get_option(&str, &newlevel)) {
+		console_loglevel = newlevel;
+		return 0;
+	}
+
+	return -EINVAL;
+>>>>>>> upstream/4.3_primoc
 }
 
 early_param("loglevel", loglevel);
@@ -347,7 +367,10 @@ static __initdata DECLARE_COMPLETION(kthreadd_done);
 static noinline void __init_refok rest_init(void)
 {
 	int pid;
+<<<<<<< HEAD
 	const struct sched_param param = { .sched_priority = 1 };
+=======
+>>>>>>> upstream/4.3_primoc
 
 	rcu_scheduler_starting();
 	/*
@@ -361,7 +384,10 @@ static noinline void __init_refok rest_init(void)
 	rcu_read_lock();
 	kthreadd_task = find_task_by_pid_ns(pid, &init_pid_ns);
 	rcu_read_unlock();
+<<<<<<< HEAD
 	sched_setscheduler_nocheck(kthreadd_task, SCHED_FIFO, &param);
+=======
+>>>>>>> upstream/4.3_primoc
 	complete(&kthreadd_done);
 
 	/*
@@ -371,9 +397,15 @@ static noinline void __init_refok rest_init(void)
 	init_idle_bootup_task(current);
 	preempt_enable_no_resched();
 	schedule();
+<<<<<<< HEAD
 	preempt_disable();
 
 	/* Call into cpu_idle with preempt disabled */
+=======
+
+	/* Call into cpu_idle with preempt disabled */
+	preempt_disable();
+>>>>>>> upstream/4.3_primoc
 	cpu_idle();
 }
 
@@ -383,7 +415,11 @@ static int __init do_early_param(char *param, char *val)
 	const struct obs_kernel_param *p;
 
 	for (p = __setup_start; p < __setup_end; p++) {
+<<<<<<< HEAD
 		if ((p->early && strcmp(param, p->str) == 0) ||
+=======
+		if ((p->early && parameq(param, p->str)) ||
+>>>>>>> upstream/4.3_primoc
 		    (strcmp(param, "console") == 0 &&
 		     strcmp(p->str, "earlycon") == 0)
 		) {
@@ -503,6 +539,12 @@ asmlinkage void __init start_kernel(void)
 	parse_args("Booting kernel", static_command_line, __start___param,
 		   __stop___param - __start___param,
 		   &unknown_bootoption);
+<<<<<<< HEAD
+=======
+
+	jump_label_init();
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
@@ -695,12 +737,121 @@ int __init_or_module do_one_initcall(initcall_t fn)
 
 extern initcall_t __initcall_start[], __initcall_end[], __early_initcall_end[];
 
+<<<<<<< HEAD
 static void __init do_initcalls(void)
 {
 	initcall_t *fn;
 
 	for (fn = __early_initcall_end; fn < __initcall_end; fn++)
 		do_one_initcall(*fn);
+=======
+
+static struct initcall_state {
+	initcall_t	*next_call;
+	atomic_t	threads, waiting;
+	wait_queue_head_t queue;
+	int		master_thread;
+} initcall;
+
+int initcall_schedule(void)
+{
+	/* Some probe function needs to wait for a pre-requisite
+	 * initcall to provide some resource.    A wakeup has already
+	 * been arranged for when it arrives.
+	 */
+	if (!initcall.master_thread)
+		return -ENODEV;
+
+	atomic_inc(&initcall.waiting);
+	/* Might need to start a new thread */
+	wake_up(&initcall.queue);
+
+	schedule();
+
+	atomic_dec(&initcall.waiting);
+	/* Might be time to progress to next initcall */
+	wake_up(&initcall.queue);
+
+	return 0;
+}
+
+void initcall_lock(struct mutex *mutex)
+{
+	if (!initcall.master_thread) {
+		mutex_lock(mutex);
+		return;
+	}
+	if (mutex_trylock(mutex))
+		return;
+
+	atomic_inc(&initcall.waiting);
+	/* Might need to start a new thread */
+	wake_up(&initcall.queue);
+
+	mutex_lock(mutex);
+
+	atomic_dec(&initcall.waiting);
+	/* Might be time to progress to next initcall */
+	wake_up(&initcall.queue);
+}
+
+static int init_caller(void *vtnum)
+{
+	unsigned long tnum = (unsigned long)vtnum;
+
+	/* Both next_call and master_thread can only be changed
+	 * when all other threads are waiting, so there is no
+	 * race here.
+	 */
+	while (initcall.next_call < __initcall_end
+	       && initcall.master_thread == tnum) {
+		initcall_t fn;
+
+		/* Don't want to proceed while other threads are
+		 * running.
+		 */
+		wait_event(initcall.queue,
+			   atomic_read(&initcall.threads)
+			   == atomic_read(&initcall.waiting)+1);
+
+		fn = *initcall.next_call;
+		initcall.next_call++;
+
+		do_one_initcall(fn);
+	}
+	atomic_dec(&initcall.threads);
+	wake_up(&initcall.queue);
+	return 0;
+}
+
+static void __init do_initcalls(void)
+{
+	DEFINE_WAIT(wait);
+
+	initcall.next_call = __early_initcall_end;
+
+	init_waitqueue_head(&initcall.queue);
+
+	while (1) {
+		prepare_to_wait(&initcall.queue, &wait, TASK_UNINTERRUPTIBLE);
+
+		if (initcall.next_call == __initcall_end)
+			break;
+
+		if (atomic_read(&initcall.threads)
+		    == atomic_read(&initcall.waiting)) {
+			/* All threads are waiting, create a new master */
+			initcall.master_thread++;
+			atomic_inc(&initcall.threads);
+			kernel_thread(init_caller,
+				      (void*)initcall.master_thread, 0);
+		}
+		schedule();
+	}
+	finish_wait(&initcall.queue, &wait);
+	wait_event(initcall.queue, atomic_read(&initcall.threads) == 0);
+	initcall.master_thread = 0;
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -714,10 +865,18 @@ static void __init do_basic_setup(void)
 {
 	cpuset_init_smp();
 	usermodehelper_init();
+<<<<<<< HEAD
 	init_tmpfs();
 	driver_init();
 	init_irq_proc();
 	do_ctors();
+=======
+	shmem_init();
+	driver_init();
+	init_irq_proc();
+	do_ctors();
+	usermodehelper_enable();
+>>>>>>> upstream/4.3_primoc
 	do_initcalls();
 }
 

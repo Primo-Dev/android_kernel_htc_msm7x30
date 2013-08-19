@@ -15,7 +15,10 @@
  * GNU General Public License for more details.
  */
 
+<<<<<<< HEAD
 #include <linux/slab.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/platform_device.h>

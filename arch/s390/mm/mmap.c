@@ -28,8 +28,13 @@
 #include <linux/mm.h>
 #include <linux/module.h>
 #include <linux/random.h>
+<<<<<<< HEAD
 #include <asm/pgalloc.h>
 #include <asm/compat.h>
+=======
+#include <linux/compat.h>
+#include <asm/pgalloc.h>
+>>>>>>> upstream/4.3_primoc
 
 static unsigned long stack_maxrandom_size(void)
 {

@@ -254,14 +254,23 @@ static void merge_cb(struct extent_io_tree *tree, struct extent_state *new,
  *
  * This should be called with the tree lock held.
  */
+<<<<<<< HEAD
 static int merge_state(struct extent_io_tree *tree,
 		       struct extent_state *state)
+=======
+static void merge_state(struct extent_io_tree *tree,
+		        struct extent_state *state)
+>>>>>>> upstream/4.3_primoc
 {
 	struct extent_state *other;
 	struct rb_node *other_node;
 
 	if (state->state & (EXTENT_IOBITS | EXTENT_BOUNDARY))
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 
 	other_node = rb_prev(&state->rb_node);
 	if (other_node) {
@@ -281,6 +290,7 @@ static int merge_state(struct extent_io_tree *tree,
 		if (other->start == state->end + 1 &&
 		    other->state == state->state) {
 			merge_cb(tree, state, other);
+<<<<<<< HEAD
 			other->start = state->start;
 			state->tree = NULL;
 			rb_erase(&state->rb_node, &tree->state);
@@ -301,6 +311,21 @@ static int set_state_cb(struct extent_io_tree *tree,
 	}
 
 	return 0;
+=======
+			state->end = other->end;
+			other->tree = NULL;
+			rb_erase(&other->rb_node, &tree->state);
+			free_extent_state(other);
+		}
+	}
+}
+
+static void set_state_cb(struct extent_io_tree *tree,
+			 struct extent_state *state, int *bits)
+{
+	if (tree->ops && tree->ops->set_bit_hook)
+		tree->ops->set_bit_hook(tree->mapping->host, state, bits);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void clear_state_cb(struct extent_io_tree *tree,
@@ -310,6 +335,12 @@ static void clear_state_cb(struct extent_io_tree *tree,
 		tree->ops->clear_bit_hook(tree->mapping->host, state, bits);
 }
 
+<<<<<<< HEAD
+=======
+static void set_state_bits(struct extent_io_tree *tree,
+			   struct extent_state *state, int *bits);
+
+>>>>>>> upstream/4.3_primoc
 /*
  * insert an extent_state struct into the tree.  'bits' are set on the
  * struct before it is inserted.
@@ -325,8 +356,11 @@ static int insert_state(struct extent_io_tree *tree,
 			int *bits)
 {
 	struct rb_node *node;
+<<<<<<< HEAD
 	int bits_to_set = *bits & ~EXTENT_CTLBITS;
 	int ret;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (end < start) {
 		printk(KERN_ERR "btrfs end < start %llu %llu\n",
@@ -336,6 +370,7 @@ static int insert_state(struct extent_io_tree *tree,
 	}
 	state->start = start;
 	state->end = end;
+<<<<<<< HEAD
 	ret = set_state_cb(tree, state, bits);
 	if (ret)
 		return ret;
@@ -343,6 +378,11 @@ static int insert_state(struct extent_io_tree *tree,
 	if (bits_to_set & EXTENT_DIRTY)
 		tree->dirty_bytes += end - start + 1;
 	state->state |= bits_to_set;
+=======
+
+	set_state_bits(tree, state, bits);
+
+>>>>>>> upstream/4.3_primoc
 	node = tree_insert(&tree->state, end, &state->rb_node);
 	if (node) {
 		struct extent_state *found;
@@ -351,7 +391,10 @@ static int insert_state(struct extent_io_tree *tree,
 		       "%llu %llu\n", (unsigned long long)found->start,
 		       (unsigned long long)found->end,
 		       (unsigned long long)start, (unsigned long long)end);
+<<<<<<< HEAD
 		free_extent_state(state);
+=======
+>>>>>>> upstream/4.3_primoc
 		return -EEXIST;
 	}
 	state->tree = tree;
@@ -359,6 +402,7 @@ static int insert_state(struct extent_io_tree *tree,
 	return 0;
 }
 
+<<<<<<< HEAD
 static int split_cb(struct extent_io_tree *tree, struct extent_state *orig,
 		     u64 split)
 {
@@ -366,6 +410,13 @@ static int split_cb(struct extent_io_tree *tree, struct extent_state *orig,
 		return tree->ops->split_extent_hook(tree->mapping->host,
 						    orig, split);
 	return 0;
+=======
+static void split_cb(struct extent_io_tree *tree, struct extent_state *orig,
+		     u64 split)
+{
+	if (tree->ops && tree->ops->split_extent_hook)
+		tree->ops->split_extent_hook(tree->mapping->host, orig, split);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -500,7 +551,12 @@ again:
 			cached_state = NULL;
 		}
 
+<<<<<<< HEAD
 		if (cached && cached->tree && cached->start == start) {
+=======
+		if (cached && cached->tree && cached->start <= start &&
+		    cached->end > start) {
+>>>>>>> upstream/4.3_primoc
 			if (clear)
 				atomic_dec(&cached->refs);
 			state = cached;
@@ -660,17 +716,22 @@ again:
 		if (start > end)
 			break;
 
+<<<<<<< HEAD
 		if (need_resched()) {
 			spin_unlock(&tree->lock);
 			cond_resched();
 			spin_lock(&tree->lock);
 		}
+=======
+		cond_resched_lock(&tree->lock);
+>>>>>>> upstream/4.3_primoc
 	}
 out:
 	spin_unlock(&tree->lock);
 	return 0;
 }
 
+<<<<<<< HEAD
 static int set_state_bits(struct extent_io_tree *tree,
 			   struct extent_state *state,
 			   int *bits)
@@ -681,13 +742,25 @@ static int set_state_bits(struct extent_io_tree *tree,
 	ret = set_state_cb(tree, state, bits);
 	if (ret)
 		return ret;
+=======
+static void set_state_bits(struct extent_io_tree *tree,
+			   struct extent_state *state,
+			   int *bits)
+{
+	int bits_to_set = *bits & ~EXTENT_CTLBITS;
+
+	set_state_cb(tree, state, bits);
+>>>>>>> upstream/4.3_primoc
 	if ((bits_to_set & EXTENT_DIRTY) && !(state->state & EXTENT_DIRTY)) {
 		u64 range = state->end - state->start + 1;
 		tree->dirty_bytes += range;
 	}
 	state->state |= bits_to_set;
+<<<<<<< HEAD
 
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void cache_state(struct extent_state *state,
@@ -742,7 +815,12 @@ again:
 	spin_lock(&tree->lock);
 	if (cached_state && *cached_state) {
 		state = *cached_state;
+<<<<<<< HEAD
 		if (state->start == start && state->tree) {
+=======
+		if (state->start <= start && state->end > start &&
+		    state->tree) {
+>>>>>>> upstream/4.3_primoc
 			node = &state->rb_node;
 			goto hit_next;
 		}
@@ -779,17 +857,26 @@ hit_next:
 			goto out;
 		}
 
+<<<<<<< HEAD
 		err = set_state_bits(tree, state, &bits);
 		if (err)
 			goto out;
 
 		next_node = rb_next(node);
+=======
+		set_state_bits(tree, state, &bits);
+
+>>>>>>> upstream/4.3_primoc
 		cache_state(state, cached_state);
 		merge_state(tree, state);
 		if (last_end == (u64)-1)
 			goto out;
 
 		start = last_end + 1;
+<<<<<<< HEAD
+=======
+		next_node = rb_next(&state->rb_node);
+>>>>>>> upstream/4.3_primoc
 		if (next_node && start < end && prealloc && !need_resched()) {
 			state = rb_entry(next_node, struct extent_state,
 					 rb_node);
@@ -830,9 +917,13 @@ hit_next:
 		if (err)
 			goto out;
 		if (state->end <= end) {
+<<<<<<< HEAD
 			err = set_state_bits(tree, state, &bits);
 			if (err)
 				goto out;
+=======
+			set_state_bits(tree, state, &bits);
+>>>>>>> upstream/4.3_primoc
 			cache_state(state, cached_state);
 			merge_state(tree, state);
 			if (last_end == (u64)-1)
@@ -862,7 +953,10 @@ hit_next:
 		 * Avoid to free 'prealloc' if it can be merged with
 		 * the later extent.
 		 */
+<<<<<<< HEAD
 		atomic_inc(&prealloc->refs);
+=======
+>>>>>>> upstream/4.3_primoc
 		err = insert_state(tree, prealloc, start, this_end,
 				   &bits);
 		BUG_ON(err == -EEXIST);
@@ -872,7 +966,10 @@ hit_next:
 			goto out;
 		}
 		cache_state(prealloc, cached_state);
+<<<<<<< HEAD
 		free_extent_state(prealloc);
+=======
+>>>>>>> upstream/4.3_primoc
 		prealloc = NULL;
 		start = this_end + 1;
 		goto search_again;
@@ -895,11 +992,15 @@ hit_next:
 		err = split_state(tree, state, prealloc, end + 1);
 		BUG_ON(err == -EEXIST);
 
+<<<<<<< HEAD
 		err = set_state_bits(tree, prealloc, &bits);
 		if (err) {
 			prealloc = NULL;
 			goto out;
 		}
+=======
+		set_state_bits(tree, prealloc, &bits);
+>>>>>>> upstream/4.3_primoc
 		cache_state(prealloc, cached_state);
 		merge_state(tree, prealloc);
 		prealloc = NULL;
@@ -1061,6 +1162,7 @@ static int set_range_writeback(struct extent_io_tree *tree, u64 start, u64 end)
 	return 0;
 }
 
+<<<<<<< HEAD
 /*
  * find the first offset in the io tree with 'bits' set. zero is
  * returned if we find something, and *start_ret and *end_ret are
@@ -1101,6 +1203,8 @@ out:
 	return ret;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* find the first state struct with 'bits' set after 'start', and
  * return it.  tree->lock must be held.  NULL will returned if
  * nothing was found after 'start'
@@ -1133,6 +1237,33 @@ out:
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * find the first offset in the io tree with 'bits' set. zero is
+ * returned if we find something, and *start_ret and *end_ret are
+ * set to reflect the state struct that was found.
+ *
+ * If nothing was found, 1 is returned, < 0 on error
+ */
+int find_first_extent_bit(struct extent_io_tree *tree, u64 start,
+			  u64 *start_ret, u64 *end_ret, int bits)
+{
+	struct extent_state *state;
+	int ret = 1;
+
+	spin_lock(&tree->lock);
+	state = find_first_extent_bit_state(tree, start, bits);
+	if (state) {
+		*start_ret = state->start;
+		*end_ret = state->end;
+		ret = 0;
+	}
+	spin_unlock(&tree->lock);
+	return ret;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  * find a contiguous range of bytes in the file marked as delalloc, not
  * more than 'max_bytes'.  start and end are used to return the range,
  *
@@ -1564,7 +1695,12 @@ int test_range_bit(struct extent_io_tree *tree, u64 start, u64 end,
 	int bitset = 0;
 
 	spin_lock(&tree->lock);
+<<<<<<< HEAD
 	if (cached && cached->tree && cached->start == start)
+=======
+	if (cached && cached->tree && cached->start <= start &&
+	    cached->end > start)
+>>>>>>> upstream/4.3_primoc
 		node = &cached->rb_node;
 	else
 		node = tree_search(tree, start);
@@ -2432,6 +2568,10 @@ static int extent_write_cache_pages(struct extent_io_tree *tree,
 	pgoff_t index;
 	pgoff_t end;		/* Inclusive */
 	int scanned = 0;
+<<<<<<< HEAD
+=======
+	int tag;
+>>>>>>> upstream/4.3_primoc
 
 	pagevec_init(&pvec, 0);
 	if (wbc->range_cyclic) {
@@ -2442,11 +2582,24 @@ static int extent_write_cache_pages(struct extent_io_tree *tree,
 		end = wbc->range_end >> PAGE_CACHE_SHIFT;
 		scanned = 1;
 	}
+<<<<<<< HEAD
 retry:
 	while (!done && !nr_to_write_done && (index <= end) &&
 	       (nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
 			      PAGECACHE_TAG_DIRTY, min(end - index,
 				  (pgoff_t)PAGEVEC_SIZE-1) + 1))) {
+=======
+	if (wbc->sync_mode == WB_SYNC_ALL)
+		tag = PAGECACHE_TAG_TOWRITE;
+	else
+		tag = PAGECACHE_TAG_DIRTY;
+retry:
+	if (wbc->sync_mode == WB_SYNC_ALL)
+		tag_pages_for_writeback(mapping, index, end);
+	while (!done && !nr_to_write_done && (index <= end) &&
+	       (nr_pages = pagevec_lookup_tag(&pvec, mapping, &index, tag,
+			min(end - index, (pgoff_t)PAGEVEC_SIZE-1) + 1))) {
+>>>>>>> upstream/4.3_primoc
 		unsigned i;
 
 		scanned = 1;
@@ -2551,7 +2704,10 @@ int extent_write_full_page(struct extent_io_tree *tree, struct page *page,
 	};
 	struct writeback_control wbc_writepages = {
 		.sync_mode	= wbc->sync_mode,
+<<<<<<< HEAD
 		.older_than_this = NULL,
+=======
+>>>>>>> upstream/4.3_primoc
 		.nr_to_write	= 64,
 		.range_start	= page_offset(page) + PAGE_CACHE_SIZE,
 		.range_end	= (loff_t)-1,
@@ -2584,7 +2740,10 @@ int extent_write_locked_range(struct extent_io_tree *tree, struct inode *inode,
 	};
 	struct writeback_control wbc_writepages = {
 		.sync_mode	= mode,
+<<<<<<< HEAD
 		.older_than_this = NULL,
+=======
+>>>>>>> upstream/4.3_primoc
 		.nr_to_write	= nr_pages * 2,
 		.range_start	= start,
 		.range_end	= end + 1,
@@ -3022,8 +3181,20 @@ static struct extent_buffer *__alloc_extent_buffer(struct extent_io_tree *tree,
 		return NULL;
 	eb->start = start;
 	eb->len = len;
+<<<<<<< HEAD
 	spin_lock_init(&eb->lock);
 	init_waitqueue_head(&eb->lock_wq);
+=======
+	rwlock_init(&eb->lock);
+	atomic_set(&eb->write_locks, 0);
+	atomic_set(&eb->read_locks, 0);
+	atomic_set(&eb->blocking_readers, 0);
+	atomic_set(&eb->blocking_writers, 0);
+	atomic_set(&eb->spinning_readers, 0);
+	atomic_set(&eb->spinning_writers, 0);
+	init_waitqueue_head(&eb->write_lock_wq);
+	init_waitqueue_head(&eb->read_lock_wq);
+>>>>>>> upstream/4.3_primoc
 
 #if LEAK_DEBUG
 	spin_lock_irqsave(&leak_lock, flags);
@@ -3119,7 +3290,11 @@ struct extent_buffer *alloc_extent_buffer(struct extent_io_tree *tree,
 		i = 0;
 	}
 	for (; i < num_pages; i++, index++) {
+<<<<<<< HEAD
 		p = find_or_create_page(mapping, index, GFP_NOFS | __GFP_HIGHMEM);
+=======
+		p = find_or_create_page(mapping, index, GFP_NOFS);
+>>>>>>> upstream/4.3_primoc
 		if (!p) {
 			WARN_ON(1);
 			goto free_eb;
@@ -3266,6 +3441,25 @@ int set_extent_buffer_dirty(struct extent_io_tree *tree,
 	return was_dirty;
 }
 
+<<<<<<< HEAD
+=======
+static int __eb_straddles_pages(u64 start, u64 len)
+{
+	if (len < PAGE_CACHE_SIZE)
+		return 1;
+	if (start & (PAGE_CACHE_SIZE - 1))
+		return 1;
+	if ((start + len) & (PAGE_CACHE_SIZE - 1))
+		return 1;
+	return 0;
+}
+
+static int eb_straddles_pages(struct extent_buffer *eb)
+{
+	return __eb_straddles_pages(eb->start, eb->len);
+}
+
+>>>>>>> upstream/4.3_primoc
 int clear_extent_buffer_uptodate(struct extent_io_tree *tree,
 				struct extent_buffer *eb,
 				struct extent_state **cached_state)
@@ -3277,8 +3471,15 @@ int clear_extent_buffer_uptodate(struct extent_io_tree *tree,
 	num_pages = num_extent_pages(eb->start, eb->len);
 	clear_bit(EXTENT_BUFFER_UPTODATE, &eb->bflags);
 
+<<<<<<< HEAD
 	clear_extent_uptodate(tree, eb->start, eb->start + eb->len - 1,
 			      cached_state, GFP_NOFS);
+=======
+	if (eb_straddles_pages(eb)) {
+		clear_extent_uptodate(tree, eb->start, eb->start + eb->len - 1,
+				      cached_state, GFP_NOFS);
+	}
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < num_pages; i++) {
 		page = extent_buffer_page(eb, i);
 		if (page)
@@ -3296,8 +3497,15 @@ int set_extent_buffer_uptodate(struct extent_io_tree *tree,
 
 	num_pages = num_extent_pages(eb->start, eb->len);
 
+<<<<<<< HEAD
 	set_extent_uptodate(tree, eb->start, eb->start + eb->len - 1,
 			    NULL, GFP_NOFS);
+=======
+	if (eb_straddles_pages(eb)) {
+		set_extent_uptodate(tree, eb->start, eb->start + eb->len - 1,
+				    NULL, GFP_NOFS);
+	}
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < num_pages; i++) {
 		page = extent_buffer_page(eb, i);
 		if ((i == 0 && (eb->start & (PAGE_CACHE_SIZE - 1))) ||
@@ -3320,9 +3528,18 @@ int extent_range_uptodate(struct extent_io_tree *tree,
 	int uptodate;
 	unsigned long index;
 
+<<<<<<< HEAD
 	ret = test_range_bit(tree, start, end, EXTENT_UPTODATE, 1, NULL);
 	if (ret)
 		return 1;
+=======
+	if (__eb_straddles_pages(start, end - start + 1)) {
+		ret = test_range_bit(tree, start, end,
+				     EXTENT_UPTODATE, 1, NULL);
+		if (ret)
+			return 1;
+	}
+>>>>>>> upstream/4.3_primoc
 	while (start <= end) {
 		index = start >> PAGE_CACHE_SHIFT;
 		page = find_get_page(tree->mapping, index);
@@ -3350,10 +3567,19 @@ int extent_buffer_uptodate(struct extent_io_tree *tree,
 	if (test_bit(EXTENT_BUFFER_UPTODATE, &eb->bflags))
 		return 1;
 
+<<<<<<< HEAD
 	ret = test_range_bit(tree, eb->start, eb->start + eb->len - 1,
 			   EXTENT_UPTODATE, 1, cached_state);
 	if (ret)
 		return ret;
+=======
+	if (eb_straddles_pages(eb)) {
+		ret = test_range_bit(tree, eb->start, eb->start + eb->len - 1,
+				   EXTENT_UPTODATE, 1, cached_state);
+		if (ret)
+			return ret;
+	}
+>>>>>>> upstream/4.3_primoc
 
 	num_pages = num_extent_pages(eb->start, eb->len);
 	for (i = 0; i < num_pages; i++) {
@@ -3386,9 +3612,17 @@ int read_extent_buffer_pages(struct extent_io_tree *tree,
 	if (test_bit(EXTENT_BUFFER_UPTODATE, &eb->bflags))
 		return 0;
 
+<<<<<<< HEAD
 	if (test_range_bit(tree, eb->start, eb->start + eb->len - 1,
 			   EXTENT_UPTODATE, 1, NULL)) {
 		return 0;
+=======
+	if (eb_straddles_pages(eb)) {
+		if (test_range_bit(tree, eb->start, eb->start + eb->len - 1,
+				   EXTENT_UPTODATE, 1, NULL)) {
+			return 0;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (start) {
@@ -3492,9 +3726,14 @@ void read_extent_buffer(struct extent_buffer *eb, void *dstv,
 		page = extent_buffer_page(eb, i);
 
 		cur = min(len, (PAGE_CACHE_SIZE - offset));
+<<<<<<< HEAD
 		kaddr = kmap_atomic(page, KM_USER1);
 		memcpy(dst, kaddr + offset, cur);
 		kunmap_atomic(kaddr, KM_USER1);
+=======
+		kaddr = page_address(page);
+		memcpy(dst, kaddr + offset, cur);
+>>>>>>> upstream/4.3_primoc
 
 		dst += cur;
 		len -= cur;
@@ -3504,9 +3743,15 @@ void read_extent_buffer(struct extent_buffer *eb, void *dstv,
 }
 
 int map_private_extent_buffer(struct extent_buffer *eb, unsigned long start,
+<<<<<<< HEAD
 			       unsigned long min_len, char **token, char **map,
 			       unsigned long *map_start,
 			       unsigned long *map_len, int km)
+=======
+			       unsigned long min_len, char **map,
+			       unsigned long *map_start,
+			       unsigned long *map_len)
+>>>>>>> upstream/4.3_primoc
 {
 	size_t offset = start & (PAGE_CACHE_SIZE - 1);
 	char *kaddr;
@@ -3536,13 +3781,18 @@ int map_private_extent_buffer(struct extent_buffer *eb, unsigned long start,
 	}
 
 	p = extent_buffer_page(eb, i);
+<<<<<<< HEAD
 	kaddr = kmap_atomic(p, km);
 	*token = kaddr;
+=======
+	kaddr = page_address(p);
+>>>>>>> upstream/4.3_primoc
 	*map = kaddr + offset;
 	*map_len = PAGE_CACHE_SIZE - offset;
 	return 0;
 }
 
+<<<<<<< HEAD
 int map_extent_buffer(struct extent_buffer *eb, unsigned long start,
 		      unsigned long min_len,
 		      char **token, char **map,
@@ -3572,6 +3822,8 @@ void unmap_extent_buffer(struct extent_buffer *eb, char *token, int km)
 	kunmap_atomic(token, km);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 int memcmp_extent_buffer(struct extent_buffer *eb, const void *ptrv,
 			  unsigned long start,
 			  unsigned long len)
@@ -3595,9 +3847,14 @@ int memcmp_extent_buffer(struct extent_buffer *eb, const void *ptrv,
 
 		cur = min(len, (PAGE_CACHE_SIZE - offset));
 
+<<<<<<< HEAD
 		kaddr = kmap_atomic(page, KM_USER0);
 		ret = memcmp(ptr, kaddr + offset, cur);
 		kunmap_atomic(kaddr, KM_USER0);
+=======
+		kaddr = page_address(page);
+		ret = memcmp(ptr, kaddr + offset, cur);
+>>>>>>> upstream/4.3_primoc
 		if (ret)
 			break;
 
@@ -3630,9 +3887,14 @@ void write_extent_buffer(struct extent_buffer *eb, const void *srcv,
 		WARN_ON(!PageUptodate(page));
 
 		cur = min(len, PAGE_CACHE_SIZE - offset);
+<<<<<<< HEAD
 		kaddr = kmap_atomic(page, KM_USER1);
 		memcpy(kaddr + offset, src, cur);
 		kunmap_atomic(kaddr, KM_USER1);
+=======
+		kaddr = page_address(page);
+		memcpy(kaddr + offset, src, cur);
+>>>>>>> upstream/4.3_primoc
 
 		src += cur;
 		len -= cur;
@@ -3661,9 +3923,14 @@ void memset_extent_buffer(struct extent_buffer *eb, char c,
 		WARN_ON(!PageUptodate(page));
 
 		cur = min(len, PAGE_CACHE_SIZE - offset);
+<<<<<<< HEAD
 		kaddr = kmap_atomic(page, KM_USER0);
 		memset(kaddr + offset, c, cur);
 		kunmap_atomic(kaddr, KM_USER0);
+=======
+		kaddr = page_address(page);
+		memset(kaddr + offset, c, cur);
+>>>>>>> upstream/4.3_primoc
 
 		len -= cur;
 		offset = 0;
@@ -3694,9 +3961,14 @@ void copy_extent_buffer(struct extent_buffer *dst, struct extent_buffer *src,
 
 		cur = min(len, (unsigned long)(PAGE_CACHE_SIZE - offset));
 
+<<<<<<< HEAD
 		kaddr = kmap_atomic(page, KM_USER0);
 		read_extent_buffer(src, kaddr + offset, src_offset, cur);
 		kunmap_atomic(kaddr, KM_USER0);
+=======
+		kaddr = page_address(page);
+		read_extent_buffer(src, kaddr + offset, src_offset, cur);
+>>>>>>> upstream/4.3_primoc
 
 		src_offset += cur;
 		len -= cur;
@@ -3709,20 +3981,32 @@ static void move_pages(struct page *dst_page, struct page *src_page,
 		       unsigned long dst_off, unsigned long src_off,
 		       unsigned long len)
 {
+<<<<<<< HEAD
 	char *dst_kaddr = kmap_atomic(dst_page, KM_USER0);
 	if (dst_page == src_page) {
 		memmove(dst_kaddr + dst_off, dst_kaddr + src_off, len);
 	} else {
 		char *src_kaddr = kmap_atomic(src_page, KM_USER1);
+=======
+	char *dst_kaddr = page_address(dst_page);
+	if (dst_page == src_page) {
+		memmove(dst_kaddr + dst_off, dst_kaddr + src_off, len);
+	} else {
+		char *src_kaddr = page_address(src_page);
+>>>>>>> upstream/4.3_primoc
 		char *p = dst_kaddr + dst_off + len;
 		char *s = src_kaddr + src_off + len;
 
 		while (len--)
 			*--p = *--s;
+<<<<<<< HEAD
 
 		kunmap_atomic(src_kaddr, KM_USER1);
 	}
 	kunmap_atomic(dst_kaddr, KM_USER0);
+=======
+	}
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline bool areas_overlap(unsigned long src, unsigned long dst, unsigned long len)
@@ -3735,20 +4019,31 @@ static void copy_pages(struct page *dst_page, struct page *src_page,
 		       unsigned long dst_off, unsigned long src_off,
 		       unsigned long len)
 {
+<<<<<<< HEAD
 	char *dst_kaddr = kmap_atomic(dst_page, KM_USER0);
 	char *src_kaddr;
 
 	if (dst_page != src_page) {
 		src_kaddr = kmap_atomic(src_page, KM_USER1);
+=======
+	char *dst_kaddr = page_address(dst_page);
+	char *src_kaddr;
+
+	if (dst_page != src_page) {
+		src_kaddr = page_address(src_page);
+>>>>>>> upstream/4.3_primoc
 	} else {
 		src_kaddr = dst_kaddr;
 		BUG_ON(areas_overlap(src_off, dst_off, len));
 	}
 
 	memcpy(dst_kaddr + dst_off, src_kaddr + src_off, len);
+<<<<<<< HEAD
 	kunmap_atomic(dst_kaddr, KM_USER0);
 	if (dst_page != src_page)
 		kunmap_atomic(src_kaddr, KM_USER1);
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 void memcpy_extent_buffer(struct extent_buffer *dst, unsigned long dst_offset,

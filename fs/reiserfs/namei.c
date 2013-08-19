@@ -572,7 +572,11 @@ static int new_inode_init(struct inode *inode, struct inode *dir, int mode)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int reiserfs_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int reiserfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 			   struct nameidata *nd)
 {
 	int retval;
@@ -622,7 +626,11 @@ static int reiserfs_create(struct inode *dir, struct dentry *dentry, int mode,
 			       dentry->d_name.len, inode, 1 /*visible */ );
 	if (retval) {
 		int err;
+<<<<<<< HEAD
 		inode->i_nlink--;
+=======
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		reiserfs_update_sd(&th, inode);
 		err = journal_end(&th, dir->i_sb, jbegin_count);
 		if (err)
@@ -643,7 +651,11 @@ static int reiserfs_create(struct inode *dir, struct dentry *dentry, int mode,
 	return retval;
 }
 
+<<<<<<< HEAD
 static int reiserfs_mknod(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int reiserfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 			  dev_t rdev)
 {
 	int retval;
@@ -702,7 +714,11 @@ static int reiserfs_mknod(struct inode *dir, struct dentry *dentry, int mode,
 			       dentry->d_name.len, inode, 1 /*visible */ );
 	if (retval) {
 		int err;
+<<<<<<< HEAD
 		inode->i_nlink--;
+=======
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		reiserfs_update_sd(&th, inode);
 		err = journal_end(&th, dir->i_sb, jbegin_count);
 		if (err)
@@ -787,7 +803,11 @@ static int reiserfs_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 			       dentry->d_name.len, inode, 1 /*visible */ );
 	if (retval) {
 		int err;
+<<<<<<< HEAD
 		inode->i_nlink = 0;
+=======
+		clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		DEC_DIR_INODE_NLINK(dir);
 		reiserfs_update_sd(&th, inode);
 		err = journal_end(&th, dir->i_sb, jbegin_count);
@@ -1086,7 +1106,11 @@ static int reiserfs_symlink(struct inode *parent_dir,
 				    dentry->d_name.len, inode, 1 /*visible */ );
 	if (retval) {
 		int err;
+<<<<<<< HEAD
 		inode->i_nlink--;
+=======
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		reiserfs_update_sd(&th, inode);
 		err = journal_end(&th, parent_dir->i_sb, jbegin_count);
 		if (err)
@@ -1129,7 +1153,11 @@ static int reiserfs_link(struct dentry *old_dentry, struct inode *dir,
 
 	retval = journal_begin(&th, dir->i_sb, jbegin_count);
 	if (retval) {
+<<<<<<< HEAD
 		inode->i_nlink--;
+=======
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		reiserfs_write_unlock(dir->i_sb);
 		return retval;
 	}
@@ -1144,7 +1172,11 @@ static int reiserfs_link(struct dentry *old_dentry, struct inode *dir,
 
 	if (retval) {
 		int err;
+<<<<<<< HEAD
 		inode->i_nlink--;
+=======
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		err = journal_end(&th, dir->i_sb, jbegin_count);
 		reiserfs_write_unlock(dir->i_sb);
 		return err ? err : retval;
@@ -1529,6 +1561,10 @@ const struct inode_operations reiserfs_dir_inode_operations = {
 	.listxattr = reiserfs_listxattr,
 	.removexattr = reiserfs_removexattr,
 	.permission = reiserfs_permission,
+<<<<<<< HEAD
+=======
+	.get_acl = reiserfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 /*
@@ -1545,6 +1581,10 @@ const struct inode_operations reiserfs_symlink_inode_operations = {
 	.listxattr = reiserfs_listxattr,
 	.removexattr = reiserfs_removexattr,
 	.permission = reiserfs_permission,
+<<<<<<< HEAD
+=======
+	.get_acl = reiserfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 
 };
 
@@ -1558,5 +1598,9 @@ const struct inode_operations reiserfs_special_inode_operations = {
 	.listxattr = reiserfs_listxattr,
 	.removexattr = reiserfs_removexattr,
 	.permission = reiserfs_permission,
+<<<<<<< HEAD
 
+=======
+	.get_acl = reiserfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 };

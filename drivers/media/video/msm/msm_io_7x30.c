@@ -58,7 +58,11 @@
 #include <linux/delay.h>
 #include <linux/clk.h>
 #include <linux/io.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/gpio.h>
 #include <mach/board.h>
 #include <mach/camera-7x30.h>
@@ -580,7 +584,10 @@ int msm_camio_enable(struct platform_device *pdev)
 		}
 		msm_camio_clk_enable(CAMIO_VFE_CAMIF_CLK);
 	} else {
+<<<<<<< HEAD
 		uint32_t val;
+=======
+>>>>>>> upstream/4.3_primoc
 		msm_camio_clk_enable(CAMIO_VFE_CLK_FOR_MIPI_2_LANE);
 		csiio = request_mem_region(camio_ext.csiphy,
 			camio_ext.csisz, pdev->name);
@@ -602,6 +609,7 @@ int msm_camio_enable(struct platform_device *pdev)
 		msm_camio_clk_enable(CAMIO_CSI0_PCLK);
 		msm_camio_clk_enable(CAMIO_CSI0_VFE_CLK);
 		msm_camio_clk_enable(CAMIO_CSI0_CLK);
+<<<<<<< HEAD
 
 		val = (20 << MIPI_PHY_D0_CONTROL2_SETTLE_COUNT_SHFT) |
 			(0x0F << MIPI_PHY_D0_CONTROL2_HS_TERM_IMP_SHFT) |
@@ -617,6 +625,8 @@ int msm_camio_enable(struct platform_device *pdev)
 			(0x0 << MIPI_PHY_CL_CONTROL_LP_REC_EN_SHFT);
 		CDBG("[CAM] %s MIPI_PHY_CL_CONTROL val=0x%x\n", __func__, val);
 		msm_io_w(val, csibase + MIPI_PHY_CL_CONTROL);
+=======
+>>>>>>> upstream/4.3_primoc
 	}
 	return 0;
 
@@ -636,6 +646,27 @@ common_fail:
 	return rc;
 }
 
+<<<<<<< HEAD
+=======
+static void msm_camio_csi_disable(void)
+{
+	uint32_t val;
+	val = 0x0;
+	CDBG("%s MIPI_PHY_D0_CONTROL2 val=0x%x\n", __func__, val);
+	msm_io_w(val, csibase + MIPI_PHY_D0_CONTROL2);
+	msm_io_w(val, csibase + MIPI_PHY_D1_CONTROL2);
+	msm_io_w(val, csibase + MIPI_PHY_D2_CONTROL2);
+	msm_io_w(val, csibase + MIPI_PHY_D3_CONTROL2);
+
+	CDBG("%s MIPI_PHY_CL_CONTROL val=0x%x\n", __func__, val);
+	msm_io_w(val, csibase + MIPI_PHY_CL_CONTROL);
+	usleep_range(9000, 10000);
+	free_irq(camio_ext.csiirq, 0);
+	iounmap(csibase);
+	release_mem_region(camio_ext.csiphy, camio_ext.csisz);
+}
+
+>>>>>>> upstream/4.3_primoc
 void msm_camio_disable(struct platform_device *pdev)
 {
 	struct msm_camera_sensor_info *sinfo = pdev->dev.platform_data;
@@ -645,6 +676,7 @@ void msm_camio_disable(struct platform_device *pdev)
 		iounmap(camifpadbase);
 		release_mem_region(camio_ext.camifpadphy, camio_ext.camifpadsz);
 	} else {
+<<<<<<< HEAD
 		uint32_t val;
 
 		val = (20 << MIPI_PHY_D0_CONTROL2_SETTLE_COUNT_SHFT) |
@@ -669,6 +701,14 @@ void msm_camio_disable(struct platform_device *pdev)
 		msm_camio_clk_disable(CAMIO_CSI0_CLK);
 		iounmap(csibase);
 		release_mem_region(camio_ext.csiphy, camio_ext.csisz);
+=======
+		CDBG("disable mipi\n");
+		msm_camio_csi_disable();
+		CDBG("disable clocks\n");
+		msm_camio_clk_disable(CAMIO_CSI0_PCLK);
+		msm_camio_clk_disable(CAMIO_CSI0_VFE_CLK);
+		msm_camio_clk_disable(CAMIO_CSI0_CLK);
+>>>>>>> upstream/4.3_primoc
 	}
 	CDBG("[CAM] disable clocks\n");
 
@@ -704,8 +744,11 @@ void msm_camio_camif_pad_reg_reset(void)
 void msm_camio_vfe_blk_reset(void)
 {
 	return;
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 void msm_camio_camif_pad_reg_reset_2(void)
@@ -780,8 +823,14 @@ int msm_camio_csi_config(struct msm_camera_csi_params *csi_params)
 {
 	int rc = 0;
 	uint32_t val = 0;
+<<<<<<< HEAD
 
 	CDBG("[CAM] msm_camio_csi_config \n");
+=======
+	int i;
+
+	CDBG("[CAM] msm_camio_csi_config\n");
+>>>>>>> upstream/4.3_primoc
 	csi_irq_debug = true;
 
 	/* SOT_ECC_EN enable error correction for SYNC (data-lane) */
@@ -819,8 +868,14 @@ int msm_camio_csi_config(struct msm_camera_csi_params *csi_params)
 		(0x1 << MIPI_PHY_D0_CONTROL2_LP_REC_EN_SHFT) |
 		(0x1 << MIPI_PHY_D0_CONTROL2_ERR_SOT_HS_EN_SHFT);
 	CDBG("[CAM] %s MIPI_PHY_D0_CONTROL2 val=0x%x\n", __func__, val);
+<<<<<<< HEAD
 	msm_io_w(val, csibase + MIPI_PHY_D0_CONTROL2);
 	msm_io_w(val, csibase + MIPI_PHY_D1_CONTROL2);
+=======
+
+	for (i = 0; i < csi_params->lane_cnt; i++)
+		msm_io_w(val, csibase + MIPI_PHY_D0_CONTROL2 + i * 4);
+>>>>>>> upstream/4.3_primoc
 
 /*HTC_START Chris 20110802*/
 /*Disable MIPI lane2,lane3 if not in use*/

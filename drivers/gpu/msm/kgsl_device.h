@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2002,2007-2012, Code Aurora Forum. All rights reserved.
+=======
+/* Copyright (c) 2002,2007-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -15,7 +19,11 @@
 
 #include <linux/idr.h>
 #include <linux/wakelock.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/earlysuspend.h>
 
 #include "kgsl.h"
@@ -23,6 +31,10 @@
 #include "kgsl_pwrctrl.h"
 #include "kgsl_log.h"
 #include "kgsl_pwrscale.h"
+<<<<<<< HEAD
+=======
+#include <linux/sync.h>
+>>>>>>> upstream/4.3_primoc
 
 #define KGSL_TIMEOUT_NONE       0
 #define KGSL_TIMEOUT_DEFAULT    0xFFFFFFFF
@@ -57,6 +69,10 @@ struct platform_device;
 struct kgsl_device_private;
 struct kgsl_context;
 struct kgsl_power_stats;
+<<<<<<< HEAD
+=======
+struct kgsl_event;
+>>>>>>> upstream/4.3_primoc
 
 struct kgsl_functable {
 	/* Mandatory functions - these functions must be implemented
@@ -105,6 +121,11 @@ struct kgsl_functable {
 		struct kgsl_context *context);
 	long (*ioctl) (struct kgsl_device_private *dev_priv,
 		unsigned int cmd, void *data);
+<<<<<<< HEAD
+=======
+	int (*next_event)(struct kgsl_device *device,
+		struct kgsl_event *event);
+>>>>>>> upstream/4.3_primoc
 };
 
 struct kgsl_memregion {
@@ -128,7 +149,11 @@ struct kgsl_event {
 	void (*func)(struct kgsl_device *, void *, u32);
 	void *priv;
 	struct list_head list;
+<<<<<<< HEAD
 	struct kgsl_device_private *owner;
+=======
+	void *owner;
+>>>>>>> upstream/4.3_primoc
 };
 
 
@@ -211,6 +236,15 @@ struct kgsl_context {
 	 * context was responsible for causing it
 	 */
 	unsigned int reset_status;
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Timeline used to create fences that can be signaled when a
+	 * sync_pt timestamp expires.
+	 */
+	struct sync_timeline *timeline;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct kgsl_process_private {

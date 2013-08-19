@@ -107,6 +107,11 @@ struct mtp_dev {
 	uint16_t xfer_command;
 	uint32_t xfer_transaction_id;
 	int xfer_result;
+<<<<<<< HEAD
+=======
+
+	int zlp_maxpacket;
+>>>>>>> upstream/4.3_primoc
 };
 
 static struct usb_interface_descriptor mtp_interface_desc = {
@@ -564,9 +569,14 @@ static ssize_t mtp_write(struct file *fp, const char __user *buf,
 	/* we need to send a zero length packet to signal the end of transfer
 	 * if the transfer size is aligned to a packet boundary.
 	 */
+<<<<<<< HEAD
 	if ((count & (dev->ep_in->maxpacket - 1)) == 0) {
 		sendZLP = 1;
 	}
+=======
+	if ((count & (dev->zlp_maxpacket - 1)) == 0)
+		sendZLP = 1;
+>>>>>>> upstream/4.3_primoc
 
 	while (count > 0 || sendZLP) {
 		/* so we exit after sending ZLP */
@@ -658,9 +668,14 @@ static void send_file_work(struct work_struct *data) {
 	/* we need to send a zero length packet to signal the end of transfer
 	 * if the transfer size is aligned to a packet boundary.
 	 */
+<<<<<<< HEAD
 	if ((count & (dev->ep_in->maxpacket - 1)) == 0) {
 		sendZLP = 1;
 	}
+=======
+	if ((count & (dev->zlp_maxpacket - 1)) == 0)
+		sendZLP = 1;
+>>>>>>> upstream/4.3_primoc
 
 	while (count > 0 || sendZLP) {
 		/* so we exit after sending ZLP */
@@ -944,6 +959,11 @@ out:
 
 static int mtp_open(struct inode *ip, struct file *fp)
 {
+<<<<<<< HEAD
+=======
+	struct usb_descriptor_header **descriptors;
+
+>>>>>>> upstream/4.3_primoc
 	printk(KERN_INFO "mtp_open\n");
 	if (mtp_lock(&_mtp_dev->open_excl))
 		return -EBUSY;
@@ -952,8 +972,33 @@ static int mtp_open(struct inode *ip, struct file *fp)
 	if (_mtp_dev->state != STATE_OFFLINE)
 		_mtp_dev->state = STATE_READY;
 
+<<<<<<< HEAD
 	fp->private_data = _mtp_dev;
 	return 0;
+=======
+	if (_mtp_dev->cdev->gadget->speed == USB_SPEED_HIGH)
+		descriptors = _mtp_dev->function.hs_descriptors;
+	else
+		descriptors = _mtp_dev->function.descriptors;
+
+	/* find mtp ep_in descriptor */
+	for (; *descriptors; ++descriptors) {
+		struct usb_endpoint_descriptor *ep;
+
+		ep = (struct usb_endpoint_descriptor *)*descriptors;
+
+		if (ep->bDescriptorType == USB_DT_ENDPOINT
+				&& (ep->bEndpointAddress & USB_DIR_IN)
+				&& ep->bmAttributes == USB_ENDPOINT_XFER_BULK) {
+			_mtp_dev->zlp_maxpacket =
+					__le16_to_cpu(ep->wMaxPacketSize);
+
+			fp->private_data = _mtp_dev;
+			return 0;
+		}
+	}
+	return -ENODEV;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int mtp_release(struct inode *ip, struct file *fp)

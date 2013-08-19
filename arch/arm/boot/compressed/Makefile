@@ -4,8 +4,32 @@
 # create a compressed vmlinuz image from the original vmlinux
 #
 
+<<<<<<< HEAD
 HEAD	= head.o
 OBJS	= misc.o decompress.o
+=======
+OBJS		=
+plus_sec := $(call as-instr,.arch_extension sec,+sec)
+
+# Ensure that mmcif loader code appears early in the image
+# to minimise that number of bocks that have to be read in
+# order to load it.
+ifeq ($(CONFIG_ZBOOT_ROM_MMCIF),y)
+ifeq ($(CONFIG_ARCH_SH7372),y)
+OBJS		+= mmcif-sh7372.o
+endif
+endif
+
+AFLAGS_head.o += -DTEXT_OFFSET=$(TEXT_OFFSET)
+AFLAGS_head.o += -Wa,-march=armv7-a$(plus_sec)
+HEAD	= head.o
+
+AFLAGS_misc.o +=-Wa,-march=armv7-a$(plus_sec)
+MISC = misc.o
+
+AFLAGS_decompress.o += -Wa,-march=armv7-a$(plus_sec)
+DECOMPRESS = decompress.o
+>>>>>>> upstream/4.3_primoc
 FONTC	= $(srctree)/drivers/video/console/font_acorn_8x8.c
 
 #
@@ -19,10 +43,13 @@ ifeq ($(CONFIG_ARCH_SHARK),y)
 OBJS		+= head-shark.o ofw-shark.o
 endif
 
+<<<<<<< HEAD
 ifeq ($(CONFIG_ARCH_L7200),y)
 OBJS		+= head-l7200.o
 endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 ifeq ($(CONFIG_ARCH_P720T),y)
 # Borrow this code from SA1100
 OBJS		+= head-sa1100.o
@@ -32,11 +59,22 @@ ifeq ($(CONFIG_ARCH_SA1100),y)
 OBJS		+= head-sa1100.o
 endif
 
+<<<<<<< HEAD
+=======
+ifeq ($(CONFIG_ARCH_VT8500),y)
+OBJS		+= head-vt8500.o
+endif
+
+>>>>>>> upstream/4.3_primoc
 ifeq ($(CONFIG_CPU_XSCALE),y)
 OBJS		+= head-xscale.o
 endif
 
+<<<<<<< HEAD
 ifeq ($(CONFIG_PXA_SHARPSL),y)
+=======
+ifeq ($(CONFIG_PXA_SHARPSL_DETECT_MACH_ID),y)
+>>>>>>> upstream/4.3_primoc
 OBJS		+= head-sharpsl.o
 endif
 
@@ -48,6 +86,13 @@ else
 endif
 endif
 
+<<<<<<< HEAD
+=======
+ifeq ($(CONFIG_ARCH_SHMOBILE),y)
+OBJS		+= head-shmobile.o
+endif
+
+>>>>>>> upstream/4.3_primoc
 #
 # We now have a PIC decompressor implementation.  Decompressors running
 # from RAM should not define ZTEXTADDR.  Decompressors running directly
@@ -58,7 +103,11 @@ ZTEXTADDR	:= $(CONFIG_ZBOOT_ROM_TEXT)
 ZBSSADDR	:= $(CONFIG_ZBOOT_ROM_BSS)
 else
 ZTEXTADDR	:= 0
+<<<<<<< HEAD
 ZBSSADDR	:= ALIGN(4)
+=======
+ZBSSADDR	:= ALIGN(8)
+>>>>>>> upstream/4.3_primoc
 endif
 
 SEDFLAGS	= s/TEXT_START/$(ZTEXTADDR)/;s/BSS_START/$(ZBSSADDR)/
@@ -66,11 +115,19 @@ SEDFLAGS	= s/TEXT_START/$(ZTEXTADDR)/;s/BSS_START/$(ZBSSADDR)/
 suffix_$(CONFIG_KERNEL_GZIP) = gzip
 suffix_$(CONFIG_KERNEL_LZO)  = lzo
 suffix_$(CONFIG_KERNEL_LZMA) = lzma
+<<<<<<< HEAD
 suffix_$(CONFIG_KERNEL_XZ) = xzkern
 
 targets       := vmlinux vmlinux.lds \
 		 piggy.$(suffix_y) piggy.$(suffix_y).o \
 		 font.o font.c head.o misc.o $(OBJS)
+=======
+suffix_$(CONFIG_KERNEL_XZ)   = xzkern
+
+targets       := vmlinux vmlinux.lds \
+		 piggy.$(suffix_y) piggy.$(suffix_y).o \
+		 font.o font.c head.o misc.o decompress.o $(OBJS)
+>>>>>>> upstream/4.3_primoc
 
 # Make sure files are removed during clean
 extra-y       += piggy.gzip piggy.lzo piggy.lzma piggy.xzkern lib1funcs.S ashldi3.S
@@ -80,6 +137,7 @@ ORIG_CFLAGS := $(KBUILD_CFLAGS)
 KBUILD_CFLAGS = $(subst -pg, , $(ORIG_CFLAGS))
 endif
 
+<<<<<<< HEAD
 EXTRA_CFLAGS  := -fpic -fno-builtin
 EXTRA_AFLAGS  := -Wa,-march=armv7-a
 
@@ -96,6 +154,18 @@ endif
 ifneq ($(PARAMS_PHYS),)
 LDFLAGS_vmlinux += --defsym params_phys=$(PARAMS_PHYS)
 endif
+=======
+ccflags-y := -fpic -fno-builtin
+asflags-y := -Wa,-march=all
+
+# Supply ZRELADDR to the decompressor via a linker symbol.
+ifneq ($(CONFIG_AUTO_ZRELADDR),y)
+LDFLAGS_vmlinux += --defsym zreladdr=$(ZRELADDR)
+endif
+ifeq ($(CONFIG_CPU_ENDIAN_BE8),y)
+LDFLAGS_vmlinux += --be8
+endif
+>>>>>>> upstream/4.3_primoc
 # ?
 LDFLAGS_vmlinux += -p
 # Report unresolved symbol references
@@ -106,25 +176,59 @@ LDFLAGS_vmlinux += -X
 LDFLAGS_vmlinux += -T
 
 # For __aeabi_uidivmod
+<<<<<<< HEAD
+=======
+AFLAGS_lib1funcs.o +=-Wa,-march=armv7-a$(plus_sec)
+>>>>>>> upstream/4.3_primoc
 lib1funcs = $(obj)/lib1funcs.o
 
 $(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S FORCE
 	$(call cmd,shipped)
 
+<<<<<<< HEAD
 # For __aeabi_llsl
+=======
+# We need to prevent any GOTOFF relocs being used with references
+# to symbols in the .bss section since we cannot relocate them
+# independently from the rest at run time.  This can be achieved by
+# ensuring that no private .bss symbols exist, as global symbols
+# always have a GOT entry which is what we need.
+# The .data section is already discarded by the linker script so no need
+# to bother about it here.
+check_for_bad_syms = \
+bad_syms=$$($(CROSS_COMPILE)nm $@ | sed -n 's/^.\{8\} [bc] \(.*\)/\1/p') && \
+[ -z "$$bad_syms" ] || \
+  ( echo "following symbols must have non local/private scope:" >&2; \
+    echo "$$bad_syms" >&2; rm -f $@; false )
+
+# For __aeabi_llsl
+AFLAGS_ashldi3.o +=-Wa,-march=armv7-a$(plus_sec)
+>>>>>>> upstream/4.3_primoc
 ashldi3 = $(obj)/ashldi3.o
 
 $(obj)/ashldi3.S: $(srctree)/arch/$(SRCARCH)/lib/ashldi3.S FORCE
 	$(call cmd,shipped)
 
+<<<<<<< HEAD
 $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/$(HEAD) $(obj)/piggy.$(suffix_y).o \
 	 	$(addprefix $(obj)/, $(OBJS)) $(lib1funcs) $(ashldi3) FORCE
 	$(call if_changed,ld)
 	@:
+=======
+$(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/$(HEAD) $(obj)/$(MISC) \
+		$(obj)/$(DECOMPRESS) $(obj)/piggy.$(suffix_y).o \
+	 	$(addprefix $(obj)/, $(OBJS)) $(lib1funcs) $(ashldi3) FORCE
+	$(call if_changed,ld)
+	@$(check_for_bad_syms)
+>>>>>>> upstream/4.3_primoc
 
 $(obj)/piggy.$(suffix_y): $(obj)/../Image FORCE
 	$(call if_changed,$(suffix_y))
 
+<<<<<<< HEAD
+=======
+AFLAGS_piggy.$(suffix_y).o += -Wa,-march=armv7-a$(plus_sec)
+>>>>>>> upstream/4.3_primoc
 $(obj)/piggy.$(suffix_y).o:  $(obj)/piggy.$(suffix_y) FORCE
 
 CFLAGS_font.o := -Dstatic=
@@ -132,5 +236,9 @@ CFLAGS_font.o := -Dstatic=
 $(obj)/font.c: $(FONTC)
 	$(call cmd,shipped)
 
+<<<<<<< HEAD
 $(obj)/vmlinux.lds: $(obj)/vmlinux.lds.in arch/arm/boot/Makefile .config
+=======
+$(obj)/vmlinux.lds: $(obj)/vmlinux.lds.in arch/arm/boot/Makefile $(KCONFIG_CONFIG)
+>>>>>>> upstream/4.3_primoc
 	@sed "$(SEDFLAGS)" < $< > $@

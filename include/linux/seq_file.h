@@ -23,6 +23,10 @@ struct seq_file {
 	u64 version;
 	struct mutex lock;
 	const struct seq_operations *op;
+<<<<<<< HEAD
+=======
+	int poll_event;
+>>>>>>> upstream/4.3_primoc
 	void *private;
 };
 
@@ -121,9 +125,16 @@ int single_release(struct inode *, struct file *);
 void *__seq_open_private(struct file *, const struct seq_operations *, int);
 int seq_open_private(struct file *, const struct seq_operations *, int);
 int seq_release_private(struct inode *, struct file *);
+<<<<<<< HEAD
 
 #define SEQ_START_TOKEN ((void *)1)
 
+=======
+int seq_put_decimal_ull(struct seq_file *m, char delimiter,
+			unsigned long long num);
+
+#define SEQ_START_TOKEN ((void *)1)
+>>>>>>> upstream/4.3_primoc
 /*
  * Helpers for iteration over list_head-s in seq_files
  */

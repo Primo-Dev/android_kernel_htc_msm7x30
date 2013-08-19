@@ -16,6 +16,15 @@
 #define MODULE_SYMBOL_PREFIX ""
 #endif
 
+<<<<<<< HEAD
+=======
+struct kernel_symbol
+{
+	unsigned long value;
+	const char *name;
+};
+
+>>>>>>> upstream/4.3_primoc
 #ifdef MODULE
 extern struct module __this_module;
 #define THIS_MODULE (&__this_module)

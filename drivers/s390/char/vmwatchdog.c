@@ -258,13 +258,21 @@ static int vmwdt_suspend(void)
 	if (test_and_set_bit(VMWDT_OPEN, &vmwdt_is_open)) {
 		pr_err("The system cannot be suspended while the watchdog"
 			" is in use\n");
+<<<<<<< HEAD
 		return NOTIFY_BAD;
+=======
+		return notifier_from_errno(-EBUSY);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (test_bit(VMWDT_RUNNING, &vmwdt_is_open)) {
 		clear_bit(VMWDT_OPEN, &vmwdt_is_open);
 		pr_err("The system cannot be suspended while the watchdog"
 			" is running\n");
+<<<<<<< HEAD
 		return NOTIFY_BAD;
+=======
+		return notifier_from_errno(-EBUSY);
+>>>>>>> upstream/4.3_primoc
 	}
 	return NOTIFY_DONE;
 }

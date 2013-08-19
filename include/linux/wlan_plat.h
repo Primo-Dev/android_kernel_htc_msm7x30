@@ -22,7 +22,13 @@ struct wifi_platform_data {
 	void *(*mem_prealloc)(int section, unsigned long size);
 	int (*get_mac_addr)(unsigned char *buf);
 	void *(*get_country_code)(char *ccode);
+<<<<<<< HEAD
 	int dot11n_enable;
+=======
+#ifndef CONFIG_BCMDHD_GOOGLE
+	int dot11n_enable;
+#endif
+>>>>>>> upstream/4.3_primoc
 };
 
 #endif

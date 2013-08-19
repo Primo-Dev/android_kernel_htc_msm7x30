@@ -1,3 +1,7 @@
 include include/asm-generic/Kbuild.asm
 
 header-y += hwcap.h
+<<<<<<< HEAD
+=======
+generic-y += unaligned.h
+>>>>>>> upstream/4.3_primoc

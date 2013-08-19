@@ -39,7 +39,11 @@ xfs_acl_from_disk(struct xfs_acl *aclp)
 	struct posix_acl_entry *acl_e;
 	struct posix_acl *acl;
 	struct xfs_acl_entry *ace;
+<<<<<<< HEAD
 	int count, i;
+=======
+	unsigned int count, i;
+>>>>>>> upstream/4.3_primoc
 
 	count = be32_to_cpu(aclp->acl_cnt);
 	if (count > XFS_ACL_MAX_ENTRIES)
@@ -116,6 +120,11 @@ xfs_get_acl(struct inode *inode, int type)
 	if (acl != ACL_NOT_CACHED)
 		return acl;
 
+<<<<<<< HEAD
+=======
+	trace_xfs_get_acl(ip);
+
+>>>>>>> upstream/4.3_primoc
 	switch (type) {
 	case ACL_TYPE_ACCESS:
 		ea_name = SGI_ACL_FILE;
@@ -220,6 +229,7 @@ xfs_set_acl(struct inode *inode, int type, struct posix_acl *acl)
 	return error;
 }
 
+<<<<<<< HEAD
 int
 xfs_check_acl(struct inode *inode, int mask, unsigned int flags)
 {
@@ -256,6 +266,10 @@ xfs_check_acl(struct inode *inode, int mask, unsigned int flags)
 
 static int
 xfs_set_mode(struct inode *inode, mode_t mode)
+=======
+static int
+xfs_set_mode(struct inode *inode, umode_t mode)
+>>>>>>> upstream/4.3_primoc
 {
 	int error = 0;
 
@@ -299,6 +313,7 @@ posix_acl_default_exists(struct inode *inode)
  * No need for i_mutex because the inode is not yet exposed to the VFS.
  */
 int
+<<<<<<< HEAD
 xfs_inherit_acl(struct inode *inode, struct posix_acl *default_acl)
 {
 	struct posix_acl *clone;
@@ -322,6 +337,25 @@ xfs_inherit_acl(struct inode *inode, struct posix_acl *default_acl)
 
 	/*
 	 * If posix_acl_create_masq returns a positive value we need to
+=======
+xfs_inherit_acl(struct inode *inode, struct posix_acl *acl)
+{
+	umode_t mode = inode->i_mode;
+	int error = 0, inherit = 0;
+
+	if (S_ISDIR(inode->i_mode)) {
+		error = xfs_set_acl(inode, ACL_TYPE_DEFAULT, acl);
+		if (error)
+			goto out;
+	}
+
+	error = posix_acl_create(&acl, GFP_KERNEL, &mode);
+	if (error < 0)
+		return error;
+
+	/*
+	 * If posix_acl_create returns a positive value we need to
+>>>>>>> upstream/4.3_primoc
 	 * inherit a permission that can't be represented using the Unix
 	 * mode bits and we actually need to set an ACL.
 	 */
@@ -330,6 +364,7 @@ xfs_inherit_acl(struct inode *inode, struct posix_acl *default_acl)
 
 	error = xfs_set_mode(inode, mode);
 	if (error)
+<<<<<<< HEAD
 		goto out_release_clone;
 
 	if (inherit)
@@ -337,13 +372,26 @@ xfs_inherit_acl(struct inode *inode, struct posix_acl *default_acl)
 
  out_release_clone:
 	posix_acl_release(clone);
+=======
+		goto out;
+
+	if (inherit)
+		error = xfs_set_acl(inode, ACL_TYPE_ACCESS, acl);
+
+out:
+	posix_acl_release(acl);
+>>>>>>> upstream/4.3_primoc
 	return error;
 }
 
 int
 xfs_acl_chmod(struct inode *inode)
 {
+<<<<<<< HEAD
 	struct posix_acl *acl, *clone;
+=======
+	struct posix_acl *acl;
+>>>>>>> upstream/4.3_primoc
 	int error;
 
 	if (S_ISLNK(inode->i_mode))
@@ -353,6 +401,7 @@ xfs_acl_chmod(struct inode *inode)
 	if (IS_ERR(acl) || !acl)
 		return PTR_ERR(acl);
 
+<<<<<<< HEAD
 	clone = posix_acl_clone(acl, GFP_KERNEL);
 	posix_acl_release(acl);
 	if (!clone)
@@ -363,6 +412,14 @@ xfs_acl_chmod(struct inode *inode)
 		error = xfs_set_acl(inode, ACL_TYPE_ACCESS, clone);
 
 	posix_acl_release(clone);
+=======
+	error = posix_acl_chmod(&acl, GFP_KERNEL, inode->i_mode);
+	if (error)
+		return error;
+
+	error = xfs_set_acl(inode, ACL_TYPE_ACCESS, acl);
+	posix_acl_release(acl);
+>>>>>>> upstream/4.3_primoc
 	return error;
 }
 
@@ -425,7 +482,11 @@ xfs_xattr_acl_set(struct dentry *dentry, const char *name,
 		goto out_release;
 
 	if (type == ACL_TYPE_ACCESS) {
+<<<<<<< HEAD
 		mode_t mode = inode->i_mode;
+=======
+		umode_t mode = inode->i_mode;
+>>>>>>> upstream/4.3_primoc
 		error = posix_acl_equiv_mode(acl, &mode);
 
 		if (error <= 0) {

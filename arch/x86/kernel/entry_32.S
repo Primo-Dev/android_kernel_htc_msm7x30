@@ -1029,7 +1029,11 @@ ENTRY(xen_sysenter_target)
 
 ENTRY(xen_hypervisor_callback)
 	CFI_STARTPROC
+<<<<<<< HEAD
 	pushl_cfi $0
+=======
+	pushl_cfi $-1 /* orig_ax = -1 => not a system call */
+>>>>>>> upstream/4.3_primoc
 	SAVE_ALL
 	TRACE_IRQS_OFF
 
@@ -1071,13 +1075,23 @@ ENTRY(xen_failsafe_callback)
 2:	mov 8(%esp),%es
 3:	mov 12(%esp),%fs
 4:	mov 16(%esp),%gs
+<<<<<<< HEAD
+=======
+	/* EAX == 0 => Category 1 (Bad segment)
+	   EAX != 0 => Category 2 (Bad IRET) */
+>>>>>>> upstream/4.3_primoc
 	testl %eax,%eax
 	popl_cfi %eax
 	lea 16(%esp),%esp
 	CFI_ADJUST_CFA_OFFSET -16
 	jz 5f
+<<<<<<< HEAD
 	jmp iret_exc		# EAX != 0 => Category 2 (Bad IRET)
 5:	pushl_cfi $0		# EAX == 0 => Category 1 (Bad segment)
+=======
+	jmp iret_exc
+5:	pushl_cfi $-1 /* orig_ax = -1 => not a system call */
+>>>>>>> upstream/4.3_primoc
 	SAVE_ALL
 	jmp ret_from_exception
 	CFI_ENDPROC

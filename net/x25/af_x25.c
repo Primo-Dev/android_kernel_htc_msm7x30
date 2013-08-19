@@ -91,7 +91,11 @@ int x25_parse_address_block(struct sk_buff *skb,
 	int needed;
 	int rc;
 
+<<<<<<< HEAD
 	if (skb->len < 1) {
+=======
+	if (!pskb_may_pull(skb, 1)) {
+>>>>>>> upstream/4.3_primoc
 		/* packet has no address block */
 		rc = 0;
 		goto empty;
@@ -100,7 +104,11 @@ int x25_parse_address_block(struct sk_buff *skb,
 	len = *skb->data;
 	needed = 1 + (len >> 4) + (len & 0x0f);
 
+<<<<<<< HEAD
 	if (skb->len < needed) {
+=======
+	if (!pskb_may_pull(skb, needed)) {
+>>>>>>> upstream/4.3_primoc
 		/* packet is too short to hold the addresses it claims
 		   to hold */
 		rc = -1;
@@ -952,14 +960,37 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 	 *
 	 *	Facilities length is mandatory in call request packets
 	 */
+<<<<<<< HEAD
 	if (skb->len < 1)
 		goto out_clear_request;
 	len = skb->data[0] + 1;
 	if (skb->len < len)
+=======
+	if (!pskb_may_pull(skb, 1))
+		goto out_clear_request;
+	len = skb->data[0] + 1;
+	if (!pskb_may_pull(skb, len))
+>>>>>>> upstream/4.3_primoc
 		goto out_clear_request;
 	skb_pull(skb,len);
 
 	/*
+<<<<<<< HEAD
+=======
+	 *	Ensure that the amount of call user data is valid.
+	 */
+	if (skb->len > X25_MAX_CUD_LEN)
+		goto out_clear_request;
+
+	/*
+	 *	Get all the call user data so it can be used in
+	 *	x25_find_listener and skb_copy_from_linear_data up ahead.
+	 */
+	if (!pskb_may_pull(skb, skb->len))
+		goto out_clear_request;
+
+	/*
+>>>>>>> upstream/4.3_primoc
 	 *	Find a listener for the particular address/cud pair.
 	 */
 	sk = x25_find_listener(&source_addr,skb);
@@ -1167,6 +1198,12 @@ static int x25_sendmsg(struct kiocb *iocb, struct socket *sock,
 	 *	byte of the user data is the logical value of the Q Bit.
 	 */
 	if (test_bit(X25_Q_BIT_FLAG, &x25->flags)) {
+<<<<<<< HEAD
+=======
+		if (!pskb_may_pull(skb, 1))
+			goto out_kfree_skb;
+
+>>>>>>> upstream/4.3_primoc
 		qbit = skb->data[0];
 		skb_pull(skb, 1);
 	}
@@ -1245,7 +1282,13 @@ static int x25_recvmsg(struct kiocb *iocb, struct socket *sock,
 	struct x25_sock *x25 = x25_sk(sk);
 	struct sockaddr_x25 *sx25 = (struct sockaddr_x25 *)msg->msg_name;
 	size_t copied;
+<<<<<<< HEAD
 	int qbit;
+=======
+	int qbit, header_len = x25->neighbour->extended ?
+		X25_EXT_MIN_LEN : X25_STD_MIN_LEN;
+
+>>>>>>> upstream/4.3_primoc
 	struct sk_buff *skb;
 	unsigned char *asmptr;
 	int rc = -ENOTCONN;
@@ -1266,6 +1309,12 @@ static int x25_recvmsg(struct kiocb *iocb, struct socket *sock,
 
 		skb = skb_dequeue(&x25->interrupt_in_queue);
 
+<<<<<<< HEAD
+=======
+		if (!pskb_may_pull(skb, X25_STD_MIN_LEN))
+			goto out_free_dgram;
+
+>>>>>>> upstream/4.3_primoc
 		skb_pull(skb, X25_STD_MIN_LEN);
 
 		/*
@@ -1286,10 +1335,19 @@ static int x25_recvmsg(struct kiocb *iocb, struct socket *sock,
 		if (!skb)
 			goto out;
 
+<<<<<<< HEAD
 		qbit = (skb->data[0] & X25_Q_BIT) == X25_Q_BIT;
 
 		skb_pull(skb, x25->neighbour->extended ?
 				X25_EXT_MIN_LEN : X25_STD_MIN_LEN);
+=======
+		if (!pskb_may_pull(skb, header_len))
+			goto out_free_dgram;
+
+		qbit = (skb->data[0] & X25_Q_BIT) == X25_Q_BIT;
+
+		skb_pull(skb, header_len);
+>>>>>>> upstream/4.3_primoc
 
 		if (test_bit(X25_Q_BIT_FLAG, &x25->flags)) {
 			asmptr  = skb_push(skb, 1);
@@ -1561,11 +1619,19 @@ out_cud_release:
 		case SIOCX25CALLACCPTAPPRV: {
 			rc = -EINVAL;
 			lock_sock(sk);
+<<<<<<< HEAD
 			if (sk->sk_state != TCP_CLOSE)
 				break;
 			clear_bit(X25_ACCPT_APPRV_FLAG, &x25->flags);
 			release_sock(sk);
 			rc = 0;
+=======
+			if (sk->sk_state == TCP_CLOSE) {
+				clear_bit(X25_ACCPT_APPRV_FLAG, &x25->flags);
+				rc = 0;
+			}
+			release_sock(sk);
+>>>>>>> upstream/4.3_primoc
 			break;
 		}
 
@@ -1573,6 +1639,7 @@ out_cud_release:
 			rc = -EINVAL;
 			lock_sock(sk);
 			if (sk->sk_state != TCP_ESTABLISHED)
+<<<<<<< HEAD
 				break;
 			/* must call accptapprv above */
 			if (test_bit(X25_ACCPT_APPRV_FLAG, &x25->flags))
@@ -1581,6 +1648,17 @@ out_cud_release:
 			x25->state = X25_STATE_3;
 			release_sock(sk);
 			rc = 0;
+=======
+				goto out_sendcallaccpt_release;
+			/* must call accptapprv above */
+			if (test_bit(X25_ACCPT_APPRV_FLAG, &x25->flags))
+				goto out_sendcallaccpt_release;
+			x25_write_internal(sk, X25_CALL_ACCEPTED);
+			x25->state = X25_STATE_3;
+			rc = 0;
+out_sendcallaccpt_release:
+			release_sock(sk);
+>>>>>>> upstream/4.3_primoc
 			break;
 		}
 

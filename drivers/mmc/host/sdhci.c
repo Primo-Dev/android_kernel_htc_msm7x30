@@ -1340,8 +1340,12 @@ static void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		if ((ios->timing == MMC_TIMING_UHS_SDR50) ||
 		    (ios->timing == MMC_TIMING_UHS_SDR104) ||
 		    (ios->timing == MMC_TIMING_UHS_DDR50) ||
+<<<<<<< HEAD
 		    (ios->timing == MMC_TIMING_UHS_SDR25) ||
 		    (ios->timing == MMC_TIMING_UHS_SDR12))
+=======
+		    (ios->timing == MMC_TIMING_UHS_SDR25))
+>>>>>>> upstream/4.3_primoc
 			ctrl |= SDHCI_CTRL_HISPD;
 
 		ctrl_2 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
@@ -2227,9 +2231,14 @@ int sdhci_suspend_host(struct sdhci_host *host, pm_message_t state)
 	/* Disable tuning since we are suspending */
 	if (host->version >= SDHCI_SPEC_300 && host->tuning_count &&
 	    host->tuning_mode == SDHCI_TUNING_MODE_1) {
+<<<<<<< HEAD
 		host->flags &= ~SDHCI_NEEDS_RETUNING;
 		mod_timer(&host->tuning_timer, jiffies +
 			host->tuning_count * HZ);
+=======
+		del_timer_sync(&host->tuning_timer);
+		host->flags &= ~SDHCI_NEEDS_RETUNING;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	ret = mmc_suspend_host(host->mmc);
@@ -2679,11 +2688,19 @@ int sdhci_add_host(struct sdhci_host *host)
 	} else {
 		mmc->max_blk_size = (caps[0] & SDHCI_MAX_BLOCK_MASK) >>
 				SDHCI_MAX_BLOCK_SHIFT;
+<<<<<<< HEAD
+=======
+#ifndef CONFIG_MMC_SDHCI_NATIVE_BLOCKSIZE
+>>>>>>> upstream/4.3_primoc
 		if (mmc->max_blk_size >= 3) {
 			printk(KERN_WARNING "%s: Invalid maximum block size, "
 				"assuming 512 bytes\n", mmc_hostname(mmc));
 			mmc->max_blk_size = 0;
 		}
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 	}
 
 	mmc->max_blk_size = 512 << mmc->max_blk_size;
@@ -2693,6 +2710,15 @@ int sdhci_add_host(struct sdhci_host *host)
 	 */
 	mmc->max_blk_count = (host->quirks & SDHCI_QUIRK_NO_MULTIBLOCK) ? 1 : 65535;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MMC_SDHCI_NATIVE_BLOCKSIZE
+	printk(KERN_INFO "%s: mss %u mrs %u mbs %u mbc %u\n", mmc_hostname(mmc),
+		mmc->max_seg_size, mmc->max_req_size, mmc->max_blk_size,
+		mmc->max_blk_count);
+#endif
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Init tasklets.
 	 */

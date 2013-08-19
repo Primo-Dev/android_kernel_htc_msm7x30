@@ -356,7 +356,11 @@ extern int nfs_refresh_inode(struct inode *, struct nfs_fattr *);
 extern int nfs_post_op_update_inode(struct inode *inode, struct nfs_fattr *fattr);
 extern int nfs_post_op_update_inode_force_wcc(struct inode *inode, struct nfs_fattr *fattr);
 extern int nfs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+<<<<<<< HEAD
 extern int nfs_permission(struct inode *, int, unsigned int);
+=======
+extern int nfs_permission(struct inode *, int);
+>>>>>>> upstream/4.3_primoc
 extern int nfs_open(struct inode *, struct file *);
 extern int nfs_release(struct inode *, struct file *);
 extern int nfs_attribute_timeout(struct inode *inode);
@@ -567,12 +571,20 @@ extern struct posix_acl *nfs3_proc_getacl(struct inode *inode, int type);
 extern int nfs3_proc_setacl(struct inode *inode, int type,
 			    struct posix_acl *acl);
 extern int nfs3_proc_set_default_acl(struct inode *dir, struct inode *inode,
+<<<<<<< HEAD
 		mode_t mode);
+=======
+		umode_t mode);
+>>>>>>> upstream/4.3_primoc
 extern void nfs3_forget_cached_acls(struct inode *inode);
 #else
 static inline int nfs3_proc_set_default_acl(struct inode *dir,
 					    struct inode *inode,
+<<<<<<< HEAD
 					    mode_t mode)
+=======
+					    umode_t mode)
+>>>>>>> upstream/4.3_primoc
 {
 	return 0;
 }

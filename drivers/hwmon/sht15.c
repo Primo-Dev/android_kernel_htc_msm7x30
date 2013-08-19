@@ -883,7 +883,11 @@ static int sht15_invalidate_voltage(struct notifier_block *nb,
 
 static int __devinit sht15_probe(struct platform_device *pdev)
 {
+<<<<<<< HEAD
 	int ret = 0;
+=======
+	int ret;
+>>>>>>> upstream/4.3_primoc
 	struct sht15_data *data = kzalloc(sizeof(*data), GFP_KERNEL);
 	u8 status = 0;
 
@@ -901,6 +905,10 @@ static int __devinit sht15_probe(struct platform_device *pdev)
 	init_waitqueue_head(&data->wait_queue);
 
 	if (pdev->dev.platform_data == NULL) {
+<<<<<<< HEAD
+=======
+		ret = -EINVAL;
+>>>>>>> upstream/4.3_primoc
 		dev_err(&pdev->dev, "no platform data supplied\n");
 		goto err_free_data;
 	}
@@ -925,7 +933,17 @@ static int __devinit sht15_probe(struct platform_device *pdev)
 		if (voltage)
 			data->supply_uV = voltage;
 
+<<<<<<< HEAD
 		regulator_enable(data->reg);
+=======
+		ret = regulator_enable(data->reg);
+		if (ret != 0) {
+			dev_err(&pdev->dev,
+				"failed to enable regulator: %d\n", ret);
+			goto err_free_data;
+		}
+
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * Setup a notifier block to update this if another device
 		 * causes the voltage to change

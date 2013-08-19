@@ -55,6 +55,10 @@
 
 #include <net/ipv6.h>
 #include <net/ip6_checksum.h>
+<<<<<<< HEAD
+=======
+#include <net/ping.h>
+>>>>>>> upstream/4.3_primoc
 #include <net/protocol.h>
 #include <net/raw.h>
 #include <net/rawv6.h>
@@ -80,10 +84,28 @@ static inline struct sock *icmpv6_sk(struct net *net)
 	return net->ipv6.icmp_sk[smp_processor_id()];
 }
 
+<<<<<<< HEAD
+=======
+static void icmpv6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+		       u8 type, u8 code, int offset, __be32 info)
+{
+	/* icmpv6_notify checks 8 bytes can be pulled, icmp6hdr is 8 bytes */
+	struct icmp6hdr *icmp6 = (struct icmp6hdr *) (skb->data + offset);
+
+	if (!(type & ICMPV6_INFOMSG_MASK))
+		if (icmp6->icmp6_type == ICMPV6_ECHO_REQUEST)
+			ping_err(skb, offset, info);
+}
+
+>>>>>>> upstream/4.3_primoc
 static int icmpv6_rcv(struct sk_buff *skb);
 
 static const struct inet6_protocol icmpv6_protocol = {
 	.handler	=	icmpv6_rcv,
+<<<<<<< HEAD
+=======
+	.err_handler	=	icmpv6_err,
+>>>>>>> upstream/4.3_primoc
 	.flags		=	INET6_PROTO_NOPOLICY|INET6_PROTO_FINAL,
 };
 
@@ -217,7 +239,12 @@ static __inline__ int opt_unrec(struct sk_buff *skb, __u32 offset)
 	return (*op & 0xC0) == 0x80;
 }
 
+<<<<<<< HEAD
 static int icmpv6_push_pending_frames(struct sock *sk, struct flowi6 *fl6, struct icmp6hdr *thdr, int len)
+=======
+int icmpv6_push_pending_frames(struct sock *sk, struct flowi6 *fl6,
+			       struct icmp6hdr *thdr, int len)
+>>>>>>> upstream/4.3_primoc
 {
 	struct sk_buff *skb;
 	struct icmp6hdr *icmp6h;
@@ -300,8 +327,13 @@ static void mip6_addr_swap(struct sk_buff *skb)
 static inline void mip6_addr_swap(struct sk_buff *skb) {}
 #endif
 
+<<<<<<< HEAD
 static struct dst_entry *icmpv6_route_lookup(struct net *net, struct sk_buff *skb,
 					     struct sock *sk, struct flowi6 *fl6)
+=======
+struct dst_entry *icmpv6_route_lookup(struct net *net, struct sk_buff *skb,
+				      struct sock *sk, struct flowi6 *fl6)
+>>>>>>> upstream/4.3_primoc
 {
 	struct dst_entry *dst, *dst2;
 	struct flowi6 fl2;
@@ -567,11 +599,14 @@ static void icmpv6_echo_reply(struct sk_buff *skb)
 	else
 		hlimit = np->hop_limit;
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(dst) || (!dst))
 		printk(KERN_ERR "[NET] dst is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (hlimit < 0)
 		hlimit = ip6_dst_hoplimit(dst);
 
@@ -601,7 +636,11 @@ out:
 	icmpv6_xmit_unlock(sk);
 }
 
+<<<<<<< HEAD
 static void icmpv6_notify(struct sk_buff *skb, u8 type, u8 code, __be32 info)
+=======
+void icmpv6_notify(struct sk_buff *skb, u8 type, u8 code, __be32 info)
+>>>>>>> upstream/4.3_primoc
 {
 	const struct inet6_protocol *ipprot;
 	int inner_offset;
@@ -692,7 +731,12 @@ static int icmpv6_rcv(struct sk_buff *skb)
 		skb->csum = ~csum_unfold(csum_ipv6_magic(saddr, daddr, skb->len,
 					     IPPROTO_ICMPV6, 0));
 		if (__skb_checksum_complete(skb)) {
+<<<<<<< HEAD
 			LIMIT_NETDEBUG(KERN_DEBUG "ICMPv6 checksum failed [%pI6 > %pI6]\n",
+=======
+			LIMIT_NETDEBUG(KERN_DEBUG
+				       "ICMPv6 checksum failed [%pI6c > %pI6c]\n",
+>>>>>>> upstream/4.3_primoc
 				       saddr, daddr);
 			goto discard_it;
 		}
@@ -713,7 +757,11 @@ static int icmpv6_rcv(struct sk_buff *skb)
 		break;
 
 	case ICMPV6_ECHO_REPLY:
+<<<<<<< HEAD
 		/* we couldn't care less */
+=======
+		ping_rcv(skb);
+>>>>>>> upstream/4.3_primoc
 		break;
 
 	case ICMPV6_PKT_TOOBIG:

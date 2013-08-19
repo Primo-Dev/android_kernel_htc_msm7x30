@@ -1,7 +1,11 @@
 /* arch/arm/mach-msm/memory.c
  *
  * Copyright (C) 2007 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
+=======
+ * Copyright (c) 2009-2012, Code Aurora Forum. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -64,7 +68,11 @@ void map_page_strongly_ordered(void)
 	map.type = MT_DEVICE_STRONGLY_ORDERED;
 	create_mapping(&map);
 
+<<<<<<< HEAD
 	printk(KERN_ALERT "[K] Initialized strongly ordered page successfully\n");
+=======
+	printk(KERN_ALERT "Initialized strongly ordered page successfully\n");
+>>>>>>> upstream/4.3_primoc
 #endif
 }
 EXPORT_SYMBOL(map_page_strongly_ordered);
@@ -76,7 +84,11 @@ void write_to_strongly_ordered_memory(void)
 		if (!in_interrupt())
 			map_page_strongly_ordered();
 		else {
+<<<<<<< HEAD
 			printk(KERN_ALERT "[K] Cannot map strongly ordered page in "
+=======
+			printk(KERN_ALERT "Cannot map strongly ordered page in "
+>>>>>>> upstream/4.3_primoc
 				"Interrupt Context\n");
 			/* capture it here before the allocation fails later */
 			BUG();
@@ -87,6 +99,7 @@ void write_to_strongly_ordered_memory(void)
 }
 EXPORT_SYMBOL(write_to_strongly_ordered_memory);
 
+<<<<<<< HEAD
 void flush_axi_bus_buffer(void)
 {
 #if defined(CONFIG_ARCH_MSM7X27) && !defined(CONFIG_ARCH_MSM7X27A)
@@ -101,10 +114,16 @@ void flush_axi_bus_buffer(void)
 /* These cache related routines make the assumption that the associated
  * physical memory is contiguous. They will operate on all (L1
  * and L2 if present) caches.
+=======
+/* These cache related routines make the assumption (if outer cache is
+ * available) that the associated physical memory is contiguous.
+ * They will operate on all (L1 and L2 if present) caches.
+>>>>>>> upstream/4.3_primoc
  */
 void clean_and_invalidate_caches(unsigned long vstart,
 	unsigned long length, unsigned long pstart)
 {
+<<<<<<< HEAD
 	unsigned long vaddr;
 
 	for (vaddr = vstart; vaddr < vstart + length; vaddr += CACHE_LINE_SIZE)
@@ -116,11 +135,16 @@ void clean_and_invalidate_caches(unsigned long vstart,
 	asm ("mcr p15, 0, %0, c7, c5, 0" : : "r" (0));
 
 	flush_axi_bus_buffer();
+=======
+	dmac_flush_range((void *)vstart, (void *) (vstart + length));
+	outer_flush_range(pstart, pstart + length);
+>>>>>>> upstream/4.3_primoc
 }
 
 void clean_caches(unsigned long vstart,
 	unsigned long length, unsigned long pstart)
 {
+<<<<<<< HEAD
 	unsigned long vaddr;
 
 	for (vaddr = vstart; vaddr < vstart + length; vaddr += CACHE_LINE_SIZE)
@@ -132,11 +156,16 @@ void clean_caches(unsigned long vstart,
 	asm ("mcr p15, 0, %0, c7, c5, 0" : : "r" (0));
 
 	flush_axi_bus_buffer();
+=======
+	dmac_clean_range((void *)vstart, (void *) (vstart + length));
+	outer_clean_range(pstart, pstart + length);
+>>>>>>> upstream/4.3_primoc
 }
 
 void invalidate_caches(unsigned long vstart,
 	unsigned long length, unsigned long pstart)
 {
+<<<<<<< HEAD
 	unsigned long vaddr;
 
 	for (vaddr = vstart; vaddr < vstart + length; vaddr += CACHE_LINE_SIZE)
@@ -148,6 +177,10 @@ void invalidate_caches(unsigned long vstart,
 	asm ("mcr p15, 0, %0, c7, c5, 0" : : "r" (0));
 
 	flush_axi_bus_buffer();
+=======
+	dmac_inv_range((void *)vstart, (void *) (vstart + length));
+	outer_inv_range(pstart, pstart + length);
+>>>>>>> upstream/4.3_primoc
 }
 
 void *alloc_bootmem_aligned(unsigned long size, unsigned long alignment)
@@ -230,6 +263,28 @@ static unsigned long stable_size(struct membank *mb,
 	return unstable_limit - mb->start;
 }
 
+<<<<<<< HEAD
+=======
+/* stable size of all memory banks contiguous to and below this one */
+static unsigned long total_stable_size(unsigned long bank)
+{
+	int i;
+	struct membank *mb = &meminfo.bank[bank];
+	int memtype = reserve_info->paddr_to_memtype(mb->start);
+	unsigned long size;
+
+	size = stable_size(mb, reserve_info->low_unstable_address);
+	for (i = bank - 1, mb = &meminfo.bank[bank - 1]; i >= 0; i--, mb--) {
+		if (mb->start + mb->size != (mb + 1)->start)
+			break;
+		if (reserve_info->paddr_to_memtype(mb->start) != memtype)
+			break;
+		size += stable_size(mb, reserve_info->low_unstable_address);
+	}
+	return size;
+}
+
+>>>>>>> upstream/4.3_primoc
 static void __init calculate_reserve_limits(void)
 {
 	int i;
@@ -246,7 +301,11 @@ static void __init calculate_reserve_limits(void)
 			continue;
 		}
 		mt = &reserve_info->memtype_reserve_table[memtype];
+<<<<<<< HEAD
 		size = stable_size(mb, reserve_info->low_unstable_address);
+=======
+		size = total_stable_size(i);
+>>>>>>> upstream/4.3_primoc
 		mt->limit = max(mt->limit, size);
 	}
 }
@@ -281,10 +340,18 @@ static void __init reserve_memory_for_mempools(void)
 		if (mt->flags & MEMTYPE_FLAGS_FIXED || !mt->size)
 			continue;
 
+<<<<<<< HEAD
 		/* We know we will find a memory bank of the proper size
 		 * as we have limited the size of the memory pool for
 		 * each memory type to the size of the largest memory
 		 * bank. Choose the memory bank with the highest physical
+=======
+		/* We know we will find memory bank(s) of the proper size
+		 * as we have limited the size of the memory pool for
+		 * each memory type to the largest total size of the memory
+		 * banks which are contiguous and of the correct memory type.
+		 * Choose the memory bank with the highest physical
+>>>>>>> upstream/4.3_primoc
 		 * address which is large enough, so that we will not
 		 * take memory from the lowest memory bank which the kernel
 		 * is in (and cause boot problems) and so that we might
@@ -297,9 +364,20 @@ static void __init reserve_memory_for_mempools(void)
 				reserve_info->paddr_to_memtype(mb->start);
 			if (memtype != membank_type)
 				continue;
+<<<<<<< HEAD
 			size = stable_size(mb,
 				reserve_info->low_unstable_address);
 			if (size >= mt->size) {
+=======
+			size = total_stable_size(i);
+			if (size >= mt->size) {
+				size = stable_size(mb,
+					reserve_info->low_unstable_address);
+				/* mt->size may be larger than size, all this
+				 * means is that we are carving the memory pool
+				 * out of multiple contiguous memory banks.
+				 */
+>>>>>>> upstream/4.3_primoc
 				mt->start = mb->start + (size - mt->size);
 				ret = memblock_remove(mt->start, mt->size);
 				BUG_ON(ret);
@@ -384,7 +462,11 @@ int32_t pmem_kalloc(const size_t size, const uint32_t flags)
 
 	/* on 7x30 and 8x55 "EBI1 kernel PMEM" is really on EBI0 */
 	if (cpu_is_msm7x30() || cpu_is_msm8x55())
+<<<<<<< HEAD
 			ebi1_memtype = MEMTYPE_EBI0;
+=======
+		ebi1_memtype = MEMTYPE_EBI0;
+>>>>>>> upstream/4.3_primoc
 
 	pmem_memtype = flags & PMEM_MEMTYPE_MASK;
 	if (pmem_memtype == PMEM_MEMTYPE_EBI1)

@@ -104,6 +104,11 @@ cpuidle/
 	- info on CPU_IDLE, CPU idle state management subsystem.
 cputopology.txt
 	- documentation on how CPU topology info is exported via sysfs.
+<<<<<<< HEAD
+=======
+crc32.txt
+	- brief tutorial on CRC computation
+>>>>>>> upstream/4.3_primoc
 cris/
 	- directory with info about Linux on CRIS architecture.
 crypto/

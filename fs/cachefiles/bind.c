@@ -130,7 +130,10 @@ static int cachefiles_daemon_add_cache(struct cachefiles_cache *cache)
 	    !root->d_inode->i_op->setxattr ||
 	    !root->d_inode->i_op->getxattr ||
 	    !root->d_sb ||
+<<<<<<< HEAD
 	    !root->d_sb->s_op ||
+=======
+>>>>>>> upstream/4.3_primoc
 	    !root->d_sb->s_op->statfs ||
 	    !root->d_sb->s_op->sync_fs)
 		goto error_unsupported;

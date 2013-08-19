@@ -33,7 +33,11 @@
 #include <linux/wakelock.h>
 #include <linux/slab.h>
 #include <mach/qdsp5v2_2x/audio_acdb_def.h>
+<<<<<<< HEAD
 #include <linux/spi/spi_aic3254.h>
+=======
+#include <linux/spi_aic3254.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/qdsp5v2_2x/marimba_profile.h>
 #include <asm/mach-types.h>
 #include <mach/debug_mm.h>
@@ -284,7 +288,10 @@ static int snddev_icodec_open_rx(struct snddev_icodec_state *icodec)
 	struct snddev_icodec_drv_state *drv = &snddev_icodec_drv;
 	struct lpa_codec_config lpa_config;
 
+<<<<<<< HEAD
 	printk("%s(): +++\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	wake_lock(&drv->rx_idlelock);
 
 	/* enable MI2S RX master block */
@@ -377,7 +384,10 @@ static int snddev_icodec_open_rx(struct snddev_icodec_state *icodec)
 	icodec->enabled = 1;
 
 	wake_unlock(&drv->rx_idlelock);
+<<<<<<< HEAD
 	printk("%s(): ---\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 
 error_afe:
@@ -402,7 +412,10 @@ error_invalid_freq:
 	pr_aud_err("%s: encounter error\n", __func__);
 
 	wake_unlock(&drv->rx_idlelock);
+<<<<<<< HEAD
 	printk("%s(): ---\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return -ENODEV;
 }
 
@@ -412,7 +425,10 @@ static int snddev_icodec_open_tx(struct snddev_icodec_state *icodec)
 	struct msm_afe_config afe_config;
 	struct snddev_icodec_drv_state *drv = &snddev_icodec_drv;
 
+<<<<<<< HEAD
 	printk("%s(): +++\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	wake_lock(&drv->tx_idlelock);
 
 	/* Reuse pamp_on for TX platform-specific setup  */
@@ -477,7 +493,10 @@ static int snddev_icodec_open_tx(struct snddev_icodec_state *icodec)
 	icodec->enabled = 1;
 
 	wake_unlock(&drv->tx_idlelock);
+<<<<<<< HEAD
 	printk("%s(): ---\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 
 error_afe:
@@ -500,7 +519,10 @@ error_invalid_freq:
 	pr_aud_err("%s: encounter error\n", __func__);
 
 	wake_unlock(&drv->tx_idlelock);
+<<<<<<< HEAD
 	printk("%s(): ---\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return -ENODEV;
 }
 
@@ -1218,7 +1240,10 @@ static int __init snddev_icodec_init(void)
 	s32 rc;
 	struct snddev_icodec_drv_state *icodec_drv = &snddev_icodec_drv;
 
+<<<<<<< HEAD
 	printk("%s(): +++\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	rc = platform_driver_register(&snddev_icodec_driver);
 	if (IS_ERR_VALUE(rc))
 		goto error_platform_driver;
@@ -1272,7 +1297,10 @@ static int __init snddev_icodec_init(void)
 			"snddev_tx_idle");
 	wake_lock_init(&icodec_drv->rx_idlelock, WAKE_LOCK_IDLE,
 			"snddev_rx_idle");
+<<<<<<< HEAD
 	printk("%s(): ---\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 
 error_lpa_p_clk:
@@ -1292,7 +1320,10 @@ error_rx_mclk:
 error_platform_driver:
 
 	pr_aud_err("%s: encounter error\n", __func__);
+<<<<<<< HEAD
 	printk("%s(): err\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 	return -ENODEV;
 }
 

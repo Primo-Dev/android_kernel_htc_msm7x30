@@ -16,7 +16,11 @@ struct jump_label_key {
 
 # include <asm/jump_label.h>
 # define HAVE_JUMP_LABEL
+<<<<<<< HEAD
 #endif
+=======
+#endif	/* CC_HAVE_ASM_GOTO && CONFIG_JUMP_LABEL */
+>>>>>>> upstream/4.3_primoc
 
 enum jump_label_type {
 	JUMP_LABEL_DISABLE = 0,
@@ -41,18 +45,32 @@ static __always_inline bool static_branch(struct jump_label_key *key)
 extern struct jump_entry __start___jump_table[];
 extern struct jump_entry __stop___jump_table[];
 
+<<<<<<< HEAD
 extern void jump_label_lock(void);
 extern void jump_label_unlock(void);
 extern void arch_jump_label_transform(struct jump_entry *entry,
 				 enum jump_label_type type);
 extern void arch_jump_label_text_poke_early(jump_label_t addr);
+=======
+extern void jump_label_init(void);
+extern void jump_label_lock(void);
+extern void jump_label_unlock(void);
+extern void arch_jump_label_transform(struct jump_entry *entry,
+				      enum jump_label_type type);
+extern void arch_jump_label_transform_static(struct jump_entry *entry,
+					     enum jump_label_type type);
+>>>>>>> upstream/4.3_primoc
 extern int jump_label_text_reserved(void *start, void *end);
 extern void jump_label_inc(struct jump_label_key *key);
 extern void jump_label_dec(struct jump_label_key *key);
 extern bool jump_label_enabled(struct jump_label_key *key);
 extern void jump_label_apply_nops(struct module *mod);
 
+<<<<<<< HEAD
 #else
+=======
+#else  /* !HAVE_JUMP_LABEL */
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/atomic.h>
 
@@ -62,6 +80,13 @@ struct jump_label_key {
 	atomic_t enabled;
 };
 
+<<<<<<< HEAD
+=======
+static __always_inline void jump_label_init(void)
+{
+}
+
+>>>>>>> upstream/4.3_primoc
 static __always_inline bool static_branch(struct jump_label_key *key)
 {
 	if (unlikely(atomic_read(&key->enabled)))
@@ -96,7 +121,13 @@ static inline int jump_label_apply_nops(struct module *mod)
 {
 	return 0;
 }
+<<<<<<< HEAD
 
 #endif
 
 #endif
+=======
+#endif	/* HAVE_JUMP_LABEL */
+
+#endif	/* _LINUX_JUMP_LABEL_H */
+>>>>>>> upstream/4.3_primoc

@@ -340,7 +340,10 @@ vxfs_iget(struct super_block *sbp, ino_t ino)
 static void vxfs_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(vxfs_inode_cachep, inode->i_private);
 }
 

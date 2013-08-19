@@ -838,13 +838,32 @@ static long compat_ipmi_ioctl(struct file *filep, unsigned int cmd,
 		return ipmi_ioctl(filep, cmd, arg);
 	}
 }
+<<<<<<< HEAD
+=======
+
+static long unlocked_compat_ipmi_ioctl(struct file *filep, unsigned int cmd,
+				       unsigned long arg)
+{
+	int ret;
+
+	mutex_lock(&ipmi_mutex);
+	ret = compat_ipmi_ioctl(filep, cmd, arg);
+	mutex_unlock(&ipmi_mutex);
+
+	return ret;
+}
+>>>>>>> upstream/4.3_primoc
 #endif
 
 static const struct file_operations ipmi_fops = {
 	.owner		= THIS_MODULE,
 	.unlocked_ioctl	= ipmi_unlocked_ioctl,
 #ifdef CONFIG_COMPAT
+<<<<<<< HEAD
 	.compat_ioctl   = compat_ipmi_ioctl,
+=======
+	.compat_ioctl   = unlocked_compat_ipmi_ioctl,
+>>>>>>> upstream/4.3_primoc
 #endif
 	.open		= ipmi_open,
 	.release	= ipmi_release,

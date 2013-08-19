@@ -49,6 +49,7 @@ void __rwlock_init(rwlock_t *lock, const char *name,
 
 EXPORT_SYMBOL(__rwlock_init);
 
+<<<<<<< HEAD
 static void spin_bug(raw_spinlock_t *lock, const char *msg)
 {
 	struct task_struct *owner = NULL;
@@ -56,6 +57,12 @@ static void spin_bug(raw_spinlock_t *lock, const char *msg)
 	if (!debug_locks_off())
 		return;
 
+=======
+static void spin_dump(raw_spinlock_t *lock, const char *msg)
+{
+	struct task_struct *owner = NULL;
+
+>>>>>>> upstream/4.3_primoc
 	if (lock->owner && lock->owner != SPINLOCK_OWNER_INIT)
 		owner = lock->owner;
 	printk(KERN_EMERG "BUG: spinlock %s on CPU#%d, %s/%d\n",
@@ -70,6 +77,17 @@ static void spin_bug(raw_spinlock_t *lock, const char *msg)
 	dump_stack();
 }
 
+<<<<<<< HEAD
+=======
+static void spin_bug(raw_spinlock_t *lock, const char *msg)
+{
+	if (!debug_locks_off())
+		return;
+
+	spin_dump(lock, msg);
+}
+
+>>>>>>> upstream/4.3_primoc
 #define SPIN_BUG_ON(cond, lock, msg) if (unlikely(cond)) spin_bug(lock, msg)
 
 static inline void
@@ -113,11 +131,15 @@ static void __spin_lock_debug(raw_spinlock_t *lock)
 		/* lockup suspected: */
 		if (print_once) {
 			print_once = 0;
+<<<<<<< HEAD
 			printk(KERN_EMERG "BUG: spinlock lockup on CPU#%d, "
 					"%s/%d, %p\n",
 				raw_smp_processor_id(), current->comm,
 				task_pid_nr(current), lock);
 			dump_stack();
+=======
+			spin_dump(lock, "lockup");
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_SMP
 			trigger_all_cpu_backtrace();
 #endif

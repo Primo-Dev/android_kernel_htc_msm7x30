@@ -3473,6 +3473,7 @@ CIFSSMBSetCIFSACL(const int xid, struct cifs_tcon *tcon, __u16 fid,
 	int rc = 0;
 	int bytes_returned = 0;
 	SET_SEC_DESC_REQ *pSMB = NULL;
+<<<<<<< HEAD
 	NTRANSACT_RSP *pSMBr = NULL;
 
 setCifsAclRetry:
@@ -3480,6 +3481,14 @@ setCifsAclRetry:
 			(void **) &pSMBr);
 	if (rc)
 			return (rc);
+=======
+	void *pSMBr;
+
+setCifsAclRetry:
+	rc = smb_init(SMB_COM_NT_TRANSACT, 19, tcon, (void **) &pSMB, &pSMBr);
+	if (rc)
+		return rc;
+>>>>>>> upstream/4.3_primoc
 
 	pSMB->MaxSetupCount = 0;
 	pSMB->Reserved = 0;
@@ -3507,9 +3516,14 @@ setCifsAclRetry:
 	pSMB->AclFlags = cpu_to_le32(CIFS_ACL_DACL);
 
 	if (pntsd && acllen) {
+<<<<<<< HEAD
 		memcpy((char *) &pSMBr->hdr.Protocol + data_offset,
 			(char *) pntsd,
 			acllen);
+=======
+		memcpy((char *)pSMBr + offsetof(struct smb_hdr, Protocol) +
+				data_offset, pntsd, acllen);
+>>>>>>> upstream/4.3_primoc
 		inc_rfc1001_len(pSMB, byte_count + data_count);
 	} else
 		inc_rfc1001_len(pSMB, byte_count);
@@ -5291,7 +5305,12 @@ CIFSSMBSetFileInfo(const int xid, struct cifs_tcon *tcon,
 	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
 	offset = param_offset + params;
 
+<<<<<<< HEAD
 	data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
+=======
+	data_offset = (char *)pSMB +
+			offsetof(struct smb_hdr, Protocol) + offset;
+>>>>>>> upstream/4.3_primoc
 
 	count = sizeof(FILE_BASIC_INFO);
 	pSMB->MaxParameterCount = cpu_to_le16(2);
@@ -5560,7 +5579,11 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs_tcon *tcon,
 		       u16 fid, u32 pid_of_opener)
 {
 	struct smb_com_transaction2_sfi_req *pSMB  = NULL;
+<<<<<<< HEAD
 	FILE_UNIX_BASIC_INFO *data_offset;
+=======
+	char *data_offset;
+>>>>>>> upstream/4.3_primoc
 	int rc = 0;
 	u16 params, param_offset, offset, byte_count, count;
 
@@ -5582,8 +5605,14 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs_tcon *tcon,
 	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
 	offset = param_offset + params;
 
+<<<<<<< HEAD
 	data_offset = (FILE_UNIX_BASIC_INFO *)
 				((char *)(&pSMB->hdr.Protocol) + offset);
+=======
+	data_offset = (char *)pSMB +
+			offsetof(struct smb_hdr, Protocol) + offset;
+
+>>>>>>> upstream/4.3_primoc
 	count = sizeof(FILE_UNIX_BASIC_INFO);
 
 	pSMB->MaxParameterCount = cpu_to_le16(2);
@@ -5605,7 +5634,11 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs_tcon *tcon,
 	inc_rfc1001_len(pSMB, byte_count);
 	pSMB->ByteCount = cpu_to_le16(byte_count);
 
+<<<<<<< HEAD
 	cifs_fill_unix_set_info(data_offset, args);
+=======
+	cifs_fill_unix_set_info((FILE_UNIX_BASIC_INFO *)data_offset, args);
+>>>>>>> upstream/4.3_primoc
 
 	rc = SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr *) pSMB, 0);
 	if (rc)

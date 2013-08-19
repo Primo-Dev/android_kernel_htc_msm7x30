@@ -558,7 +558,11 @@ int ubifs_removexattr(struct dentry *dentry, const char *name)
 	}
 
 	ubifs_assert(inode->i_nlink == 1);
+<<<<<<< HEAD
 	inode->i_nlink = 0;
+=======
+	clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 	err = remove_xattr(c, host, inode, &nm);
 	if (err)
 		inode->i_nlink = 1;

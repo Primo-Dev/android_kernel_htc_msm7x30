@@ -55,6 +55,10 @@ extern int check_htc_mode_status(void);
 extern void android_switch_adb_ums(void);
 extern void android_switch_htc_mode(void);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 #ifdef err
 #undef err
 #endif

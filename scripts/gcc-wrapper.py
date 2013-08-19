@@ -99,7 +99,11 @@ def run_gcc():
         proc = subprocess.Popen(args, stderr=subprocess.PIPE)
         for line in proc.stderr:
             print line,
+<<<<<<< HEAD
             interpret_warning(line)
+=======
+#            interpret_warning(line)
+>>>>>>> upstream/4.3_primoc
 
         result = proc.wait()
     except OSError as e:

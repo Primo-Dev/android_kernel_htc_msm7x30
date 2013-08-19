@@ -513,7 +513,11 @@ static inline int cppi_autoreq_update(struct cppi_channel *rx,
 		if (!(val & MUSB_RXCSR_H_REQPKT)) {
 			val |= MUSB_RXCSR_H_REQPKT | MUSB_RXCSR_H_WZC_BITS;
 			musb_writew(regs, MUSB_RXCSR, val);
+<<<<<<< HEAD
 			/* flush writebufer */
+=======
+			/* flush writebuffer */
+>>>>>>> upstream/4.3_primoc
 			val = musb_readw(regs, MUSB_RXCSR);
 		}
 	}

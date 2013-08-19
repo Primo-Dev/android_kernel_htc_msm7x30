@@ -20,12 +20,28 @@ static int set_x2apic_phys_mode(char *arg)
 }
 early_param("x2apic_phys", set_x2apic_phys_mode);
 
+<<<<<<< HEAD
 static int x2apic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
 {
 	if (x2apic_phys)
 		return x2apic_enabled();
 	else
 		return 0;
+=======
+static bool x2apic_fadt_phys(void)
+{
+	if ((acpi_gbl_FADT.header.revision >= FADT2_REVISION_ID) &&
+		(acpi_gbl_FADT.flags & ACPI_FADT_APIC_PHYSICAL)) {
+		printk(KERN_DEBUG "System requires x2apic physical mode\n");
+		return true;
+	}
+	return false;
+}
+
+static int x2apic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
+{
+	return x2apic_enabled() && (x2apic_phys || x2apic_fadt_phys());
+>>>>>>> upstream/4.3_primoc
 }
 
 static void
@@ -108,7 +124,11 @@ static void init_x2apic_ldr(void)
 
 static int x2apic_phys_probe(void)
 {
+<<<<<<< HEAD
 	if (x2apic_mode && x2apic_phys)
+=======
+	if (x2apic_mode && (x2apic_phys || x2apic_fadt_phys()))
+>>>>>>> upstream/4.3_primoc
 		return 1;
 
 	return apic == &apic_x2apic_phys;

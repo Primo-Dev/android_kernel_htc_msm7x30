@@ -1098,6 +1098,7 @@ int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb, u32 pid,
 	netlink_unlock_table();
 
 	if (info.delivery_failure) {
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 		if (!IS_ERR(info.skb2) && (info.skb2))
@@ -1106,6 +1107,9 @@ int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb, u32 pid,
 			kfree_skb(info.skb2);
 #endif
 
+=======
+		kfree_skb(info.skb2);
+>>>>>>> upstream/4.3_primoc
 		return -ENOBUFS;
 	} else
 		consume_skb(info.skb2);
@@ -1348,11 +1352,18 @@ static int netlink_sendmsg(struct kiocb *kiocb, struct socket *sock,
 	if (msg->msg_flags&MSG_OOB)
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
 	if (NULL == siocb->scm) {
 		siocb->scm = &scm;
 		memset(&scm, 0, sizeof(scm));
 	}
 	err = scm_send(sock, msg, siocb->scm);
+=======
+	if (NULL == siocb->scm)
+		siocb->scm = &scm;
+
+	err = scm_send(sock, msg, siocb->scm, true);
+>>>>>>> upstream/4.3_primoc
 	if (err < 0)
 		return err;
 

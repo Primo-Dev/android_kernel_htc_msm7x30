@@ -149,12 +149,20 @@ static int fat_file_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
+<<<<<<< HEAD
 int fat_file_fsync(struct file *filp, int datasync)
+=======
+int fat_file_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode = filp->f_mapping->host;
 	int res, err;
 
+<<<<<<< HEAD
 	res = generic_file_fsync(filp, datasync);
+=======
+	res = generic_file_fsync(filp, start, end, datasync);
+>>>>>>> upstream/4.3_primoc
 	err = sync_mapping_buffers(MSDOS_SB(inode->i_sb)->fat_inode->i_mapping);
 
 	return res ? res : err;
@@ -397,6 +405,11 @@ int fat_setattr(struct dentry *dentry, struct iattr *attr)
 	 * sequence.
 	 */
 	if (attr->ia_valid & ATTR_SIZE) {
+<<<<<<< HEAD
+=======
+		inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 		if (attr->ia_size > inode->i_size) {
 			error = fat_cont_expand(inode, attr->ia_size);
 			if (error || attr->ia_valid == ATTR_SIZE)
@@ -429,8 +442,15 @@ int fat_setattr(struct dentry *dentry, struct iattr *attr)
 	}
 
 	if (attr->ia_valid & ATTR_SIZE) {
+<<<<<<< HEAD
 		truncate_setsize(inode, attr->ia_size);
 		fat_truncate_blocks(inode, attr->ia_size);
+=======
+		down_write(&MSDOS_I(inode)->truncate_lock);
+		truncate_setsize(inode, attr->ia_size);
+		fat_truncate_blocks(inode, attr->ia_size);
+		up_write(&MSDOS_I(inode)->truncate_lock);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	setattr_copy(inode, attr);

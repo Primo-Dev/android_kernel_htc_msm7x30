@@ -31,6 +31,10 @@
 #include <linux/random.h>
 #include <linux/hw_breakpoint.h>
 #include <linux/console.h>
+<<<<<<< HEAD
+=======
+#include <linux/cpuidle.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/cacheflush.h>
 #include <asm/processor.h>
@@ -231,7 +235,12 @@ void cpu_idle(void)
 				cpu_relax();
 			} else {
 				stop_critical_timings();
+<<<<<<< HEAD
 				pm_idle();
+=======
+				if (cpuidle_idle_call())
+					pm_idle();
+>>>>>>> upstream/4.3_primoc
 				start_critical_timings();
 				/*
 				 * This will eventually be removed - pm_idle
@@ -263,6 +272,18 @@ __setup("reboot=", reboot_setup);
 void machine_shutdown(void)
 {
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
+=======
+	/*
+	 * Disable preemption so we're guaranteed to
+	 * run to power off or reboot and prevent
+	 * the possibility of switching to another
+	 * thread that might wind up blocking on
+	 * one of the stopped CPUs.
+	 */
+	preempt_disable();
+
+>>>>>>> upstream/4.3_primoc
 	smp_send_stop();
 #endif
 }

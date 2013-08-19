@@ -68,6 +68,10 @@ enum {
 enum layoutdriver_policy_flags {
 	/* Should the pNFS client commit and return the layout upon a setattr */
 	PNFS_LAYOUTRET_ON_SETATTR	= 1 << 0,
+<<<<<<< HEAD
+=======
+	PNFS_LAYOUTRET_ON_ERROR		= 1 << 1,
+>>>>>>> upstream/4.3_primoc
 };
 
 struct nfs4_deviceid_node;

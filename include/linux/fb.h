@@ -171,8 +171,12 @@ struct fb_fix_screeninfo {
 	__u32 mmio_len;			/* Length of Memory Mapped I/O  */
 	__u32 accel;			/* Indicate to driver which	*/
 					/*  specific chip/card we have	*/
+<<<<<<< HEAD
 	__u16 capabilities;		/* see FB_CAP_*/
 	__u16 reserved[2];		/* Reserved for future compatibility */
+=======
+	__u16 reserved[3];		/* Reserved for future compatibility */
+>>>>>>> upstream/4.3_primoc
 };
 
 /* Interpretation of offset for color fields: All offsets are from the right,
@@ -274,8 +278,12 @@ struct fb_var_screeninfo {
 	__u32 sync;			/* see FB_SYNC_*		*/
 	__u32 vmode;			/* see FB_VMODE_*		*/
 	__u32 rotate;			/* angle we rotate counter clockwise */
+<<<<<<< HEAD
 	__u32 colorspace;		/* colorspace for FOURCC-based modes */
 	__u32 reserved[4];		/* Reserved for future compatibility */
+=======
+	__u32 reserved[4];              /* Reserved for future compatibility */
+>>>>>>> upstream/4.3_primoc
 };
 
 struct fb_cmap {
@@ -1046,7 +1054,12 @@ extern void fb_deferred_io_open(struct fb_info *info,
 				struct inode *inode,
 				struct file *file);
 extern void fb_deferred_io_cleanup(struct fb_info *info);
+<<<<<<< HEAD
 extern int fb_deferred_io_fsync(struct file *file, int datasync);
+=======
+extern int fb_deferred_io_fsync(struct file *file, loff_t start,
+				loff_t end, int datasync);
+>>>>>>> upstream/4.3_primoc
 
 static inline bool fb_be_math(struct fb_info *info)
 {

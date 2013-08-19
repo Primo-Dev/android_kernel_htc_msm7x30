@@ -41,6 +41,14 @@ config TOUCHSCREEN_ATMEL
 	help
 	  This enables support for Atmel over I2C based touchscreens.
 
+<<<<<<< HEAD
+=======
+config TOUCHSCREEN_ATMEL_SWEEP2WAKE
+    bool "Sweep2Wake for Atmel based touchscreens"
+    depends on TOUCHSCREEN_ATMEL
+    default n
+
+>>>>>>> upstream/4.3_primoc
 config TOUCHSCREEN_NTRIG
 	tristate "N-trig spi touchscreen"
 	depends on SPI_TOUCHSCREEN_NTRIG
@@ -221,6 +229,7 @@ config TOUCHSCREEN_CYPRESS_CS
 	  Say Y here if you have cap sensor on your device
 	  If unsure, say N.
 
+<<<<<<< HEAD
 config TOUCH_KEY_FILTER
 	tristate "Virtualkey and TouchScreen Filter"
 	depends on TOUCHSCREEN_CYPRESS_CS
@@ -229,6 +238,8 @@ config TOUCH_KEY_FILTER
 		say y here if you need to avoid some unintend touch & key
 		if unsure, say N
 
+=======
+>>>>>>> upstream/4.3_primoc
 config TOUCHSCREEN_DYNAPRO
 	tristate "Dynapro serial touchscreen"
 	select SERIO
@@ -299,6 +310,15 @@ config TOUCHSCREEN_GUNZE
 	  To compile this driver as a module, choose M here: the
 	  module will be called gunze.
 
+<<<<<<< HEAD
+=======
+config TOUCHSCREEN_ELAN_KTF2K
+	tristate "Elan KTF2000 I2C touchscreen"
+	depends on I2C
+	help
+	  This enables support for Elan KTF2000 over I2C based touchscreens.
+
+>>>>>>> upstream/4.3_primoc
 config TOUCHSCREEN_ELO
 	tristate "Elo serial touchscreens"
 	select SERIO
@@ -311,11 +331,14 @@ config TOUCHSCREEN_ELO
 	  To compile this driver as a module, choose M here: the
 	  module will be called elo.
 
+<<<<<<< HEAD
 config TOUCHSCREEN_ELAN_KTF2K
 	tristate "Elan KTF2000 I2C touchscreen"
 	depends on I2C
 	help
 	  This enables support for Elan KTF2000 over I2C based touchscreens.
+=======
+>>>>>>> upstream/4.3_primoc
 config TOUCHSCREEN_WACOM_W8001
 	tristate "Wacom W8001 penabled serial touchscreen"
 	select SERIO
@@ -494,11 +517,18 @@ config TOUCHSCREEN_SYNAPTICS_3K
         help
           This enables support for Synaptics RMI4 over I2C based touchscreens.
 
+<<<<<<< HEAD
 config TOUCHSCREEN_SYNAPTICS_3000
         tristate "Synaptics 3000 serious i2c touchscreen"
         depends on I2C
         help
           This enables support for Synaptics RMI4 over I2C based touchscreens.
+=======
+config TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+	bool "Sweep2Wake for SYNAPTICS_3K based touchscreens"
+	depends on TOUCHSCREEN_SYNAPTICS_3K
+	default n
+>>>>>>> upstream/4.3_primoc
 
 config TOUCHSCREEN_TOUCHRIGHT
 	tristate "Touchright serial touchscreen"

@@ -15,6 +15,11 @@
 
 #ifdef __KERNEL__
 
+<<<<<<< HEAD
+=======
+#include <asm-generic/atomic64.h>
+
+>>>>>>> upstream/4.3_primoc
 #include <asm/system.h>
 
 #define ATOMIC_INIT(i)  { (i) }

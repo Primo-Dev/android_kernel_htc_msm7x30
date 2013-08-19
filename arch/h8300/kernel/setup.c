@@ -46,7 +46,11 @@
 #include <asm/regs267x.h>
 #endif
 
+<<<<<<< HEAD
 #define STUBSIZE 0xc000;
+=======
+#define STUBSIZE 0xc000
+>>>>>>> upstream/4.3_primoc
 
 unsigned long rom_length;
 unsigned long memory_start;

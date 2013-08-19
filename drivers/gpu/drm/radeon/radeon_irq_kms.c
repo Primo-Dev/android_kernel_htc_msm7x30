@@ -108,6 +108,7 @@ void radeon_driver_irq_uninstall_kms(struct drm_device *dev)
 	radeon_irq_set(rdev);
 }
 
+<<<<<<< HEAD
 static bool radeon_msi_ok(struct radeon_device *rdev)
 {
 	/* RV370/RV380 was first asic with MSI support */
@@ -160,6 +161,8 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
 	return true;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 int radeon_irq_kms_init(struct radeon_device *rdev)
 {
 	int i;
@@ -176,8 +179,17 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
 	}
 	/* enable msi */
 	rdev->msi_enabled = 0;
+<<<<<<< HEAD
 
 	if (radeon_msi_ok(rdev)) {
+=======
+	/* MSIs don't seem to work reliably on all IGP
+	 * chips.  Disable MSI on them for now.
+	 */
+	if ((rdev->family >= CHIP_RV380) &&
+	    ((!(rdev->flags & RADEON_IS_IGP)) || (rdev->family >= CHIP_PALM)) &&
+	    (!(rdev->flags & RADEON_IS_AGP))) {
+>>>>>>> upstream/4.3_primoc
 		int ret = pci_enable_msi(rdev->pdev);
 		if (!ret) {
 			rdev->msi_enabled = 1;

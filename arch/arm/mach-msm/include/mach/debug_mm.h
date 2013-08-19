@@ -29,6 +29,7 @@
 #define MM_INFO(fmt, args...) pr_info("[%s:%s] " fmt,\
 	       __MM_FILE__, __func__, ##args)
 
+<<<<<<< HEAD
 #if 1
 #define MM_AUD_INFO(fmt, args...)    do { } while (0)
 
@@ -36,6 +37,10 @@
 #define MM_AUD_INFO(fmt, args...) pr_info("[AUD][%s:%s] " fmt,\
 			   __MM_FILE__, __func__, ##args)
 #endif
+=======
+#define MM_AUD_INFO(fmt, args...) pr_info("[AUD][%s:%s] " fmt,\
+			   __MM_FILE__, __func__, ##args)
+>>>>>>> upstream/4.3_primoc
 
 #define MM_ERR(fmt, args...) pr_err("[%s:%s] " fmt,\
 	       __MM_FILE__, __func__, ##args)

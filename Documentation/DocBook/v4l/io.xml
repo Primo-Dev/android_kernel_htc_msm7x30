@@ -210,7 +210,11 @@ for (i = 0; i &lt; reqbuf.count; i++)
       <programlisting>
 &v4l2-requestbuffers; reqbuf;
 /* Our current format uses 3 planes per buffer */
+<<<<<<< HEAD
 #define FMT_NUM_PLANES = 3;
+=======
+#define FMT_NUM_PLANES = 3
+>>>>>>> upstream/4.3_primoc
 
 struct {
 	void *start[FMT_NUM_PLANES];

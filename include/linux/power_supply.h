@@ -132,8 +132,11 @@ enum power_supply_property {
 	POWER_SUPPLY_PROP_MODEL_NAME,
 	POWER_SUPPLY_PROP_MANUFACTURER,
 	POWER_SUPPLY_PROP_SERIAL_NUMBER,
+<<<<<<< HEAD
 	POWER_SUPPLY_PROP_OVERLOAD,
 	POWER_SUPPLY_PROP_AVGCURRENT,
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 enum power_supply_type {

@@ -10,7 +10,11 @@
 
 #include <linux/mm.h>
 #include <linux/slab.h>
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+#include <linux/export.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/mempool.h>
 #include <linux/blkdev.h>
 #include <linux/writeback.h>

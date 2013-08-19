@@ -4,6 +4,14 @@
 
 menu "File systems"
 
+<<<<<<< HEAD
+=======
+config VFS_CACHE_PRESSURE
+	int "vfs Cache Pressure"
+	default 100
+	help
+
+>>>>>>> upstream/4.3_primoc
 if BLOCK
 
 source "fs/ext2/Kconfig"
@@ -274,4 +282,13 @@ endif
 source "fs/nls/Kconfig"
 source "fs/dlm/Kconfig"
 
+<<<<<<< HEAD
+=======
+config DYNAMIC_FSYNC
+	bool "dynamic file sync control"
+	default n
+	help
+	  An experimental file sync control using Android's early suspend / late resume drivers
+
+>>>>>>> upstream/4.3_primoc
 endmenu

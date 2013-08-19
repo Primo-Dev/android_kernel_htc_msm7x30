@@ -679,6 +679,7 @@ void drm_mm_debug_table(struct drm_mm *mm, const char *prefix)
 EXPORT_SYMBOL(drm_mm_debug_table);
 
 #if defined(CONFIG_DEBUG_FS)
+<<<<<<< HEAD
 int drm_mm_dump_table(struct seq_file *m, struct drm_mm *mm)
 {
 	struct drm_mm_node *entry;
@@ -692,12 +693,37 @@ int drm_mm_dump_table(struct seq_file *m, struct drm_mm *mm)
 		seq_printf(m, "0x%08lx-0x%08lx: 0x%08lx: free\n",
 				hole_start, hole_end, hole_size);
 	total_free += hole_size;
+=======
+static unsigned long drm_mm_dump_hole(struct seq_file *m, struct drm_mm_node *entry)
+{
+	unsigned long hole_start, hole_end, hole_size;
+
+	if (entry->hole_follows) {
+		hole_start = drm_mm_hole_node_start(entry);
+		hole_end = drm_mm_hole_node_end(entry);
+		hole_size = hole_end - hole_start;
+		seq_printf(m, "0x%08lx-0x%08lx: 0x%08lx: free\n",
+				hole_start, hole_end, hole_size);
+		return hole_size;
+	}
+
+	return 0;
+}
+
+int drm_mm_dump_table(struct seq_file *m, struct drm_mm *mm)
+{
+	struct drm_mm_node *entry;
+	unsigned long total_used = 0, total_free = 0, total = 0;
+
+	total_free += drm_mm_dump_hole(m, &mm->head_node);
+>>>>>>> upstream/4.3_primoc
 
 	drm_mm_for_each_node(entry, mm) {
 		seq_printf(m, "0x%08lx-0x%08lx: 0x%08lx: used\n",
 				entry->start, entry->start + entry->size,
 				entry->size);
 		total_used += entry->size;
+<<<<<<< HEAD
 		if (entry->hole_follows) {
 			hole_start = drm_mm_hole_node_start(entry);
 			hole_end = drm_mm_hole_node_end(entry);
@@ -706,6 +732,9 @@ int drm_mm_dump_table(struct seq_file *m, struct drm_mm *mm)
 					hole_start, hole_end, hole_size);
 			total_free += hole_size;
 		}
+=======
+		total_free += drm_mm_dump_hole(m, entry);
+>>>>>>> upstream/4.3_primoc
 	}
 	total = total_free + total_used;
 

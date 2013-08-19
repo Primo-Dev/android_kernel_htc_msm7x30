@@ -733,6 +733,12 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 	case BLKSECTGET:
 		return compat_put_ushort(arg,
 					 queue_max_sectors(bdev_get_queue(bdev)));
+<<<<<<< HEAD
+=======
+	case BLKROTATIONAL:
+		return compat_put_ushort(arg,
+					 !blk_queue_nonrot(bdev_get_queue(bdev)));
+>>>>>>> upstream/4.3_primoc
 	case BLKRASET: /* compatible, but no compat_ptr (!) */
 	case BLKFRASET:
 		if (!capable(CAP_SYS_ADMIN))

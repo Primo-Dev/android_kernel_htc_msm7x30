@@ -21,7 +21,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: dhd_cdc.c 288105 2011-10-06 01:58:02Z $
+=======
+ * $Id: dhd_cdc.c 324280 2012-03-28 19:01:17Z $
+>>>>>>> upstream/4.3_primoc
  *
  * BDC is like CDC, except it includes a header for data packets to convey
  * packet priority over the bus, and flags (e.g. to indicate checksum status
@@ -78,6 +82,11 @@ typedef struct dhd_prot {
 	unsigned char buf[WLC_IOCTL_MAXLEN + ROUND_UP_MARGIN];
 } dhd_prot_t;
 
+<<<<<<< HEAD
+=======
+extern int dhd_dbus_txdata(dhd_pub_t *dhdp, void *pktbuf);
+
+>>>>>>> upstream/4.3_primoc
 static int
 dhdcdc_msg(dhd_pub_t *dhd)
 {
@@ -121,7 +130,11 @@ dhdcdc_cmplt(dhd_pub_t *dhd, uint32 id, uint32 len)
 	return ret;
 }
 
+<<<<<<< HEAD
 int
+=======
+static int
+>>>>>>> upstream/4.3_primoc
 dhdcdc_query_ioctl(dhd_pub_t *dhd, int ifidx, uint cmd, void *buf, uint len, uint8 action)
 {
 	dhd_prot_t *prot = dhd->prot;
@@ -276,6 +289,7 @@ done:
 	return ret;
 }
 
+<<<<<<< HEAD
 #ifdef PNO_SUPPORT
 #define htod32(i) i
 #define htod16(i) i
@@ -410,6 +424,8 @@ void dhd_clear_pfn()
 	memset(&pfn_ssid_set, 0, sizeof(pfn_ssid_set_t));
 }
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 int
 dhd_prot_ioctl(dhd_pub_t *dhd, int ifidx, wl_ioctl_t * ioc, void * buf, int len)
@@ -2308,6 +2324,10 @@ dhd_wlfc_init(dhd_pub_t *dhd)
 		WLFC_FLAGS_CREDIT_STATUS_SIGNALS |
 		WLFC_FLAGS_HOST_PROPTXSTATUS_ACTIVE : 0;
 
+<<<<<<< HEAD
+=======
+	dhd->wlfc_state  = NULL;
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	try to enable/disable signaling by sending "tlv" iovar. if that fails,
@@ -2469,8 +2489,11 @@ dhd_prot_dump(dhd_pub_t *dhdp, struct bcmstrbuf *strbuf)
 #endif
 }
 
+<<<<<<< HEAD
 #define RAISE_BK_PRIO 1
 
+=======
+>>>>>>> upstream/4.3_primoc
 void
 dhd_prot_hdrpush(dhd_pub_t *dhd, int ifidx, void *pktbuf)
 {
@@ -2493,10 +2516,13 @@ dhd_prot_hdrpush(dhd_pub_t *dhd, int ifidx, void *pktbuf)
 
 
 	h->priority = (PKTPRIO(pktbuf) & BDC_PRIORITY_MASK);
+<<<<<<< HEAD
 #ifdef RAISE_BK_PRIO
 	if ((dhd_APUP == true) && (h->priority < 3))
 		h->priority = 3;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	h->flags2 = 0;
 	h->dataOffset = 0;
 #endif /* BDC */
@@ -2600,10 +2626,17 @@ dhd_prot_attach(dhd_pub_t *dhd)
 	return 0;
 
 fail:
+<<<<<<< HEAD
 #ifndef DHD_USE_STATIC_BUF
 	if (cdc != NULL)
 		MFREE(dhd->osh, cdc, sizeof(dhd_prot_t));
 #endif /* DHD_USE_STATIC_BUF */
+=======
+#ifndef CONFIG_DHD_USE_STATIC_BUF
+	if (cdc != NULL)
+		MFREE(dhd->osh, cdc, sizeof(dhd_prot_t));
+#endif /* CONFIG_DHD_USE_STATIC_BUF */
+>>>>>>> upstream/4.3_primoc
 	return BCME_NOMEM;
 }
 
@@ -2614,9 +2647,15 @@ dhd_prot_detach(dhd_pub_t *dhd)
 #ifdef PROP_TXSTATUS
 	dhd_wlfc_deinit(dhd);
 #endif
+<<<<<<< HEAD
 #ifndef DHD_USE_STATIC_BUF
 	MFREE(dhd->osh, dhd->prot, sizeof(dhd_prot_t));
 #endif /* DHD_USE_STATIC_BUF */
+=======
+#ifndef CONFIG_DHD_USE_STATIC_BUF
+	MFREE(dhd->osh, dhd->prot, sizeof(dhd_prot_t));
+#endif /* CONFIG_DHD_USE_STATIC_BUF */
+>>>>>>> upstream/4.3_primoc
 	dhd->prot = NULL;
 }
 
@@ -2655,7 +2694,11 @@ dhd_prot_init(dhd_pub_t *dhd)
 #if defined(WL_CFG80211)
 	if (dhd_download_fw_on_driverload)
 #endif /* defined(WL_CFG80211) */
+<<<<<<< HEAD
 		ret = dhd_preinit_ioctls(dhd);
+=======
+	ret = dhd_preinit_ioctls(dhd);
+>>>>>>> upstream/4.3_primoc
 
 	/* Always assumes wl for now */
 	dhd->iswl = TRUE;

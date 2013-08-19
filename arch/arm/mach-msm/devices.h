@@ -25,6 +25,15 @@ void __init msm9615_device_init(void);
 void __init msm9615_map_io(void);
 void __init msm_map_msm9615_io(void);
 void __init msm9615_init_irq(void);
+<<<<<<< HEAD
+=======
+void config_gpio_table_dbg(uint32_t *, int, char *, int);
+#define config_gpio_table(a, b) config_gpio_table_dbg(a, b, __FILE__, __LINE__)
+int panel_init_spi_hack(void);
+
+/* for boards with multi-panels builtin */
+int device_fb_detect_panel(const char *name);
+>>>>>>> upstream/4.3_primoc
 
 extern struct platform_device asoc_msm_pcm;
 extern struct platform_device asoc_msm_dai0;
@@ -104,6 +113,11 @@ extern struct platform_device msm_device_i2c_2;
 
 extern struct platform_device qup_device_i2c;
 
+<<<<<<< HEAD
+=======
+extern struct platform_device qsd_device_spi;
+
+>>>>>>> upstream/4.3_primoc
 extern struct platform_device msm_gsbi0_qup_i2c_device;
 extern struct platform_device msm_gsbi1_qup_i2c_device;
 extern struct platform_device msm_gsbi2_qup_i2c_device;
@@ -197,6 +211,30 @@ extern unsigned msm_num_clocks_fsm9xxx;
 
 extern struct platform_device msm_footswitch;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_FB_MSM_NEW
+extern struct resource msm_fb_resources[];
+extern struct platform_device msm_fb_device;
+#ifdef CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE
+/*
+ * Reserve space for double buffered full screen
+ * res V4L2 video overlay - i.e. 800x480x1.5x2
+ */
+#define MSM_V4L2_VIDEO_OVERLAY_BUF_SIZE 1152000
+
+extern struct resource msm_v4l2_video_overlay_resources[];
+extern struct platform_device msm_v4l2_video_overlay_device;
+#endif
+#endif
+
+struct msm_list_device {
+  char *name;
+  void *data;
+};
+
+void __init msm_fb_add_devices(struct msm_list_device *, int);
+>>>>>>> upstream/4.3_primoc
 void __init msm_fb_register_device(char *name, void *data);
 void __init msm_camera_register_device(void *, uint32_t, void *);
 struct platform_device *msm_add_gsbi9_uart(void);

@@ -1206,7 +1206,11 @@ static int pkt_start_recovery(struct packet_data *pkt)
 	if (!sb)
 		return 0;
 
+<<<<<<< HEAD
 	if (!sb->s_op || !sb->s_op->relocate_blocks)
+=======
+	if (!sb->s_op->relocate_blocks)
+>>>>>>> upstream/4.3_primoc
 		goto out;
 
 	old_block = pkt->sector / (CD_FRAMESIZE >> 9);
@@ -2444,7 +2448,11 @@ static void pkt_end_io_read_cloned(struct bio *bio, int err)
 	pkt_bio_finished(pd);
 }
 
+<<<<<<< HEAD
 static int pkt_make_request(struct request_queue *q, struct bio *bio)
+=======
+static void pkt_make_request(struct request_queue *q, struct bio *bio)
+>>>>>>> upstream/4.3_primoc
 {
 	struct pktcdvd_device *pd;
 	char b[BDEVNAME_SIZE];
@@ -2473,7 +2481,11 @@ static int pkt_make_request(struct request_queue *q, struct bio *bio)
 		cloned_bio->bi_end_io = pkt_end_io_read_cloned;
 		pd->stats.secs_r += bio->bi_size >> 9;
 		pkt_queue_bio(pd, cloned_bio);
+<<<<<<< HEAD
 		return 0;
+=======
+		return;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (!test_bit(PACKET_WRITABLE, &pd->flags)) {
@@ -2509,7 +2521,11 @@ static int pkt_make_request(struct request_queue *q, struct bio *bio)
 			pkt_make_request(q, &bp->bio1);
 			pkt_make_request(q, &bp->bio2);
 			bio_pair_release(bp);
+<<<<<<< HEAD
 			return 0;
+=======
+			return;
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 
@@ -2533,7 +2549,11 @@ static int pkt_make_request(struct request_queue *q, struct bio *bio)
 				}
 				spin_unlock(&pkt->lock);
 				spin_unlock(&pd->cdrw.active_list_lock);
+<<<<<<< HEAD
 				return 0;
+=======
+				return;
+>>>>>>> upstream/4.3_primoc
 			} else {
 				blocked_bio = 1;
 			}
@@ -2584,10 +2604,16 @@ static int pkt_make_request(struct request_queue *q, struct bio *bio)
 		 */
 		wake_up(&pd->wqueue);
 	}
+<<<<<<< HEAD
 	return 0;
 end_io:
 	bio_io_error(bio);
 	return 0;
+=======
+	return;
+end_io:
+	bio_io_error(bio);
+>>>>>>> upstream/4.3_primoc
 }
 
 

@@ -1577,6 +1577,7 @@ void ti_dc_msm_hs_request_clock_on(struct uart_port *uport)
 }
 EXPORT_SYMBOL(ti_dc_msm_hs_request_clock_on);
 
+<<<<<<< HEAD
 static void msm_hs_request_clock_on_locked(struct uart_port *uport)
 {
 	struct msm_hs_port *msm_uport = UARTDM_TO_MSM(uport);
@@ -1619,6 +1620,8 @@ static void msm_hs_request_clock_on_locked(struct uart_port *uport)
 		break;
 	}
 }
+=======
+>>>>>>> upstream/4.3_primoc
 /*
 void msm_hs_request_clock_on(struct uart_port *uport) {
 	unsigned long flags;
@@ -2039,7 +2042,11 @@ static int __init msm_serial_hs_init(void)
 
 	ret = uart_register_driver(&msm_hs_driver);
 	if (unlikely(ret)) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "[BT]%s failed to load\n", __func__);
+=======
+		printk(KERN_ERR "[BT]%s failed to load\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	debug_base = debugfs_create_dir("msm_serial_hs", NULL);
@@ -2049,7 +2056,11 @@ static int __init msm_serial_hs_init(void)
 	ret = platform_driver_probe(&msm_serial_hs_platform_driver,
 					msm_hs_probe);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "[BT]%s failed to load\n", __func__);
+=======
+		printk(KERN_ERR "[BT]%s failed to load\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		debugfs_remove_recursive(debug_base);
 		uart_unregister_driver(&msm_hs_driver);
 		return ret;

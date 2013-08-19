@@ -1248,6 +1248,11 @@ static int vnet_port_remove(struct vio_dev *vdev)
 		dev_set_drvdata(&vdev->dev, NULL);
 
 		kfree(port);
+<<<<<<< HEAD
+=======
+
+		unregister_netdev(vp->dev);
+>>>>>>> upstream/4.3_primoc
 	}
 	return 0;
 }

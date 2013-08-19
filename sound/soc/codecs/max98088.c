@@ -1598,7 +1598,11 @@ static int max98088_dai2_digital_mute(struct snd_soc_dai *codec_dai, int mute)
 
 static void max98088_sync_cache(struct snd_soc_codec *codec)
 {
+<<<<<<< HEAD
        u16 *reg_cache = codec->reg_cache;
+=======
+       u8 *reg_cache = codec->reg_cache;
+>>>>>>> upstream/4.3_primoc
        int i;
 
        if (!codec->cache_sync)
@@ -1998,7 +2002,11 @@ static int max98088_probe(struct snd_soc_codec *codec)
                        ret);
                goto err_access;
        }
+<<<<<<< HEAD
        dev_info(codec->dev, "revision %c\n", ret + 'A');
+=======
+       dev_info(codec->dev, "revision %c\n", ret - 0x40 + 'A');
+>>>>>>> upstream/4.3_primoc
 
        snd_soc_write(codec, M98088_REG_51_PWR_SYS, M98088_PWRSV);
 

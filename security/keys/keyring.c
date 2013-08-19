@@ -155,7 +155,10 @@ static void keyring_destroy(struct key *keyring)
 	}
 
 	klist = rcu_dereference_check(keyring->payload.subscriptions,
+<<<<<<< HEAD
 				      rcu_read_lock_held() ||
+=======
+>>>>>>> upstream/4.3_primoc
 				      atomic_read(&keyring->usage) == 0);
 	if (klist) {
 		for (loop = klist->nkeys - 1; loop >= 0; loop--)

@@ -335,7 +335,10 @@ struct inode *ntfs_alloc_big_inode(struct super_block *sb)
 static void ntfs_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(ntfs_big_inode_cache, NTFS_I(inode));
 }
 
@@ -2357,12 +2360,16 @@ static const char *es = "  Leaving inconsistent metadata.  Unmount and run "
  *
  * Returns 0 on success or -errno on error.
  *
+<<<<<<< HEAD
  * Called with ->i_mutex held.  In all but one case ->i_alloc_sem is held for
  * writing.  The only case in the kernel where ->i_alloc_sem is not held is
  * mm/filemap.c::generic_file_buffered_write() where vmtruncate() is called
  * with the current i_size as the offset.  The analogous place in NTFS is in
  * fs/ntfs/file.c::ntfs_file_buffered_write() where we call vmtruncate() again
  * without holding ->i_alloc_sem.
+=======
+ * Called with ->i_mutex held.
+>>>>>>> upstream/4.3_primoc
  */
 int ntfs_truncate(struct inode *vi)
 {
@@ -2887,8 +2894,12 @@ void ntfs_truncate_vfs(struct inode *vi) {
  * We also abort all changes of user, group, and mode as we do not implement
  * the NTFS ACLs yet.
  *
+<<<<<<< HEAD
  * Called with ->i_mutex held.  For the ATTR_SIZE (i.e. ->truncate) case, also
  * called with ->i_alloc_sem held for writing.
+=======
+ * Called with ->i_mutex held.
+>>>>>>> upstream/4.3_primoc
  */
 int ntfs_setattr(struct dentry *dentry, struct iattr *attr)
 {

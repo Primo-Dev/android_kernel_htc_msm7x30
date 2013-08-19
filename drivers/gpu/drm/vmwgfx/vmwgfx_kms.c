@@ -313,7 +313,11 @@ int vmw_framebuffer_create_handle(struct drm_framebuffer *fb,
 				  unsigned int *handle)
 {
 	if (handle)
+<<<<<<< HEAD
 		*handle = 0;
+=======
+		handle = 0;
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 }

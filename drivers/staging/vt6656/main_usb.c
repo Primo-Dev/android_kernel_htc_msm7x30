@@ -725,8 +725,11 @@ static int vt6656_suspend(struct usb_interface *intf, pm_message_t message)
 	if (device->flags & DEVICE_FLAGS_OPENED)
 		device_close(device->dev);
 
+<<<<<<< HEAD
 	usb_put_dev(interface_to_usbdev(intf));
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -737,8 +740,11 @@ static int vt6656_resume(struct usb_interface *intf)
 	if (!device || !device->dev)
 		return -ENODEV;
 
+<<<<<<< HEAD
 	usb_get_dev(interface_to_usbdev(intf));
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!(device->flags & DEVICE_FLAGS_OPENED))
 		device_open(device->dev);
 

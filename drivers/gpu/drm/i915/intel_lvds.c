@@ -714,6 +714,7 @@ static const struct dmi_system_id intel_no_lvds[] = {
 	},
 	{
 		.callback = intel_no_lvds_dmi_callback,
+<<<<<<< HEAD
                 .ident = "AOpen i45GMx-I",
                 .matches = {
                         DMI_MATCH(DMI_BOARD_VENDOR, "AOpen"),
@@ -722,6 +723,8 @@ static const struct dmi_system_id intel_no_lvds[] = {
         },
 	{
 		.callback = intel_no_lvds_dmi_callback,
+=======
+>>>>>>> upstream/4.3_primoc
 		.ident = "Aopen i945GTt-VFA",
 		.matches = {
 			DMI_MATCH(DMI_PRODUCT_VERSION, "AO00001JW"),
@@ -745,6 +748,7 @@ static const struct dmi_system_id intel_no_lvds[] = {
 	},
 	{
 		.callback = intel_no_lvds_dmi_callback,
+<<<<<<< HEAD
 		.ident = "MSI Wind Box DC500",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "MICRO-STAR INTERNATIONAL CO., LTD"),
@@ -753,6 +757,8 @@ static const struct dmi_system_id intel_no_lvds[] = {
 	},
 	{
 		.callback = intel_no_lvds_dmi_callback,
+=======
+>>>>>>> upstream/4.3_primoc
 		.ident = "Gigabyte GA-D525TUD",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "Gigabyte Technology Co., Ltd."),
@@ -767,6 +773,17 @@ static const struct dmi_system_id intel_no_lvds[] = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "X7SPA-H"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		.callback = intel_no_lvds_dmi_callback,
+		.ident = "Fujitsu Esprimo Q900",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "ESPRIMO Q900"),
+		},
+	},
+>>>>>>> upstream/4.3_primoc
 
 	{ }	/* terminating entry */
 };

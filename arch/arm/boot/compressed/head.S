@@ -444,6 +444,18 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 		mov	pc, lr
 ENDPROC(__setup_mmu)
 
+<<<<<<< HEAD
+=======
+@ Enable unaligned access on v6, to allow better code generation
+@ for the decompressor C code:
+__armv6_mmu_cache_on:
+		mrc	p15, 0, r0, c1, c0, 0	@ read SCTLR
+		bic	r0, r0, #2		@ A (no unaligned access fault)
+		orr	r0, r0, #1 << 22	@ U (v6 unaligned access model)
+		mcr	p15, 0, r0, c1, c0, 0	@ write SCTLR
+		b	__armv4_mmu_cache_on
+
+>>>>>>> upstream/4.3_primoc
 __armv4_mmu_cache_on:
 		mov	r12, lr
 #ifdef CONFIG_MMU
@@ -478,6 +490,12 @@ __armv7_mmu_cache_on:
 		bic	r0, r0, #1 << 28	@ clear SCTLR.TRE
 		orr	r0, r0, #0x5000		@ I-cache enable, RR cache replacement
 		orr	r0, r0, #0x003c		@ write buffer
+<<<<<<< HEAD
+=======
+		bic	r0, r0, #2		@ A (no unaligned access fault)
+		orr	r0, r0, #1 << 22	@ U (v6 unaligned access model)
+						@ (needed for ARM1176)
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_MMU
 #ifdef CONFIG_CPU_ENDIAN_BE8
 		orr	r0, r0, #1 << 25	@ big-endian page tables
@@ -744,7 +762,11 @@ proc_types:
 
 		.word	0x0007b000		@ ARMv6
 		.word	0x000ff000
+<<<<<<< HEAD
 		W(b)	__armv4_mmu_cache_on
+=======
+		W(b)	__armv6_mmu_cache_on
+>>>>>>> upstream/4.3_primoc
 		W(b)	__armv4_mmu_cache_off
 		W(b)	__armv6_mmu_cache_flush
 

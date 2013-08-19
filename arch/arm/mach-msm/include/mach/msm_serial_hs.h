@@ -25,6 +25,10 @@ struct msm_serial_hs_platform_data {
 	unsigned char inject_rx_on_wakeup;
 	char rx_to_inject;
 	int (*gpio_config)(int);
+<<<<<<< HEAD
+=======
+	void (*exit_lpm_cb)(struct uart_port *);
+>>>>>>> upstream/4.3_primoc
 
 	unsigned char cpu_lock_supported;
 
@@ -33,11 +37,14 @@ struct msm_serial_hs_platform_data {
 	unsigned char bt_wakeup_pin_supported;
 	unsigned char bt_wakeup_pin;	/* Device to Chip */
 	unsigned char host_wakeup_pin;	/* Chip to Device */
+<<<<<<< HEAD
 
 #ifdef CONFIG_SERIAL_BCM_BT_LPM
         void (*exit_lpm_cb)(struct uart_port *);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 };
 #if 1		//Add by evan.xu@2012-02-02
 /* API for TI_ST */
@@ -45,18 +52,27 @@ extern void ti_msm_hs_request_clock_off(struct uart_port *uport);
 extern void ti_msm_hs_request_clock_on(struct uart_port *uport);
 extern void ti_dc_msm_hs_request_clock_off(struct uart_port *uport);
 extern void ti_dc_msm_hs_request_clock_on(struct uart_port *uport);
+<<<<<<< HEAD
+=======
+/* uport->lock must be held when calling _locked() */
+extern void msm_hs_request_clock_off_locked(struct uart_port *uport);
+extern void msm_hs_request_clock_on_locked(struct uart_port *uport);
+>>>>>>> upstream/4.3_primoc
 #endif
 
 extern void imc_msm_hs_request_clock_on(struct uart_port *uport);
 unsigned int msm_hs_tx_empty(struct uart_port *uport);
 void msm_hs_request_clock_off(struct uart_port *uport);
 void msm_hs_request_clock_on(struct uart_port *uport);
+<<<<<<< HEAD
 
 #ifdef CONFIG_SERIAL_BCM_BT_LPM
 void msm_hs_request_clock_off_locked(struct uart_port *uport);
 void msm_hs_request_clock_on_locked(struct uart_port *uport);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 void msm_hs_set_mctrl(struct uart_port *uport,
 				    unsigned int mctrl);
 #endif

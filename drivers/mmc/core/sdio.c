@@ -706,6 +706,10 @@ static int mmc_sdio_resume(struct mmc_host *host)
 	}
 
 	if (!err && host->sdio_irqs)
+<<<<<<< HEAD
+=======
+		wake_up_process(host->sdio_irq_thread);
+>>>>>>> upstream/4.3_primoc
 	mmc_release_host(host);
 
 	/*

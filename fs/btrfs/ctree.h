@@ -755,6 +755,11 @@ struct btrfs_space_info {
 				   chunks for this space */
 	unsigned int chunk_alloc:1;	/* set if we are allocating a chunk */
 
+<<<<<<< HEAD
+=======
+	unsigned int flush:1;		/* set if we are trying to make space */
+
+>>>>>>> upstream/4.3_primoc
 	unsigned int force_alloc;	/* set if we need to force a chunk
 					   alloc for this space */
 
@@ -764,7 +769,11 @@ struct btrfs_space_info {
 	struct list_head block_groups[BTRFS_NR_RAID_TYPES];
 	spinlock_t lock;
 	struct rw_semaphore groups_sem;
+<<<<<<< HEAD
 	atomic_t caching_threads;
+=======
+	wait_queue_head_t wait;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct btrfs_block_rsv {
@@ -824,6 +833,10 @@ struct btrfs_caching_control {
 	struct list_head list;
 	struct mutex mutex;
 	wait_queue_head_t wait;
+<<<<<<< HEAD
+=======
+	struct btrfs_work work;
+>>>>>>> upstream/4.3_primoc
 	struct btrfs_block_group_cache *block_group;
 	u64 progress;
 	atomic_t count;
@@ -1032,6 +1045,11 @@ struct btrfs_fs_info {
 	struct btrfs_workers endio_write_workers;
 	struct btrfs_workers endio_freespace_worker;
 	struct btrfs_workers submit_workers;
+<<<<<<< HEAD
+=======
+	struct btrfs_workers caching_workers;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * fixup workers take dirty pages that didn't properly go through
 	 * the cow mechanism and make them safe to write.  It happens
@@ -1219,7 +1237,11 @@ struct btrfs_root {
 	 * right now this just gets used so that a root has its own devid
 	 * for stat.  It may be used for more later
 	 */
+<<<<<<< HEAD
 	struct super_block anon_super;
+=======
+	dev_t anon_dev;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct btrfs_ioctl_defrag_range_args {
@@ -1410,17 +1432,27 @@ void btrfs_set_##name(struct extent_buffer *eb, type *s, u##bits val);
 #define BTRFS_SETGET_HEADER_FUNCS(name, type, member, bits)		\
 static inline u##bits btrfs_##name(struct extent_buffer *eb)		\
 {									\
+<<<<<<< HEAD
 	type *p = kmap_atomic(eb->first_page, KM_USER0);		\
 	u##bits res = le##bits##_to_cpu(p->member);			\
 	kunmap_atomic(p, KM_USER0);					\
+=======
+	type *p = page_address(eb->first_page);				\
+	u##bits res = le##bits##_to_cpu(p->member);			\
+>>>>>>> upstream/4.3_primoc
 	return res;							\
 }									\
 static inline void btrfs_set_##name(struct extent_buffer *eb,		\
 				    u##bits val)			\
 {									\
+<<<<<<< HEAD
 	type *p = kmap_atomic(eb->first_page, KM_USER0);		\
 	p->member = cpu_to_le##bits(val);				\
 	kunmap_atomic(p, KM_USER0);					\
+=======
+	type *p = page_address(eb->first_page);				\
+	p->member = cpu_to_le##bits(val);				\
+>>>>>>> upstream/4.3_primoc
 }
 
 #define BTRFS_SETGET_STACK_FUNCS(name, type, member, bits)		\
@@ -2128,7 +2160,11 @@ static inline bool btrfs_mixed_space_info(struct btrfs_space_info *space_info)
 
 /* extent-tree.c */
 static inline u64 btrfs_calc_trans_metadata_size(struct btrfs_root *root,
+<<<<<<< HEAD
 						 int num_items)
+=======
+						 unsigned num_items)
+>>>>>>> upstream/4.3_primoc
 {
 	return (root->leafsize + root->nodesize * (BTRFS_MAX_LEVEL - 1)) *
 		3 * num_items;
@@ -2222,9 +2258,12 @@ void btrfs_set_inode_space_info(struct btrfs_root *root, struct inode *ionde);
 void btrfs_clear_space_info_full(struct btrfs_fs_info *info);
 int btrfs_check_data_free_space(struct inode *inode, u64 bytes);
 void btrfs_free_reserved_data_space(struct inode *inode, u64 bytes);
+<<<<<<< HEAD
 int btrfs_trans_reserve_metadata(struct btrfs_trans_handle *trans,
 				struct btrfs_root *root,
 				int num_items);
+=======
+>>>>>>> upstream/4.3_primoc
 void btrfs_trans_release_metadata(struct btrfs_trans_handle *trans,
 				struct btrfs_root *root);
 int btrfs_orphan_reserve_metadata(struct btrfs_trans_handle *trans,
@@ -2330,7 +2369,11 @@ struct btrfs_path *btrfs_alloc_path(void);
 void btrfs_free_path(struct btrfs_path *p);
 void btrfs_set_path_blocking(struct btrfs_path *p);
 void btrfs_clear_path_blocking(struct btrfs_path *p,
+<<<<<<< HEAD
 			       struct extent_buffer *held);
+=======
+			       struct extent_buffer *held, int held_rw);
+>>>>>>> upstream/4.3_primoc
 void btrfs_unlock_up_safe(struct btrfs_path *p, int level);
 
 int btrfs_del_items(struct btrfs_trans_handle *trans, struct btrfs_root *root,
@@ -2365,8 +2408,13 @@ static inline int btrfs_insert_empty_item(struct btrfs_trans_handle *trans,
 int btrfs_next_leaf(struct btrfs_root *root, struct btrfs_path *path);
 int btrfs_prev_leaf(struct btrfs_root *root, struct btrfs_path *path);
 int btrfs_leaf_free_space(struct btrfs_root *root, struct extent_buffer *leaf);
+<<<<<<< HEAD
 int btrfs_drop_snapshot(struct btrfs_root *root,
 			struct btrfs_block_rsv *block_rsv, int update_ref);
+=======
+void btrfs_drop_snapshot(struct btrfs_root *root,
+			 struct btrfs_block_rsv *block_rsv, int update_ref);
+>>>>>>> upstream/4.3_primoc
 int btrfs_drop_subtree(struct btrfs_trans_handle *trans,
 			struct btrfs_root *root,
 			struct extent_buffer *node,
@@ -2404,8 +2452,13 @@ int btrfs_find_last_root(struct btrfs_root *root, u64 objectid, struct
 			 btrfs_root_item *item, struct btrfs_key *key);
 int btrfs_find_dead_roots(struct btrfs_root *root, u64 objectid);
 int btrfs_find_orphan_roots(struct btrfs_root *tree_root);
+<<<<<<< HEAD
 int btrfs_set_root_node(struct btrfs_root_item *item,
 			struct extent_buffer *node);
+=======
+void btrfs_set_root_node(struct btrfs_root_item *item,
+			 struct extent_buffer *node);
+>>>>>>> upstream/4.3_primoc
 void btrfs_check_and_init_root_item(struct btrfs_root_item *item);
 
 /* dir-item.c */
@@ -2510,6 +2563,12 @@ int btrfs_csum_truncate(struct btrfs_trans_handle *trans,
 int btrfs_lookup_csums_range(struct btrfs_root *root, u64 start, u64 end,
 			     struct list_head *list, int search_commit);
 /* inode.c */
+<<<<<<< HEAD
+=======
+struct extent_map *btrfs_get_extent_fiemap(struct inode *inode, struct page *page,
+					   size_t pg_offset, u64 start, u64 len,
+					   int create);
+>>>>>>> upstream/4.3_primoc
 
 /* RHEL and EL kernels have a patch that renames PG_checked to FsMisc */
 #if defined(ClearPageFsMisc) && !defined(ClearPageChecked)
@@ -2518,6 +2577,17 @@ int btrfs_lookup_csums_range(struct btrfs_root *root, u64 start, u64 end,
 #define PageChecked PageFsMisc
 #endif
 
+<<<<<<< HEAD
+=======
+/* This forces readahead on a given range of bytes in an inode */
+static inline void btrfs_force_ra(struct address_space *mapping,
+				  struct file_ra_state *ra, struct file *file,
+				  pgoff_t offset, unsigned long req_size)
+{
+	page_cache_sync_readahead(mapping, ra, file, offset, req_size);
+}
+
+>>>>>>> upstream/4.3_primoc
 struct inode *btrfs_lookup_dentry(struct inode *dir, struct dentry *dentry);
 int btrfs_set_inode_index(struct inode *dir, u64 *index);
 int btrfs_unlink_inode(struct btrfs_trans_handle *trans,
@@ -2546,9 +2616,12 @@ int btrfs_create_subvol_root(struct btrfs_trans_handle *trans,
 int btrfs_merge_bio_hook(struct page *page, unsigned long offset,
 			 size_t size, struct bio *bio, unsigned long bio_flags);
 
+<<<<<<< HEAD
 unsigned long btrfs_force_ra(struct address_space *mapping,
 			      struct file_ra_state *ra, struct file *file,
 			      pgoff_t offset, pgoff_t last_index);
+=======
+>>>>>>> upstream/4.3_primoc
 int btrfs_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf);
 int btrfs_readpage(struct file *file, struct page *page);
 void btrfs_evict_inode(struct inode *inode);
@@ -2602,7 +2675,11 @@ int btrfs_defrag_file(struct inode *inode, struct file *file,
 int btrfs_add_inode_defrag(struct btrfs_trans_handle *trans,
 			   struct inode *inode);
 int btrfs_run_defrag_inodes(struct btrfs_fs_info *fs_info);
+<<<<<<< HEAD
 int btrfs_sync_file(struct file *file, int datasync);
+=======
+int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync);
+>>>>>>> upstream/4.3_primoc
 int btrfs_drop_extent_cache(struct inode *inode, u64 start, u64 end,
 			    int skip_pinned);
 extern const struct file_operations btrfs_file_operations;
@@ -2642,9 +2719,15 @@ do {								\
 
 /* acl.c */
 #ifdef CONFIG_BTRFS_FS_POSIX_ACL
+<<<<<<< HEAD
 int btrfs_check_acl(struct inode *inode, int mask, unsigned int flags);
 #else
 #define btrfs_check_acl NULL
+=======
+struct posix_acl *btrfs_get_acl(struct inode *inode, int type);
+#else
+#define btrfs_get_acl NULL
+>>>>>>> upstream/4.3_primoc
 #endif
 int btrfs_init_acl(struct btrfs_trans_handle *trans,
 		   struct inode *inode, struct inode *dir);

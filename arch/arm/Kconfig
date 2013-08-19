@@ -16,14 +16,25 @@ config ARM
 	select HAVE_KERNEL_GZIP
 	select HAVE_KERNEL_LZO
 	select HAVE_KERNEL_LZMA
+<<<<<<< HEAD
+=======
+	select HAVE_KERNEL_XZ
+>>>>>>> upstream/4.3_primoc
 	select HAVE_IRQ_WORK
 	select HAVE_PERF_EVENTS
 	select PERF_USE_VMALLOC
 	select HAVE_GENERIC_HARDIRQS
 	select HAVE_SPARSE_IRQ
 	select GENERIC_IRQ_SHOW
+<<<<<<< HEAD
         select HAVE_KERNEL_XZ
         select HAVE_BPF_JIT
+=======
+	select HAVE_BPF_JIT	
+	select DCACHE_WORD_ACCESS if (CPU_V6 || CPU_V6K || CPU_V7) && !CPU_BIG_ENDIAN && MMU
+	select GENERIC_STRNCPY_FROM_USER
+	select GENERIC_STRNLEN_USER
+>>>>>>> upstream/4.3_primoc
 	help
 	  The ARM series is a line of low-power-consumption RISC chip designs
 	  licensed by ARM Ltd and targeted at embedded applications and
@@ -32,6 +43,12 @@ config ARM
 	  Europe.  There is an ARM Linux project with a web page at
 	  <http://www.arm.linux.org.uk/>.
 
+<<<<<<< HEAD
+=======
+config ARM_HAS_SG_CHAIN
+	bool
+
+>>>>>>> upstream/4.3_primoc
 config HAVE_PWM
 	bool
 
@@ -749,7 +766,10 @@ config ARCH_S5PC100
 	select GENERIC_GPIO
 	select HAVE_CLK
 	select CPU_V7
+<<<<<<< HEAD
 	select ARM_L1_CACHE_SHIFT_6
+=======
+>>>>>>> upstream/4.3_primoc
 	select ARCH_USES_GETTIMEOFFSET
 	select HAVE_S3C2410_I2C if I2C
 	select HAVE_S3C_RTC if RTC_CLASS
@@ -763,7 +783,10 @@ config ARCH_S5PV210
 	select ARCH_SPARSEMEM_ENABLE
 	select GENERIC_GPIO
 	select HAVE_CLK
+<<<<<<< HEAD
 	select ARM_L1_CACHE_SHIFT_6
+=======
+>>>>>>> upstream/4.3_primoc
 	select ARCH_HAS_CPUFREQ
 	select GENERIC_CLOCKEVENTS
 	select HAVE_SCHED_CLOCK
@@ -1304,6 +1327,19 @@ config PL310_ERRATA_769419
 	  on systems with an outer cache, the store buffer is drained
 	  explicitly.
 
+<<<<<<< HEAD
+=======
+config ARM_ERRATA_775420
+       bool "ARM errata: A data cache maintenance operation which aborts, might lead to deadlock"
+       depends on CPU_V7
+       help
+	 This option enables the workaround for the 775420 Cortex-A9 (r2p2,
+	 r2p6,r2p8,r2p10,r3p0) erratum. In case a date cache maintenance
+	 operation aborts with MMU exception, it might cause the processor
+	 to deadlock. This workaround puts DSB before executing ISB if
+	 an abort may occur on cache maintenance.
+
+>>>>>>> upstream/4.3_primoc
 endmenu
 
 source "arch/arm/common/Kconfig"
@@ -1414,6 +1450,34 @@ config SMP_ON_UP
 
 	  If you don't know what to do here, say Y.
 
+<<<<<<< HEAD
+=======
+config ARM_CPU_TOPOLOGY
+	bool "Support cpu topology definition"
+	depends on SMP && CPU_V7
+	default y
+	help
+	  Support ARM cpu topology definition. The MPIDR register defines
+	  affinity between processors which is then used to describe the cpu
+	  topology of an ARM System.
+
+config SCHED_MC
+	bool "Multi-core scheduler support"
+	depends on ARM_CPU_TOPOLOGY
+	help
+	  Multi-core scheduler support improves the CPU scheduler's decision
+	  making when dealing with multi-core CPU chips at a cost of slightly
+	  increased overhead in some places. If unsure say N here.
+
+config SCHED_SMT
+	bool "SMT scheduler support"
+	depends on ARM_CPU_TOPOLOGY
+	help
+	  Improves the CPU scheduler's decision making when dealing with
+	  MultiThreading at a cost of slightly increased overhead in some
+	  places. If unsure say N here.
+
+>>>>>>> upstream/4.3_primoc
 config HAVE_ARM_SCU
 	bool
 	depends on SMP
@@ -1733,6 +1797,19 @@ config ALIGNMENT_TRAP
 	  correct operation of some network protocols. With an IP-only
 	  configuration it is safe to say N, otherwise say Y.
 
+<<<<<<< HEAD
+=======
+config ALLOW_CPU_ALIGNMENT
+	bool "Allow CPU-based alignment handling"
+	default y if ARCH_MSM_SCORPION || ARCH_MSM_SCORPIONMP
+	help
+	  Advanced ARM processors, such as the Cortex series and ARMv7-based
+	  CPUS are capable of performing unaligned accesses for many types of
+	  memory accesses.  Typically, using a cpu-based alignment fixup is
+	  faster than doing such a fixup in software.  For best performance
+	  on advanced CPUs, say Y here.
+
+>>>>>>> upstream/4.3_primoc
 config UACCESS_WITH_MEMCPY
 	bool "Use kernel mem{cpy,set}() for {copy_to,clear}_user() (EXPERIMENTAL)"
 	depends on MMU && EXPERIMENTAL
@@ -1793,7 +1870,11 @@ config ARM_FLUSH_CONSOLE_ON_RESTART
 
 config CP_ACCESS
 	tristate "CP register access tool"
+<<<<<<< HEAD
 	default n
+=======
+	default m
+>>>>>>> upstream/4.3_primoc
 	help
 	  Provide support for Coprocessor register access using /sys
 	  interface. Read and write to CP registers from userspace

@@ -78,7 +78,11 @@ void vm_events_fold_cpu(int cpu)
  *
  * vm_stat contains the global counters
  */
+<<<<<<< HEAD
 atomic_long_t vm_stat[NR_VM_ZONE_STAT_ITEMS];
+=======
+atomic_long_t vm_stat[NR_VM_ZONE_STAT_ITEMS] __cacheline_aligned_in_smp;
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(vm_stat);
 
 #ifdef CONFIG_SMP

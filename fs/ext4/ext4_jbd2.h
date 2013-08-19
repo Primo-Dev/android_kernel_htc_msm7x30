@@ -240,8 +240,20 @@ static inline int ext4_journal_force_commit(journal_t *journal)
 
 static inline int ext4_jbd2_file_inode(handle_t *handle, struct inode *inode)
 {
+<<<<<<< HEAD
 	if (ext4_handle_valid(handle))
 		return jbd2_journal_file_inode(handle, EXT4_I(inode)->jinode);
+=======
+	if (ext4_handle_valid(handle)) {
+		if (unlikely(EXT4_I(inode)->jinode == NULL)) {
+			/* Should never happen */
+			WARN(true, "inode #%lu has NULL jinode\n",
+				inode->i_ino);
+			return 0;
+		}
+		return jbd2_journal_file_inode(handle, EXT4_I(inode)->jinode);
+	}
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 

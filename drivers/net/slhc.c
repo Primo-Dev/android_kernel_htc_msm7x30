@@ -230,6 +230,7 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 	register unsigned long deltaS, deltaA;
 	register short changes = 0;
 	int hlen;
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	unsigned char new_seq[16] = {'\0'};
@@ -237,6 +238,9 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 	unsigned char new_seq[16];
 #endif
 
+=======
+	unsigned char new_seq[16];
+>>>>>>> upstream/4.3_primoc
 	register unsigned char *cp = new_seq;
 	struct iphdr *ip;
 	struct tcphdr *th, *oth;

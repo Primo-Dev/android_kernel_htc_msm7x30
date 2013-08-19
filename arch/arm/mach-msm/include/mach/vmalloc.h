@@ -20,6 +20,7 @@
 #ifdef CONFIG_VMSPLIT_2G
 #define VMALLOC_END	  (PAGE_OFFSET + 0x7A000000)
 #else
+<<<<<<< HEAD
 #ifdef CONFIG_ARCH_MSM8X60
 #define VMALLOC_END       (PAGE_OFFSET + 0x3E000000)
 #elif defined(CONFIG_ARCH_MSM7X30)
@@ -32,6 +33,10 @@
 #define VMALLOC_END	  (PAGE_OFFSET + 0x3A000000)
 #endif
 #endif
+=======
+#define VMALLOC_END	  (PAGE_OFFSET + 0x3E000000)
+#endif
+>>>>>>> upstream/4.3_primoc
 
 #endif
 

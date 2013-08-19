@@ -18,12 +18,19 @@
 #include <linux/hdreg.h>	/* HDIO_GETGEO			    */
 #include <linux/bio.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/compat.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/init.h>
 
 #include <asm/debug.h>
 #include <asm/idals.h>
 #include <asm/ebcdic.h>
+<<<<<<< HEAD
 #include <asm/compat.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <asm/io.h>
 #include <asm/uaccess.h>
 #include <asm/cio.h>

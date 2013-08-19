@@ -38,6 +38,39 @@ void __ptrace_link(struct task_struct *child, struct task_struct *new_parent)
 	child->parent = new_parent;
 }
 
+<<<<<<< HEAD
+=======
+/* Ensure that nothing can wake it up, even SIGKILL */
+static bool ptrace_freeze_traced(struct task_struct *task)
+{
+	bool ret = false;
+
+	spin_lock_irq(&task->sighand->siglock);
+	if (task_is_traced(task) && !__fatal_signal_pending(task)) {
+		task->state = __TASK_TRACED;
+		ret = true;
+	}
+	spin_unlock_irq(&task->sighand->siglock);
+
+	return ret;
+}
+
+static void ptrace_unfreeze_traced(struct task_struct *task)
+{
+	if (task->state != __TASK_TRACED)
+		return;
+
+	WARN_ON(!task->ptrace || task->parent != current);
+
+	spin_lock_irq(&task->sighand->siglock);
+	if (__fatal_signal_pending(task))
+		wake_up_state(task, __TASK_TRACED);
+	else
+		task->state = TASK_TRACED;
+	spin_unlock_irq(&task->sighand->siglock);
+}
+
+>>>>>>> upstream/4.3_primoc
 /**
  * __ptrace_unlink - unlink ptracee and restore its execution state
  * @child: ptracee to be unlinked
@@ -92,7 +125,11 @@ void __ptrace_unlink(struct task_struct *child)
 	 * TASK_KILLABLE sleeps.
 	 */
 	if (child->group_stop & GROUP_STOP_PENDING || task_is_traced(child))
+<<<<<<< HEAD
 		signal_wake_up(child, task_is_traced(child));
+=======
+		ptrace_signal_wake_up(child, true);
+>>>>>>> upstream/4.3_primoc
 
 	spin_unlock(&child->sighand->siglock);
 }
@@ -112,11 +149,17 @@ int ptrace_check_attach(struct task_struct *child, int kill)
 	 * be changed by us so it's not changing right after this.
 	 */
 	read_lock(&tasklist_lock);
+<<<<<<< HEAD
 	if ((child->ptrace & PT_PTRACED) && child->parent == current) {
+=======
+	if (child->ptrace && child->parent == current) {
+		WARN_ON(child->state == __TASK_TRACED);
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * child->sighand can't be NULL, release_task()
 		 * does ptrace_unlink() before __exit_signal().
 		 */
+<<<<<<< HEAD
 		spin_lock_irq(&child->sighand->siglock);
 		WARN_ON_ONCE(task_is_stopped(child));
 		if (task_is_traced(child) || kill)
@@ -129,6 +172,25 @@ int ptrace_check_attach(struct task_struct *child, int kill)
 		ret = wait_task_inactive(child, TASK_TRACED) ? 0 : -ESRCH;
 
 	/* All systems go.. */
+=======
+		if (kill || ptrace_freeze_traced(child))
+			ret = 0;
+	}
+	read_unlock(&tasklist_lock);
+
+	if (!ret && !kill) {
+		if (!wait_task_inactive(child, __TASK_TRACED)) {
+			/*
+			 * This can only happen if may_ptrace_stop() fails and
+			 * ptrace_stop() changes ->state back to TASK_RUNNING,
+			 * so we should not worry about leaking __TASK_TRACED.
+			 */
+			WARN_ON(child->state == __TASK_TRACED);
+			ret = -ESRCH;
+		}
+	}
+
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 
@@ -245,7 +307,11 @@ static int ptrace_attach(struct task_struct *task)
 	 */
 	if (task_is_stopped(task)) {
 		task->group_stop |= GROUP_STOP_PENDING | GROUP_STOP_TRAPPING;
+<<<<<<< HEAD
 		signal_wake_up(task, 1);
+=======
+		signal_wake_up_state(task, __TASK_STOPPED);
+>>>>>>> upstream/4.3_primoc
 		wait_trap = true;
 	}
 
@@ -777,6 +843,11 @@ SYSCALL_DEFINE4(ptrace, long, request, long, pid, unsigned long, addr,
 		goto out_put_task_struct;
 
 	ret = arch_ptrace(child, request, addr, data);
+<<<<<<< HEAD
+=======
+	if (ret || request != PTRACE_DETACH)
+		ptrace_unfreeze_traced(child);
+>>>>>>> upstream/4.3_primoc
 
  out_put_task_struct:
 	put_task_struct(child);
@@ -915,8 +986,16 @@ asmlinkage long compat_sys_ptrace(compat_long_t request, compat_long_t pid,
 	}
 
 	ret = ptrace_check_attach(child, request == PTRACE_KILL);
+<<<<<<< HEAD
 	if (!ret)
 		ret = compat_arch_ptrace(child, request, addr, data);
+=======
+	if (!ret) {
+		ret = compat_arch_ptrace(child, request, addr, data);
+		if (ret || request != PTRACE_DETACH)
+			ptrace_unfreeze_traced(child);
+	}
+>>>>>>> upstream/4.3_primoc
 
  out_put_task_struct:
 	put_task_struct(child);

@@ -174,10 +174,19 @@ static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 
 static inline cputime64_t get_cpu_idle_time(unsigned int cpu, cputime64_t *wall)
 {
+<<<<<<< HEAD
 	u64 idle_time = get_cpu_idle_time_us(cpu, wall);
 
 	if (idle_time == -1ULL)
 		return get_cpu_idle_time_jiffy(cpu, wall);
+=======
+	u64 idle_time = get_cpu_idle_time_us(cpu, NULL);
+
+	if (idle_time == -1ULL)
+		return get_cpu_idle_time_jiffy(cpu, wall);
+	else
+		idle_time += get_cpu_iowait_time_us(cpu, wall);
+>>>>>>> upstream/4.3_primoc
 
 	return idle_time;
 }
@@ -479,9 +488,18 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 {
 	int input  = 0;
 	int bypass = 0;
+<<<<<<< HEAD
 	int ret, cpu, reenable_timer;
 	struct cpu_dbs_info_s *dbs_info;
 
+=======
+	int ret, cpu, reenable_timer, j;
+	struct cpu_dbs_info_s *dbs_info;
+
+	struct cpumask cpus_timer_done;
+	cpumask_clear(&cpus_timer_done);
+
+>>>>>>> upstream/4.3_primoc
 	ret = sscanf(buf, "%d", &input);
 
 	if (ret != 1)
@@ -514,10 +532,29 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 					continue;
 
 				dbs_info = &per_cpu(od_cpu_dbs_info, cpu);
+<<<<<<< HEAD
+=======
+
+				for_each_cpu(j, &cpus_timer_done) {
+					if (!dbs_info->cur_policy) {
+						pr_err("Dbs policy is NULL\n");
+						goto skip_this_cpu;
+					}
+					if (cpumask_test_cpu(j, dbs_info->
+							cur_policy->cpus))
+						goto skip_this_cpu;
+				}
+
+				cpumask_set_cpu(cpu, &cpus_timer_done);
+>>>>>>> upstream/4.3_primoc
 				if (dbs_info->cur_policy) {
 					/* restart dbs timer */
 					dbs_timer_init(dbs_info);
 				}
+<<<<<<< HEAD
+=======
+skip_this_cpu:
+>>>>>>> upstream/4.3_primoc
 				unlock_policy_rwsem_write(cpu);
 			}
 		}
@@ -530,6 +567,22 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 				continue;
 
 			dbs_info = &per_cpu(od_cpu_dbs_info, cpu);
+<<<<<<< HEAD
+=======
+
+			for_each_cpu(j, &cpus_timer_done) {
+				if (!dbs_info->cur_policy) {
+					pr_err("Dbs policy is NULL\n");
+					goto skip_this_cpu_bypass;
+				}
+				if (cpumask_test_cpu(j, dbs_info->
+							cur_policy->cpus))
+					goto skip_this_cpu_bypass;
+			}
+
+			cpumask_set_cpu(cpu, &cpus_timer_done);
+
+>>>>>>> upstream/4.3_primoc
 			if (dbs_info->cur_policy) {
 				/* cpu using ondemand, cancel dbs timer */
 				mutex_lock(&dbs_info->timer_mutex);
@@ -542,6 +595,10 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 
 				mutex_unlock(&dbs_info->timer_mutex);
 			}
+<<<<<<< HEAD
+=======
+skip_this_cpu_bypass:
+>>>>>>> upstream/4.3_primoc
 			unlock_policy_rwsem_write(cpu);
 		}
 	}
@@ -595,7 +652,15 @@ static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
 
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 {
+<<<<<<< HEAD
 	unsigned int max_load_freq;
+=======
+	/* Extrapolated load of this CPU */
+	unsigned int load_at_max_freq = 0;
+	unsigned int max_load_freq;
+	/* Current load across this CPU */
+	unsigned int cur_load = 0;
+>>>>>>> upstream/4.3_primoc
 
 	struct cpufreq_policy *policy;
 	unsigned int j;
@@ -640,7 +705,11 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		struct cpu_dbs_info_s *j_dbs_info;
 		cputime64_t cur_wall_time, cur_idle_time, cur_iowait_time;
 		unsigned int idle_time, wall_time, iowait_time;
+<<<<<<< HEAD
 		unsigned int load, load_freq;
+=======
+		unsigned int load_freq;
+>>>>>>> upstream/4.3_primoc
 		int freq_avg;
 
 		j_dbs_info = &per_cpu(od_cpu_dbs_info, j);
@@ -690,16 +759,31 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		if (unlikely(!wall_time || wall_time < idle_time))
 			continue;
 
+<<<<<<< HEAD
 		load = 100 * (wall_time - idle_time) / wall_time;
+=======
+		cur_load = 100 * (wall_time - idle_time) / wall_time;
+>>>>>>> upstream/4.3_primoc
 
 		freq_avg = __cpufreq_driver_getavg(policy, j);
 		if (freq_avg <= 0)
 			freq_avg = policy->cur;
 
+<<<<<<< HEAD
 		load_freq = load * freq_avg;
 		if (load_freq > max_load_freq)
 			max_load_freq = load_freq;
 	}
+=======
+		load_freq = cur_load * freq_avg;
+		if (load_freq > max_load_freq)
+			max_load_freq = load_freq;
+	}
+	/* calculate the scaled load across CPU */
+	load_at_max_freq = (cur_load * policy->cur)/policy->cpuinfo.max_freq;
+
+	cpufreq_notify_utilization(policy, load_at_max_freq);
+>>>>>>> upstream/4.3_primoc
 
 	/* Check for frequency increase */
 	if (max_load_freq > dbs_tuners_ins.up_threshold * policy->cur) {
@@ -852,13 +936,21 @@ static void dbs_refresh_callback(struct work_struct *unused)
 	struct cpu_dbs_info_s *this_dbs_info;
 	unsigned int cpu = smp_processor_id();
 
+<<<<<<< HEAD
 	if (lock_policy_rwsem_write(cpu) < 0)
 		return;
+=======
+	get_online_cpus();
+
+	if (lock_policy_rwsem_write(cpu) < 0)
+		goto bail_acq_sema_failed;
+>>>>>>> upstream/4.3_primoc
 
 	this_dbs_info = &per_cpu(od_cpu_dbs_info, cpu);
 	policy = this_dbs_info->cur_policy;
 	if (!policy) {
 		/* CPU not using ondemand governor */
+<<<<<<< HEAD
 		unlock_policy_rwsem_write(cpu);
 		return;
 	}
@@ -872,6 +964,30 @@ static void dbs_refresh_callback(struct work_struct *unused)
 				&this_dbs_info->prev_cpu_wall);
 	}
 	unlock_policy_rwsem_write(cpu);
+=======
+		goto bail_incorrect_governor;
+	}
+
+	if (policy->cur < policy->max) {
+		/*
+		 * Arch specific cpufreq driver may fail.
+		 * Don't update governor frequency upon failure.
+		 */
+		if (__cpufreq_driver_target(policy, policy->max,
+					CPUFREQ_RELATION_L) >= 0)
+			policy->cur = policy->max;
+
+		this_dbs_info->prev_cpu_idle = get_cpu_idle_time(cpu,
+				&this_dbs_info->prev_cpu_wall);
+	}
+
+bail_incorrect_governor:
+	unlock_policy_rwsem_write(cpu);
+
+bail_acq_sema_failed:
+	put_online_cpus();
+	return;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int cpufreq_governor_dbs(struct cpufreq_policy *policy,

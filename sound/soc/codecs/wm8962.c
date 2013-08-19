@@ -2373,7 +2373,11 @@ static int out_pga_event(struct snd_soc_dapm_widget *w,
 	}
 }
 
+<<<<<<< HEAD
 static const char *st_text[] = { "None", "Right", "Left" };
+=======
+static const char *st_text[] = { "None", "Left", "Right" };
+>>>>>>> upstream/4.3_primoc
 
 static const struct soc_enum str_enum =
 	SOC_ENUM_SINGLE(WM8962_DAC_DSP_MIXING_1, 2, 3, st_text);
@@ -2978,6 +2982,7 @@ static int wm8962_hw_params(struct snd_pcm_substream *substream,
 	case SNDRV_PCM_FORMAT_S16_LE:
 		break;
 	case SNDRV_PCM_FORMAT_S20_3LE:
+<<<<<<< HEAD
 		aif0 |= 0x40;
 		break;
 	case SNDRV_PCM_FORMAT_S24_LE:
@@ -2985,6 +2990,15 @@ static int wm8962_hw_params(struct snd_pcm_substream *substream,
 		break;
 	case SNDRV_PCM_FORMAT_S32_LE:
 		aif0 |= 0xc0;
+=======
+		aif0 |= 0x4;
+		break;
+	case SNDRV_PCM_FORMAT_S24_LE:
+		aif0 |= 0x8;
+		break;
+	case SNDRV_PCM_FORMAT_S32_LE:
+		aif0 |= 0xc;
+>>>>>>> upstream/4.3_primoc
 		break;
 	default:
 		return -EINVAL;

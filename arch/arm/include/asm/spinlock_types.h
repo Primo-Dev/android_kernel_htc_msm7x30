@@ -5,11 +5,32 @@
 # error "please don't include this file directly"
 #endif
 
+<<<<<<< HEAD
 typedef struct {
 	volatile unsigned int lock;
 } arch_spinlock_t;
 
 #define __ARCH_SPIN_LOCK_UNLOCKED	{ 0 }
+=======
+#define TICKET_SHIFT	16
+
+typedef struct {
+	union {
+		u32 slock;
+		struct __raw_tickets {
+#ifdef __ARMEB__
+			u16 next;
+			u16 owner;
+#else
+			u16 owner;
+			u16 next;
+#endif
+		} tickets;
+	};
+} arch_spinlock_t;
+
+#define __ARCH_SPIN_LOCK_UNLOCKED	{ { 0 } }
+>>>>>>> upstream/4.3_primoc
 
 typedef struct {
 	volatile unsigned int lock;

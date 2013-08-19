@@ -157,7 +157,11 @@ fail_drop:
 	dquot_drop(inode);
 	inode->i_flags |= S_NOQUOTA;
 fail_unlock:
+<<<<<<< HEAD
 	inode->i_nlink = 0;
+=======
+	clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 	unlock_new_inode(inode);
 fail_put:
 	iput(inode);

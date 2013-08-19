@@ -34,11 +34,19 @@ static struct task_struct *pick_next_task_stop(struct rq *rq)
 static void
 enqueue_task_stop(struct rq *rq, struct task_struct *p, int flags)
 {
+<<<<<<< HEAD
+=======
+	inc_nr_running(rq);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void
 dequeue_task_stop(struct rq *rq, struct task_struct *p, int flags)
 {
+<<<<<<< HEAD
+=======
+	dec_nr_running(rq);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void yield_task_stop(struct rq *rq)

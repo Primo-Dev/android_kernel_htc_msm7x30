@@ -30,6 +30,7 @@
 #include <wldev_common.h>
 #include <wl_cfg80211.h>
 #include <dhd_cfg80211.h>
+<<<<<<< HEAD
 
 extern struct wl_priv *wlcfg_drv_priv;
 static int dhd_dongle_up = FALSE;
@@ -42,6 +43,18 @@ static s32 wl_dongle_scantime(struct net_device *ndev, s32 scan_assoc_time, s32 
 static s32 wl_dongle_offload(struct net_device *ndev, s32 arpoe, s32 arp_ol);
 static s32 wl_pattern_atoh(s8 *src, s8 *dst);
 static s32 wl_dongle_filter(struct net_device *ndev, u32 filter_mode);
+=======
+extern struct wl_priv *wlcfg_drv_priv;
+static int dhd_dongle_up = FALSE;
+
+#include <dngl_stats.h>
+#include <dhd.h>
+#include <dhdioctl.h>
+#include <wlioctl.h>
+#include <dhd_cfg80211.h>
+
+static s32 wl_dongle_up(struct net_device *ndev, u32 up);
+>>>>>>> upstream/4.3_primoc
 
 /**
  * Function implementations
@@ -59,6 +72,7 @@ s32 dhd_cfg80211_deinit(struct wl_priv *wl)
 	return 0;
 }
 
+<<<<<<< HEAD
 s32 dhd_cfg80211_down(struct wl_priv *wl)
 {
 	dhd_dongle_up = FALSE;
@@ -316,6 +330,82 @@ static s32 wl_dongle_filter(struct net_device *ndev, u32 filter_mode)
 	}
 
 dongle_filter_out:
+=======
+s32 dhd_cfg80211_get_opmode(struct wl_priv *wl)
+{
+	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+	return dhd->op_mode;
+}
+
+s32 dhd_cfg80211_down(struct wl_priv *wl)
+{
+	dhd_dongle_up = FALSE;
+	return 0;
+}
+
+/*
+ * dhd_cfg80211_set_p2p_info : gets called when GO or GC created
+ */
+s32 dhd_cfg80211_set_p2p_info(struct wl_priv *wl, int val)
+{
+	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+	int bcn_timeout = DHD_BEACON_TIMEOUT_HIGH;
+	char iovbuf[30];
+
+	dhd->op_mode |= val;
+	WL_ERR(("Set : op_mode=%d\n", dhd->op_mode));
+
+#ifdef ARP_OFFLOAD_SUPPORT
+	/* IF P2P is enabled, disable arpoe */
+	dhd_arp_offload_set(dhd, 0);
+	dhd_arp_offload_enable(dhd, false);
+#endif /* ARP_OFFLOAD_SUPPORT */
+	/* diable all filtering in p2p mode */
+	dhd_os_set_packet_filter(dhd, 0);
+
+	/* Setup timeout if Beacons are lost and roam is off to report link down */
+	bcm_mkiovar("bcn_timeout", (char *)&bcn_timeout, 4, iovbuf, sizeof(iovbuf));
+	dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
+
+
+	return 0;
+}
+
+/*
+ * dhd_cfg80211_clean_p2p_info : gets called when GO or GC terminated
+ */
+s32 dhd_cfg80211_clean_p2p_info(struct wl_priv *wl)
+{
+	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+	int bcn_timeout = DHD_BEACON_TIMEOUT_NORMAL;
+	char iovbuf[30];
+
+	dhd->op_mode &= ~CONCURENT_MASK;
+	WL_ERR(("Clean : op_mode=%d\n", dhd->op_mode));
+
+#ifdef ARP_OFFLOAD_SUPPORT
+	/* IF P2P is disabled, enable arpoe back for STA mode. */
+	dhd_arp_offload_set(dhd, dhd_arp_mode);
+	dhd_arp_offload_enable(dhd, true);
+#endif /* ARP_OFFLOAD_SUPPORT */
+	dhd_os_set_packet_filter(dhd, 1);
+
+	/* Setup timeout if Beacons are lost and roam is off to report link down */
+	bcm_mkiovar("bcn_timeout", (char *)&bcn_timeout, 4, iovbuf, sizeof(iovbuf));
+	dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
+
+	return 0;
+}
+
+static s32 wl_dongle_up(struct net_device *ndev, u32 up)
+{
+	s32 err = 0;
+
+	err = wldev_ioctl(ndev, WLC_UP, &up, sizeof(up), true);
+	if (unlikely(err)) {
+		WL_ERR(("WLC_UP error (%d)\n", err));
+	}
+>>>>>>> upstream/4.3_primoc
 	return err;
 }
 
@@ -343,6 +433,7 @@ s32 dhd_config_dongle(struct wl_priv *wl, bool need_lock)
 		WL_ERR(("wl_dongle_up failed\n"));
 		goto default_conf_out;
 	}
+<<<<<<< HEAD
 	err = wl_dongle_power(ndev, PM_FAST);
 	if (unlikely(err)) {
 		WL_ERR(("wl_dongle_power failed\n"));
@@ -361,6 +452,8 @@ s32 dhd_config_dongle(struct wl_priv *wl, bool need_lock)
 	wl_dongle_scantime(ndev, 40, 80);
 	wl_dongle_offload(ndev, 1, 0xf);
 	wl_dongle_filter(ndev, 1);
+=======
+>>>>>>> upstream/4.3_primoc
 	dhd_dongle_up = true;
 
 default_conf_out:
@@ -641,7 +734,11 @@ static void wl_cfg80211_bt_handler(struct work_struct *work)
 				__FUNCTION__));
 			btcx_inf->bt_state = BT_DHCP_OPPR_WIN;
 			mod_timer(&btcx_inf->timer,
+<<<<<<< HEAD
 				jiffies + BT_DHCP_OPPR_WIN_TIME*HZ/1000);
+=======
+				jiffies + msecs_to_jiffies(BT_DHCP_OPPR_WIN_TIME));
+>>>>>>> upstream/4.3_primoc
 			btcx_inf->timer_on = 1;
 			break;
 
@@ -661,7 +758,11 @@ static void wl_cfg80211_bt_handler(struct work_struct *work)
 				wl_cfg80211_bt_setflag(btcx_inf->dev, TRUE);
 			btcx_inf->bt_state = BT_DHCP_FLAG_FORCE_TIMEOUT;
 			mod_timer(&btcx_inf->timer,
+<<<<<<< HEAD
 				jiffies + BT_DHCP_FLAG_FORCE_TIME*HZ/1000);
+=======
+				jiffies + msecs_to_jiffies(BT_DHCP_FLAG_FORCE_TIME));
+>>>>>>> upstream/4.3_primoc
 			btcx_inf->timer_on = 1;
 			break;
 
@@ -737,7 +838,10 @@ void wl_cfg80211_btcoex_deinit(struct wl_priv *wl)
 	kfree(wl->btcoex_info);
 	wl->btcoex_info = NULL;
 }
+<<<<<<< HEAD
 #endif 
+=======
+>>>>>>> upstream/4.3_primoc
 
 int wl_cfg80211_set_btcoex_dhcp(struct net_device *dev, char *command)
 {
@@ -861,3 +965,7 @@ int wl_cfg80211_set_btcoex_dhcp(struct net_device *dev, char *command)
 
 	return (strlen("OK"));
 }
+<<<<<<< HEAD
+=======
+#endif 
+>>>>>>> upstream/4.3_primoc

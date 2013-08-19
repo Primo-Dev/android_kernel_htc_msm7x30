@@ -105,6 +105,21 @@ static int __jump_label_text_reserved(struct jump_entry *iter_start,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/* 
+ * Update code which is definitely not currently executing.
+ * Architectures which need heavyweight synchronization to modify
+ * running code can override this to make the non-live update case
+ * cheaper.
+ */
+void __weak arch_jump_label_transform_static(struct jump_entry *entry,
+					    enum jump_label_type type)
+{
+	arch_jump_label_transform(entry, type);	
+}
+
+>>>>>>> upstream/4.3_primoc
 static void __jump_label_update(struct jump_label_key *key,
 				struct jump_entry *entry,
 				struct jump_entry *stop, int enable)
@@ -122,6 +137,7 @@ static void __jump_label_update(struct jump_label_key *key,
 	}
 }
 
+<<<<<<< HEAD
 /*
  * Not all archs need this.
  */
@@ -130,6 +146,9 @@ void __weak arch_jump_label_text_poke_early(jump_label_t addr)
 }
 
 static __init int jump_label_init(void)
+=======
+void __init jump_label_init(void)
+>>>>>>> upstream/4.3_primoc
 {
 	struct jump_entry *iter_start = __start___jump_table;
 	struct jump_entry *iter_stop = __stop___jump_table;
@@ -140,22 +159,38 @@ static __init int jump_label_init(void)
 	jump_label_sort_entries(iter_start, iter_stop);
 
 	for (iter = iter_start; iter < iter_stop; iter++) {
+<<<<<<< HEAD
 		arch_jump_label_text_poke_early(iter->code);
 		if (iter->key == (jump_label_t)(unsigned long)key)
 			continue;
 
 		key = (struct jump_label_key *)(unsigned long)iter->key;
 		atomic_set(&key->enabled, 0);
+=======
+		struct jump_label_key *iterk;
+
+		iterk = (struct jump_label_key *)(unsigned long)iter->key;
+		arch_jump_label_transform_static(iter, jump_label_enabled(iterk) ?
+						 JUMP_LABEL_ENABLE : JUMP_LABEL_DISABLE);
+		if (iterk == key)
+			continue;
+
+		key = iterk;
+>>>>>>> upstream/4.3_primoc
 		key->entries = iter;
 #ifdef CONFIG_MODULES
 		key->next = NULL;
 #endif
 	}
 	jump_label_unlock();
+<<<<<<< HEAD
 
 	return 0;
 }
 early_initcall(jump_label_init);
+=======
+}
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_MODULES
 
@@ -213,7 +248,11 @@ void jump_label_apply_nops(struct module *mod)
 		return;
 
 	for (iter = iter_start; iter < iter_stop; iter++)
+<<<<<<< HEAD
 		arch_jump_label_text_poke_early(iter->code);
+=======
+		arch_jump_label_transform_static(iter, JUMP_LABEL_DISABLE);
+>>>>>>> upstream/4.3_primoc
 }
 
 static int jump_label_add_module(struct module *mod)

@@ -38,7 +38,11 @@
 #include <linux/usb/htc_info.h>
 #include <linux/regulator/consumer.h>
 #include <linux/mfd/pm8xxx/pm8921-charger.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <mach/clk.h>
 #include <mach/cable_detect.h>
@@ -57,6 +61,7 @@ enum {
 };
 
 static DEFINE_MUTEX(notify_sem);
+<<<<<<< HEAD
 static DEFINE_MUTEX(smwork_sem);
 static void msm_otg_start_peripheral(struct otg_transceiver *otg, int on);
 static int carkit_phy_reset(struct otg_transceiver *otg);
@@ -96,6 +101,8 @@ int htc_get_accessory_state(void)
 	return ret;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static void send_usb_connect_notify(struct work_struct *w)
 {
 	static struct t_usb_status_notifier *notifier;
@@ -429,6 +436,7 @@ static int msm_hsusb_ldo_enable(struct msm_otg *motg, int on)
 	return ret < 0 ? ret : 0;
 }
 
+<<<<<<< HEAD
 static void do_usb_hub_disable(struct work_struct *w)
 {
 	struct msm_otg *motg = container_of(w, struct msm_otg, usb_hub_work);
@@ -491,6 +499,8 @@ static void charger_detect_by_uart(void)
 	}
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static const char *state_string(enum usb_otg_state state)
 {
 	switch (state) {
@@ -790,6 +800,7 @@ static int msm_otg_link_reset(struct msm_otg *motg)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int carkit_phy_reset(struct otg_transceiver *otg)
 {
 	struct msm_otg *motg = container_of(otg, struct msm_otg, otg);
@@ -839,6 +850,8 @@ static int carkit_phy_reset(struct otg_transceiver *otg)
 	return 0;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int msm_otg_reset(struct otg_transceiver *otg)
 {
 	struct msm_otg *motg = container_of(otg, struct msm_otg, otg);
@@ -1842,11 +1855,14 @@ static void msm_chg_detect_work(struct work_struct *w)
 	USBH_INFO("%s: state:%s\n", __func__,
 		chg_state_string(motg->chg_state));
 
+<<<<<<< HEAD
 	if (motg->pdata->china_ac_detect) {
 		charger_detect_by_uart();
 		return;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	switch (motg->chg_state) {
 	case USB_CHG_STATE_UNDEFINED:
 		msm_chg_block_on(motg);
@@ -1973,9 +1989,15 @@ static void msm_otg_init_sm(struct msm_otg *motg)
 			else
 				clear_bit(ID, &motg->inputs);
 
+<<<<<<< HEAD
 			if (htc_otg_vbus)
 				set_bit(B_SESS_VLD, &motg->inputs);
 			else
+=======
+			if ((otgsc & OTGSC_BSV) || htc_otg_vbus) {
+				set_bit(B_SESS_VLD, &motg->inputs);
+			} else
+>>>>>>> upstream/4.3_primoc
 				clear_bit(B_SESS_VLD, &motg->inputs);
 		}
 		break;
@@ -1989,12 +2011,17 @@ static void msm_otg_init_sm(struct msm_otg *motg)
 				set_bit(B_SESS_VLD, &motg->inputs);
 			else
 				clear_bit(B_SESS_VLD, &motg->inputs);
+<<<<<<< HEAD
 		} else if (pdata->otg_control == OTG_PMIC_CONTROL) {
 			/*
 			 * VBUS initial state is reported after PMIC
 			 * driver initialization. Wait for it.
 			 */
 			if (htc_otg_vbus)
+=======
+		} else {
+			if ((otgsc & OTGSC_BSV) || htc_otg_vbus)
+>>>>>>> upstream/4.3_primoc
 				set_bit(B_SESS_VLD, &motg->inputs);
 			else
 				clear_bit(B_SESS_VLD, &motg->inputs);
@@ -2019,7 +2046,10 @@ static void msm_otg_sm_work(struct work_struct *w)
 		state_string(otg->state), (unsigned) motg->inputs);
 
 	pm_runtime_resume(otg->dev);
+<<<<<<< HEAD
 	mutex_lock(&smwork_sem);
+=======
+>>>>>>> upstream/4.3_primoc
 	switch (otg->state) {
 	case OTG_STATE_UNDEFINED:
 		dev_dbg(otg->dev, "OTG_STATE_UNDEFINED state\n");
@@ -2103,9 +2133,13 @@ static void msm_otg_sm_work(struct work_struct *w)
 					msm_otg_start_peripheral(otg, 1);
 					otg->state = OTG_STATE_B_PERIPHERAL;
 					motg->ac_detect_count = 0;
+<<<<<<< HEAD
 					/*re-detect charger type only for projects who has no usb hub*/
 					if (!motg->pdata->usb_hub_enable)
 						mod_timer(&motg->ac_detect_timer, jiffies + (3 * HZ));
+=======
+					mod_timer(&motg->ac_detect_timer, jiffies + (3 * HZ));
+>>>>>>> upstream/4.3_primoc
 					break;
 				default:
 					break;
@@ -2222,7 +2256,10 @@ static void msm_otg_sm_work(struct work_struct *w)
 	default:
 		break;
 	}
+<<<<<<< HEAD
 	mutex_unlock(&smwork_sem);
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 void msm_hsusb_vbus_notif_register(void (*vbus_notif)(int))
@@ -2391,12 +2428,22 @@ void msm_otg_set_id_state(int id)
 	schedule_work(&motg->sm_work);
 }
 
+<<<<<<< HEAD
+=======
+static void usb_host_switch(int on)
+{
+	if (the_otg_info->usb_host_switch)
+		the_otg_info->usb_host_switch(on);
+}
+
+>>>>>>> upstream/4.3_primoc
 static void usb_host_cable_detect(bool cable_in)
 {
 	if (cable_in)
 		msm_otg_set_id_state(0);
 	else
 		msm_otg_set_id_state(1);
+<<<<<<< HEAD
 }
 #endif
 
@@ -2405,6 +2452,12 @@ int msm_otg_get_vbus_state(void)
 	return htc_otg_vbus;
 }
 
+=======
+        usb_host_switch(cable_in ? 1 : 0);
+}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 void msm_otg_set_vbus_state(int online)
 {
 	struct msm_otg *motg = the_msm_otg;
@@ -2430,10 +2483,18 @@ void msm_otg_set_vbus_state(int online)
 		return;
 #endif
 
+<<<<<<< HEAD
+=======
+	/* for non-cable_detect && software switch project */
+	if (motg->pdata->usb_uart_switch)
+		motg->pdata->usb_uart_switch(!online);
+
+>>>>>>> upstream/4.3_primoc
 	if (online) {
 		set_bit(B_SESS_VLD, &motg->inputs);
 		/* VBUS interrupt will be triggered while HOST 5V power turn on */
 		/* set_bit(ID, &motg->inputs); */
+<<<<<<< HEAD
 		/*USB*/
 		if (motg->pdata->usb_uart_switch)
 			motg->pdata->usb_uart_switch(0);
@@ -2450,6 +2511,10 @@ void msm_otg_set_vbus_state(int online)
 		if (motg->pdata->serial_debug_gpios)
 			motg->pdata->serial_debug_gpios(1);
 	}
+=======
+	} else
+		clear_bit(B_SESS_VLD, &motg->inputs);
+>>>>>>> upstream/4.3_primoc
 
 	/* Hold a wake_lock so that it will not sleep in detection */
 	wake_lock_timeout(&motg->cable_detect_wlock, 3 * HZ);
@@ -2972,8 +3037,11 @@ static int __init msm_otg_probe(struct platform_device *pdev)
 
 	INIT_WORK(&motg->sm_work, msm_otg_sm_work);
 	INIT_WORK(&motg->notifier_work, send_usb_connect_notify);
+<<<<<<< HEAD
 	if (motg->pdata->usb_hub_enable)
 		INIT_WORK(&motg->usb_hub_work, do_usb_hub_disable);
+=======
+>>>>>>> upstream/4.3_primoc
 	INIT_DELAYED_WORK(&motg->chg_work, msm_chg_detect_work);
 	setup_timer(&motg->id_timer, msm_otg_id_timer_func,
 				(unsigned long) motg);

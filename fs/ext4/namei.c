@@ -289,7 +289,11 @@ static struct stats dx_show_leaf(struct dx_hash_info *hinfo, struct ext4_dir_ent
 				while (len--) printk("%c", *name++);
 				ext4fs_dirhash(de->name, de->name_len, &h);
 				printk(":%x.%u ", h.hash,
+<<<<<<< HEAD
 				       ((char *) de - base));
+=======
+				       (unsigned) ((char *) de - base));
+>>>>>>> upstream/4.3_primoc
 			}
 			space += EXT4_DIR_REC_LEN(de->name_len);
 			names++;
@@ -585,11 +589,16 @@ static int htree_dirblock_to_tree(struct file *dir_file,
 		if (ext4_check_dir_entry(dir, NULL, de, bh,
 				(block<<EXT4_BLOCK_SIZE_BITS(dir->i_sb))
 					 + ((char *)de - bh->b_data))) {
+<<<<<<< HEAD
 			/* On error, skip the f_pos to the next block. */
 			dir_file->f_pos = (dir_file->f_pos |
 					(dir->i_sb->s_blocksize - 1)) + 1;
 			brelse(bh);
 			return count;
+=======
+			/* silently ignore the rest of the block */
+			break;
+>>>>>>> upstream/4.3_primoc
 		}
 		ext4fs_dirhash(de->name, de->name_len, hinfo);
 		if ((hinfo->hash < start_hash) ||
@@ -922,7 +931,12 @@ restart:
 				bh = ext4_getblk(NULL, dir, b++, 0, &err);
 				bh_use[ra_max] = bh;
 				if (bh)
+<<<<<<< HEAD
 					ll_rw_block(READ_META, 1, &bh);
+=======
+					ll_rw_block(READ | REQ_META | REQ_PRIO,
+						    1, &bh);
+>>>>>>> upstream/4.3_primoc
 			}
 		}
 		if ((bh = bh_use[ra_ptr++]) == NULL)
@@ -1013,7 +1027,11 @@ static struct buffer_head * ext4_dx_find_entry(struct inode *dir, const struct q
 
 	*err = -ENOENT;
 errout:
+<<<<<<< HEAD
 	dxtrace(printk(KERN_DEBUG "%s not found\n", name));
+=======
+	dxtrace(printk(KERN_DEBUG "%s not found\n", d_name->name));
+>>>>>>> upstream/4.3_primoc
 	dx_release (frames);
 	return NULL;
 }
@@ -1037,6 +1055,7 @@ static struct dentry *ext4_lookup(struct inode *dir, struct dentry *dentry, stru
 			return ERR_PTR(-EIO);
 		}
 		inode = ext4_iget(dir->i_sb, ino);
+<<<<<<< HEAD
 		if (IS_ERR(inode)) {
 			if (PTR_ERR(inode) == -ESTALE) {
 				EXT4_ERROR_INODE(dir,
@@ -1046,6 +1065,13 @@ static struct dentry *ext4_lookup(struct inode *dir, struct dentry *dentry, stru
 			} else {
 				return ERR_CAST(inode);
 			}
+=======
+		if (inode == ERR_PTR(-ESTALE)) {
+			EXT4_ERROR_INODE(dir,
+					 "deleted inode referenced: %u",
+					 ino);
+			return ERR_PTR(-EIO);
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	return d_splice_alias(inode, dentry);
@@ -1710,9 +1736,14 @@ static void ext4_inc_count(handle_t *handle, struct inode *inode)
  */
 static void ext4_dec_count(handle_t *handle, struct inode *inode)
 {
+<<<<<<< HEAD
 	drop_nlink(inode);
 	if (S_ISDIR(inode->i_mode) && inode->i_nlink == 0)
 		inc_nlink(inode);
+=======
+	if (!S_ISDIR(inode->i_mode) || inode->i_nlink > 2)
+		drop_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 }
 
 
@@ -1740,7 +1771,11 @@ static int ext4_add_nondir(handle_t *handle,
  * If the create succeeds, we fill in the inode information
  * with d_instantiate().
  */
+<<<<<<< HEAD
 static int ext4_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int ext4_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		       struct nameidata *nd)
 {
 	handle_t *handle;
@@ -1759,7 +1794,11 @@ retry:
 	if (IS_DIRSYNC(dir))
 		ext4_handle_sync(handle);
 
+<<<<<<< HEAD
 	inode = ext4_new_inode(handle, dir, mode, &dentry->d_name, 0);
+=======
+	inode = ext4_new_inode(handle, dir, mode, &dentry->d_name, 0, NULL);
+>>>>>>> upstream/4.3_primoc
 	err = PTR_ERR(inode);
 	if (!IS_ERR(inode)) {
 		inode->i_op = &ext4_file_inode_operations;
@@ -1774,7 +1813,11 @@ retry:
 }
 
 static int ext4_mknod(struct inode *dir, struct dentry *dentry,
+<<<<<<< HEAD
 		      int mode, dev_t rdev)
+=======
+		      umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	handle_t *handle;
 	struct inode *inode;
@@ -1795,7 +1838,11 @@ retry:
 	if (IS_DIRSYNC(dir))
 		ext4_handle_sync(handle);
 
+<<<<<<< HEAD
 	inode = ext4_new_inode(handle, dir, mode, &dentry->d_name, 0);
+=======
+	inode = ext4_new_inode(handle, dir, mode, &dentry->d_name, 0, NULL);
+>>>>>>> upstream/4.3_primoc
 	err = PTR_ERR(inode);
 	if (!IS_ERR(inode)) {
 		init_special_inode(inode, inode->i_mode, rdev);
@@ -1833,7 +1880,11 @@ retry:
 		ext4_handle_sync(handle);
 
 	inode = ext4_new_inode(handle, dir, S_IFDIR | mode,
+<<<<<<< HEAD
 			       &dentry->d_name, 0);
+=======
+			       &dentry->d_name, 0, NULL);
+>>>>>>> upstream/4.3_primoc
 	err = PTR_ERR(inode);
 	if (IS_ERR(inode))
 		goto out_stop;
@@ -1987,6 +2038,7 @@ int ext4_orphan_add(handle_t *handle, struct inode *inode)
 	if (!list_empty(&EXT4_I(inode)->i_orphan))
 		goto out_unlock;
 
+<<<<<<< HEAD
 	/* Orphan handling is only valid for files with data blocks
 	 * being truncated, or files being unlinked. */
 
@@ -1999,6 +2051,13 @@ int ext4_orphan_add(handle_t *handle, struct inode *inode)
 	 * tytso, 4/25/2009: I'm not sure how that could happen;
 	 * shouldn't the fs core protect us from these sort of
 	 * unlink()/link() races?
+=======
+	/*
+	 * Orphan handling is only valid for files with data blocks
+	 * being truncated, or files being unlinked. Note that we either
+	 * hold i_mutex, or the inode can not be referenced from outside,
+	 * so i_nlink should not be bumped due to race
+>>>>>>> upstream/4.3_primoc
 	 */
 	J_ASSERT((S_ISREG(inode->i_mode) || S_ISDIR(inode->i_mode) ||
 		  S_ISLNK(inode->i_mode)) || inode->i_nlink == 0);
@@ -2287,7 +2346,11 @@ retry:
 		ext4_handle_sync(handle);
 
 	inode = ext4_new_inode(handle, dir, S_IFLNK|S_IRWXUGO,
+<<<<<<< HEAD
 			       &dentry->d_name, 0);
+=======
+			       &dentry->d_name, 0, NULL);
+>>>>>>> upstream/4.3_primoc
 	err = PTR_ERR(inode);
 	if (IS_ERR(inode))
 		goto out_stop;
@@ -2547,7 +2610,11 @@ static int ext4_rename(struct inode *old_dir, struct dentry *old_dentry,
 		if (new_inode) {
 			/* checked empty_dir above, can't have another parent,
 			 * ext4_dec_count() won't work for many-linked dirs */
+<<<<<<< HEAD
 			new_inode->i_nlink = 0;
+=======
+			clear_nlink(new_inode);
+>>>>>>> upstream/4.3_primoc
 		} else {
 			ext4_inc_count(handle, new_dir);
 			ext4_update_dx_flag(new_dir);
@@ -2594,7 +2661,11 @@ const struct inode_operations ext4_dir_inode_operations = {
 	.listxattr	= ext4_listxattr,
 	.removexattr	= generic_removexattr,
 #endif
+<<<<<<< HEAD
 	.check_acl	= ext4_check_acl,
+=======
+	.get_acl	= ext4_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.fiemap         = ext4_fiemap,
 };
 
@@ -2606,5 +2677,9 @@ const struct inode_operations ext4_special_inode_operations = {
 	.listxattr	= ext4_listxattr,
 	.removexattr	= generic_removexattr,
 #endif
+<<<<<<< HEAD
 	.check_acl	= ext4_check_acl,
+=======
+	.get_acl	= ext4_get_acl,
+>>>>>>> upstream/4.3_primoc
 };

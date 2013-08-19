@@ -55,7 +55,11 @@ struct proto udplitev6_prot = {
 	.compat_setsockopt = compat_udpv6_setsockopt,
 	.compat_getsockopt = compat_udpv6_getsockopt,
 #endif
+<<<<<<< HEAD
 	.clear_sk	   = sk_prot_clear_portaddr_nulls,
+=======
+	.clear_sk	   = udp_v6_clear_sk,
+>>>>>>> upstream/4.3_primoc
 };
 
 static struct inet_protosw udplite6_protosw = {

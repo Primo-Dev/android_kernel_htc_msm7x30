@@ -4,6 +4,12 @@ nf_conntrack-y	:= nf_conntrack_core.o nf_conntrack_standalone.o nf_conntrack_exp
 nf_conntrack-$(CONFIG_NF_CONNTRACK_TIMESTAMP) += nf_conntrack_timestamp.o
 nf_conntrack-$(CONFIG_NF_CONNTRACK_EVENTS) += nf_conntrack_ecache.o
 
+<<<<<<< HEAD
+=======
+CFLAGS_nf_conntrack_proto.o = -Wno-address
+CFLAGS_nf_conntrack_core.o = -Wno-address
+
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_NETFILTER) = netfilter.o
 
 obj-$(CONFIG_NETFILTER_NETLINK) += nfnetlink.o

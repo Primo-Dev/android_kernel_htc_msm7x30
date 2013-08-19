@@ -47,7 +47,10 @@ struct cpuidle_state {
 
 /* Idle State Flags */
 #define CPUIDLE_FLAG_TIME_VALID	(0x01) /* is residency time measurable? */
+<<<<<<< HEAD
 #define CPUIDLE_FLAG_IGNORE	(0x100) /* ignore during this idle period */
+=======
+>>>>>>> upstream/4.3_primoc
 
 #define CPUIDLE_DRIVER_FLAGS_MASK (0xFFFF0000)
 
@@ -94,8 +97,11 @@ struct cpuidle_device {
 	struct completion	kobj_unregister;
 	void			*governor_data;
 	struct cpuidle_state	*safe_state;
+<<<<<<< HEAD
 
 	int (*prepare)		(struct cpuidle_device *dev);
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 DECLARE_PER_CPU(struct cpuidle_device *, cpuidle_devices);
@@ -122,6 +128,11 @@ struct cpuidle_driver {
 };
 
 #ifdef CONFIG_CPU_IDLE
+<<<<<<< HEAD
+=======
+extern void disable_cpuidle(void);
+extern int cpuidle_idle_call(void);
+>>>>>>> upstream/4.3_primoc
 
 extern int cpuidle_register_driver(struct cpuidle_driver *drv);
 struct cpuidle_driver *cpuidle_get_driver(void);
@@ -135,6 +146,11 @@ extern int cpuidle_enable_device(struct cpuidle_device *dev);
 extern void cpuidle_disable_device(struct cpuidle_device *dev);
 
 #else
+<<<<<<< HEAD
+=======
+static inline void disable_cpuidle(void) { }
+static inline int cpuidle_idle_call(void) { return -ENODEV; }
+>>>>>>> upstream/4.3_primoc
 
 static inline int cpuidle_register_driver(struct cpuidle_driver *drv)
 {return -ENODEV; }

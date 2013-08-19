@@ -17,6 +17,12 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <linux/spinlock.h>
+<<<<<<< HEAD
+=======
+#include <linux/pm_qos.h>
+#include <linux/mutex.h>
+#include <linux/clk.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/string.h>
 #include <linux/module.h>
 #include <linux/clk.h>
@@ -203,8 +209,15 @@ void clk_disable(struct clk *clk)
 		return;
 
 	spin_lock_irqsave(&clk->lock, flags);
+<<<<<<< HEAD
 	if (WARN(clk->count == 0, "%s is unbalanced", clk->dbg_name))
 		goto out;
+=======
+	if (clk->count == 0) {
+		printk(KERN_INFO "%s is unbalanced", clk->dbg_name);
+		goto out;
+	}
+>>>>>>> upstream/4.3_primoc
 	if (clk->count == 1) {
 		struct clk *parent = clk_get_parent(clk);
 
@@ -245,13 +258,21 @@ unsigned long clk_get_rate(struct clk *clk)
 }
 EXPORT_SYMBOL(clk_get_rate);
 
+<<<<<<< HEAD
 static int _clk_set_rate(struct clk *clk, unsigned long rate,
 			 int (*set_fn)(struct clk *, unsigned long))
+=======
+int clk_set_rate(struct clk *clk, unsigned long rate)
+>>>>>>> upstream/4.3_primoc
 {
 	unsigned long start_rate, flags;
 	int rc;
 
+<<<<<<< HEAD
 	if (!set_fn)
+=======
+	if (!clk->ops->set_rate)
+>>>>>>> upstream/4.3_primoc
 		return -ENOSYS;
 
 	spin_lock_irqsave(&clk->lock, flags);
@@ -261,13 +282,21 @@ static int _clk_set_rate(struct clk *clk, unsigned long rate,
 		rc = vote_rate_vdd(clk, rate);
 		if (rc)
 			goto err_vote_vdd;
+<<<<<<< HEAD
 		rc = set_fn(clk, rate);
+=======
+		rc = clk->ops->set_rate(clk, rate);
+>>>>>>> upstream/4.3_primoc
 		if (rc)
 			goto err_set_rate;
 		/* Release vdd requirements for starting frequency. */
 		unvote_rate_vdd(clk, start_rate);
 	} else {
+<<<<<<< HEAD
 		rc = set_fn(clk, rate);
+=======
+		rc = clk->ops->set_rate(clk, rate);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (!rc)
@@ -282,6 +311,10 @@ err_vote_vdd:
 	spin_unlock_irqrestore(&clk->lock, flags);
 	return rc;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(clk_set_rate);
+>>>>>>> upstream/4.3_primoc
 
 long clk_round_rate(struct clk *clk, unsigned long rate)
 {
@@ -292,6 +325,7 @@ long clk_round_rate(struct clk *clk, unsigned long rate)
 }
 EXPORT_SYMBOL(clk_round_rate);
 
+<<<<<<< HEAD
 int clk_set_rate(struct clk *clk, unsigned long rate)
 {
 	int rc;
@@ -317,6 +351,8 @@ int clk_set_min_rate(struct clk *clk, unsigned long rate)
 }
 EXPORT_SYMBOL(clk_set_min_rate);
 
+=======
+>>>>>>> upstream/4.3_primoc
 int clk_set_max_rate(struct clk *clk, unsigned long rate)
 {
 	if (!clk->ops->set_max_rate)

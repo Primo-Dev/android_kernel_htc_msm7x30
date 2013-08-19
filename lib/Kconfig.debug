@@ -248,8 +248,14 @@ config DEFAULT_HUNG_TASK_TIMEOUT
 	  to determine when a task has become non-responsive and should
 	  be considered hung.
 
+<<<<<<< HEAD
 	  It can be adjusted at runtime via the kernel.hung_task_timeout
 	  sysctl or by writing a value to /proc/sys/kernel/hung_task_timeout.
+=======
+	  It can be adjusted at runtime via the kernel.hung_task_timeout_secs
+	  sysctl or by writing a value to
+	  /proc/sys/kernel/hung_task_timeout_secs.
+>>>>>>> upstream/4.3_primoc
 
 	  A timeout of 0 disables the check.  The default is two minutes.
 	  Keeping the default should be fine in most cases.
@@ -411,6 +417,7 @@ config SLUB_STATS
 	  out which slabs are relevant to a particular load.
 	  Try running: slabinfo -DA
 
+<<<<<<< HEAD
 config DEBUG_FDLEAK
     default n
     bool "Debug FD leak of user process"
@@ -425,6 +432,27 @@ config DEBUG_FDLEAK_CRITERION
     help
        Set this crierion value of fd numer per process, 1024 is the max fd number
        one process can open
+=======
+config SLQB_DEBUG
+	default y
+	bool "Enable SLQB debugging support"
+	depends on SLQB
+
+config SLQB_DEBUG_ON
+	default n
+	bool "SLQB debugging on by default"
+	depends on SLQB_DEBUG
+
+config SLQB_SYSFS
+	bool "Create SYSFS entries for slab caches"
+	default n
+	depends on SLQB
+
+config SLQB_STATS
+	bool "Enable SLQB performance statistics"
+	default n
+	depends on SLQB_SYSFS
+>>>>>>> upstream/4.3_primoc
 
 config DEBUG_KMEMLEAK
 	bool "Kernel memory leak detector"
@@ -916,6 +944,23 @@ config RCU_TORTURE_TEST_RUNNABLE
 	  Say N here if you want the RCU torture tests to start only
 	  after being manually enabled via /proc.
 
+<<<<<<< HEAD
+=======
+config RCU_CPU_STALL_INFO
+	bool "Print additional diagnostics on RCU CPU stall"
+	depends on (TREE_RCU || TREE_PREEMPT_RCU) && DEBUG_KERNEL
+	default n
+	help
+	  For each stalled CPU that is aware of the current RCU grace
+	  period, print out additional per-CPU diagnostic information
+	  regarding scheduling-clock ticks, idle state, and,
+	  for RCU_FAST_NO_HZ kernels, idle-entry state.
+
+	  Say N if you are unsure.
+
+	  Say Y if you want to enable such diagnostics.
+
+>>>>>>> upstream/4.3_primoc
 config RCU_CPU_STALL_TIMEOUT
 	int "RCU CPU stall timeout in seconds"
 	depends on TREE_RCU || TREE_PREEMPT_RCU
@@ -1056,7 +1101,11 @@ config FAULT_INJECTION
 config FAILSLAB
 	bool "Fault-injection capability for kmalloc"
 	depends on FAULT_INJECTION
+<<<<<<< HEAD
 	depends on SLAB || SLUB
+=======
+	depends on SLAB || SLUB || SLQB
+>>>>>>> upstream/4.3_primoc
 	help
 	  Provide fault-injection capability for kmalloc.
 

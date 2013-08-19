@@ -229,6 +229,11 @@ static int primou_rfkill_probe(struct platform_device *pdev)
 	int rc = 0;
 	bool default_state = true;  /* off */
 
+<<<<<<< HEAD
+=======
+	/* always turn on clock? */
+	/* htc_wifi_bt_sleep_clk_ctl(CLK_ON, ID_BT); */
+>>>>>>> upstream/4.3_primoc
 	mdelay(2);
 
 	bluetooth_set_power(NULL, default_state);
@@ -254,7 +259,10 @@ err_rfkill_reg:
 	rfkill_destroy(bt_rfk);
 err_rfkill_alloc:
 	return rc;
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static int primou_rfkill_remove(struct platform_device *dev)

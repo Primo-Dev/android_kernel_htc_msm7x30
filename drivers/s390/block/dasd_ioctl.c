@@ -13,6 +13,10 @@
 #define KMSG_COMPONENT "dasd"
 
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/compat.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/major.h>
 #include <linux/fs.h>
 #include <linux/blkpg.h>

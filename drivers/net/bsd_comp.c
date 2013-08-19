@@ -201,7 +201,11 @@ extern void ppp_unregister_compressor (struct compressor *cp);
 #define LAST	255
 
 #define MAXCODE(b)	((1 << (b)) - 1)
+<<<<<<< HEAD
 #define BADCODEM1	MAXCODE(MAX_BSD_BITS);
+=======
+#define BADCODEM1	MAXCODE(MAX_BSD_BITS)
+>>>>>>> upstream/4.3_primoc
 
 #define BSD_HASH(prefix,suffix,hshift) ((((unsigned long)(suffix))<<(hshift)) \
 					 ^ (unsigned long)(prefix))

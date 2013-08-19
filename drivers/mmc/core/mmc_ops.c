@@ -81,9 +81,21 @@ int mmc_card_sleepawake(struct mmc_host *host, int sleep)
 	 * SEND_STATUS command to poll the status because that command (and most
 	 * others) is invalid while the card sleeps.
 	 */
+<<<<<<< HEAD
 	if (!(host->caps & MMC_CAP_WAIT_WHILE_BUSY))
 		mmc_delay(DIV_ROUND_UP(card->ext_csd.sa_timeout, 10000));
 
+=======
+	if (!(host->caps & MMC_CAP_WAIT_WHILE_BUSY)) {
+		/* JEDEC MMCA 4.41 specifies the timeout value is in 200ns..838.86ms
+		   range. Round it up to 1us and use an appropriate delay method. */
+		unsigned long us = DIV_ROUND_UP(card->ext_csd.sa_timeout, 10);
+		if (us < 10)
+			udelay(us);
+		else
+			usleep_range(us, us + 100);
+	}
+>>>>>>> upstream/4.3_primoc
 	if (!sleep)
 		err = mmc_select_card(card);
 
@@ -451,6 +463,7 @@ int mmc_send_status(struct mmc_card *card, u32 *status)
 	return 0;
 }
 
+<<<<<<< HEAD
 int mmc_set_block_length(struct mmc_card *card, u32 length)
 {
 	int err;
@@ -552,6 +565,8 @@ int mmc_send_write_prot_type(struct mmc_card *card, void *buf, u32 address)
 	return 0;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int
 mmc_send_bus_test(struct mmc_card *card, struct mmc_host *host, u8 opcode,
 		  u8 len)

@@ -2,7 +2,11 @@
  * drivers/gpu/ion/ion.c
  *
  * Copyright (C) 2011 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
+=======
+ * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -109,6 +113,7 @@ struct ion_handle {
 
 static void ion_iommu_release(struct kref *kref);
 
+<<<<<<< HEAD
 static int ion_validate_buffer_flags(struct ion_buffer *buffer,
 					unsigned long flags)
 {
@@ -127,6 +132,8 @@ static int ion_validate_buffer_flags(struct ion_buffer *buffer,
 	return 0;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* this function should only be called while dev->lock is held */
 static void ion_buffer_add(struct ion_device *dev,
 			   struct ion_buffer *buffer)
@@ -232,6 +239,10 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 	}
 	buffer->dev = dev;
 	buffer->size = len;
+<<<<<<< HEAD
+=======
+	buffer->flags = flags;
+>>>>>>> upstream/4.3_primoc
 	mutex_init(&buffer->lock);
 	ion_buffer_add(dev, buffer);
 	return buffer;
@@ -575,11 +586,14 @@ void *ion_map_kernel(struct ion_client *client, struct ion_handle *handle,
 		return ERR_PTR(-ENODEV);
 	}
 
+<<<<<<< HEAD
 	if (ion_validate_buffer_flags(buffer, flags)) {
 			vaddr = ERR_PTR(-EEXIST);
 			goto out;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (_ion_map(&buffer->kmap_cnt, &handle->kmap_cnt)) {
 		vaddr = buffer->heap->ops->map_kernel(buffer->heap, buffer,
 							flags);
@@ -590,7 +604,10 @@ void *ion_map_kernel(struct ion_client *client, struct ion_handle *handle,
 		vaddr = buffer->vaddr;
 	}
 
+<<<<<<< HEAD
 out:
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&buffer->lock);
 	mutex_unlock(&client->lock);
 	return vaddr;
@@ -806,11 +823,14 @@ struct scatterlist *ion_map_dma(struct ion_client *client,
 		return ERR_PTR(-ENODEV);
 	}
 
+<<<<<<< HEAD
 	if (ion_validate_buffer_flags(buffer, flags)) {
 		sglist = ERR_PTR(-EEXIST);
 		goto out;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (_ion_map(&buffer->dmap_cnt, &handle->dmap_cnt)) {
 		sglist = buffer->heap->ops->map_dma(buffer->heap, buffer);
 		if (IS_ERR_OR_NULL(sglist))
@@ -820,7 +840,10 @@ struct scatterlist *ion_map_dma(struct ion_client *client,
 		sglist = buffer->sglist;
 	}
 
+<<<<<<< HEAD
 out:
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&buffer->lock);
 	mutex_unlock(&client->lock);
 	return sglist;
@@ -903,6 +926,7 @@ end:
 }
 EXPORT_SYMBOL(ion_import);
 
+<<<<<<< HEAD
 static int check_vaddr_bounds(unsigned long start, unsigned long end)
 {
 	struct mm_struct *mm = current->active_mm;
@@ -928,6 +952,8 @@ out:
 	return ret;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 int ion_do_cache_op(struct ion_client *client, struct ion_handle *handle,
 			void *uaddr, unsigned long offset, unsigned long len,
 			unsigned int cmd)
@@ -1207,7 +1233,16 @@ int ion_handle_get_flags(struct ion_client *client, struct ion_handle *handle,
 	}
 	buffer = handle->buffer;
 	mutex_lock(&buffer->lock);
+<<<<<<< HEAD
 	*flags = buffer->flags;
+=======
+	/*
+	 * Make sure we only return FLAGS. buffer->flags also holds
+	 * the heap_mask, so we need to make sure we're only looking
+	 * at the supported Ion flags.
+	 */
+	*flags = buffer->flags & (ION_FLAG_CACHED | ION_SECURE);
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&buffer->lock);
 	mutex_unlock(&client->lock);
 
@@ -1322,10 +1357,14 @@ static int ion_share_mmap(struct file *file, struct vm_area_struct *vma)
 	struct ion_client *client;
 	struct ion_handle *handle;
 	int ret;
+<<<<<<< HEAD
 	unsigned long flags = file->f_flags & O_DSYNC ?
 				ION_SET_CACHE(UNCACHED) :
 				ION_SET_CACHE(CACHED);
 
+=======
+	unsigned long flags = buffer->flags;
+>>>>>>> upstream/4.3_primoc
 
 	pr_debug("%s: %d\n", __func__, __LINE__);
 	/* make sure the client still exists, it's possible for the client to
@@ -1362,12 +1401,15 @@ static int ion_share_mmap(struct file *file, struct vm_area_struct *vma)
 
 	mutex_lock(&buffer->lock);
 
+<<<<<<< HEAD
 	if (ion_validate_buffer_flags(buffer, flags)) {
 		ret = -EEXIST;
 		mutex_unlock(&buffer->lock);
 		goto err1;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* now map it to userspace */
 	ret = buffer->heap->ops->map_user(buffer->heap, buffer, vma,
 						flags);
@@ -1425,9 +1467,12 @@ static int ion_ioctl_share(struct file *parent, struct ion_client *client,
 	if (IS_ERR_OR_NULL(file))
 		goto err;
 
+<<<<<<< HEAD
 	if (parent->f_flags & O_DSYNC)
 		file->f_flags |= O_DSYNC;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ion_buffer_get(handle->buffer);
 	fd_install(fd, file);
 
@@ -1449,6 +1494,10 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 		if (copy_from_user(&data, (void __user *)arg, sizeof(data)))
 			return -EFAULT;
+<<<<<<< HEAD
+=======
+		data.flags |= data.heap_mask;
+>>>>>>> upstream/4.3_primoc
 		data.handle = ion_alloc(client, data.len, data.align,
 					     data.flags);
 
@@ -1525,6 +1574,7 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	case ION_IOC_CLEAN_CACHES:
 	case ION_IOC_INV_CACHES:
 	case ION_IOC_CLEAN_INV_CACHES:
+<<<<<<< HEAD
 	{
 		struct ion_flush_data data;
 		unsigned long start, end;
@@ -1580,6 +1630,10 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			return -EFAULT;
 		break;
 	}
+=======
+	case ION_IOC_GET_FLAGS:
+		return client->dev->custom_ioctl(client, cmd, arg);
+>>>>>>> upstream/4.3_primoc
 	default:
 		return -ENOTTY;
 	}

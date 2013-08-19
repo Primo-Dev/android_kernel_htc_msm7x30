@@ -43,7 +43,11 @@ static void __exit nf_nat_tftp_fini(void)
 static int __init nf_nat_tftp_init(void)
 {
 	BUG_ON(nf_nat_tftp_hook != NULL);
+<<<<<<< HEAD
 	rcu_assign_pointer_nonull(nf_nat_tftp_hook, help);
+=======
+	rcu_assign_pointer(nf_nat_tftp_hook, help);
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 

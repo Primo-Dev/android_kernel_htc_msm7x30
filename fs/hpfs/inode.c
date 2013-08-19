@@ -53,7 +53,11 @@ void hpfs_read_inode(struct inode *i)
 		i->i_mode &= ~0111;
 		i->i_op = &hpfs_file_iops;
 		i->i_fop = &hpfs_file_ops;
+<<<<<<< HEAD
 		i->i_nlink = 0;*/
+=======
+		clear_nlink(i);*/
+>>>>>>> upstream/4.3_primoc
 		make_bad_inode(i);
 		return;
 	}

@@ -22,6 +22,10 @@
 #include <linux/regulator/machine.h>
 #include <mach/irqs.h>
 #include <mach/msm_iomap.h>
+<<<<<<< HEAD
+=======
+#include <mach/msm_smsm.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/dma.h>
 #include <mach/board.h>
 #include <asm/clkdev.h>
@@ -39,7 +43,26 @@
 #endif
 #include <mach/dal_axi.h>
 #include <mach/msm_memtypes.h>
+<<<<<<< HEAD
 
+=======
+#include <mach/msm_fb.h>
+
+void config_gpio_table_dbg(uint32_t *table, int len, char *file, int line)
+{
+	int n, rc;
+	for (n = 0; n < len; n++) {
+		rc = gpio_tlmm_config(table[n], GPIO_CFG_ENABLE);
+		if (rc) {
+			pr_err("%s: gpio_tlmm_config(%#x)[%d]=%d (%s:%d)\n",
+			       __func__, table[n], n, rc, file, line);
+			break;
+		}
+	}
+}
+
+unsigned long msm_fb_base;
+>>>>>>> upstream/4.3_primoc
 /* EBI THERMAL DRIVER */
 static struct resource msm_ebi0_thermal_resources[] = {
 	{
@@ -265,6 +288,51 @@ struct platform_device msm_device_i2c = {
 	.resource	= resources_i2c,
 };
 
+<<<<<<< HEAD
+=======
+static struct resource qsd_spi_resources[] = {
+	{
+		.name   = "spi_irq_in",
+		.start	= INT_SPI_INPUT,
+		.end	= INT_SPI_INPUT,
+		.flags	= IORESOURCE_IRQ,
+	},
+	{
+		.name   = "spi_irq_out",
+		.start	= INT_SPI_OUTPUT,
+		.end	= INT_SPI_OUTPUT,
+		.flags	= IORESOURCE_IRQ,
+	},
+	{
+		.name   = "spi_irq_err",
+		.start	= INT_SPI_ERROR,
+		.end	= INT_SPI_ERROR,
+		.flags	= IORESOURCE_IRQ,
+	},
+	{
+		.name   = "spi_base",
+		.start	= MSM_SPI_PHYS,
+		.end	= MSM_SPI_PHYS + MSM_SPI_SIZE - 1,
+		.flags	= IORESOURCE_MEM,
+	},
+	{
+		.name   = "spidm_channels",
+		.flags  = IORESOURCE_DMA,
+	},
+	{
+		.name   = "spidm_crci",
+		.flags  = IORESOURCE_DMA,
+	},
+};
+
+struct platform_device qsd_device_spi = {
+	.name		= "spi_qsd",
+	.id		= 0,
+	.num_resources	= ARRAY_SIZE(qsd_spi_resources),
+	.resource	= qsd_spi_resources,
+};
+
+>>>>>>> upstream/4.3_primoc
 #define MSM_QUP_PHYS           0xA8301000
 #define MSM_GSBI_QUP_I2C_PHYS  0xA8300000
 #define MSM_QUP_SIZE           SZ_4K
@@ -886,7 +954,11 @@ static struct resource msm_vidc_720p_resources[] = {
 };
 
 struct msm_vidc_platform_data vidc_platform_data = {
+<<<<<<< HEAD
 	.memtype = MEMTYPE_EBI1,
+=======
+	.memtype = MEMTYPE_EBI0,
+>>>>>>> upstream/4.3_primoc
 	.enable_ion = 0,
 	.disable_dmx = 0
 };
@@ -1146,6 +1218,62 @@ static void __init msm_register_device(struct platform_device *pdev, void *data)
 			  __func__, ret);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_FB_MSM_NEW
+struct resource msm_fb_resources[] = {
+	{
+		.flags = IORESOURCE_DMA,
+	}
+};
+
+#ifdef CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE
+struct resource msm_v4l2_video_overlay_resources[] = {
+	{
+		.flags = IORESOURCE_DMA,
+	}
+};
+#endif
+
+static int msm_fb_detect_panel(const char *name)
+{
+	return device_fb_detect_panel(name);
+}
+
+static struct msm_fb_platform_data msm_fb_pdata = {
+	.mddi_prescan = 1,
+	.detect_client = msm_fb_detect_panel,
+};
+
+struct platform_device msm_fb_device = {
+	.name   = "msm_fb",
+	.id     = 0,
+	.num_resources  = ARRAY_SIZE(msm_fb_resources),
+	.resource       = msm_fb_resources,
+	.dev    = {
+		.platform_data = &msm_fb_pdata,
+	}
+};
+
+#ifdef CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE
+struct platform_device msm_v4l2_video_overlay_device = {
+	.name   = "msm_v4l2_overlay_pd",
+	.id     = 0,
+	.num_resources  = ARRAY_SIZE(msm_v4l2_video_overlay_resources),
+	.resource       = msm_v4l2_video_overlay_resources,
+};
+#endif
+#endif /* CONFIG_FB_MSM_NEW */
+
+void __init msm_fb_add_devices(struct msm_list_device *devices, int len)
+{
+	int i;
+	for (i = 0; i < len; ++i)
+		msm_fb_register_device(devices[i].name, devices[i].data);
+}
+
+
+>>>>>>> upstream/4.3_primoc
 void __init msm_fb_register_device(char *name, void *data)
 {
 	if (!strncmp(name, "mdp", 3))
@@ -1170,6 +1298,69 @@ void __init msm_fb_register_device(char *name, void *data)
 		printk(KERN_ERR "%s: unknown device! %s\n", __func__, name);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MSM_RMT_STORAGE_SERVER
+#define RAMFS_INFO_MAGICNUMBER		0x654D4D43
+#define RAMFS_INFO_VERSION		0x00000001
+#define RAMFS_MODEMSTORAGE_ID		0x4D454653
+
+static struct resource rmt_storage_resources[] = {
+       {
+		.flags  = IORESOURCE_MEM,
+       },
+};
+
+static struct platform_device rmt_storage_device = {
+       .name           = "rmt_storage",
+       .id             = -1,
+       .num_resources  = ARRAY_SIZE(rmt_storage_resources),
+       .resource       = rmt_storage_resources,
+};
+
+int __init rmt_storage_add_ramfs(void)
+{
+	struct shared_ramfs_table *ramfs_table;
+	struct shared_ramfs_entry *ramfs_entry;
+	int index;
+
+	ramfs_table = smem_alloc(SMEM_SEFS_INFO,
+			sizeof(struct shared_ramfs_table));
+
+	if (!ramfs_table) {
+		printk(KERN_WARNING "%s: No RAMFS table in SMEM\n", __func__);
+		return -ENOENT;
+	}
+
+	if ((ramfs_table->magic_id != (u32) RAMFS_INFO_MAGICNUMBER) ||
+		(ramfs_table->version != (u32) RAMFS_INFO_VERSION)) {
+		printk(KERN_WARNING "%s: Magic / Version mismatch:, "
+		       "magic_id=%#x, format_version=%#x\n", __func__,
+		       ramfs_table->magic_id, ramfs_table->version);
+		return -ENOENT;
+	}
+
+	for (index = 0; index < ramfs_table->entries; index++) {
+		ramfs_entry = &ramfs_table->ramfs_entry[index];
+
+		/* Find a match for the Modem Storage RAMFS area */
+		if (ramfs_entry->client_id == (u32) RAMFS_MODEMSTORAGE_ID) {
+			printk(KERN_INFO "%s: RAMFS Info (from SMEM): "
+				"Baseaddr = 0x%08x, Size = 0x%08x\n", __func__,
+				ramfs_entry->base_addr, ramfs_entry->size);
+
+			rmt_storage_resources[0].start = ramfs_entry->base_addr;
+			rmt_storage_resources[0].end = ramfs_entry->base_addr +
+							ramfs_entry->size - 1;
+			msm_register_device(&rmt_storage_device, ramfs_entry);
+			return 0;
+		}
+	}
+	return -ENOENT;
+}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 static struct platform_device msm_camera_device = {
 	.name	= "msm_camera",
 	.id	= 0,
@@ -1219,6 +1410,10 @@ static struct kgsl_device_platform_data kgsl_3d0_pdata = {
 	.set_grp_async = set_grp3d_async,
 	.idle_timeout = HZ/20,
 	.nap_allowed = true,
+<<<<<<< HEAD
+=======
+	.idle_needed = true,
+>>>>>>> upstream/4.3_primoc
 	.clk_map = KGSL_CLK_SRC | KGSL_CLK_CORE |
 		KGSL_CLK_IFACE | KGSL_CLK_MEM,
 };
@@ -1261,6 +1456,10 @@ static struct kgsl_device_platform_data kgsl_2d0_pdata = {
 	.set_grp_async = NULL,
 	.idle_timeout = HZ/10,
 	.nap_allowed = true,
+<<<<<<< HEAD
+=======
+	.idle_needed = true,
+>>>>>>> upstream/4.3_primoc
 	.clk_map = KGSL_CLK_CORE | KGSL_CLK_IFACE,
 };
 

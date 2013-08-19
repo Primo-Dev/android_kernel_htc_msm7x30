@@ -45,9 +45,13 @@ extern unsigned long lpj_fine;
 void calibrate_delay(void);
 void msleep(unsigned int msecs);
 unsigned long msleep_interruptible(unsigned int msecs);
+<<<<<<< HEAD
 void hr_msleep(unsigned int msecs);
 unsigned long hr_msleep_interruptible(unsigned int msecs);
 void usleep_range(unsigned long min, unsigned long max);
+=======
+unsigned long usleep_range(unsigned long min, unsigned long max);
+>>>>>>> upstream/4.3_primoc
 
 static inline void usleep(unsigned long usecs)
 {

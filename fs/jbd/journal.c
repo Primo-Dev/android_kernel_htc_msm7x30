@@ -126,6 +126,11 @@ static int kjournald(void *arg)
 	setup_timer(&journal->j_commit_timer, commit_timeout,
 			(unsigned long)current);
 
+<<<<<<< HEAD
+=======
+	set_freezable();
+
+>>>>>>> upstream/4.3_primoc
 	/* Record that the journal thread is running */
 	journal->j_task = current;
 	wake_up(&journal->j_wait_done_commit);
@@ -820,7 +825,11 @@ journal_t * journal_init_inode (struct inode *inode)
 	journal_t *journal = journal_init_common();
 	int err;
 	int n;
+<<<<<<< HEAD
 	unsigned int blocknr;
+=======
+	unsigned int blocknr = 0;
+>>>>>>> upstream/4.3_primoc
 
 	if (!journal)
 		return NULL;
@@ -1131,6 +1140,17 @@ static int journal_get_superblock(journal_t *journal)
 		goto out;
 	}
 
+<<<<<<< HEAD
+=======
+	if (be32_to_cpu(sb->s_first) == 0 ||
+	    be32_to_cpu(sb->s_first) >= journal->j_maxlen) {
+		printk(KERN_WARNING
+			"JBD: Invalid start block of journal: %u\n",
+			be32_to_cpu(sb->s_first));
+		goto out;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	return 0;
 
 out:

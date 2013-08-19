@@ -3,7 +3,11 @@
  * them to run sooner, but does not allow tons of sleepers to
  * rip the spread apart.
  */
+<<<<<<< HEAD
 SCHED_FEAT(GENTLE_FAIR_SLEEPERS, 0)
+=======
+SCHED_FEAT(GENTLE_FAIR_SLEEPERS, 1)
+>>>>>>> upstream/4.3_primoc
 
 /*
  * Place new tasks ahead so that they do not starve already running
@@ -12,11 +16,14 @@ SCHED_FEAT(GENTLE_FAIR_SLEEPERS, 0)
 SCHED_FEAT(START_DEBIT, 1)
 
 /*
+<<<<<<< HEAD
  * Should wakeups try to preempt running tasks.
  */
 SCHED_FEAT(WAKEUP_PREEMPT, 1)
 
 /*
+=======
+>>>>>>> upstream/4.3_primoc
  * Based on load and program behaviour, see if it makes sense to place
  * a newly woken task on the same cpu as the task that woke it --
  * improve cache locality. Typically used with SYNC wakeups as

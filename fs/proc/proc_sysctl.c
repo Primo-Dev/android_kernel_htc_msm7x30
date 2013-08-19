@@ -39,7 +39,11 @@ static struct inode *proc_sys_make_inode(struct super_block *sb,
 		inode->i_fop = &proc_sys_file_operations;
 	} else {
 		inode->i_mode |= S_IFDIR;
+<<<<<<< HEAD
 		inode->i_nlink = 0;
+=======
+		clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 		inode->i_op = &proc_sys_dir_operations;
 		inode->i_fop = &proc_sys_dir_file_operations;
 	}
@@ -294,7 +298,11 @@ out:
 	return ret;
 }
 
+<<<<<<< HEAD
 static int proc_sys_permission(struct inode *inode, int mask,unsigned int flags)
+=======
+static int proc_sys_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	/*
 	 * sysctl entries that are not writeable,
@@ -316,7 +324,11 @@ static int proc_sys_permission(struct inode *inode, int mask,unsigned int flags)
 	if (!table) /* global root - r-xr-xr-x */
 		error = mask & MAY_WRITE ? -EACCES : 0;
 	else /* Use the permissions on the sysctl table entry */
+<<<<<<< HEAD
 		error = sysctl_perm(head->root, table, mask);
+=======
+		error = sysctl_perm(head->root, table, mask & ~MAY_NOT_BLOCK);
+>>>>>>> upstream/4.3_primoc
 
 	sysctl_head_finish(head);
 	return error;

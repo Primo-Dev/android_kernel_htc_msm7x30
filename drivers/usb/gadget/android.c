@@ -61,6 +61,10 @@
 #elif defined(CONFIG_USB_ANDROID_RMNET_BAM)
 #include "f_rmnet.c"
 #endif
+<<<<<<< HEAD
+=======
+#include "f_audio_source.c"
+>>>>>>> upstream/4.3_primoc
 #include "f_mass_storage.c"
 #include "u_serial.c"
 #include "u_sdio.c"
@@ -87,9 +91,12 @@
 #ifdef CONFIG_USB_ANDROID_ECM
 #include "f_ecm.c"
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 #include "passthru.c"
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 #include "u_ether.c"
 #ifdef CONFIG_USB_ANDROID_USBNET
 #include "f_usbnet.c"
@@ -297,7 +304,11 @@ static void android_work(struct work_struct *data)
 #endif
 		}
 
+<<<<<<< HEAD
 		if (!connect2pc && dev->connected && !is_mtp_enabled) {
+=======
+		if (!connect2pc && dev->connected) {
+>>>>>>> upstream/4.3_primoc
 			connect2pc = true;
 			switch_set_state(&cdev->sw_connect2pc, 1);
 			pr_info("set usb_connect2pc = 1\n");
@@ -314,6 +325,7 @@ static void android_work(struct work_struct *data)
 		pr_info("%s\n", dev->connected ? connected[0] : disconnected[0]);
 	} else {
 		spin_unlock_irqrestore(&cdev->lock, flags);
+<<<<<<< HEAD
 
 		if (is_mtp_enabled) {
 			kobject_uevent_env(&dev->dev->kobj, KOBJ_CHANGE,
@@ -324,6 +336,11 @@ static void android_work(struct work_struct *data)
 	}
 
 	if (connect2pc && !dev->connected && !is_mtp_enabled) {
+=======
+	}
+
+	if (connect2pc && !dev->connected) {
+>>>>>>> upstream/4.3_primoc
 		connect2pc = false;
 		switch_set_state(&cdev->sw_connect2pc, 0);
 		pr_info("set usb_connect2pc = 0\n");
@@ -830,9 +847,13 @@ static struct android_usb_function serial_function = {
 /* ADB */
 static int adb_function_init(struct android_usb_function *f, struct usb_composite_dev *cdev)
 {
+<<<<<<< HEAD
 	struct android_dev *dev = _android_dev;
 
 	return adb_setup(dev->pdata->adb_perf_lock_on?true:false);
+=======
+	return adb_setup();
+>>>>>>> upstream/4.3_primoc
 }
 
 static void adb_function_cleanup(struct android_usb_function *f)
@@ -1597,12 +1618,81 @@ struct android_usb_function usbnet_function = {
 };
 #endif
 
+<<<<<<< HEAD
+=======
+static int audio_source_function_init(struct android_usb_function *f,
+			struct usb_composite_dev *cdev)
+{
+	struct audio_source_config *config;
+
+	config = kzalloc(sizeof(struct audio_source_config), GFP_KERNEL);
+	if (!config)
+		return -ENOMEM;
+	config->card = -1;
+	config->device = -1;
+	f->config = config;
+	return 0;
+}
+
+static void audio_source_function_cleanup(struct android_usb_function *f)
+{
+	kfree(f->config);
+}
+
+static int audio_source_function_bind_config(struct android_usb_function *f,
+						struct usb_configuration *c)
+{
+	struct audio_source_config *config = f->config;
+
+	return audio_source_bind_config(c, config);
+}
+
+static void audio_source_function_unbind_config(struct android_usb_function *f,
+						struct usb_configuration *c)
+{
+	struct audio_source_config *config = f->config;
+
+	config->card = -1;
+	config->device = -1;
+}
+
+static ssize_t audio_source_pcm_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct android_usb_function *f = dev_get_drvdata(dev);
+	struct audio_source_config *config = f->config;
+
+	/* print PCM card and device numbers */
+	return sprintf(buf, "%d %d\n", config->card, config->device);
+}
+
+static DEVICE_ATTR(pcm, S_IRUGO | S_IWUSR, audio_source_pcm_show, NULL);
+
+static struct device_attribute *audio_source_function_attributes[] = {
+	&dev_attr_pcm,
+	NULL
+};
+
+static struct android_usb_function audio_source_function = {
+	.name		= "audio_source",
+	.init		= audio_source_function_init,
+	.cleanup	= audio_source_function_cleanup,
+	.bind_config	= audio_source_function_bind_config,
+	.unbind_config	= audio_source_function_unbind_config,
+	.attributes	= audio_source_function_attributes,
+};
+
+>>>>>>> upstream/4.3_primoc
 static struct android_usb_function *supported_functions[] = {
 #if 1
 #ifdef CONFIG_USB_ANDROID_RNDIS
 	&rndis_function,
 #endif
 	&accessory_function,
+<<<<<<< HEAD
+=======
+	&audio_source_function,
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_USB_ANDROID_MTP
 	&mtp_function,
 	&ptp_function,
@@ -1647,7 +1737,10 @@ static struct android_usb_function *supported_functions[] = {
 #endif
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int android_init_functions(struct android_usb_function **functions,
 				  struct usb_composite_dev *cdev)
 {
@@ -2211,7 +2304,11 @@ android_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *c)
 	if (value < 0)
 		value = acc_ctrlrequest(cdev, c);
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ANDROID_PROJECTOR_HTC_MODE
+=======
+#ifdef CONFIG_USB_ANDROID_PROJECTOR
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * The projector needs to handle control requests before it's enabled.
 	 */
@@ -2242,11 +2339,20 @@ static void android_disconnect(struct usb_gadget *gadget)
 	unsigned long flags;
 
 	composite_disconnect(gadget);
+<<<<<<< HEAD
+=======
+	/* accessory HID support can be active while the
+	   accessory function is not actually enabled,
+	   so we need to inform it when we are disconnected.
+	 */
+	acc_disconnect();
+>>>>>>> upstream/4.3_primoc
 
 	spin_lock_irqsave(&cdev->lock, flags);
 	dev->connected = 0;
 	schedule_work(&dev->work);
 	spin_unlock_irqrestore(&cdev->lock, flags);
+<<<<<<< HEAD
 
 	/*android_switch_function is not called if removing usb cable. Without it, connect2pc may be blocked by is_mtp_enabled*/
 	is_mtp_enabled = false;
@@ -2267,6 +2373,8 @@ static void android_mute_disconnect(struct usb_gadget *gadget)
 		schedule_work(&dev->work);
 		spin_unlock_irqrestore(&cdev->lock, flags);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void android_destroy_device(struct android_dev *dev)
@@ -2439,7 +2547,10 @@ static int __init init(void)
 	/* Override composite driver functions */
 	composite_driver.setup = android_setup;
 	composite_driver.disconnect = android_disconnect;
+<<<<<<< HEAD
 	composite_driver.mute_disconnect = android_mute_disconnect;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	ret = platform_driver_probe(&android_platform_driver, android_probe);
 	if (ret) {

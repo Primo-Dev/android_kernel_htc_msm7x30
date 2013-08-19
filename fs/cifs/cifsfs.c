@@ -224,7 +224,11 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int cifs_permission(struct inode *inode, int mask, unsigned int flags)
+=======
+static int cifs_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	struct cifs_sb_info *cifs_sb;
 
@@ -239,7 +243,11 @@ static int cifs_permission(struct inode *inode, int mask, unsigned int flags)
 		on the client (above and beyond ACL on servers) for
 		servers which do not support setting and viewing mode bits,
 		so allowing client to check permissions is useful */
+<<<<<<< HEAD
 		return generic_permission(inode, mask, flags, NULL);
+=======
+		return generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 }
 
 static struct kmem_cache *cifs_inode_cachep;
@@ -571,6 +579,14 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
 			dentry = ERR_PTR(-ENOENT);
 			break;
 		}
+<<<<<<< HEAD
+=======
+		if (!S_ISDIR(dir->i_mode)) {
+			dput(dentry);
+			dentry = ERR_PTR(-ENOTDIR);
+			break;
+		}
+>>>>>>> upstream/4.3_primoc
 
 		/* skip separators */
 		while (*s == sep)
@@ -710,8 +726,16 @@ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 
 static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
 {
+<<<<<<< HEAD
 	/* origin == SEEK_END => we must revalidate the cached file length */
 	if (origin == SEEK_END) {
+=======
+	/*
+	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
+	 * the cached file length
+	 */
+	if (origin != SEEK_SET || origin != SEEK_CUR) {
+>>>>>>> upstream/4.3_primoc
 		int rc;
 		struct inode *inode = file->f_path.dentry->d_inode;
 
@@ -738,7 +762,11 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
 		if (rc < 0)
 			return (loff_t)rc;
 	}
+<<<<<<< HEAD
 	return generic_file_llseek_unlocked(file, offset, origin);
+=======
+	return generic_file_llseek(file, offset, origin);
+>>>>>>> upstream/4.3_primoc
 }
 
 static int cifs_setlease(struct file *file, long arg, struct file_lock **lease)

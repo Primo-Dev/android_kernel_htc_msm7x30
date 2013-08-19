@@ -107,9 +107,12 @@ void __init reserve_crashkernel(void)
 	unsigned long long crash_size, crash_base;
 	int ret;
 
+<<<<<<< HEAD
 	/* this is necessary because of memblock_phys_mem_size() */
 	memblock_analyze();
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* use common parsing */
 	ret = parse_crashkernel(boot_command_line, memblock_phys_mem_size(),
 			&crash_size, &crash_base);

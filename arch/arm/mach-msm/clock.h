@@ -70,7 +70,10 @@ struct clk_ops {
 	int (*handoff)(struct clk *clk);
 	int (*reset)(struct clk *clk, enum clk_reset_action action);
 	int (*set_rate)(struct clk *clk, unsigned long rate);
+<<<<<<< HEAD
 	int (*set_min_rate)(struct clk *clk, unsigned long rate);
+=======
+>>>>>>> upstream/4.3_primoc
 	int (*set_max_rate)(struct clk *clk, unsigned long rate);
 	int (*set_flags)(struct clk *clk, unsigned flags);
 	unsigned long (*get_rate)(struct clk *clk);

@@ -50,10 +50,13 @@
 
 /* End of user params */
 
+<<<<<<< HEAD
 /* Cache of the first/second-level indices for PAGE_SIZE allocations */
 static u32 pagesize_slindex;
 static u32 pagesize_flindex;
 
+=======
+>>>>>>> upstream/4.3_primoc
 enum blockflags {
 	BLOCK_FREE,
 	PREV_FREE,
@@ -97,5 +100,8 @@ struct xv_pool {
 };
 
 #endif
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> upstream/4.3_primoc

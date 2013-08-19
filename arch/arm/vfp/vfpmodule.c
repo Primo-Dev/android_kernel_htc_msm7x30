@@ -11,12 +11,21 @@
 #include <linux/module.h>
 #include <linux/types.h>
 #include <linux/cpu.h>
+<<<<<<< HEAD
+=======
+#include <linux/hardirq.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/kernel.h>
 #include <linux/notifier.h>
 #include <linux/signal.h>
 #include <linux/sched.h>
 #include <linux/smp.h>
 #include <linux/init.h>
+<<<<<<< HEAD
+=======
+#include <linux/uaccess.h>
+#include <linux/user.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/cputype.h>
 #include <asm/thread_notify.h>
@@ -369,7 +378,11 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	 * If there isn't a second FP instruction, exit now. Note that
 	 * the FPEXC.FP2V bit is valid only if FPEXC.EX is 1.
 	 */
+<<<<<<< HEAD
 	if (fpexc ^ (FPEXC_EX | FPEXC_FP2V))
+=======
+	if ((fpexc & (FPEXC_EX | FPEXC_FP2V)) != (FPEXC_EX | FPEXC_FP2V))
+>>>>>>> upstream/4.3_primoc
 		goto exit;
 
 	/*
@@ -389,7 +402,14 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 
 static void vfp_enable(void *unused)
 {
+<<<<<<< HEAD
 	u32 access = get_copro_access();
+=======
+	u32 access;
+
+	BUG_ON(preemptible());
+	access = get_copro_access();
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Enable full access to VFP (cp10 and cp11)
@@ -425,7 +445,11 @@ int vfp_flush_context(void)
 		vfp_save_state(last_VFP_context[cpu], fpexc);
 
 		/* disable, just in case */
+<<<<<<< HEAD
 		fmxr(FPEXC, fmrx(FPEXC) & ~FPEXC_EN);
+=======
+		fmxr(FPEXC, fpexc & ~FPEXC_EN);
+>>>>>>> upstream/4.3_primoc
 		saved = 1;
 	}
 	last_VFP_context[cpu] = NULL;
@@ -529,6 +553,106 @@ void vfp_flush_hwstate(struct thread_info *thread)
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Save the current VFP state into the provided structures and prepare
+ * for entry into a new function (signal handler).
+ */
+int vfp_preserve_user_hwstate(struct user_vfp __user *ufp,
+			      struct user_vfp_exc __user *ufp_exc)
+{
+	struct thread_info *thread = current_thread_info();
+	struct vfp_hard_struct *hwstate = &thread->vfpstate.hard;
+	int err = 0;
+
+	/* Ensure that the saved hwstate is up-to-date. */
+	vfp_sync_hwstate(thread);
+
+	/*
+	 * Copy the floating point registers. There can be unused
+	 * registers see asm/hwcap.h for details.
+	 */
+	err |= __copy_to_user(&ufp->fpregs, &hwstate->fpregs,
+			      sizeof(hwstate->fpregs));
+	/*
+	 * Copy the status and control register.
+	 */
+	__put_user_error(hwstate->fpscr, &ufp->fpscr, err);
+
+	/*
+	 * Copy the exception registers.
+	 */
+	__put_user_error(hwstate->fpexc, &ufp_exc->fpexc, err);
+	__put_user_error(hwstate->fpinst, &ufp_exc->fpinst, err);
+	__put_user_error(hwstate->fpinst2, &ufp_exc->fpinst2, err);
+
+	if (err)
+		return -EFAULT;
+
+	/* Ensure that VFP is disabled. */
+	vfp_flush_hwstate(thread);
+
+	/*
+	 * As per the PCS, clear the length and stride bits before entry
+	 * to the signal handler.
+	 */
+	hwstate->fpscr &= ~(FPSCR_LENGTH_MASK | FPSCR_STRIDE_MASK);
+
+	/*
+	 * Disable VFP in the hwstate so that we can detect if it was
+	 * used by the signal handler.
+	 */
+	hwstate->fpexc &= ~FPEXC_EN;
+	return 0;
+}
+
+/* Sanitise and restore the current VFP state from the provided structures. */
+int vfp_restore_user_hwstate(struct user_vfp __user *ufp,
+			     struct user_vfp_exc __user *ufp_exc)
+{
+	struct thread_info *thread = current_thread_info();
+	struct vfp_hard_struct *hwstate = &thread->vfpstate.hard;
+	unsigned long fpexc;
+	int err = 0;
+
+	/*
+	 * If VFP has been used, then disable it to avoid corrupting
+	 * the new thread state.
+	 */
+	if (hwstate->fpexc & FPEXC_EN)
+		vfp_flush_hwstate(thread);
+
+	/*
+	 * Copy the floating point registers. There can be unused
+	 * registers see asm/hwcap.h for details.
+	 */
+	err |= __copy_from_user(&hwstate->fpregs, &ufp->fpregs,
+				sizeof(hwstate->fpregs));
+	/*
+	 * Copy the status and control register.
+	 */
+	__get_user_error(hwstate->fpscr, &ufp->fpscr, err);
+
+	/*
+	 * Sanitise and restore the exception registers.
+	 */
+	__get_user_error(fpexc, &ufp_exc->fpexc, err);
+
+	/* Ensure the VFP is enabled. */
+	fpexc |= FPEXC_EN;
+
+	/* Ensure FPINST2 is invalid and the exception flag is cleared. */
+	fpexc &= ~(FPEXC_EX | FPEXC_FP2V);
+	hwstate->fpexc = fpexc;
+
+	__get_user_error(hwstate->fpinst, &ufp_exc->fpinst, err);
+	__get_user_error(hwstate->fpinst2, &ufp_exc->fpinst2, err);
+
+	return err ? -EFAULT : 0;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  * VFP hardware can lose all context when a CPU goes offline.
  * As we will be running in SMP mode with CPU hotplug, we will save the
  * hardware state at every thread switch.  We clear our held state when
@@ -559,7 +683,11 @@ static int __init vfp_init(void)
 	unsigned int cpu_arch = cpu_architecture();
 
 	if (cpu_arch >= CPU_ARCH_ARMv6)
+<<<<<<< HEAD
 		vfp_enable(NULL);
+=======
+		on_each_cpu(vfp_enable, NULL, 1);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * First check that there is a VFP that we can use.
@@ -580,8 +708,11 @@ static int __init vfp_init(void)
 	} else {
 		hotcpu_notifier(vfp_hotplug, 0);
 
+<<<<<<< HEAD
 		smp_call_function(vfp_enable, NULL, 1);
 
+=======
+>>>>>>> upstream/4.3_primoc
 		VFP_arch = (vfpsid & FPSID_ARCH_MASK) >> FPSID_ARCH_BIT;  /* Extract the architecture version */
 		printk("implementor %02x architecture %d part %02x variant %x rev %x\n",
 			(vfpsid & FPSID_IMPLEMENTER_MASK) >> FPSID_IMPLEMENTER_BIT,

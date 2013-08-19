@@ -139,8 +139,15 @@ struct event_filter;
 enum trace_reg {
 	TRACE_REG_REGISTER,
 	TRACE_REG_UNREGISTER,
+<<<<<<< HEAD
 	TRACE_REG_PERF_REGISTER,
 	TRACE_REG_PERF_UNREGISTER,
+=======
+#ifdef CONFIG_PERF_EVENTS
+	TRACE_REG_PERF_REGISTER,
+	TRACE_REG_PERF_UNREGISTER,
+#endif
+>>>>>>> upstream/4.3_primoc
 };
 
 struct ftrace_event_call;

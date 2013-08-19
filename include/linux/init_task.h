@@ -30,6 +30,16 @@ extern struct fs_struct init_fs;
 #define INIT_THREADGROUP_FORK_LOCK(sig)
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CPUSETS
+#define INIT_CPUSET_SEQ							\
+	.mems_allowed_seq = SEQCNT_ZERO,
+#else
+#define INIT_CPUSET_SEQ
+#endif
+
+>>>>>>> upstream/4.3_primoc
 #define INIT_SIGNALS(sig) {						\
 	.nr_threads	= 1,						\
 	.wait_chldexit	= __WAIT_QUEUE_HEAD_INITIALIZER(sig.wait_chldexit),\
@@ -157,7 +167,11 @@ extern struct task_group root_task_group;
 	},								\
 	.rt		= {						\
 		.run_list	= LIST_HEAD_INIT(tsk.rt.run_list),	\
+<<<<<<< HEAD
 		.time_slice	= HZ, 					\
+=======
+		.time_slice	= DEF_TIMESLICE,			\
+>>>>>>> upstream/4.3_primoc
 		.nr_cpus_allowed = NR_CPUS,				\
 	},								\
 	.tasks		= LIST_HEAD_INIT(tsk.tasks),			\
@@ -186,7 +200,10 @@ extern struct task_group root_task_group;
 	.alloc_lock	= __SPIN_LOCK_UNLOCKED(tsk.alloc_lock),		\
 	.journal_info	= NULL,						\
 	.cpu_timers	= INIT_CPU_TIMERS(tsk.cpu_timers),		\
+<<<<<<< HEAD
 	.fs_excl	= ATOMIC_INIT(0),				\
+=======
+>>>>>>> upstream/4.3_primoc
 	.pi_lock	= __RAW_SPIN_LOCK_UNLOCKED(tsk.pi_lock),	\
 	.timer_slack_ns = 50000, /* 50 usec default slack */		\
 	.pids = {							\
@@ -195,7 +212,10 @@ extern struct task_group root_task_group;
 		[PIDTYPE_SID]  = INIT_PID_LINK(PIDTYPE_SID),		\
 	},								\
 	.thread_group	= LIST_HEAD_INIT(tsk.thread_group),		\
+<<<<<<< HEAD
 	.dirties = INIT_PROP_LOCAL_SINGLE(dirties),			\
+=======
+>>>>>>> upstream/4.3_primoc
 	INIT_IDS							\
 	INIT_PERF_EVENTS(tsk)						\
 	INIT_TRACE_IRQFLAGS						\
@@ -203,6 +223,10 @@ extern struct task_group root_task_group;
 	INIT_FTRACE_GRAPH						\
 	INIT_TRACE_RECURSION						\
 	INIT_TASK_RCU_PREEMPT(tsk)					\
+<<<<<<< HEAD
+=======
+	INIT_CPUSET_SEQ							\
+>>>>>>> upstream/4.3_primoc
 }
 
 

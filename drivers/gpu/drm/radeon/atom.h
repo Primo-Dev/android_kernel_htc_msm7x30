@@ -44,7 +44,10 @@
 #define ATOM_CMD_SETSCLK	0x0A
 #define ATOM_CMD_SETMCLK	0x0B
 #define ATOM_CMD_SETPCLK	0x0C
+<<<<<<< HEAD
 #define ATOM_CMD_SPDFANCNTL	0x39
+=======
+>>>>>>> upstream/4.3_primoc
 
 #define ATOM_DATA_FWI_PTR	0xC
 #define ATOM_DATA_IIO_PTR	0x32

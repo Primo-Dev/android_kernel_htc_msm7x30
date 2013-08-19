@@ -195,6 +195,7 @@ static int nilfs_writepage(struct page *page, struct writeback_control *wbc)
 
 static int nilfs_set_page_dirty(struct page *page)
 {
+<<<<<<< HEAD
 	int ret = __set_page_dirty_buffers(page);
 
 	if (ret) {
@@ -202,6 +203,34 @@ static int nilfs_set_page_dirty(struct page *page)
 		unsigned nr_dirty = 1 << (PAGE_SHIFT - inode->i_blkbits);
 
 		nilfs_set_file_dirty(inode, nr_dirty);
+=======
+	int ret = __set_page_dirty_nobuffers(page);
+
+	if (page_has_buffers(page)) {
+		struct inode *inode = page->mapping->host;
+		unsigned nr_dirty = 0;
+		struct buffer_head *bh, *head;
+
+		/*
+		 * This page is locked by callers, and no other thread
+		 * concurrently marks its buffers dirty since they are
+		 * only dirtied through routines in fs/buffer.c in
+		 * which call sites of mark_buffer_dirty are protected
+		 * by page lock.
+		 */
+		bh = head = page_buffers(page);
+		do {
+			/* Do not mark hole blocks dirty */
+			if (buffer_dirty(bh) || !buffer_mapped(bh))
+				continue;
+
+			set_buffer_dirty(bh);
+			nr_dirty++;
+		} while (bh = bh->b_this_page, bh != head);
+
+		if (nr_dirty)
+			nilfs_set_file_dirty(inode, nr_dirty);
+>>>>>>> upstream/4.3_primoc
 	}
 	return ret;
 }
@@ -259,8 +288,13 @@ nilfs_direct_IO(int rw, struct kiocb *iocb, const struct iovec *iov,
 		return 0;
 
 	/* Needs synchronization with the cleaner */
+<<<<<<< HEAD
 	size = blockdev_direct_IO(rw, iocb, inode, inode->i_sb->s_bdev, iov,
 				  offset, nr_segs, nilfs_get_block, NULL);
+=======
+	size = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
+				  nilfs_get_block);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * In case of error extending write may have instantiated a few
@@ -354,7 +388,11 @@ struct inode *nilfs_new_inode(struct inode *dir, int mode)
 
  failed_acl:
  failed_bmap:
+<<<<<<< HEAD
 	inode->i_nlink = 0;
+=======
+	clear_nlink(inode);
+>>>>>>> upstream/4.3_primoc
 	iput(inode);  /* raw_inode will be deleted through
 			 generic_delete_inode() */
 	goto failed;
@@ -778,6 +816,11 @@ int nilfs_setattr(struct dentry *dentry, struct iattr *iattr)
 
 	if ((iattr->ia_valid & ATTR_SIZE) &&
 	    iattr->ia_size != i_size_read(inode)) {
+<<<<<<< HEAD
+=======
+		inode_dio_wait(inode);
+
+>>>>>>> upstream/4.3_primoc
 		err = vmtruncate(inode, iattr->ia_size);
 		if (unlikely(err))
 			goto out_err;
@@ -799,14 +842,22 @@ out_err:
 	return err;
 }
 
+<<<<<<< HEAD
 int nilfs_permission(struct inode *inode, int mask, unsigned int flags)
+=======
+int nilfs_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	struct nilfs_root *root = NILFS_I(inode)->i_root;
 	if ((mask & MAY_WRITE) && root &&
 	    root->cno != NILFS_CPTREE_CURRENT_CNO)
 		return -EROFS; /* snapshot is not writable */
 
+<<<<<<< HEAD
 	return generic_permission(inode, mask, flags, NULL);
+=======
+	return generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 }
 
 int nilfs_load_inode_block(struct inode *inode, struct buffer_head **pbh)

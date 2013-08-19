@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2008-2012, Code Aurora Forum. All rights reserved.
+=======
+/* Copyright (c) 2008-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -89,6 +93,10 @@ struct adreno_gpudev {
 	void (*ctxt_draw_workaround)(struct adreno_device *, struct adreno_context *);
 	irqreturn_t (*irq_handler)(struct adreno_device *);
 	void (*irq_control)(struct adreno_device *, int);
+<<<<<<< HEAD
+=======
+	unsigned int (*irq_pending)(struct adreno_device *);
+>>>>>>> upstream/4.3_primoc
 	void * (*snapshot)(struct adreno_device *, void *, int *, int);
 };
 

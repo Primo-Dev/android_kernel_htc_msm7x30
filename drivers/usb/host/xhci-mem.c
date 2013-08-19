@@ -273,6 +273,13 @@ static struct xhci_container_ctx *xhci_alloc_container_ctx(struct xhci_hcd *xhci
 		ctx->size += CTX_SIZE(xhci->hcc_params);
 
 	ctx->bytes = dma_pool_alloc(xhci->device_pool, flags, &ctx->dma);
+<<<<<<< HEAD
+=======
+	if (!ctx->bytes) {
+		kfree(ctx);
+		return NULL;
+	}
+>>>>>>> upstream/4.3_primoc
 	memset(ctx->bytes, 0, ctx->size);
 	return ctx;
 }

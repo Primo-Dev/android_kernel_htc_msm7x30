@@ -168,6 +168,10 @@ static void destroy_serial(struct kref *kref)
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	usb_put_intf(serial->interface);
+>>>>>>> upstream/4.3_primoc
 	usb_put_dev(serial->dev);
 	kfree(serial);
 }
@@ -624,7 +628,11 @@ static struct usb_serial *create_serial(struct usb_device *dev,
 	}
 	serial->dev = usb_get_dev(dev);
 	serial->type = driver;
+<<<<<<< HEAD
 	serial->interface = interface;
+=======
+	serial->interface = usb_get_intf(interface);
+>>>>>>> upstream/4.3_primoc
 	kref_init(&serial->kref);
 	mutex_init(&serial->disc_mutex);
 	serial->minor = SERIAL_TTY_NO_MINOR;

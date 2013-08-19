@@ -765,7 +765,11 @@ send:
 /*
  * Push out all pending data as one UDP datagram. Socket is locked.
  */
+<<<<<<< HEAD
 static int udp_push_pending_frames(struct sock *sk)
+=======
+int udp_push_pending_frames(struct sock *sk)
+>>>>>>> upstream/4.3_primoc
 {
 	struct udp_sock  *up = udp_sk(sk);
 	struct inet_sock *inet = inet_sk(sk);
@@ -784,6 +788,10 @@ out:
 	up->pending = 0;
 	return err;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(udp_push_pending_frames);
+>>>>>>> upstream/4.3_primoc
 
 int udp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 		size_t len)
@@ -939,11 +947,14 @@ int udp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 			goto out;
 		}
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(rt) || (!rt))
 		printk(KERN_ERR "[NET] rt is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 		err = -EACCES;
 		if ((rt->rt_flags & RTCF_BROADCAST) &&
 		    !sock_flag(sk, SOCK_BROADCAST))

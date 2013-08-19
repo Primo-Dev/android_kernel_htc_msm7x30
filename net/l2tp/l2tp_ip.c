@@ -411,11 +411,14 @@ static int l2tp_ip_backlog_recv(struct sock *sk, struct sk_buff *skb)
 {
 	int rc;
 
+<<<<<<< HEAD
 	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb))
 		goto drop;
 
 	nf_reset(skb);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* Charge it to the socket, dropping if the queue is full. */
 	rc = sock_queue_rcv_skb(sk, skb);
 	if (rc < 0)

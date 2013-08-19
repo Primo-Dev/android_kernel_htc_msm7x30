@@ -122,8 +122,11 @@ struct synaptics_i2c_rmi_platform_data {
 	uint8_t support_htc_event;
 	uint8_t mfg_flag;
 	uint8_t customer_register[CUS_REG_SIZE];
+<<<<<<< HEAD
 	uint8_t segmentation_bef_unlock;
 	uint8_t i2c_err_handler_en;
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 struct page_description {
@@ -155,4 +158,12 @@ enum {
 	FUNCTION
 };
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+extern void sweep2wake_syn_setdev(struct input_dev * input_device);
+#endif
+extern void synaptics_proximity_status(bool val);
+
+>>>>>>> upstream/4.3_primoc
 #endif /* _LINUX_SYNAPTICS_I2C_RMI_H */

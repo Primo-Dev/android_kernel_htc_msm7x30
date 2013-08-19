@@ -53,6 +53,11 @@ static struct protection_domain *pt_domain;
 
 static struct iommu_ops amd_iommu_ops;
 
+<<<<<<< HEAD
+=======
+static struct dma_map_ops amd_iommu_dma_ops;
+
+>>>>>>> upstream/4.3_primoc
 /*
  * general struct to manage commands send to an IOMMU
  */
@@ -1778,6 +1783,7 @@ static int device_change_notifier(struct notifier_block *nb,
 
 		domain = domain_for_device(dev);
 
+<<<<<<< HEAD
 		/* allocate a protection domain if a device is added */
 		dma_domain = find_protection_domain(devid);
 		if (dma_domain)
@@ -1790,6 +1796,22 @@ static int device_change_notifier(struct notifier_block *nb,
 		spin_lock_irqsave(&iommu_pd_list_lock, flags);
 		list_add_tail(&dma_domain->list, &iommu_pd_list);
 		spin_unlock_irqrestore(&iommu_pd_list_lock, flags);
+=======
+		dma_domain = find_protection_domain(devid);
+		if (!dma_domain) {
+			/* allocate a protection domain if a device is added */
+			dma_domain = dma_ops_domain_alloc();
+			if (!dma_domain)
+				goto out;
+			dma_domain->target_dev = devid;
+
+			spin_lock_irqsave(&iommu_pd_list_lock, flags);
+			list_add_tail(&dma_domain->list, &iommu_pd_list);
+			spin_unlock_irqrestore(&iommu_pd_list_lock, flags);
+		}
+
+		dev->archdata.dma_ops = &amd_iommu_dma_ops;
+>>>>>>> upstream/4.3_primoc
 
 		break;
 	case BUS_NOTIFY_DEL_DEVICE:

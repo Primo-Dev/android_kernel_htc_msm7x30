@@ -9,7 +9,11 @@
 #define _LINUX_PNODE_H
 
 #include <linux/list.h>
+<<<<<<< HEAD
 #include <linux/mount.h>
+=======
+#include "mount.h"
+>>>>>>> upstream/4.3_primoc
 
 #define IS_MNT_SHARED(mnt) (mnt->mnt_flags & MNT_SHARED)
 #define IS_MNT_SLAVE(mnt) (mnt->mnt_master)
@@ -36,4 +40,15 @@ int propagate_umount(struct list_head *);
 int propagate_mount_busy(struct vfsmount *, int);
 void mnt_release_group_id(struct vfsmount *);
 int get_dominating_id(struct vfsmount *mnt, const struct path *root);
+<<<<<<< HEAD
+=======
+unsigned int mnt_get_count(struct vfsmount *mnt);
+void mnt_set_mountpoint(struct vfsmount *, struct dentry *,
+			struct vfsmount *);
+void release_mounts(struct list_head *);
+void umount_tree(struct vfsmount *, int, struct list_head *);
+struct vfsmount *copy_tree(struct vfsmount *, struct dentry *, int);
+bool is_path_reachable(struct vfsmount *, struct dentry *,
+			 const struct path *root);
+>>>>>>> upstream/4.3_primoc
 #endif /* _LINUX_PNODE_H */

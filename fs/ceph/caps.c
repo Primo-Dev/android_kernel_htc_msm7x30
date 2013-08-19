@@ -1811,7 +1811,11 @@ out:
 	spin_unlock(&ci->i_unsafe_lock);
 }
 
+<<<<<<< HEAD
 int ceph_fsync(struct file *file, int datasync)
+=======
+int ceph_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode = file->f_mapping->host;
 	struct ceph_inode_info *ci = ceph_inode(inode);
@@ -1822,9 +1826,16 @@ int ceph_fsync(struct file *file, int datasync)
 	dout("fsync %p%s\n", inode, datasync ? " datasync" : "");
 	sync_write_wait(inode);
 
+<<<<<<< HEAD
 	ret = filemap_write_and_wait(inode->i_mapping);
 	if (ret < 0)
 		return ret;
+=======
+	ret = filemap_write_and_wait_range(inode->i_mapping, start, end);
+	if (ret < 0)
+		return ret;
+	mutex_lock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 
 	dirty = try_flush_caps(inode, NULL, &flush_tid);
 	dout("fsync dirty caps are %s\n", ceph_cap_string(dirty));
@@ -1841,6 +1852,10 @@ int ceph_fsync(struct file *file, int datasync)
 	}
 
 	dout("fsync %p%s done\n", inode, datasync ? " datasync" : "");
+<<<<<<< HEAD
+=======
+	mutex_unlock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 

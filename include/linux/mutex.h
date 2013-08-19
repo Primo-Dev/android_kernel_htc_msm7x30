@@ -50,6 +50,12 @@ struct mutex {
 	atomic_t		count;
 	spinlock_t		wait_lock;
 	struct list_head	wait_list;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MUTEX_SPIN_ON_OWNER
+	struct task_struct	*spinner;
+#endif
+>>>>>>> upstream/4.3_primoc
 #if defined(CONFIG_DEBUG_MUTEXES) || defined(CONFIG_SMP)
 	struct task_struct	*owner;
 #endif

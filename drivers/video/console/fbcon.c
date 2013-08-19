@@ -843,6 +843,11 @@ static void con2fb_init_display(struct vc_data *vc, struct fb_info *info,
  *
  *	Maps a virtual console @unit to a frame buffer device
  *	@newidx.
+<<<<<<< HEAD
+=======
+ *
+ *	This should be called with the console lock held.
+>>>>>>> upstream/4.3_primoc
  */
 static int set_con2fb_map(int unit, int newidx, int user)
 {
@@ -860,7 +865,11 @@ static int set_con2fb_map(int unit, int newidx, int user)
 
 	if (!search_for_mapped_con() || !con_is_bound(&fb_con)) {
 		info_idx = newidx;
+<<<<<<< HEAD
 		return fbcon_takeover(0);
+=======
+		return do_fbcon_takeover(0);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (oldidx != -1)
@@ -868,7 +877,10 @@ static int set_con2fb_map(int unit, int newidx, int user)
 
 	found = search_fb_in_map(newidx);
 
+<<<<<<< HEAD
 	console_lock();
+=======
+>>>>>>> upstream/4.3_primoc
 	con2fb_map[unit] = newidx;
 	if (!err && !found)
  		err = con2fb_acquire_newinfo(vc, info, unit, oldidx);
@@ -895,7 +907,10 @@ static int set_con2fb_map(int unit, int newidx, int user)
 	if (!search_fb_in_map(info_idx))
 		info_idx = newidx;
 
+<<<<<<< HEAD
 	console_unlock();
+=======
+>>>>>>> upstream/4.3_primoc
  	return err;
 }
 
@@ -1229,6 +1244,11 @@ static void fbcon_deinit(struct vc_data *vc)
 finished:
 
 	fbcon_free_font(p, free_font);
+<<<<<<< HEAD
+=======
+	if (free_font)
+		vc->vc_font.data = NULL;
+>>>>>>> upstream/4.3_primoc
 
 	if (!con_is_bound(&fb_con))
 		fbcon_exit();
@@ -3026,6 +3046,10 @@ static inline int fbcon_unbind(void)
 }
 #endif /* CONFIG_VT_HW_CONSOLE_BINDING */
 
+<<<<<<< HEAD
+=======
+/* called with console_lock held */
+>>>>>>> upstream/4.3_primoc
 static int fbcon_fb_unbind(int idx)
 {
 	int i, new_idx = -1, ret = 0;
@@ -3052,6 +3076,10 @@ static int fbcon_fb_unbind(int idx)
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+/* called with console_lock held */
+>>>>>>> upstream/4.3_primoc
 static int fbcon_fb_unregistered(struct fb_info *info)
 {
 	int i, idx;
@@ -3089,6 +3117,10 @@ static int fbcon_fb_unregistered(struct fb_info *info)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/* called with console_lock held */
+>>>>>>> upstream/4.3_primoc
 static void fbcon_remap_all(int idx)
 {
 	int i;
@@ -3133,6 +3165,10 @@ static inline void fbcon_select_primary(struct fb_info *info)
 }
 #endif /* CONFIG_FRAMEBUFFER_DETECT_PRIMARY */
 
+<<<<<<< HEAD
+=======
+/* called with console_lock held */
+>>>>>>> upstream/4.3_primoc
 static int fbcon_fb_registered(struct fb_info *info)
 {
 	int ret = 0, i, idx;
@@ -3285,6 +3321,10 @@ static int fbcon_event_notify(struct notifier_block *self,
 		ret = fbcon_fb_unregistered(info);
 		break;
 	case FB_EVENT_SET_CONSOLE_MAP:
+<<<<<<< HEAD
+=======
+		/* called with console lock held */
+>>>>>>> upstream/4.3_primoc
 		con2fb = event->data;
 		ret = set_con2fb_map(con2fb->console - 1,
 				     con2fb->framebuffer, 1);

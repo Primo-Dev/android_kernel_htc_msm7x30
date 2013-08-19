@@ -86,7 +86,11 @@ void __init setup_bios_corruption_check(void)
 		u64 size;
 		addr = memblock_x86_find_in_range_size(addr, &size, PAGE_SIZE);
 
+<<<<<<< HEAD
 		if (addr == MEMBLOCK_ERROR)
+=======
+		if (!addr)
+>>>>>>> upstream/4.3_primoc
 			break;
 
 		if (addr >= corruption_check_size)

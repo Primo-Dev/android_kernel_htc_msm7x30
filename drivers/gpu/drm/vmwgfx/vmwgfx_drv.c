@@ -147,6 +147,10 @@ static struct pci_device_id vmw_pci_id_list[] = {
 	{0x15ad, 0x0405, PCI_ANY_ID, PCI_ANY_ID, 0, 0, VMWGFX_CHIP_SVGAII},
 	{0, 0, 0}
 };
+<<<<<<< HEAD
+=======
+MODULE_DEVICE_TABLE(pci, vmw_pci_id_list);
+>>>>>>> upstream/4.3_primoc
 
 static int enable_fbdev;
 

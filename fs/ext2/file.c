@@ -40,13 +40,21 @@ static int ext2_release_file (struct inode * inode, struct file * filp)
 	return 0;
 }
 
+<<<<<<< HEAD
 int ext2_fsync(struct file *file, int datasync)
+=======
+int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	int ret;
 	struct super_block *sb = file->f_mapping->host->i_sb;
 	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
 
+<<<<<<< HEAD
 	ret = generic_file_fsync(file, datasync);
+=======
+	ret = generic_file_fsync(file, start, end, datasync);
+>>>>>>> upstream/4.3_primoc
 	if (ret == -EIO || test_and_clear_bit(AS_EIO, &mapping->flags)) {
 		/* We don't really know where the IO error happened... */
 		ext2_error(sb, __func__,
@@ -102,6 +110,10 @@ const struct inode_operations ext2_file_inode_operations = {
 	.removexattr	= generic_removexattr,
 #endif
 	.setattr	= ext2_setattr,
+<<<<<<< HEAD
 	.check_acl	= ext2_check_acl,
+=======
+	.get_acl	= ext2_get_acl,
+>>>>>>> upstream/4.3_primoc
 	.fiemap		= ext2_fiemap,
 };

@@ -54,6 +54,7 @@
 #define RAWCHIP_IOCTL_UPDATE_3A \
 	_IOW(RAWCHIP_IOCTL_MAGIC, 5, struct rawchip_stats_event_ctrl *)
 
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_CAMERA_V4L2
 #define RAWCHIP_IOCTL_SET_DXOPRC_AF_STRATEGY \
 	_IOW(RAWCHIP_IOCTL_MAGIC, 6, struct rawchip_stats_event_ctrl *)
@@ -102,6 +103,8 @@ typedef struct
 }Yushan_AF_Stats_t;
 #endif // CONFIG_MSM_CAMERA_V4L2
 
+=======
+>>>>>>> upstream/4.3_primoc
 struct rawchip_stats_event_ctrl {
 	uint32_t type;
 	uint32_t timeout_ms;

@@ -221,7 +221,11 @@ int __node_distance(int a, int b)
 	int distance = LOCAL_DISTANCE;
 
 	if (!form1_affinity)
+<<<<<<< HEAD
 		return distance;
+=======
+		return ((a == b) ? LOCAL_DISTANCE : REMOTE_DISTANCE);
+>>>>>>> upstream/4.3_primoc
 
 	for (i = 0; i < distance_ref_points_depth; i++) {
 		if (distance_lookup_table[a][i] == distance_lookup_table[b][i])

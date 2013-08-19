@@ -77,6 +77,11 @@ static int max_devices;
 static DECLARE_BITMAP(dev_use, 256);
 static DECLARE_BITMAP(name_use, 256);
 
+<<<<<<< HEAD
+=======
+extern int board_emmc_boot(void);
+
+>>>>>>> upstream/4.3_primoc
 /*
  * There is one mmc_blk_data per slot.
  */
@@ -934,6 +939,38 @@ static int sd_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 		} else {
 			brq.cmd.opcode = writecmd;
 			brq.data.flags |= MMC_DATA_WRITE;
+<<<<<<< HEAD
+=======
+#if defined(CONFIG_ARCH_MSM7X30)
+		if (board_emmc_boot())
+			if (mmc_card_mmc(card)) {
+				if (brq.cmd.arg < 131073) {/* should not write any value before 131073 */
+					pr_err("%s: pid %d(tgid %d)(%s)\n", __func__,
+						(unsigned)(current->pid), (unsigned)(current->tgid),
+						current->comm);
+					pr_err("ERROR! Attemp to write radio partition start %d size %d\n"
+						, brq.cmd.arg, blk_rq_sectors(req));
+					BUG();
+
+					return 0;
+				}
+#if defined(CONFIG_ARCH_MSM7230)
+				if ((brq.cmd.arg > 143361) && (brq.cmd.arg < 163328)) {
+
+					pr_err("%s: pid %d(tgid %d)(%s)\n", __func__,
+						(unsigned)(current->pid), (unsigned)(current->tgid),
+						current->comm);
+					pr_err("ERROR! Attemp to write radio partition start %d size %d\n"
+						, brq.cmd.arg, blk_rq_sectors(req));
+					BUG();
+
+
+					return 0;
+				}
+#endif
+			}
+#endif
+>>>>>>> upstream/4.3_primoc
 		}
 
 		if (do_rel_wr)
@@ -1249,14 +1286,23 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 	struct mmc_card *card = md->queue.card;
 	struct mmc_blk_request brq;
 	int ret = 1, disable_multi = 0, retry = 0;
+<<<<<<< HEAD
 	int reinit_retry = 1;
 	int err;
 	u32 status;
 	int  no_ready = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Reliable writes are used to implement Forced Unit Access and
 	 * REQ_META accesses, and are supported only on MMCs.
+<<<<<<< HEAD
+=======
+	 *
+	 * XXX: this really needs a good explanation of why REQ_META
+	 * is treated special.
+>>>>>>> upstream/4.3_primoc
 	 */
 	bool do_rel_wr = ((req->cmd_flags & REQ_FUA) ||
 			  (req->cmd_flags & REQ_META)) &&
@@ -1316,6 +1362,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 		} else {
 			brq.cmd.opcode = writecmd;
 			brq.data.flags |= MMC_DATA_WRITE;
+<<<<<<< HEAD
 
 #if defined(CONFIG_MMC_DISABLE_WP_RFG_5)
 			if (mmc_card_mmc(card)) {
@@ -1336,6 +1383,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 				}
 			}
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 		}
 
 		if (do_rel_wr)
@@ -1411,6 +1460,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 		 * may have been transferred, or may still be transferring.
 		 */
 		if (brq.sbc.error || brq.cmd.error || brq.stop.error) {
+<<<<<<< HEAD
 			if (reinit_retry) {
 				reinit_retry = 0;
 				err = get_card_status(card, &status, 0);
@@ -1425,6 +1475,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 					continue;
 				}
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 			switch (mmc_blk_cmd_recovery(card, req, &brq)) {
 			case ERR_RETRY:
 				if (retry++ < 5)
@@ -1454,16 +1506,23 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 		 * program mode, which we have to wait for it to complete.
 		 */
 		if (!mmc_host_is_spi(card->host) && rq_data_dir(req) != READ) {
+<<<<<<< HEAD
 			int i = 0;
 			unsigned long timeout = jiffies + HZ * 2;
 			u32 status;
 			do {
 				err = get_card_status(card, &status, 5);
+=======
+			u32 status;
+			do {
+				int err = get_card_status(card, &status, 5);
+>>>>>>> upstream/4.3_primoc
 				if (err) {
 					printk(KERN_ERR "%s: error %d requesting status\n",
 					       req->rq_disk->disk_name, err);
 					goto cmd_err;
 				}
+<<<<<<< HEAD
 				if (time_after(jiffies, timeout) && (i > 1000)) {
 					if ((status & R1_READY_FOR_DATA) &&
 						(R1_CURRENT_STATE(status) == 4)) {
@@ -1477,6 +1536,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 					break;
 				}
 				i++;
+=======
+>>>>>>> upstream/4.3_primoc
 				/*
 				 * Some cards mishandle the status bits,
 				 * so make sure to check both the busy
@@ -1485,6 +1546,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 			} while (!(status & R1_READY_FOR_DATA) ||
 				 (R1_CURRENT_STATE(status) == R1_STATE_PRG));
 		}
+<<<<<<< HEAD
 		if (no_ready && reinit_retry) {
 			reinit_retry = 0;
 			pr_info("%s: card status %#x \n", req->rq_disk->disk_name, status);
@@ -1494,6 +1556,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 				continue;
 			}
 		}
+=======
+>>>>>>> upstream/4.3_primoc
 
 		if (brq.data.error) {
 			pr_err("%s: error %d transferring data, sector %u, nr %u, cmd response %#x, card status %#x\n",
@@ -1501,6 +1565,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 				(unsigned)blk_rq_pos(req),
 				(unsigned)blk_rq_sectors(req),
 				brq.cmd.resp[0], brq.stop.resp[0]);
+<<<<<<< HEAD
 			if (reinit_retry) {
 				reinit_retry = 0;
 				err = get_card_status(card, &status, 0);
@@ -1515,6 +1580,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *req)
 					continue;
 				}
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 
 			if (rq_data_dir(req) == READ) {
 				if (brq.data.blocks > 1) {

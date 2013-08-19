@@ -569,6 +569,16 @@ config HAPTIC_ISA1200
 	help
 	  The ISA1200 is a high performance enhanced haptic driver.
 
+<<<<<<< HEAD
+=======
+config SENSORS_BMA150_SPI
+        tristate "BMA150 G-sensor Driver"
+	depends on MICROP_COMMON
+        default y
+        help
+         BMA150 G-sensor Driver implemented by HTC.
+
+>>>>>>> upstream/4.3_primoc
 config PMIC8058_PWM
 	tristate "Qualcomm PM8058 PWM support"
 	depends on PMIC8058
@@ -587,6 +597,7 @@ config PMIC8058_VIBRATOR
 	  This option enables device driver support for the vibrator
 	  on Qualcomm PM8058 chip.
 
+<<<<<<< HEAD
 config SENSORS_BMA150_SPI
         tristate "BMA150 G-sensor Driver"
 	depends on MICROP_COMMON
@@ -594,6 +605,8 @@ config SENSORS_BMA150_SPI
         help
          BMA150 G-sensor Driver implemented by HTC.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config PMIC8XXX_VIBRATOR
 	tristate "Qualcomm Vibrator support for PMIC8XXX"
 	depends on MFD_PM8XXX && ANDROID_TIMED_OUTPUT
@@ -693,11 +706,14 @@ config CABLE_DETECT_GPIO_DOCK
         depends on CABLE_DETECT_8960
         default n
 
+<<<<<<< HEAD
 config RESET_BY_CABLE_IN
         boolean "DEVICE RESET BY CABLE IN"
         default n
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"

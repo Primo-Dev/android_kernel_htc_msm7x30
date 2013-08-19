@@ -926,11 +926,24 @@ static struct dst_entry *ip6_sk_dst_check(struct sock *sk,
 					  const struct flowi6 *fl6)
 {
 	struct ipv6_pinfo *np = inet6_sk(sk);
+<<<<<<< HEAD
 	struct rt6_info *rt = (struct rt6_info *)dst;
+=======
+	struct rt6_info *rt;
+>>>>>>> upstream/4.3_primoc
 
 	if (!dst)
 		goto out;
 
+<<<<<<< HEAD
+=======
+	if (dst->ops->family != AF_INET6) {
+		dst_release(dst);
+		return NULL;
+	}
+
+	rt = (struct rt6_info *)dst;
+>>>>>>> upstream/4.3_primoc
 	/* Yes, checking route validity in not connected
 	 * case is not very simple. Take into account,
 	 * that we do not support routing by source, TOS,
@@ -1233,12 +1246,16 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 	int hh_len;
 	int mtu;
 	int copy;
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	int err = 0;
 #else
 	int err;
 #endif
+=======
+	int err;
+>>>>>>> upstream/4.3_primoc
 	int offset = 0;
 	int csummode = CHECKSUM_NONE;
 	__u8 tx_flags = 0;
@@ -1254,7 +1271,11 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 			if (WARN_ON(np->cork.opt))
 				return -EINVAL;
 
+<<<<<<< HEAD
 			np->cork.opt = kmalloc(opt->tot_len, sk->sk_allocation);
+=======
+			np->cork.opt = kzalloc(opt->tot_len, sk->sk_allocation);
+>>>>>>> upstream/4.3_primoc
 			if (unlikely(np->cork.opt == NULL))
 				return -ENOBUFS;
 

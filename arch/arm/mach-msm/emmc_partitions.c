@@ -108,7 +108,11 @@ static int __init parse_tag_msm_partition(const struct tag *tag)
 		uint64_t kpanic_off = 0;
 
 		if (count == MSM_MAX_PARTITIONS) {
+<<<<<<< HEAD
 			printk(KERN_ERR "[K] Cannot create virtual 'kpanic' partition\n");
+=======
+			printk("Cannot create virtual 'kpanic' partition\n");
+>>>>>>> upstream/4.3_primoc
 			goto out;
 		}
 
@@ -121,7 +125,11 @@ static int __init parse_tag_msm_partition(const struct tag *tag)
 			}
 		}
 		if (i == count) {
+<<<<<<< HEAD
 			printk(KERN_ERR "[K] Partition %s not found\n",
+=======
+			printk(KERN_ERR "Partition %s not found\n",
+>>>>>>> upstream/4.3_primoc
 			       CONFIG_VIRTUAL_KPANIC_SRC);
 			goto out;
 		}
@@ -131,7 +139,11 @@ static int __init parse_tag_msm_partition(const struct tag *tag)
 		ptn->offset = kpanic_off;
 		ptn->size = CONFIG_VIRTUAL_KPANIC_PSIZE;
 
+<<<<<<< HEAD
 		printk(KERN_INFO "[K] Virtual mtd partition '%s' created @%llx (%llu)\n",
+=======
+		printk("Virtual mtd partition '%s' created @%llx (%llu)\n",
+>>>>>>> upstream/4.3_primoc
 		       ptn->name, ptn->offset, ptn->size);
 
 		count++;

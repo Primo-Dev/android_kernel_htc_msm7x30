@@ -332,12 +332,17 @@ static int __rtc_set_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 	/* Make sure we're not setting alarms in the past */
 	err = __rtc_read_time(rtc, &tm);
 	rtc_tm_to_time(&tm, &now);
+<<<<<<< HEAD
 	if (scheduled <= now) {
 		printk("%s: msmrtc_now = %ld, rtcalarm_time = %ld\n",
 		       __func__, now, scheduled);
 		return -ETIME;
 	}
 
+=======
+	if (scheduled <= now)
+		return -ETIME;
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * XXX - We just checked to make sure the alarm time is not
 	 * in the past, but there is still a race window where if

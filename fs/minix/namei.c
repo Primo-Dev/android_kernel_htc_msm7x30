@@ -36,7 +36,11 @@ static struct dentry *minix_lookup(struct inode * dir, struct dentry *dentry, st
 	return NULL;
 }
 
+<<<<<<< HEAD
 static int minix_mknod(struct inode * dir, struct dentry *dentry, int mode, dev_t rdev)
+=======
+static int minix_mknod(struct inode * dir, struct dentry *dentry, umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	int error;
 	struct inode *inode;
@@ -54,7 +58,11 @@ static int minix_mknod(struct inode * dir, struct dentry *dentry, int mode, dev_
 	return error;
 }
 
+<<<<<<< HEAD
 static int minix_create(struct inode * dir, struct dentry *dentry, int mode,
+=======
+static int minix_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		struct nameidata *nd)
 {
 	return minix_mknod(dir, dentry, mode, 0);

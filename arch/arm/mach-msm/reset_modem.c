@@ -61,28 +61,44 @@ static ssize_t reset_modem_write(struct file *fp, const char __user *buf,
 	}
 
 	if (!strncmp(cmd, "wait", 4)) {
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: WAIT\n",
 		       __FILE__,
 		       __LINE__,
 		       __func__);
 		smsm_reset_modem(SMSM_MODEM_WAIT);
 	} else if (!strncmp(cmd, "continue", 8)) {
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: CONTINUE\n",
 		       __FILE__,
 		       __LINE__,
 		       __func__);
 		smsm_reset_modem_cont();
 	} else if (!strncmp(cmd, "download", 8)) {
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: DOWNLOAD\n",
 		       __FILE__,
 		       __LINE__,
 		       __func__);
 		smsm_reset_modem(SMSM_SYSTEM_DOWNLOAD);
 	} else if (sscanf(cmd, "deferred reset %i", &time) == 1) {
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: DEFERRED RESET %ims\n",
 		       __FILE__,
 		       __LINE__,
@@ -97,7 +113,11 @@ static ssize_t reset_modem_write(struct file *fp, const char __user *buf,
 		if (r < 0)
 			return r;
 	} else if (!strncmp(cmd, "deferred reset", 14)) {
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: DEFERRED RESET 0ms\n",
 		       __FILE__,
 		       __LINE__,
@@ -110,7 +130,11 @@ static ssize_t reset_modem_write(struct file *fp, const char __user *buf,
 		uint param1 = 0x0;
 		uint param2 = 0x0;
 
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		  "MODEM RESTART: CHIP RESET IMMEDIATE\n",
 		  __FILE__,
 		  __LINE__,
@@ -125,7 +149,11 @@ static ssize_t reset_modem_write(struct file *fp, const char __user *buf,
 		uint param1 = 0x0;
 		uint param2 = 0x0;
 
+<<<<<<< HEAD
 		D(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		D(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		  "MODEM RESTART: CHIP RESET \n",
 		  __FILE__,
 		  __LINE__,
@@ -136,7 +164,11 @@ static ssize_t reset_modem_write(struct file *fp, const char __user *buf,
 		if (r < 0)
 			return r;
 	} else if (!strncmp(cmd, "reset", 5)) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[K] INFO:%s:%i:%s: "
+=======
+		printk(KERN_ERR "INFO:%s:%i:%s: "
+>>>>>>> upstream/4.3_primoc
 		       "MODEM RESTART: RESET\n",
 		       __FILE__,
 		       __LINE__,

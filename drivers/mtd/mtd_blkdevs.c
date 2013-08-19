@@ -215,7 +215,11 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
 
 	mutex_lock(&dev->lock);
 
+<<<<<<< HEAD
 	if (dev->open++)
+=======
+	if (dev->open)
+>>>>>>> upstream/4.3_primoc
 		goto unlock;
 
 	kref_get(&dev->ref);
@@ -235,6 +239,10 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
 		goto error_release;
 
 unlock:
+<<<<<<< HEAD
+=======
+	dev->open++;
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&dev->lock);
 	blktrans_dev_put(dev);
 	return ret;
@@ -424,6 +432,16 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
 		goto error3;
 
 	new->rq->queuedata = new;
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Empirical measurements revealed that read ahead values larger than
+	 * 4 slowed down boot time, so start out with this small value.
+	 */
+	new->rq->backing_dev_info.ra_pages = (4 * 1024) / PAGE_CACHE_SIZE;
+
+>>>>>>> upstream/4.3_primoc
 	blk_queue_logical_block_size(new->rq, tr->blksize);
 
 	if (tr->discard) {

@@ -1,6 +1,10 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
+<<<<<<< HEAD
    Copyright (c) 2000-2001, 2010-2012 Code Aurora Forum.  All rights reserved.
+=======
+   Copyright (c) 2000-2001, 2010-2012 The Linux Foundation.  All rights reserved.
+>>>>>>> upstream/4.3_primoc
 
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
@@ -60,7 +64,11 @@ static void hci_tx_task(unsigned long arg);
 
 static DEFINE_RWLOCK(hci_task_lock);
 
+<<<<<<< HEAD
 static bool enable_smp = 1;
+=======
+static int enable_smp = 1;
+>>>>>>> upstream/4.3_primoc
 
 /* HCI device list */
 LIST_HEAD(hci_dev_list);
@@ -305,6 +313,15 @@ static void hci_le_init_req(struct hci_dev *hdev, unsigned long opt)
 
 	/* Read LE buffer size */
 	hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
+<<<<<<< HEAD
+=======
+
+	/* Read LE clear white list */
+	hci_send_cmd(hdev, HCI_OP_LE_CLEAR_WHITE_LIST, 0, NULL);
+
+	/* Read LE white list size */
+	hci_send_cmd(hdev, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void hci_scan_req(struct hci_dev *hdev, unsigned long opt)
@@ -543,6 +560,14 @@ int hci_dev_open(__u16 dev)
 
 	hci_req_lock(hdev);
 
+<<<<<<< HEAD
+=======
+	if (test_bit(HCI_UNREGISTER, &hdev->flags)) {
+		ret = -ENODEV;
+		goto done;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	if (hdev->rfkill && rfkill_blocked(hdev->rfkill)) {
 		ret = -ERFKILL;
 		goto done;
@@ -1559,17 +1584,29 @@ int hci_unregister_dev(struct hci_dev *hdev)
 
 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
 
+<<<<<<< HEAD
+=======
+	set_bit(HCI_UNREGISTER, &hdev->flags);
+
+>>>>>>> upstream/4.3_primoc
 	write_lock_bh(&hci_dev_list_lock);
 	list_del(&hdev->list);
 	write_unlock_bh(&hci_dev_list_lock);
 
+<<<<<<< HEAD
 	hci_dev_do_close(hdev, hdev->bus == HCI_SMD);
+=======
+	hci_dev_do_close(hdev, 0);
+>>>>>>> upstream/4.3_primoc
 
 	for (i = 0; i < NUM_REASSEMBLY; i++)
 		kfree_skb(hdev->reassembly[i]);
 
+<<<<<<< HEAD
 	cancel_work_sync(&hdev->power_on);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!test_bit(HCI_INIT, &hdev->flags) &&
 				!test_bit(HCI_SETUP, &hdev->flags) &&
 				hdev->dev_type == HCI_BREDR) {

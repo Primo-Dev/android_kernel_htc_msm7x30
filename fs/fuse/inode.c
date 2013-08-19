@@ -71,7 +71,11 @@ struct fuse_mount_data {
 	unsigned blksize;
 };
 
+<<<<<<< HEAD
 struct fuse_forget_link *fuse_alloc_forget()
+=======
+struct fuse_forget_link *fuse_alloc_forget(void)
+>>>>>>> upstream/4.3_primoc
 {
 	return kzalloc(sizeof(struct fuse_forget_link), GFP_KERNEL);
 }
@@ -108,7 +112,10 @@ static struct inode *fuse_alloc_inode(struct super_block *sb)
 static void fuse_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(fuse_inode_cachep, inode);
 }
 
@@ -824,6 +831,16 @@ static void process_init_reply(struct fuse_conn *fc, struct fuse_req *req)
 				fc->async_read = 1;
 			if (!(arg->flags & FUSE_POSIX_LOCKS))
 				fc->no_lock = 1;
+<<<<<<< HEAD
+=======
+			if (arg->minor >= 17) {
+				if (!(arg->flags & FUSE_FLOCK_LOCKS))
+					fc->no_flock = 1;
+			} else {
+				if (!(arg->flags & FUSE_POSIX_LOCKS))
+					fc->no_flock = 1;
+			}
+>>>>>>> upstream/4.3_primoc
 			if (arg->flags & FUSE_ATOMIC_O_TRUNC)
 				fc->atomic_o_trunc = 1;
 			if (arg->minor >= 9) {
@@ -838,6 +855,10 @@ static void process_init_reply(struct fuse_conn *fc, struct fuse_req *req)
 		} else {
 			ra_pages = fc->max_read / PAGE_CACHE_SIZE;
 			fc->no_lock = 1;
+<<<<<<< HEAD
+=======
+			fc->no_flock = 1;
+>>>>>>> upstream/4.3_primoc
 		}
 
 		fc->bdi.ra_pages = min(fc->bdi.ra_pages, ra_pages);
@@ -858,7 +879,12 @@ static void fuse_send_init(struct fuse_conn *fc, struct fuse_req *req)
 	arg->minor = FUSE_KERNEL_MINOR_VERSION;
 	arg->max_readahead = fc->bdi.ra_pages * PAGE_CACHE_SIZE;
 	arg->flags |= FUSE_ASYNC_READ | FUSE_POSIX_LOCKS | FUSE_ATOMIC_O_TRUNC |
+<<<<<<< HEAD
 		FUSE_EXPORT_SUPPORT | FUSE_BIG_WRITES | FUSE_DONT_MASK;
+=======
+		FUSE_EXPORT_SUPPORT | FUSE_BIG_WRITES | FUSE_DONT_MASK |
+		FUSE_FLOCK_LOCKS;
+>>>>>>> upstream/4.3_primoc
 	req->in.h.opcode = FUSE_INIT;
 	req->in.numargs = 1;
 	req->in.args[0].size = sizeof(*arg);
@@ -884,7 +910,11 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
 	int err;
 
 	fc->bdi.name = "fuse";
+<<<<<<< HEAD
 	fc->bdi.ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_CACHE_SIZE;
+=======
+	fc->bdi.ra_pages = max_readahead_pages;
+>>>>>>> upstream/4.3_primoc
 	/* fuse does it's own writeback accounting */
 	fc->bdi.capabilities = BDI_CAP_NO_ACCT_WB;
 
@@ -954,6 +984,10 @@ static int fuse_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_magic = FUSE_SUPER_MAGIC;
 	sb->s_op = &fuse_super_operations;
 	sb->s_maxbytes = MAX_LFS_FILESIZE;
+<<<<<<< HEAD
+=======
+	sb->s_time_gran = 1;
+>>>>>>> upstream/4.3_primoc
 	sb->s_export_op = &fuse_export_operations;
 
 	file = fget(d.fd);
@@ -1144,6 +1178,7 @@ static int __init fuse_fs_init(void)
 {
 	int err;
 
+<<<<<<< HEAD
 	err = register_filesystem(&fuse_fs_type);
 	if (err)
 		goto out;
@@ -1152,12 +1187,15 @@ static int __init fuse_fs_init(void)
 	if (err)
 		goto out_unreg;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	fuse_inode_cachep = kmem_cache_create("fuse_inode",
 					      sizeof(struct fuse_inode),
 					      0, SLAB_HWCACHE_ALIGN,
 					      fuse_inode_init_once);
 	err = -ENOMEM;
 	if (!fuse_inode_cachep)
+<<<<<<< HEAD
 		goto out_unreg2;
 
 	return 0;
@@ -1166,6 +1204,24 @@ static int __init fuse_fs_init(void)
 	unregister_fuseblk();
  out_unreg:
 	unregister_filesystem(&fuse_fs_type);
+=======
+		goto out;
+
+	err = register_fuseblk();
+	if (err)
+		goto out2;
+
+	err = register_filesystem(&fuse_fs_type);
+	if (err)
+		goto out3;
+
+	return 0;
+
+ out3:
+	unregister_fuseblk();
+ out2:
+	kmem_cache_destroy(fuse_inode_cachep);
+>>>>>>> upstream/4.3_primoc
  out:
 	return err;
 }

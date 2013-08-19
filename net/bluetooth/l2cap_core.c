@@ -1,6 +1,10 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
+<<<<<<< HEAD
    Copyright (c) 2000-2001, 2010-2012 Code Aurora Forum.  All rights reserved.
+=======
+   Copyright (c) 2000-2001, 2010-2012 The Linux Foundation.  All rights reserved.
+>>>>>>> upstream/4.3_primoc
    Copyright (C) 2009-2010 Gustavo F. Padovan <gustavo@padovan.org>
    Copyright (C) 2010 Google Inc.
 
@@ -58,12 +62,20 @@
 #include <net/bluetooth/smp.h>
 #include <net/bluetooth/amp.h>
 
+<<<<<<< HEAD
 bool disable_ertm;
 bool enable_hs;
 bool enable_reconfig;
 
 static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
 static u8 l2cap_fc_mask = L2CAP_FC_L2CAP;
+=======
+int disable_ertm;
+int enable_reconfig;
+
+static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP | L2CAP_FC_A2MP, };
+>>>>>>> upstream/4.3_primoc
 
 struct workqueue_struct *_l2cap_wq;
 
@@ -755,7 +767,10 @@ static void l2cap_do_start(struct sock *sk)
 
 			if (l2cap_pi(sk)->amp_pref ==
 					BT_AMP_POLICY_PREFER_AMP &&
+<<<<<<< HEAD
 					enable_hs &&
+=======
+>>>>>>> upstream/4.3_primoc
 					conn->fc_mask & L2CAP_FC_A2MP)
 				amp_create_physical(conn, sk);
 			else
@@ -864,7 +879,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
 
 			if (l2cap_pi(sk)->amp_pref ==
 					BT_AMP_POLICY_PREFER_AMP &&
+<<<<<<< HEAD
 					enable_hs &&
+=======
+>>>>>>> upstream/4.3_primoc
 					conn->fc_mask & L2CAP_FC_A2MP)
 				amp_create_physical(conn, sk);
 			else
@@ -1423,6 +1441,14 @@ void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
 	} else {
 		u16 flags;
 
+<<<<<<< HEAD
+=======
+		if (!(pi->conn)) {
+			kfree_skb(skb);
+			return;
+		}
+
+>>>>>>> upstream/4.3_primoc
 		bt_cb(skb)->force_active = pi->force_active;
 		BT_DBG("Sending on BR/EDR connection %p", pi->conn->hcon);
 
@@ -1993,10 +2019,17 @@ static void l2cap_ertm_send_ack(struct sock *sk)
 				frames_to_ack = 0;
 		}
 
+<<<<<<< HEAD
 		/* Ack now if the window is 3/4ths full.
 		 * Calculate without mul or div
 		 */
 		threshold = pi->ack_win;
+=======
+		/* Ack now if the tx window is 3/4ths full.
+		 * Calculate without mul or div
+		 */
+		threshold = pi->tx_win;
+>>>>>>> upstream/4.3_primoc
 		threshold += threshold << 1;
 		threshold >>= 2;
 
@@ -2726,7 +2759,11 @@ void l2cap_amp_move_init(struct sock *sk)
 	if (!l2cap_pi(sk)->conn)
 		return;
 
+<<<<<<< HEAD
 	if (!(l2cap_pi(sk)->conn->fc_mask & L2CAP_FC_A2MP) || !enable_hs)
+=======
+	if (!(l2cap_pi(sk)->conn->fc_mask & L2CAP_FC_A2MP))
+>>>>>>> upstream/4.3_primoc
 		return;
 
 	if (l2cap_pi(sk)->amp_id == 0) {
@@ -2810,6 +2847,12 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
 	BT_DBG("conn %p, code 0x%2.2x, ident 0x%2.2x, len %d",
 			conn, code, ident, dlen);
 
+<<<<<<< HEAD
+=======
+	if (conn->mtu < L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE)
+		return NULL;
+
+>>>>>>> upstream/4.3_primoc
 	len = L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE + dlen;
 	count = min_t(unsigned int, mtu, len);
 
@@ -3105,7 +3148,10 @@ static void l2cap_setup_txwin(struct l2cap_pinfo *pi)
 		pi->tx_win_max = L2CAP_TX_WIN_MAX_ENHANCED;
 		pi->extended_control = 0;
 	}
+<<<<<<< HEAD
 	pi->ack_win = pi->tx_win;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void l2cap_aggregate_fs(struct hci_ext_fs *cur,
@@ -3201,9 +3247,14 @@ static int l2cap_deaggregate(struct hci_chan *chan, struct l2cap_pinfo *pi)
 	return 1;
 }
 
+<<<<<<< HEAD
 static struct hci_chan *l2cap_chan_admit(u8 amp_id, struct sock *sk)
 {
 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+=======
+static struct hci_chan *l2cap_chan_admit(u8 amp_id, struct l2cap_pinfo *pi)
+{
+>>>>>>> upstream/4.3_primoc
 	struct hci_dev *hdev;
 	struct hci_conn *hcon;
 	struct hci_chan *chan;
@@ -3223,6 +3274,7 @@ static struct hci_chan *l2cap_chan_admit(u8 amp_id, struct sock *sk)
 	chan = hci_chan_list_lookup_id(hdev, hcon->handle);
 	if (chan) {
 		l2cap_aggregate(chan, pi);
+<<<<<<< HEAD
 		sock_hold(sk);
 		chan->l2cap_sk = sk;
 		hci_chan_hold(chan);
@@ -3240,6 +3292,21 @@ static struct hci_chan *l2cap_chan_admit(u8 amp_id, struct sock *sk)
 		hci_chan_create(chan,
 			(struct hci_ext_fs *) &pi->local_fs,
 			(struct hci_ext_fs *) &pi->remote_fs);
+=======
+		goto done;
+	}
+
+	if (bt_sk(pi)->parent) {
+		/* Incoming connection */
+		chan = hci_chan_accept(hcon,
+					(struct hci_ext_fs *) &pi->local_fs,
+					(struct hci_ext_fs *) &pi->remote_fs);
+	} else {
+		/* Outgoing connection */
+		chan = hci_chan_create(hcon,
+					(struct hci_ext_fs *) &pi->local_fs,
+					(struct hci_ext_fs *) &pi->remote_fs);
+>>>>>>> upstream/4.3_primoc
 	}
 done:
 	hci_dev_put(hdev);
@@ -3291,7 +3358,11 @@ int l2cap_build_conf_req(struct sock *sk, void *data)
 	struct l2cap_conf_rfc rfc = { .mode = pi->mode };
 	void *ptr = req->data;
 
+<<<<<<< HEAD
 	BT_DBG("sk %p mode %d", sk, pi->mode);
+=======
+	BT_DBG("sk %p", sk);
+>>>>>>> upstream/4.3_primoc
 
 	if (pi->num_conf_req || pi->num_conf_rsp)
 		goto done;
@@ -3317,6 +3388,10 @@ done:
 		if (!(pi->conn->feat_mask & L2CAP_FEAT_ERTM) &&
 				!(pi->conn->feat_mask & L2CAP_FEAT_STREAMING))
 			break;
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 		rfc.txwin_size      = 0;
 		rfc.max_transmit    = 0;
 		rfc.retrans_timeout = 0;
@@ -3368,7 +3443,10 @@ done:
 		break;
 
 	case L2CAP_MODE_STREAMING:
+<<<<<<< HEAD
 		l2cap_setup_txwin(pi);
+=======
+>>>>>>> upstream/4.3_primoc
 		rfc.txwin_size      = 0;
 		rfc.max_transmit    = 0;
 		rfc.retrans_timeout = 0;
@@ -3466,9 +3544,12 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
 
 	BT_DBG("sk %p", sk);
 
+<<<<<<< HEAD
 	if (pi->omtu > mtu)
 		mtu = pi->omtu;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	while (len >= L2CAP_CONF_OPT_SIZE) {
 		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
 
@@ -3570,8 +3651,11 @@ done:
 	if (pi->mode != rfc.mode) {
 		result = L2CAP_CONF_UNACCEPT;
 		rfc.mode = pi->mode;
+<<<<<<< HEAD
 		if (mtu > L2CAP_DEFAULT_MTU)
 			pi->omtu = mtu;
+=======
+>>>>>>> upstream/4.3_primoc
 
 		if (pi->num_conf_rsp == 1)
 			return -ECONNREFUSED;
@@ -3650,10 +3734,21 @@ done:
 				struct hci_chan *chan;
 				/* Trigger logical link creation only on AMP */
 
+<<<<<<< HEAD
 				chan = l2cap_chan_admit(pi->amp_id, sk);
 				if (!chan)
 					return -ECONNREFUSED;
 
+=======
+				chan = l2cap_chan_admit(pi->amp_id, pi);
+				if (!chan)
+					return -ECONNREFUSED;
+
+				hci_chan_hold(chan);
+				pi->ampchan = chan;
+				chan->l2cap_sk = sk;
+
+>>>>>>> upstream/4.3_primoc
 				if (chan->state == BT_CONNECTED)
 					l2cap_create_cfm(chan, 0);
 			}
@@ -3849,7 +3944,14 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
 			break;
 
 		case L2CAP_CONF_EXT_WINDOW:
+<<<<<<< HEAD
 			pi->ack_win = min_t(u16, val, pi->ack_win);
+=======
+			pi->tx_win = val;
+
+			if (pi->tx_win > L2CAP_TX_WIN_MAX_ENHANCED)
+				pi->tx_win = L2CAP_TX_WIN_MAX_ENHANCED;
+>>>>>>> upstream/4.3_primoc
 
 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EXT_WINDOW,
 					2, pi->tx_win);
@@ -3871,10 +3973,13 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
 			pi->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
 			pi->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
 			pi->mps    = le16_to_cpu(rfc.max_pdu_size);
+<<<<<<< HEAD
 			if (!pi->extended_control) {
 				pi->ack_win = min_t(u16, pi->ack_win,
 						    rfc.txwin_size);
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 			break;
 		case L2CAP_MODE_STREAMING:
 			pi->mps    = le16_to_cpu(rfc.max_pdu_size);
@@ -3907,7 +4012,10 @@ static void l2cap_conf_rfc_get(struct sock *sk, void *rsp, int len)
 	int type, olen;
 	unsigned long val;
 	struct l2cap_conf_rfc rfc;
+<<<<<<< HEAD
 	u16 txwin_ext = pi->ack_win;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	BT_DBG("sk %p, rsp %p, len %d", sk, rsp, len);
 
@@ -3916,7 +4024,10 @@ static void l2cap_conf_rfc_get(struct sock *sk, void *rsp, int len)
 	rfc.retrans_timeout = cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
 	rfc.monitor_timeout = cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
 	rfc.max_pdu_size = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+<<<<<<< HEAD
 	rfc.txwin_size = min_t(u16, pi->ack_win, L2CAP_DEFAULT_TX_WINDOW);
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if ((pi->mode != L2CAP_MODE_ERTM) && (pi->mode != L2CAP_MODE_STREAMING))
 		return;
@@ -3928,6 +4039,7 @@ static void l2cap_conf_rfc_get(struct sock *sk, void *rsp, int len)
 		case L2CAP_CONF_RFC:
 			if (olen == sizeof(rfc))
 				memcpy(&rfc, (void *)val, olen);
+<<<<<<< HEAD
 			break;
 		case L2CAP_CONF_EXT_WINDOW:
 			txwin_ext = val;
@@ -3935,15 +4047,25 @@ static void l2cap_conf_rfc_get(struct sock *sk, void *rsp, int len)
 		}
 	}
 
+=======
+			goto done;
+		}
+	}
+
+done:
+>>>>>>> upstream/4.3_primoc
 	switch (rfc.mode) {
 	case L2CAP_MODE_ERTM:
 		pi->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
 		pi->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
 		pi->mps    = le16_to_cpu(rfc.max_pdu_size);
+<<<<<<< HEAD
 		if (pi->extended_control)
 			pi->ack_win = min_t(u16, pi->ack_win, txwin_ext);
 		else
 			pi->ack_win = min_t(u16, pi->ack_win, rfc.txwin_size);
+=======
+>>>>>>> upstream/4.3_primoc
 		break;
 	case L2CAP_MODE_STREAMING:
 		pi->mps    = le16_to_cpu(rfc.max_pdu_size);
@@ -4496,13 +4618,24 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
 			/* Already sent a 'pending' response, so set up
 			 * the logical link now
 			 */
+<<<<<<< HEAD
 			chan = l2cap_chan_admit(pi->amp_id, sk);
+=======
+			chan = l2cap_chan_admit(pi->amp_id, pi);
+>>>>>>> upstream/4.3_primoc
 			if (!chan) {
 				l2cap_send_disconn_req(pi->conn, sk,
 							ECONNRESET);
 				goto done;
 			}
 
+<<<<<<< HEAD
+=======
+			hci_chan_hold(chan);
+			pi->ampchan = chan;
+			chan->l2cap_sk = sk;
+
+>>>>>>> upstream/4.3_primoc
 			if (chan->state == BT_CONNECTED)
 				l2cap_create_cfm(chan, 0);
 		}
@@ -4671,6 +4804,7 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
 					L2CAP_INFO_RSP, sizeof(buf), buf);
 	} else if (type == L2CAP_IT_FIXED_CHAN) {
 		u8 buf[12];
+<<<<<<< HEAD
 		u8 fc_mask = l2cap_fc_mask;
 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
 		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
@@ -4679,6 +4813,12 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
 			fc_mask |= L2CAP_FC_A2MP;
 		memset(rsp->data, 0, 8);
 		rsp->data[0] = fc_mask;
+=======
+		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
+		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
+		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+		memcpy(buf + 4, l2cap_fixed_chan, 8);
+>>>>>>> upstream/4.3_primoc
 		l2cap_send_cmd(conn, cmd->ident,
 					L2CAP_INFO_RSP, sizeof(buf), buf);
 	} else {
@@ -5034,7 +5174,11 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
 			}
 			pi->remote_fs = default_fs;
 			pi->local_fs = default_fs;
+<<<<<<< HEAD
 			chan = l2cap_chan_admit(pi->amp_move_id, sk);
+=======
+			chan = l2cap_chan_admit(pi->amp_move_id, pi);
+>>>>>>> upstream/4.3_primoc
 			if (!chan) {
 				/* Logical link not available */
 				l2cap_send_move_chan_cfm(conn, pi, pi->scid,
@@ -5042,6 +5186,13 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
 				break;
 			}
 
+<<<<<<< HEAD
+=======
+			hci_chan_hold(chan);
+			pi->ampchan = chan;
+			chan->l2cap_sk = sk;
+
+>>>>>>> upstream/4.3_primoc
 			if (chan->state == BT_CONNECTED) {
 				/* Logical link is already ready to go */
 				pi->ampcon = chan->conn;
@@ -5349,8 +5500,17 @@ void l2cap_amp_physical_complete(int result, u8 local_id, u8 remote_id,
 				0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 		pi->remote_fs = default_fs;
 		pi->local_fs = default_fs;
+<<<<<<< HEAD
 		chan = l2cap_chan_admit(local_id, sk);
 		if (chan) {
+=======
+		chan = l2cap_chan_admit(local_id, pi);
+		if (chan) {
+			hci_chan_hold(chan);
+			pi->ampchan = chan;
+			chan->l2cap_sk = sk;
+
+>>>>>>> upstream/4.3_primoc
 			if (chan->state == BT_CONNECTED) {
 				/* Logical link is ready to go */
 				pi->ampcon = chan->conn;
@@ -5404,7 +5564,11 @@ void l2cap_amp_physical_complete(int result, u8 local_id, u8 remote_id,
 	release_sock(sk);
 }
 
+<<<<<<< HEAD
 static void l2cap_logical_link_complete(struct hci_chan *chan, u8 status)
+=======
+int l2cap_logical_link_complete(struct hci_chan *chan, u8 status)
+>>>>>>> upstream/4.3_primoc
 {
 	struct l2cap_pinfo *pi;
 	struct sock *sk;
@@ -5422,7 +5586,11 @@ static void l2cap_logical_link_complete(struct hci_chan *chan, u8 status)
 
 	if (sk->sk_state != BT_CONNECTED && !l2cap_pi(sk)->amp_id) {
 		release_sock(sk);
+<<<<<<< HEAD
 		return;
+=======
+		return 0;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	pi = l2cap_pi(sk);
@@ -5487,9 +5655,13 @@ static void l2cap_logical_link_complete(struct hci_chan *chan, u8 status)
 		} else if ((pi->amp_move_state !=
 				L2CAP_AMP_STATE_WAIT_MOVE_RSP_SUCCESS) &&
 			(pi->amp_move_state !=
+<<<<<<< HEAD
 				L2CAP_AMP_STATE_WAIT_MOVE_CONFIRM) &&
 			(pi->amp_move_state !=
 				L2CAP_AMP_STATE_WAIT_MOVE_CONFIRM_RSP)) {
+=======
+				L2CAP_AMP_STATE_WAIT_MOVE_CONFIRM)) {
+>>>>>>> upstream/4.3_primoc
 			/* Move was not in expected state, free the channel */
 			ampchan = pi->ampchan;
 			ampcon = pi->ampcon;
@@ -5549,6 +5721,10 @@ static void l2cap_logical_link_complete(struct hci_chan *chan, u8 status)
 	}
 
 	release_sock(sk);
+<<<<<<< HEAD
+=======
+	return 0;
+>>>>>>> upstream/4.3_primoc
 }
 
 static void l2cap_logical_link_worker(struct work_struct *work)
@@ -5557,11 +5733,16 @@ static void l2cap_logical_link_worker(struct work_struct *work)
 		container_of(work, struct l2cap_logical_link_work, work);
 	struct sock *sk = log_link_work->chan->l2cap_sk;
 
+<<<<<<< HEAD
 	if (sk) {
 		l2cap_logical_link_complete(log_link_work->chan,
 							log_link_work->status);
 		sock_put(sk);
 	}
+=======
+	l2cap_logical_link_complete(log_link_work->chan, log_link_work->status);
+	sock_put(sk);
+>>>>>>> upstream/4.3_primoc
 	hci_chan_put(log_link_work->chan);
 	kfree(log_link_work);
 }
@@ -5570,7 +5751,13 @@ static int l2cap_create_cfm(struct hci_chan *chan, u8 status)
 {
 	struct l2cap_logical_link_work *amp_work;
 
+<<<<<<< HEAD
 	if (!chan->l2cap_sk) {
+=======
+	if (chan->l2cap_sk) {
+		sock_hold(chan->l2cap_sk);
+	} else {
+>>>>>>> upstream/4.3_primoc
 		BT_ERR("Expected l2cap_sk to point to connecting socket");
 		return -EFAULT;
 	}
@@ -7263,6 +7450,7 @@ done:
 static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid,
 							struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	struct sock *sk = NULL;
 	struct sk_buff *skb_rsp;
 	struct l2cap_hdr *lh;
@@ -7288,6 +7476,16 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid,
 		goto free_skb;
 	}
 
+=======
+	struct sock *sk;
+	struct sk_buff *skb_rsp;
+	struct l2cap_hdr *lh;
+	int dir;
+	u8 mtu_rsp[] = {L2CAP_ATT_MTU_RSP, 23, 0};
+	u8 err_rsp[] = {L2CAP_ATT_ERROR, 0x00, 0x00, 0x00,
+						L2CAP_ATT_NOT_SUPPORTED};
+
+>>>>>>> upstream/4.3_primoc
 	dir = (skb->data[0] & L2CAP_ATT_RESPONSE_BIT) ? 0 : 1;
 
 	sk = l2cap_find_sock_by_fixed_cid_and_dir(cid, conn->src,
@@ -7308,6 +7506,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid,
 	if (l2cap_pi(sk)->imtu < skb->len)
 		goto drop;
 
+<<<<<<< HEAD
 	if (!sock_queue_rcv_skb(sk, skb))
 		goto done;
 
@@ -7332,6 +7531,30 @@ drop:
 not_indicate:
 	if (skb->data[0] & L2CAP_ATT_RESPONSE_BIT ||
 			skb->data[0] == L2CAP_ATT_CONFIRM)
+=======
+	if (skb->data[0] == L2CAP_ATT_MTU_REQ) {
+		skb_rsp = bt_skb_alloc(sizeof(mtu_rsp) + L2CAP_HDR_SIZE,
+								GFP_ATOMIC);
+		if (!skb_rsp)
+			goto drop;
+
+		lh = (struct l2cap_hdr *) skb_put(skb_rsp, L2CAP_HDR_SIZE);
+		lh->len = cpu_to_le16(sizeof(mtu_rsp));
+		lh->cid = cpu_to_le16(L2CAP_CID_LE_DATA);
+		memcpy(skb_put(skb_rsp, sizeof(mtu_rsp)), mtu_rsp,
+							sizeof(mtu_rsp));
+		hci_send_acl(conn->hcon, NULL, skb_rsp, 0);
+
+		goto free_skb;
+	}
+
+	if (!sock_queue_rcv_skb(sk, skb))
+		goto done;
+
+drop:
+	if (skb->data[0] & L2CAP_ATT_RESPONSE_BIT &&
+			skb->data[0] != L2CAP_ATT_INDICATE)
+>>>>>>> upstream/4.3_primoc
 		goto free_skb;
 
 	/* If this is an incoming PDU that requires a response, respond with
@@ -7407,9 +7630,15 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
 				l2cap_data_channel(sk, skb);
 
 			bh_unlock_sock(sk);
+<<<<<<< HEAD
 		} else if ((cid == L2CAP_CID_A2MP) && enable_hs) {
 			BT_DBG("A2MP");
 			amp_conn_ind(conn->hcon, skb);
+=======
+		} else if (cid == L2CAP_CID_A2MP) {
+			BT_DBG("A2MP");
+			amp_conn_ind(conn, skb);
+>>>>>>> upstream/4.3_primoc
 		} else {
 			BT_DBG("unknown cid 0x%4.4x", cid);
 			kfree_skb(skb);
@@ -7562,9 +7791,14 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
 			if (!status) {
 				l2cap_pi(sk)->conf_state |=
 						L2CAP_CONF_CONNECT_PEND;
+<<<<<<< HEAD
 				if ((l2cap_pi(sk)->amp_pref ==
 						BT_AMP_POLICY_PREFER_AMP) &&
 						enable_hs) {
+=======
+				if (l2cap_pi(sk)->amp_pref ==
+						BT_AMP_POLICY_PREFER_AMP) {
+>>>>>>> upstream/4.3_primoc
 					amp_create_physical(l2cap_pi(sk)->conn,
 								sk);
 				} else
@@ -7599,6 +7833,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
 			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
 			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
 					L2CAP_CONN_RSP, sizeof(rsp), &rsp);
+<<<<<<< HEAD
 
 			if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT) &&
 				result == L2CAP_CR_SUCCESS) {
@@ -7610,6 +7845,8 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
 					       buf);
 				l2cap_pi(sk)->num_conf_req++;
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 		}
 
 		bh_unlock_sock(sk);
@@ -7866,8 +8103,11 @@ void l2cap_exit(void)
 module_param(disable_ertm, bool, 0644);
 MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
 
+<<<<<<< HEAD
 module_param(enable_hs, bool, 0644);
 MODULE_PARM_DESC(enable_hs, "Enable A2MP protocol");
 
+=======
+>>>>>>> upstream/4.3_primoc
 module_param(enable_reconfig, bool, 0644);
 MODULE_PARM_DESC(enable_reconfig, "Enable reconfig after initiating AMP move");

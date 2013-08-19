@@ -125,6 +125,64 @@ static void restore_normal_threshold(struct atmel_ts_data *ts);
 static void confirm_calibration(struct atmel_ts_data *ts, uint8_t recal, uint8_t reason);
 static void multi_input_report(struct atmel_ts_data *ts);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+/* S2W starts */
+static int s2w_register_threshold = 9; /* beyond this threshold the panel will not register to apps */
+static int s2w_min_distance = 600; /* power will toggle at this distance from start point */
+static bool s2w_allow_stroke = false; /* use either direction for on/off */
+static bool s2w_switch = false;
+/* S2W ends */
+
+/* DT2W starts */
+static bool dt2w_switch = false;
+static unsigned int dt2w_min_duration = 100; /* msecs */
+static unsigned int dt2w_max_duration = 500;  /* msecs */
+static cputime64_t dt2w_start = 0;
+static bool dt2w_screen = false; /* true if last touch was on display area */
+/* DT2W ends */
+
+static bool scr_suspended = false;
+static bool exec_count = true;
+static bool barrier = false;
+static bool mode = true;
+// -1 = not touched; -2 = touched on screen; >=0 = touched on button panel
+static int downx = -1;
+
+static struct input_dev * sweep2wake_pwrdev;
+static DEFINE_MUTEX(pwrlock);
+
+static inline bool s2w_active(void) {
+	return s2w_switch || dt2w_switch;
+}
+
+extern void sweep2wake_atmel_setdev(struct input_dev * input_device) {
+	sweep2wake_pwrdev = input_device;
+}
+EXPORT_SYMBOL(sweep2wake_atmel_setdev);
+
+static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work) {
+	if (!mutex_trylock(&pwrlock))
+		return;
+	printk(KERN_INFO "[TP] [sweep2wake]: mode=%d", mode);
+	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 1);
+	input_sync(sweep2wake_pwrdev);
+	msleep(100);
+	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 0);
+	input_sync(sweep2wake_pwrdev);
+	msleep(100);
+	mutex_unlock(&pwrlock);
+}
+static DECLARE_WORK(sweep2wake_presspwr_work, sweep2wake_presspwr);
+
+void sweep2wake_atmel_pwrtrigger(void) {
+	if (!work_busy(&sweep2wake_presspwr_work))
+		schedule_work(&sweep2wake_presspwr_work);
+}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 static int i2c_atmel_read(struct i2c_client *client, uint16_t address, uint8_t *data, uint8_t length)
 {
 	int retry;
@@ -243,7 +301,11 @@ static ssize_t atmel_gpio_show(struct device *dev,
 	pdata = ts_data->client->dev.platform_data;
 
 	ret = gpio_get_value(pdata->gpio_irq);
+<<<<<<< HEAD
 	printk(KERN_DEBUG "GPIO_TP_INT_N=%d\n", pdata->gpio_irq);
+=======
+	printk(KERN_DEBUG "[TP]GPIO_TP_INT_N=%d\n", pdata->gpio_irq);
+>>>>>>> upstream/4.3_primoc
 	sprintf(buf, "GPIO_TP_INT_N=%d\n", ret);
 	ret = strlen(buf) + 1;
 	return ret;
@@ -301,7 +363,11 @@ static ssize_t atmel_register_show(struct device *dev,
 	struct atmel_ts_data *ts_data;
 	ts_data = private_ts;
 	if (i2c_atmel_read(ts_data->client, atmel_reg_addr, ptr, 1) < 0) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "%s: read fail\n", __func__);
+=======
+		printk(KERN_WARNING "[TP]%s: read fail\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret += sprintf(buf, "addr: %d, data: %d\n", atmel_reg_addr, ptr[0]);
@@ -322,6 +388,7 @@ static ssize_t atmel_register_store(struct device *dev,
 		(buf[5] == ':' || buf[5] == '\n')) {
 		memcpy(buf_tmp, buf + 2, 3);
 		atmel_reg_addr = simple_strtol(buf_tmp, NULL, 10);
+<<<<<<< HEAD
 		printk(KERN_DEBUG "read addr: 0x%X\n", atmel_reg_addr);
 		if (!atmel_reg_addr) {
 			printk(KERN_WARNING "%s: string to number fail\n",
@@ -329,16 +396,33 @@ static ssize_t atmel_register_store(struct device *dev,
 			return count;
 		}
 		printk(KERN_DEBUG "%s: set atmel_reg_addr is: %d\n",
+=======
+		printk(KERN_DEBUG "[TP]read addr: 0x%X\n", atmel_reg_addr);
+		if (!atmel_reg_addr) {
+			printk(KERN_WARNING "[TP]%s: string to number fail\n",
+								__func__);
+			return count;
+		}
+		printk(KERN_DEBUG "[TP]%s: set atmel_reg_addr is: %d\n",
+>>>>>>> upstream/4.3_primoc
 						__func__, atmel_reg_addr);
 		if (buf[0] == 'w' && buf[5] == ':' && buf[9] == '\n') {
 			memcpy(buf_tmp, buf + 6, 3);
 			write_da = simple_strtol(buf_tmp, NULL, 10);
+<<<<<<< HEAD
 			printk(KERN_DEBUG "write addr: 0x%X, data: 0x%X\n",
+=======
+			printk(KERN_DEBUG "[TP]write addr: 0x%X, data: 0x%X\n",
+>>>>>>> upstream/4.3_primoc
 						atmel_reg_addr, write_da);
 			ret = i2c_atmel_write_byte_data(ts_data->client,
 						atmel_reg_addr, write_da);
 			if (ret < 0) {
+<<<<<<< HEAD
 				printk(KERN_ERR "%s: write fail(%d)\n",
+=======
+				printk(KERN_WARNING "[TP]%s: write fail(%d)\n",
+>>>>>>> upstream/4.3_primoc
 								__func__, ret);
 			}
 		}
@@ -386,7 +470,11 @@ static ssize_t atmel_regdump_show(struct device *dev,
 		for (loop_i = startAddr; loop_i <= endAddr; loop_i++) {
 			ret_t = i2c_atmel_read(ts_data->client, loop_i, ptr, 1);
 			if (ret_t < 0) {
+<<<<<<< HEAD
 				printk(KERN_WARNING "dump fail, addr: %d\n",
+=======
+				printk(KERN_WARNING "[TP]dump fail, addr: %d\n",
+>>>>>>> upstream/4.3_primoc
 								loop_i);
 			}
 			count += sprintf(buf + count, "addr[%3d]: %3d, ",
@@ -420,7 +508,11 @@ static void regdump_to_kernel(void)
 		for (loop_i = startAddr; loop_i <= endAddr; loop_i++) {
 			ret_t = i2c_atmel_read(ts_data->client, loop_i, ptr, 1);
 			if (ret_t < 0) {
+<<<<<<< HEAD
 				printk(KERN_WARNING "dump fail, addr: %d\n",
+=======
+				printk(KERN_WARNING "[TP]dump fail, addr: %d\n",
+>>>>>>> upstream/4.3_primoc
 								loop_i);
 			}
 			count += sprintf(buf + count, "addr[%3d]: %3d, ",
@@ -512,7 +604,11 @@ static ssize_t atmel_diag_show(struct device *dev,
 				get_object_address(ts_data, DIAGNOSTIC_T37), data, 2);
 		}
 		if (loop_j == 10)
+<<<<<<< HEAD
 			printk(KERN_ERR "%s: Diag data not ready\n", __func__);
+=======
+			printk(KERN_ERR "[TP]TOUCH_ERR:%s: Diag data not ready\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 		i2c_atmel_read(ts_data->client,
 			get_object_address(ts_data, DIAGNOSTIC_T37) +
@@ -631,6 +727,232 @@ static ssize_t atmel_info_show(struct device *dev,
 
 static DEVICE_ATTR(info, S_IRUGO, atmel_info_show, NULL);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+/* S2W sysfs starts */
+static ssize_t atmel_sweep2wake_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", s2w_switch);
+	return count;
+}
+
+static ssize_t atmel_sweep2wake_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_switch failed %s\n", buf);
+		return count;
+	}
+	if (scr_suspended) {
+		printk(KERN_INFO "[TP] [sweep2wake]: turn on the screen to toggle s2w\n");
+		return count;
+	}
+	if (value == 0 || value == 1) {
+		s2w_switch = (bool)value;
+		printk(KERN_INFO "[TP] [sweep2wake]: s2w_switch=%d\n", s2w_switch);
+	} else {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_switch failed - valid values are 0 or 1 - %s\n", buf);
+	}
+	return count;
+}
+
+static DEVICE_ATTR(sweep2wake, (S_IWUSR|S_IRUGO),
+		atmel_sweep2wake_show, atmel_sweep2wake_store);
+
+static ssize_t atmel_s2w_allow_stroke_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", s2w_allow_stroke);
+	return count;
+}
+
+static ssize_t atmel_s2w_allow_stroke_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_allow_stroke failed %s\n", buf);
+		return count;
+	}
+	if (value == 0 || value == 1) {
+		s2w_allow_stroke = (bool)value;
+		printk(KERN_INFO "[TP] [sweep2wake]: s2w_allow_stroke=%d\n", s2w_allow_stroke);
+	} else {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_allow_stroke failed - valid values are 0 or 1 - %s\n", buf);
+	}
+	return count;
+}
+
+static DEVICE_ATTR(s2w_allow_stroke, (S_IWUSR|S_IRUGO),
+		atmel_s2w_allow_stroke_show, atmel_s2w_allow_stroke_store);
+
+static ssize_t atmel_s2w_register_threshold_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", s2w_register_threshold);
+	return count;
+}
+
+static ssize_t atmel_s2w_register_threshold_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_register_threshold failed - %s\n", buf);
+		return count;
+	}
+	s2w_register_threshold = (int)value;
+	printk(KERN_INFO "[TP] [sweep2wake]: s2w_register_threshold=%d\n", s2w_register_threshold);
+	return count;
+}
+
+static DEVICE_ATTR(s2w_register_threshold, (S_IWUSR|S_IRUGO),
+		atmel_s2w_register_threshold_show, atmel_s2w_register_threshold_store);
+
+static ssize_t atmel_s2w_min_distance_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", s2w_min_distance);
+	return count;
+}
+
+static ssize_t atmel_s2w_min_distance_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set s2w_min_distance failed - %s\n", buf);
+		return count;
+	}
+	s2w_min_distance = (int)value;
+	printk(KERN_INFO "[TP] [sweep2wake]: s2w_min_distance=%d", s2w_min_distance);
+	return count;
+}
+
+static DEVICE_ATTR(s2w_min_distance, (S_IWUSR|S_IRUGO),
+		atmel_s2w_min_distance_show, atmel_s2w_min_distance_store);
+/* S2W sysfs ends */
+
+/* DT2W sysfs starts */
+static ssize_t atmel_dt2w_switch_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", dt2w_switch);
+	return count;
+}
+
+static ssize_t atmel_dt2w_switch_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_switch failed - %s\n", buf);
+		return count;
+	}
+	if (scr_suspended) {
+		printk(KERN_INFO "[TP] [sweep2wake]: turn on the screen to toggle dt2w\n");
+		return count;
+	}
+	if (value == 0 || value == 1) {
+		dt2w_switch = (bool)value;
+		printk(KERN_INFO "[TP] [sweep2wake]: dt2w_switch=%d\n", s2w_allow_stroke);
+	} else {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_switch failed - valid values are 0 or 1 - %s\n", buf);
+	}
+	return count;
+}
+
+static DEVICE_ATTR(doubletap2wake, (S_IWUSR|S_IRUGO),
+		atmel_dt2w_switch_show, atmel_dt2w_switch_store);
+
+static ssize_t atmel_dt2w_min_duration_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", dt2w_min_duration);
+	return count;
+}
+
+static ssize_t atmel_dt2w_min_duration_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_min_duration failed - %s\n", buf);
+		return count;
+	}
+	if (value > 0) {
+		dt2w_min_duration = (int)value;
+		printk(KERN_INFO "[TP] [sweep2wake]: dt2w_min_duration=%d\n", dt2w_min_duration);
+	} else {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_min_duration failed - valid values are positive integers - %s\n", buf);
+	}
+	return count;
+}
+
+static DEVICE_ATTR(dt2w_min_duration, (S_IWUSR|S_IRUGO),
+		atmel_dt2w_min_duration_show, atmel_dt2w_min_duration_store);
+
+static ssize_t atmel_dt2w_max_duration_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+	count += sprintf(buf, "%d\n", dt2w_max_duration);
+	return count;
+}
+
+static ssize_t atmel_dt2w_max_duration_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned long value;
+	int ret = 0;
+
+	ret = strict_strtoul(buf, 10, &value);
+	if (ret < 0) {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_max_duration failed - %s\n", buf);
+		return count;
+	}
+	if (value > 0) {
+		dt2w_max_duration = (int)value;
+		printk(KERN_INFO "[TP] [sweep2wake]: dt2w_max_duration=%d\n", dt2w_max_duration);
+	} else {
+		printk(KERN_INFO "[TP] [sweep2wake]: set dt2w_max_duration failed - valid values are positive integers - %s\n", buf);
+	}
+	return count;
+}
+
+static DEVICE_ATTR(dt2w_max_duration, (S_IWUSR|S_IRUGO),
+		atmel_dt2w_max_duration_show, atmel_dt2w_max_duration_store);
+/* DT2W sysfs ends */
+#endif
+
+>>>>>>> upstream/4.3_primoc
 static struct kobject *android_touch_kobj;
 
 static int atmel_touch_sysfs_init(void)
@@ -642,6 +964,19 @@ static int atmel_touch_sysfs_init(void)
 		ret = -ENOMEM;
 		return ret;
 	}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (sysfs_create_file(android_touch_kobj, &dev_attr_sweep2wake.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_s2w_allow_stroke.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_s2w_register_threshold.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_s2w_min_distance.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_dt2w_min_duration.attr) ||
+			sysfs_create_file(android_touch_kobj, &dev_attr_dt2w_max_duration.attr))
+		return -ENOMEM;
+#endif
+>>>>>>> upstream/4.3_primoc
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_gpio.attr);
 	if (ret) {
 		printk(KERN_ERR "[TP]TOUCH_ERR: create_file gpio failed\n");
@@ -698,6 +1033,18 @@ static int atmel_touch_sysfs_init(void)
 
 static void atmel_touch_sysfs_deinit(void)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	sysfs_remove_file(android_touch_kobj, &dev_attr_sweep2wake.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_s2w_allow_stroke.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_s2w_register_threshold.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_s2w_min_distance.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_doubletap2wake.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_dt2w_min_duration.attr);
+	sysfs_remove_file(android_touch_kobj, &dev_attr_dt2w_max_duration.attr);
+#endif
+>>>>>>> upstream/4.3_primoc
 	sysfs_remove_file(android_touch_kobj, &dev_attr_info.attr);
 	sysfs_remove_file(android_touch_kobj, &dev_attr_htc_event.attr);
 	sysfs_remove_file(android_touch_kobj, &dev_attr_unlock.attr);
@@ -730,7 +1077,11 @@ static int check_delta(struct atmel_ts_data*ts)
 			get_object_address(ts, DIAGNOSTIC_T37), data, 2);
 	}
 	if (loop_i == 10)
+<<<<<<< HEAD
 		printk(KERN_ERR "%s: Diag data not ready\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR:%s: Diag data not ready\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 	i2c_atmel_read(ts->client,
 		get_object_address(ts, DIAGNOSTIC_T37),
@@ -777,7 +1128,11 @@ static int check_delta_full(struct atmel_ts_data *ts,
 				get_object_address(ts, DIAGNOSTIC_T37), data, 2);
 		}
 		if (loop_j == 10)
+<<<<<<< HEAD
 			printk(KERN_ERR "%s: Diag data not ready\n", __func__);
+=======
+			printk(KERN_ERR "[TP]TOUCH_ERR:%s: Diag data not ready\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 		i2c_atmel_read(ts->client,
 			get_object_address(ts, DIAGNOSTIC_T37),
@@ -830,7 +1185,11 @@ static void check_calibration(struct atmel_ts_data*ts)
 	}
 
 	if (loop_i == 10)
+<<<<<<< HEAD
 		printk(KERN_ERR "%s: Diag data not ready\n", __func__);
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR:%s: Diag data not ready\n", __func__);
+>>>>>>> upstream/4.3_primoc
 
 	i2c_atmel_read(ts->client, get_object_address(ts, DIAGNOSTIC_T37), data,
 		T37_DATA + T37_TCH_FLAG_SIZE);
@@ -998,6 +1357,7 @@ static void msg_process_multitouch(struct atmel_ts_data *ts, uint8_t *data, uint
 					idx + 1, ts->finger_data[idx].x, ts->finger_data[idx].y);
 			}
 			if (ts->id->version >= 0x20 && ts->pre_data[0] < RECALIB_DONE) {
+<<<<<<< HEAD
 				if (ts->finger_count == 0) {
 					if (ts->pre_data[0] == RECALIB_NEED &&
 						!ts->unlock_attr && idx == 0 &&
@@ -1026,6 +1386,19 @@ static void msg_process_multitouch(struct atmel_ts_data *ts, uint8_t *data, uint
 			if (!ts->finger_count) {
 				// Force re-calibrate whenever we run out of fingers
 				atmel_unlock_store(NULL, NULL, "2\n" , 1);
+=======
+				if (ts->finger_count == 0 && !ts->pre_data[0] &&
+					(idx == 0 && ts->finger_data[idx].y > 750
+					&& ((ts->finger_data[idx].y - ts->pre_data[idx + 1]) > 135)))
+						restore_normal_threshold(ts);
+						confirm_calibration(ts, 1, 0);
+				if (ts->finger_count)
+					i2c_atmel_write_byte_data(ts->client,
+						get_object_address(ts, GEN_COMMANDPROCESSOR_T6) +
+						T6_CFG_CALIBRATE, 0x55);
+				else if (!ts->finger_count && ts->pre_data[0] == RECALIB_NG)
+					ts->pre_data[0] = RECALIB_NEED;
+>>>>>>> upstream/4.3_primoc
 			}
 		}
 	} else if ((data[T9_MSG_STATUS] & (T9_MSG_STATUS_DETECT|T9_MSG_STATUS_PRESS)) &&
@@ -1052,6 +1425,7 @@ static void msg_process_multitouch(struct atmel_ts_data *ts, uint8_t *data, uint
 				ts->finger_count++;
 			ts->finger_pressed |= BIT(idx);
 			if (ts->id->version >= 0x20 && ts->pre_data[0] < RECALIB_DONE) {
+<<<<<<< HEAD
 				if (ts->pre_data[0] < RECALIB_UNLOCK) {
 					ts->pre_data[idx + 1] = ts->finger_data[idx].y;
 					if (ts->finger_count == ts->finger_support)
@@ -1064,6 +1438,15 @@ static void msg_process_multitouch(struct atmel_ts_data *ts, uint8_t *data, uint
 				} else if (ts->pre_data[0] == RECALIB_UNLOCK && ts->unlock_attr)
 					if (ts->finger_count > 1)
 						ts->valid_pressed_cnt = 0;
+=======
+				ts->pre_data[idx + 1] = ts->finger_data[idx].y;
+				if (ts->finger_count == ts->finger_support)
+					i2c_atmel_write_byte_data(ts->client,
+						get_object_address(ts, GEN_COMMANDPROCESSOR_T6) +
+						T6_CFG_CALIBRATE, 0x55);
+				else if (!ts->pre_data[0] && ts->finger_count > 1)
+					ts->pre_data[0] = RECALIB_NG;
+>>>>>>> upstream/4.3_primoc
 			}
 		}
 	}
@@ -1159,18 +1542,36 @@ static void compatible_input_report(struct input_dev *idev,
 	if (!press)
 		input_mt_sync(idev);
 	else {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+		if (!s2w_active() || (s2w_active() & !scr_suspended)) {
+#endif
+>>>>>>> upstream/4.3_primoc
 		input_report_abs(idev, ABS_MT_PRESSURE, fdata->z);
 		input_report_abs(idev, ABS_MT_TOUCH_MAJOR, fdata->z);
 		input_report_abs(idev, ABS_MT_WIDTH_MAJOR, fdata->w);
 		input_report_abs(idev, ABS_MT_POSITION_X, fdata->x);
 		input_report_abs(idev, ABS_MT_POSITION_Y, fdata->y);
 		input_mt_sync(idev);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+		}
+#endif
+>>>>>>> upstream/4.3_primoc
 	}
 }
 
 static void htc_input_report(struct input_dev *idev,
 				struct atmel_finger_data *fdata, uint8_t press, uint8_t last)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (!s2w_active() || (s2w_active() & !scr_suspended)) {
+#endif
+>>>>>>> upstream/4.3_primoc
 	if (!press) {
 		input_report_abs(idev, ABS_MT_AMPLITUDE, 0);
 		input_report_abs(idev, ABS_MT_POSITION, BIT(31));
@@ -1179,6 +1580,12 @@ static void htc_input_report(struct input_dev *idev,
 		input_report_abs(idev, ABS_MT_POSITION,
 			(last ? BIT(31) : 0) | fdata->x << 16 | fdata->y);
 	}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	}
+#endif
+>>>>>>> upstream/4.3_primoc
 }
 
 static void multi_input_report(struct atmel_ts_data *ts)
@@ -1199,6 +1606,153 @@ static void multi_input_report(struct atmel_ts_data *ts)
 				compatible_input_report(ts->input_dev, &ts->finger_data[loop_i],
 					1, (ts->finger_count == ++finger_report));
 			}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+			dt2w_screen = ts->finger_data[loop_i].y < 966;
+			if (s2w_allow_stroke)
+			{
+				// stroke2wake - any direction activates
+				if ((ts->finger_count == 1) && s2w_switch && (downx != -2))
+				{
+					if (ts->finger_data[loop_i].y > 966)
+					{
+						if ((downx == -1) || (abs(downx - ts->finger_data[loop_i].x) > s2w_register_threshold))
+						{
+							// handle touch down
+							if (downx == -1)
+							{
+								downx = ts->finger_data[loop_i].x;
+								break;
+							}
+							else
+							{
+								// lock panel to s2w after this distance
+								if (abs(downx - ts->finger_data[loop_i].x) > s2w_register_threshold)
+								{
+									barrier = true;
+								}
+
+								// lock/unlock after distance travelled
+								if (abs(downx - ts->finger_data[loop_i].x) > s2w_min_distance)
+								{
+									if (exec_count) {
+										if (scr_suspended)
+										{
+											printk(KERN_INFO "[TP] [sweep2wake]: ON\n");
+											mode = true;
+											sweep2wake_atmel_pwrtrigger();
+											exec_count = false;
+											break;
+										}
+										else
+										{
+											printk(KERN_INFO "[TP] [sweep2wake]: OFF\n");
+											mode=false;
+											sweep2wake_atmel_pwrtrigger();
+											exec_count = false;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					else // touch down on screen
+					{
+						// this prevents swipes originating on screen and then
+						// entering button panel to affect s2w (gaming etc.)
+						downx = -2;
+					}
+				}
+			}
+			else
+			{
+				// Free swipe - single direction activation
+				// left->right
+				if ((ts->finger_count == 1) && scr_suspended && s2w_switch && (downx != -2))
+				{
+					if (ts->finger_data[loop_i].y > 966)
+					{
+						if ((downx == -1) || (ts->finger_data[loop_i].x > downx))
+						{
+							// handle touch down
+							if (downx == -1)
+							{
+								downx = ts->finger_data[loop_i].x;
+								break;
+							}
+							else
+							{
+								// lock panel to s2w after this distance
+								if (abs(downx - ts->finger_data[loop_i].x) > s2w_register_threshold)
+								{
+									barrier = true;
+								}
+
+								// unlock after distance travelled
+								if (abs(downx - ts->finger_data[loop_i].x) > s2w_min_distance)
+								{
+									if (exec_count) {
+										printk(KERN_INFO "[TP] [sweep2wake]: ON\n");
+										mode = true;
+										sweep2wake_atmel_pwrtrigger();
+										exec_count = false;
+										break;
+									}
+								}
+							}
+						}
+					}
+					else // touch down on screen
+					{
+						downx = -2;
+					}
+				}
+				// right->left
+				else if ((ts->finger_count == 1) && !scr_suspended && s2w_switch && (downx != -2))
+				{
+					if (ts->finger_data[loop_i].y > 966)
+					{
+						if ((downx == -1) || (ts->finger_data[loop_i].x < downx))
+						{
+							// handle touch down
+							if (downx == -1)
+							{
+								downx = ts->finger_data[loop_i].x;
+								break;
+							}
+							else
+							{
+								// lock panel to s2w after this distance
+								if (downx - s2w_register_threshold > ts->finger_data[loop_i].x)
+								{
+									barrier = true;
+								}
+
+								// lock after distance travelled
+								if (downx - s2w_min_distance > ts->finger_data[loop_i].x)
+								{
+									if (exec_count)
+									{
+										printk(KERN_INFO "[TP] [sweep2wake]: OFF\n");
+										mode = false;
+										sweep2wake_atmel_pwrtrigger();
+										exec_count = false;
+										break;
+									}
+								}
+							}
+						}
+					}
+					else // touch down on screen
+					{
+						downx = -2;
+					}
+				}
+			}
+#endif
+>>>>>>> upstream/4.3_primoc
 			if (ts->debug_log_level & 0x2)
 				printk(KERN_INFO "Finger %d=> X:%d, Y:%d w:%d, z:%d, F:%d\n",
 					loop_i + 1,
@@ -1285,6 +1839,47 @@ static irqreturn_t atmel_irq_thread(int irq, void *ptr)
 			else
 				htc_input_report(ts->input_dev, NULL, 0, 1);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+			/* if finger released, reset count & barriers */
+			if ((((ts->finger_count > 0)?1:0) == 0) && s2w_active()) {
+				if (s2w_switch) {
+					exec_count = true;
+					barrier = false;
+					downx = -1;
+				}
+
+				/* DT2W */
+				if (scr_suspended && dt2w_switch) {
+					cputime64_t now = ktime_to_ns(ktime_get());
+					cputime64_t diff = cputime64_sub(now, dt2w_start);
+					cputime64_t min = dt2w_min_duration * 1000 * 1000;
+					cputime64_t max = dt2w_max_duration * 1000 * 1000;
+
+					if (ts->debug_log_level > 0)
+						printk(KERN_INFO "[TP] [dt2w]: s2w_double_tap diff=%lld\n", diff);
+
+					dt2w_start = now;
+
+					if (dt2w_screen && ts->finger_data[loop_i].y < 966) {
+						if (diff > min && diff < max) {
+							printk(KERN_INFO "[TP] [dt2w]: s2w_double_tap ON\n");
+							mode = true;
+							sweep2wake_atmel_pwrtrigger();
+						} else {
+							if (ts->debug_log_level > 0)
+								printk(KERN_INFO "[TP] [dt2w]: s2w_double_tap took too long, %lld\n", diff);
+						}
+					} else {
+						if (ts->debug_log_level > 0)
+							printk(KERN_INFO "[TP] [dt2w]: previous tap was outside of the screen");
+					}
+				}
+			}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 			if (ts->debug_log_level & 0x2)
 				printk(KERN_INFO "Finger leave\n");
 		} else {
@@ -1401,7 +1996,11 @@ static int wlc_tp_status_handler_func(struct notifier_block *this,
 	struct atmel_ts_data *ts;
 	int wlc_status;
 
+<<<<<<< HEAD
 	wlc_status = connect_status ? CONNECTED : NONE;
+=======
+	wlc_status = connect_status > 0 ? CONNECTED : NONE;
+>>>>>>> upstream/4.3_primoc
 	printk(KERN_INFO "[TP]wireless charger %d\n", wlc_status);
 
 	ts = private_ts;
@@ -1496,7 +2095,11 @@ static void cable_tp_status_handler_func(int connect_status)
 	ts = private_ts;
 
 #if defined(CONFIG_ARCH_MSM8X60)
+<<<<<<< HEAD
 	if (connect_status == 4 || (connect_status == 0 && ts->wlc_status)) {
+=======
+	if (connect_status == 4 || (connect_status <= 0 && ts->wlc_status)) {
+>>>>>>> upstream/4.3_primoc
 		wlc_tp_status_handler_func(NULL, connect_status == 4 ? 1 : 0, NULL);
 		return;
 	}
@@ -1505,7 +2108,12 @@ static void cable_tp_status_handler_func(int connect_status)
 	printk(KERN_INFO "[TP]cable change to %d\n", connect_status);
 
 	if (connect_status != ts->status) {
+<<<<<<< HEAD
 		ts->status = connect_status ? CONNECTED : NONE;
+=======
+		ts->status = connect_status > 0 ? CONNECTED : NONE;
+		printk(KERN_INFO "[TP]ts->status change to %d\n", ts->status);
+>>>>>>> upstream/4.3_primoc
 		if (!ts->status && ts->wlc_status)
 			printk(KERN_INFO "[TP]ambigurous wireless charger state\n");
 		if (ts->config_setting[CONNECTED].config[0]) {
@@ -1748,7 +2356,11 @@ static int atmel_ts_probe(struct i2c_client *client,
 		ts->power = pdata->power;
 		intr = pdata->gpio_irq;
 	} else {
+<<<<<<< HEAD
 		printk(KERN_ERR "[TP] pdata is NULL\n");
+=======
+		printk(KERN_ERR "[TP]TOUCH_ERR: pdata is NULL\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_get_platform_data_fail;
 	}
 
@@ -1952,7 +2564,11 @@ static int atmel_ts_probe(struct i2c_client *client,
 		cable_connect_type = cable_get_connect_type();
 		if (cable_connect_type == 4)
 			ts->wlc_status = CONNECTED;
+<<<<<<< HEAD
 		else if (cable_connect_type != 0)
+=======
+		else if (cable_connect_type > 0)
+>>>>>>> upstream/4.3_primoc
 			ts->status = CONNECTED;
 #endif
 
@@ -2343,10 +2959,28 @@ static int atmel_ts_remove(struct i2c_client *client)
 static int atmel_ts_suspend(struct i2c_client *client, pm_message_t mesg)
 {
 	struct atmel_ts_data *ts = i2c_get_clientdata(client);
+<<<<<<< HEAD
 
 	printk(KERN_INFO "%s:[TP]enter\n", __func__);
 
 	disable_irq(client->irq);
+=======
+	if (ts->debug_log_level > 0)
+		printk(KERN_INFO "%s:[TP]enter\n", __func__);
+
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (s2w_active()) {
+		//screen off, enable_irq_wake
+		if (ts->debug_log_level > 0)
+			printk(KERN_INFO "[TP] [sweep2wake]: enable_irq_wake\n");
+		enable_irq_wake(client->irq);
+	} else {
+#endif
+	disable_irq(client->irq);
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	}
+#endif
+>>>>>>> upstream/4.3_primoc
 
 	cancel_delayed_work_sync(&ts->unlock_work);
 	if (ts->pre_data[0] == RECALIB_UNLOCK && ts->psensor_status)
@@ -2364,20 +2998,56 @@ static int atmel_ts_suspend(struct i2c_client *client, pm_message_t mesg)
 			ts->ATCH_EXT, 4);
 	}
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (!s2w_active()) {
+#endif
+>>>>>>> upstream/4.3_primoc
 	i2c_atmel_write_byte_data(client,
 		get_object_address(ts, GEN_POWERCONFIG_T7) + T7_CFG_IDLEACQINT, 0x0);
 	i2c_atmel_write_byte_data(client,
 		get_object_address(ts, GEN_POWERCONFIG_T7) + T7_CFG_ACTVACQINT, 0x0);
+<<<<<<< HEAD
 
 	printk(KERN_INFO "%s:[TP]done\n", __func__);
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	}
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (s2w_active()) {
+		scr_suspended = true;
+		mode = false;
+	}
+#endif
+
+	if (ts->debug_log_level > 0)
+		printk(KERN_INFO "%s:[TP]done\n", __func__);
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
 static int atmel_ts_resume(struct i2c_client *client)
 {
 	struct atmel_ts_data *ts = i2c_get_clientdata(client);
+<<<<<<< HEAD
 
 	printk(KERN_INFO "%s:[TP]enter\n", __func__);
+=======
+	if (ts->debug_log_level > 0)
+		printk(KERN_INFO "%s:[TP]enter\n", __func__);
+
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (s2w_active()) {
+		//screen on, disable_irq_wake
+		if (ts->debug_log_level > 0)
+			printk(KERN_INFO "[sweep2wake]: disable_irq_wake\n");
+		disable_irq_wake(client->irq);
+	}
+#endif
+>>>>>>> upstream/4.3_primoc
 
 	if (ts->id->version >= 0x20 && ts->pre_data[0] == RECALIB_NEED) {
 		if (ts->call_tchthr[0] && ts->psensor_status == 2 && !ts->wlc_status) {
@@ -2397,6 +3067,12 @@ static int atmel_ts_resume(struct i2c_client *client)
 		}
 	}
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (!s2w_active()) {
+#endif
+>>>>>>> upstream/4.3_primoc
 	if (!ts->status && ts->wlc_status && ts->wlc_config[0])
 		i2c_atmel_write(ts->client,
 			get_object_address(ts, GEN_POWERCONFIG_T7),
@@ -2407,6 +3083,12 @@ static int atmel_ts_resume(struct i2c_client *client)
 			get_object_address(ts, GEN_POWERCONFIG_T7),
 			ts->config_setting[ts->status].config_T7,
 			get_object_size(ts, GEN_POWERCONFIG_T7));
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	}
+#endif
+>>>>>>> upstream/4.3_primoc
 
 	if (ts->id->version == 0x16) {
 		if (ts->config_setting[CONNECTED].config[0] && ts->status &&
@@ -2445,9 +3127,29 @@ static int atmel_ts_resume(struct i2c_client *client)
 				T6_CFG_CALIBRATE, 0x55);
 		}
 	}
+<<<<<<< HEAD
 	enable_irq(client->irq);
 
 	printk(KERN_INFO "%s:[TP]done\n", __func__);
+=======
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (!s2w_active()) {
+#endif
+	enable_irq(client->irq);
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	}
+#endif
+
+#ifdef CONFIG_TOUCHSCREEN_ATMEL_SWEEP2WAKE
+	if (s2w_active()) {
+		scr_suspended = false;
+		mode = true;
+	}
+#endif
+
+	if (ts->debug_log_level > 0)
+		printk(KERN_INFO "%s:[TP]done\n", __func__);
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 

@@ -24,7 +24,11 @@
 
 #define VENDOR_ID	0x0fc5
 #define PRODUCT_ID	0x1227
+<<<<<<< HEAD
 #define MAXLEN		6
+=======
+#define MAXLEN		8
+>>>>>>> upstream/4.3_primoc
 
 /* table of devices that work with this driver */
 static const struct usb_device_id id_table[] = {

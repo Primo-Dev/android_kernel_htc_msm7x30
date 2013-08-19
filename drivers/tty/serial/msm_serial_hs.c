@@ -158,6 +158,11 @@ struct msm_hs_port {
 	ktime_t clk_off_delay;
 	enum msm_hs_clk_states_e clk_state;
 	enum msm_hs_clk_req_off_state_e clk_req_off_state;
+<<<<<<< HEAD
+=======
+	/* optional callback to exit low power mode */
+	void (*exit_lpm_cb)(struct uart_port *);
+>>>>>>> upstream/4.3_primoc
 
 	struct msm_hs_wakeup wakeup;
 	struct wake_lock dma_wake_lock;  /* held while any DMA active */
@@ -1103,6 +1108,12 @@ static void msm_hs_start_tx_locked(struct uart_port *uport )
 
 	clk_enable(msm_uport->clk);
 
+<<<<<<< HEAD
+=======
+	if (msm_uport->exit_lpm_cb)
+		msm_uport->exit_lpm_cb(uport);
+
+>>>>>>> upstream/4.3_primoc
 	if (msm_uport->tx.tx_ready_int_en == 0) {
 		msm_uport->tx.tx_ready_int_en = 1;
 		if (msm_uport->tx.dma_in_flight == 0)
@@ -1187,22 +1198,56 @@ static unsigned int msm_hs_get_mctrl_locked(struct uart_port *uport)
 }
 
 /*
+<<<<<<< HEAD
  *  Standard API, Set or clear RFR_signal
  *
  * Set RFR high, (Indicate we are not ready for data), we disable auto
  * ready for receiving and then set RFR_N high. To set RFR to low we just turn
  * back auto ready for receiving and it should lower RFR signal
  * when hardware is ready
+=======
+ * True enables UART auto RFR, which indicates we are ready for data if the RX
+ * buffer is not full. False disables auto RFR, and deasserts RFR to indicate
+ * we are not ready for data. Must be called with UART clock on.
+ */
+static void set_rfr_locked(struct uart_port *uport, int auto_rfr)
+{
+	unsigned int data;
+
+	data = msm_hs_read(uport, UARTDM_MR1_ADDR);
+
+	if (auto_rfr) {
+		/* enable auto ready-for-receiving */
+		data |= UARTDM_MR1_RX_RDY_CTL_BMSK;
+		msm_hs_write(uport, UARTDM_MR1_ADDR, data);
+	} else {
+		/* disable auto ready-for-receiving */
+		data &= ~UARTDM_MR1_RX_RDY_CTL_BMSK;
+		msm_hs_write(uport, UARTDM_MR1_ADDR, data);
+		/* RFR is active low, set high */
+		msm_hs_write(uport, UARTDM_CR_ADDR, RFR_HIGH);
+	}
+}
+
+/*
+ *  Standard API, Set or clear RFR_signal
+ *
+>>>>>>> upstream/4.3_primoc
  */
 void msm_hs_set_mctrl_locked(struct uart_port *uport,
 				    unsigned int mctrl)
 {
+<<<<<<< HEAD
 	unsigned int set_rts;
 	unsigned int data;
+=======
+	unsigned int auto_rfr;
+>>>>>>> upstream/4.3_primoc
 	struct msm_hs_port *msm_uport = UARTDM_TO_MSM(uport);
 
 	clk_enable(msm_uport->clk);
 
+<<<<<<< HEAD
 	/* RTS is active low */
 	set_rts = TIOCM_RTS & mctrl ? 0 : 1;
 
@@ -1218,6 +1263,11 @@ void msm_hs_set_mctrl_locked(struct uart_port *uport,
 		data |= UARTDM_MR1_RX_RDY_CTL_BMSK;
 		msm_hs_write(uport, UARTDM_MR1_ADDR, data);
 	}
+=======
+	auto_rfr = TIOCM_RTS & mctrl ? 1 : 0;
+	set_rfr_locked(uport, auto_rfr);
+
+>>>>>>> upstream/4.3_primoc
 	/* Calling CLOCK API. Hence mb() requires. */
 	mb();
 	clk_disable(msm_uport->clk);
@@ -1484,6 +1534,24 @@ static irqreturn_t msm_hs_isr(int irq, void *dev)
 	return IRQ_HANDLED;
 }
 
+<<<<<<< HEAD
+=======
+void msm_hs_request_clock_off_locked(struct uart_port *uport)
+{
+	struct msm_hs_port *msm_uport = UARTDM_TO_MSM(uport);
+
+	if (msm_uport->clk_state == MSM_HS_CLK_ON) {
+		msm_uport->clk_state = MSM_HS_CLK_REQUEST_OFF;
+		msm_uport->clk_req_off_state = CLK_REQ_OFF_START;
+		if (!use_low_power_wakeup(msm_uport))
+			set_rfr_locked(uport, 0);
+		msm_uport->imr_reg |= UARTDM_ISR_TXLEV_BMSK;
+		msm_hs_write(uport, UARTDM_IMR_ADDR, msm_uport->imr_reg);
+	}
+}
+EXPORT_SYMBOL(msm_hs_request_clock_off_locked);
+
+>>>>>>> upstream/4.3_primoc
 /* request to turn off uart clock once pending TX is flushed */
 void msm_hs_request_clock_off(struct uart_port *uport) {
 	unsigned long flags;
@@ -1505,7 +1573,11 @@ void msm_hs_request_clock_off(struct uart_port *uport) {
 }
 EXPORT_SYMBOL(msm_hs_request_clock_off);
 
+<<<<<<< HEAD
 static void msm_hs_request_clock_on_locked(struct uart_port *uport) {
+=======
+void msm_hs_request_clock_on_locked(struct uart_port *uport) {
+>>>>>>> upstream/4.3_primoc
 	struct msm_hs_port *msm_uport = UARTDM_TO_MSM(uport);
 	unsigned int data;
 	int ret = 0;
@@ -1536,6 +1608,11 @@ static void msm_hs_request_clock_on_locked(struct uart_port *uport) {
 		hrtimer_try_to_cancel(&msm_uport->clk_off_timer);
 		if (msm_uport->rx.flush == FLUSH_SHUTDOWN)
 			msm_hs_start_rx_locked(uport);
+<<<<<<< HEAD
+=======
+		if (!use_low_power_wakeup(msm_uport))
+			set_rfr_locked(uport, 1);
+>>>>>>> upstream/4.3_primoc
 		if (msm_uport->rx.flush == FLUSH_STOP)
 			msm_uport->rx.flush = FLUSH_IGNORE;
 		msm_uport->clk_state = MSM_HS_CLK_ON;
@@ -1868,7 +1945,11 @@ static int __init msm_hs_probe(struct platform_device *pdev)
 	if (unlikely((int)uport->irq < 0))
 		return -ENXIO;
 
+<<<<<<< HEAD
 	if (pdata == NULL)
+=======
+	if (pdata == NULL || pdata->rx_wakeup_irq < 0)
+>>>>>>> upstream/4.3_primoc
 		msm_uport->wakeup.irq = -1;
 	else {
 		msm_uport->wakeup.irq = pdata->rx_wakeup_irq;
@@ -1885,6 +1966,14 @@ static int __init msm_hs_probe(struct platform_device *pdev)
 					"gpios\n");
 	}
 
+<<<<<<< HEAD
+=======
+	if (pdata == NULL)
+		msm_uport->exit_lpm_cb = NULL;
+	else
+		msm_uport->exit_lpm_cb = pdata->exit_lpm_cb;
+
+>>>>>>> upstream/4.3_primoc
 	resource = platform_get_resource_byname(pdev, IORESOURCE_DMA,
 						"uartdm_channels");
 	if (unlikely(!resource))
@@ -1964,7 +2053,11 @@ static int __init msm_serial_hs_init(void)
 
 	ret = uart_register_driver(&msm_hs_driver);
 	if (unlikely(ret)) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "%s failed to load\n", __FUNCTION__);
+=======
+		printk(KERN_ERR "%s failed to load\n", __FUNCTION__);
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	debug_base = debugfs_create_dir("msm_serial_hs", NULL);
@@ -1974,7 +2067,11 @@ static int __init msm_serial_hs_init(void)
 	ret = platform_driver_probe(&msm_serial_hs_platform_driver,
 					msm_hs_probe);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "%s failed to load\n", __FUNCTION__);
+=======
+		printk(KERN_ERR "%s failed to load\n", __FUNCTION__);
+>>>>>>> upstream/4.3_primoc
 		debugfs_remove_recursive(debug_base);
 		uart_unregister_driver(&msm_hs_driver);
 		return ret;
@@ -2049,6 +2146,11 @@ static void __exit msm_serial_hs_exit(void)
 	uart_unregister_driver(&msm_hs_driver);
 }
 
+<<<<<<< HEAD
+=======
+#ifndef CONFIG_BT_MSM_SLEEP
+/* Bluesleep manages uart clk control */
+>>>>>>> upstream/4.3_primoc
 static int msm_hs_runtime_idle(struct device *dev)
 {
 	/*
@@ -2083,12 +2185,23 @@ static const struct dev_pm_ops msm_hs_dev_pm_ops = {
 	.runtime_resume  = msm_hs_runtime_resume,
 	.runtime_idle    = msm_hs_runtime_idle,
 };
+<<<<<<< HEAD
+=======
+#endif /* CONFIG_BT_MSM_SLEEP */
+>>>>>>> upstream/4.3_primoc
 
 static struct platform_driver msm_serial_hs_platform_driver = {
 	.remove = msm_hs_remove,
 	.driver = {
 		.name = "msm_serial_hs",
+<<<<<<< HEAD
 		.pm   = &msm_hs_dev_pm_ops,
+=======
+#ifndef CONFIG_BT_MSM_SLEEP
+		/* Bluesleep manages uart clk control */
+		.pm   = &msm_hs_dev_pm_ops,
+#endif
+>>>>>>> upstream/4.3_primoc
 	},
 };
 

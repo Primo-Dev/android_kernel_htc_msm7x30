@@ -31,9 +31,12 @@
 
 #include "u_ether.h"
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 #include "passthru.h"
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 /*
  * This component encapsulates the Ethernet link glue needed to provide
@@ -116,6 +119,7 @@ static inline int qlen(struct usb_gadget *gadget)
 }
 
 /*-------------------------------------------------------------------------*/
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 static unsigned ipt_cap = 0;
 module_param(ipt_cap, uint, S_IRUGO|S_IWUSR);
@@ -123,6 +127,8 @@ MODULE_PARM_DESC(ipt_cap, "Enable IPT encapsulation");
 #endif
 
 /*-------------------------------------------------------------------------*/
+=======
+>>>>>>> upstream/4.3_primoc
 
 /* REVISIT there must be a better way than having two sets
  * of debug calls ...
@@ -326,11 +332,14 @@ static void rx_complete(struct usb_ep *ep, struct usb_request *req)
 				dev_kfree_skb_any(skb2);
 				goto next_frame;
 			}
+<<<<<<< HEAD
 
 #ifdef CONFIG_USB_ETH_PASS_FW
 			ipt_decap_packet(skb2, ipt_cap);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 			skb2->protocol = eth_type_trans(skb2, dev->net);
 			dev->net->stats.rx_packets++;
 			dev->net->stats.rx_bytes += skb2->len;
@@ -558,11 +567,14 @@ static netdev_tx_t eth_start_xmit(struct sk_buff *skb,
 		/* ignores USB_CDC_PACKET_TYPE_DIRECTED */
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 	if (ipt_encap_packet(skb, ipt_cap))
 		return NETDEV_TX_OK;
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	spin_lock_irqsave(&dev->req_lock, flags);
 	/*
 	 * this freelist can be empty if an interrupt triggered disconnect()
@@ -677,10 +689,13 @@ static int eth_open(struct net_device *net)
 		link->open(link);
 	spin_unlock_irq(&dev->lock);
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 	ipt_open(net);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -689,11 +704,14 @@ static int eth_stop(struct net_device *net)
 	struct eth_dev	*dev = netdev_priv(net);
 	unsigned long	flags;
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ETH_PASS_FW
 	ipt_close();
     ipt_cap = 0;
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	VDBG(dev, "%s\n", __func__);
 	netif_stop_queue(net);
 

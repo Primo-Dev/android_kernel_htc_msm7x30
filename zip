@@ -1,0 +1,26 @@
+#!/bin/bash
+DATE=$(date +%Y%m%d-%H%M)
+PWD=$(pwd)
+HOSTNAME=$(hostname)
+
+if [ $HOSTNAME = "ubuntu" ]; then
+    ANYKERNEL="/home/niko/AnyKernel"
+    OUTPUT="/media/glooms"
+elif [ $HOSTNAME = "p000001.pubip.peer1.net" ]; then
+    ANYKERNEL="/home/mustaavalkosta/storage/AnyKernel"
+    OUTPUT="/home/mustaavalkosta/downloads/tests"
+else
+    echo "invalid hostname"
+    exit
+fi
+
+# cleanup
+rm -v $ANYKERNEL/{kernel/zImage,system/lib/modules/*}
+# copy files
+find . -name "*.ko" -exec cp -v {} $ANYKERNEL/system/lib/modules/ \;
+cp -v arch/arm/boot/zImage $ANYKERNEL/kernel/zImage
+# zip it
+cd $ANYKERNEL
+zip -r9 $OUTPUT/kernel-$DATE.zip *
+# return
+cd $PWD

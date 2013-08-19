@@ -269,6 +269,10 @@ static void jsm_io_resume(struct pci_dev *pdev)
 	struct jsm_board *brd = pci_get_drvdata(pdev);
 
 	pci_restore_state(pdev);
+<<<<<<< HEAD
+=======
+	pci_save_state(pdev);
+>>>>>>> upstream/4.3_primoc
 
 	jsm_uart_port_init(brd);
 }

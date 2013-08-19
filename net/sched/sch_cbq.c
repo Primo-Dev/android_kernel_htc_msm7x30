@@ -963,8 +963,16 @@ cbq_dequeue(struct Qdisc *sch)
 		cbq_update(q);
 		if ((incr -= incr2) < 0)
 			incr = 0;
+<<<<<<< HEAD
 	}
 	q->now += incr;
+=======
+		q->now += incr;
+	} else {
+		if (now > q->now)
+			q->now = now;
+	}
+>>>>>>> upstream/4.3_primoc
 	q->now_rt = now;
 
 	for (;;) {

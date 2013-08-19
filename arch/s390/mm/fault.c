@@ -36,7 +36,10 @@
 #include <asm/pgtable.h>
 #include <asm/irq.h>
 #include <asm/mmu_context.h>
+<<<<<<< HEAD
 #include <asm/compat.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include "../kernel/entry.h"
 
 #ifndef CONFIG_64BIT

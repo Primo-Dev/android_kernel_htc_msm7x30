@@ -16,6 +16,10 @@ msm_kgsl_core-$(CONFIG_MSM_KGSL_CFF_DUMP) += kgsl_cffdump.o
 msm_kgsl_core-$(CONFIG_MSM_KGSL_DRM) += kgsl_drm.o
 msm_kgsl_core-$(CONFIG_MSM_SCM) += kgsl_pwrscale_trustzone.o
 msm_kgsl_core-$(CONFIG_MSM_SLEEP_STATS_DEVICE) += kgsl_pwrscale_idlestats.o
+<<<<<<< HEAD
+=======
+msm_kgsl_core-$(CONFIG_SYNC) += kgsl_sync.o
+>>>>>>> upstream/4.3_primoc
 
 msm_adreno-y += \
 	adreno_ringbuffer.o \

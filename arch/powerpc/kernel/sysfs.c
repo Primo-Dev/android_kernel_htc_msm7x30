@@ -603,7 +603,11 @@ static void register_nodes(void)
 int sysfs_add_device_to_node(struct sys_device *dev, int nid)
 {
 	struct node *node = &node_devices[nid];
+<<<<<<< HEAD
 	return sysfs_create_link(&node->sysdev.kobj, &dev->kobj,
+=======
+	return sysfs_create_link(&node->dev.kobj, &dev->kobj,
+>>>>>>> upstream/4.3_primoc
 			kobject_name(&dev->kobj));
 }
 EXPORT_SYMBOL_GPL(sysfs_add_device_to_node);
@@ -611,7 +615,11 @@ EXPORT_SYMBOL_GPL(sysfs_add_device_to_node);
 void sysfs_remove_device_from_node(struct sys_device *dev, int nid)
 {
 	struct node *node = &node_devices[nid];
+<<<<<<< HEAD
 	sysfs_remove_link(&node->sysdev.kobj, kobject_name(&dev->kobj));
+=======
+	sysfs_remove_link(&node->dev.kobj, kobject_name(&dev->kobj));
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(sysfs_remove_device_from_node);
 

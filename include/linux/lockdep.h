@@ -157,6 +157,27 @@ struct lockdep_map {
 #endif
 };
 
+<<<<<<< HEAD
+=======
+static inline void lockdep_copy_map(struct lockdep_map *to,
+				    struct lockdep_map *from)
+{
+	int i;
+
+	*to = *from;
+	/*
+	 * Since the class cache can be modified concurrently we could observe
+	 * half pointers (64bit arch using 32bit copy insns). Therefore clear
+	 * the caches and take the performance hit.
+	 *
+	 * XXX it doesn't work well with lockdep_set_class_and_subclass(), since
+	 *     that relies on cache abuse.
+	 */
+	for (i = 0; i < NR_LOCKDEP_CACHING_CLASSES; i++)
+		to->class_cache[i] = NULL;
+}
+
+>>>>>>> upstream/4.3_primoc
 /*
  * Every lock has a list of other locks that were taken after it.
  * We only grow the list, never remove from it:
@@ -548,7 +569,11 @@ do {									\
 #endif
 
 #ifdef CONFIG_PROVE_RCU
+<<<<<<< HEAD
 extern void lockdep_rcu_dereference(const char *file, const int line);
+=======
+void lockdep_rcu_suspicious(const char *file, const int line, const char *s);
+>>>>>>> upstream/4.3_primoc
 #endif
 
 #endif /* __LINUX_LOCKDEP_H */

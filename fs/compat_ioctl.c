@@ -1502,6 +1502,7 @@ static long do_ioctl_trans(int fd, unsigned int cmd,
 	return -ENOIOCTLCMD;
 }
 
+<<<<<<< HEAD
 static void compat_ioctl_error(struct file *filp, unsigned int fd,
 		unsigned int cmd, unsigned long arg)
 {
@@ -1531,6 +1532,8 @@ static void compat_ioctl_error(struct file *filp, unsigned int fd,
 		free_page((unsigned long)path);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int compat_ioctl_check_table(unsigned int xcmd)
 {
 	int i;
@@ -1617,6 +1620,7 @@ asmlinkage long compat_sys_ioctl(unsigned int fd, unsigned int cmd,
 		goto found_handler;
 
 	error = do_ioctl_trans(fd, cmd, arg, filp);
+<<<<<<< HEAD
 	if (error == -ENOIOCTLCMD) {
 		static int count;
 
@@ -1624,6 +1628,10 @@ asmlinkage long compat_sys_ioctl(unsigned int fd, unsigned int cmd,
 			compat_ioctl_error(filp, fd, cmd, arg);
 		error = -EINVAL;
 	}
+=======
+	if (error == -ENOIOCTLCMD)
+		error = -ENOTTY;
+>>>>>>> upstream/4.3_primoc
 
 	goto out_fput;
 

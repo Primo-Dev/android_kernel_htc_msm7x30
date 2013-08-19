@@ -72,6 +72,7 @@ void tmem_register_pamops(struct tmem_pamops *m)
  * the hashbucket lock must be held.
  */
 
+<<<<<<< HEAD
 /* searches for object==oid in pool, returns locked object if found */
 static struct tmem_obj *tmem_obj_find(struct tmem_hashbucket *hb,
 					struct tmem_oid *oidp)
@@ -83,10 +84,26 @@ static struct tmem_obj *tmem_obj_find(struct tmem_hashbucket *hb,
 	while (rbnode) {
 		BUG_ON(RB_EMPTY_NODE(rbnode));
 		obj = rb_entry(rbnode, struct tmem_obj, rb_tree_node);
+=======
+static struct tmem_obj
+*__tmem_obj_find(struct tmem_hashbucket*hb, struct tmem_oid *oidp,
+		 struct rb_node **parent, struct rb_node ***link)
+{
+	struct rb_node *_parent = NULL, **rbnode;
+	struct tmem_obj *obj = NULL;
+
+	rbnode = &hb->obj_rb_root.rb_node;
+	while (*rbnode) {
+		BUG_ON(RB_EMPTY_NODE(*rbnode));
+		_parent = *rbnode;
+		obj = rb_entry(*rbnode, struct tmem_obj,
+			       rb_tree_node);
+>>>>>>> upstream/4.3_primoc
 		switch (tmem_oid_compare(oidp, &obj->oid)) {
 		case 0: /* equal */
 			goto out;
 		case -1:
+<<<<<<< HEAD
 			rbnode = rbnode->rb_left;
 			break;
 		case 1:
@@ -94,11 +111,37 @@ static struct tmem_obj *tmem_obj_find(struct tmem_hashbucket *hb,
 			break;
 		}
 	}
+=======
+			rbnode = &(*rbnode)->rb_left;
+			break;
+		case 1:
+			rbnode = &(*rbnode)->rb_right;
+			break;
+		}
+	}
+
+	if (parent)
+		*parent = _parent;
+	if (link)
+		*link = rbnode;
+
+>>>>>>> upstream/4.3_primoc
 	obj = NULL;
 out:
 	return obj;
 }
 
+<<<<<<< HEAD
+=======
+
+/* searches for object==oid in pool, returns locked object if found */
+static struct tmem_obj *tmem_obj_find(struct tmem_hashbucket *hb,
+					struct tmem_oid *oidp)
+{
+	return __tmem_obj_find(hb, oidp, NULL, NULL);
+}
+
+>>>>>>> upstream/4.3_primoc
 static void tmem_pampd_destroy_all_in_obj(struct tmem_obj *);
 
 /* free an object that has no more pampds in it */
@@ -131,8 +174,12 @@ static void tmem_obj_init(struct tmem_obj *obj, struct tmem_hashbucket *hb,
 					struct tmem_oid *oidp)
 {
 	struct rb_root *root = &hb->obj_rb_root;
+<<<<<<< HEAD
 	struct rb_node **new = &(root->rb_node), *parent = NULL;
 	struct tmem_obj *this;
+=======
+	struct rb_node **new = NULL, *parent = NULL;
+>>>>>>> upstream/4.3_primoc
 
 	BUG_ON(pool == NULL);
 	atomic_inc(&pool->obj_count);
@@ -142,6 +189,7 @@ static void tmem_obj_init(struct tmem_obj *obj, struct tmem_hashbucket *hb,
 	obj->oid = *oidp;
 	obj->objnode_count = 0;
 	obj->pampd_count = 0;
+<<<<<<< HEAD
 	SET_SENTINEL(obj, OBJ);
 	while (*new) {
 		BUG_ON(RB_EMPTY_NODE(*new));
@@ -159,6 +207,14 @@ static void tmem_obj_init(struct tmem_obj *obj, struct tmem_hashbucket *hb,
 			break;
 		}
 	}
+=======
+	(*tmem_pamops.new_obj)(obj);
+	SET_SENTINEL(obj, OBJ);
+
+	if (__tmem_obj_find(hb, oidp, &parent, &new))
+		BUG();
+
+>>>>>>> upstream/4.3_primoc
 	rb_link_node(&obj->rb_tree_node, parent, new);
 	rb_insert_color(&obj->rb_tree_node, root);
 }
@@ -274,7 +330,11 @@ static void tmem_objnode_free(struct tmem_objnode *objnode)
 /*
  * lookup index in object and return associated pampd (or NULL if not found)
  */
+<<<<<<< HEAD
 static void *tmem_pampd_lookup_in_obj(struct tmem_obj *obj, uint32_t index)
+=======
+static void **__tmem_pampd_lookup_in_obj(struct tmem_obj *obj, uint32_t index)
+>>>>>>> upstream/4.3_primoc
 {
 	unsigned int height, shift;
 	struct tmem_objnode **slot = NULL;
@@ -303,9 +363,39 @@ static void *tmem_pampd_lookup_in_obj(struct tmem_obj *obj, uint32_t index)
 		height--;
 	}
 out:
+<<<<<<< HEAD
 	return slot != NULL ? *slot : NULL;
 }
 
+=======
+	return slot != NULL ? (void **)slot : NULL;
+}
+
+static void *tmem_pampd_lookup_in_obj(struct tmem_obj *obj, uint32_t index)
+{
+	struct tmem_objnode **slot;
+
+	slot = (struct tmem_objnode **)__tmem_pampd_lookup_in_obj(obj, index);
+	return slot != NULL ? *slot : NULL;
+}
+
+static void *tmem_pampd_replace_in_obj(struct tmem_obj *obj, uint32_t index,
+					void *new_pampd)
+{
+	struct tmem_objnode **slot;
+	void *ret = NULL;
+
+	slot = (struct tmem_objnode **)__tmem_pampd_lookup_in_obj(obj, index);
+	if ((slot != NULL) && (*slot != NULL)) {
+		void *old_pampd = *(void **)slot;
+		*(void **)slot = new_pampd;
+		(*tmem_pamops.free)(old_pampd, obj->pool, NULL, 0);
+		ret = new_pampd;
+	}
+	return ret;
+}
+
+>>>>>>> upstream/4.3_primoc
 static int tmem_pampd_add_to_obj(struct tmem_obj *obj, uint32_t index,
 					void *pampd)
 {
@@ -456,7 +546,11 @@ static void tmem_objnode_node_destroy(struct tmem_obj *obj,
 			if (ht == 1) {
 				obj->pampd_count--;
 				(*tmem_pamops.free)(objnode->slots[i],
+<<<<<<< HEAD
 								obj->pool);
+=======
+						obj->pool, NULL, 0);
+>>>>>>> upstream/4.3_primoc
 				objnode->slots[i] = NULL;
 				continue;
 			}
@@ -473,7 +567,11 @@ static void tmem_pampd_destroy_all_in_obj(struct tmem_obj *obj)
 		return;
 	if (obj->objnode_tree_height == 0) {
 		obj->pampd_count--;
+<<<<<<< HEAD
 		(*tmem_pamops.free)(obj->objnode_tree_root, obj->pool);
+=======
+		(*tmem_pamops.free)(obj->objnode_tree_root, obj->pool, NULL, 0);
+>>>>>>> upstream/4.3_primoc
 	} else {
 		tmem_objnode_node_destroy(obj, obj->objnode_tree_root,
 					obj->objnode_tree_height);
@@ -481,6 +579,10 @@ static void tmem_pampd_destroy_all_in_obj(struct tmem_obj *obj)
 		obj->objnode_tree_height = 0;
 	}
 	obj->objnode_tree_root = NULL;
+<<<<<<< HEAD
+=======
+	(*tmem_pamops.free_obj)(obj->pool, obj);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -503,15 +605,24 @@ static void tmem_pampd_destroy_all_in_obj(struct tmem_obj *obj)
  * always flushes for simplicity.
  */
 int tmem_put(struct tmem_pool *pool, struct tmem_oid *oidp, uint32_t index,
+<<<<<<< HEAD
 		struct page *page)
+=======
+		char *data, size_t size, bool raw, bool ephemeral)
+>>>>>>> upstream/4.3_primoc
 {
 	struct tmem_obj *obj = NULL, *objfound = NULL, *objnew = NULL;
 	void *pampd = NULL, *pampd_del = NULL;
 	int ret = -ENOMEM;
+<<<<<<< HEAD
 	bool ephemeral;
 	struct tmem_hashbucket *hb;
 
 	ephemeral = is_ephemeral(pool);
+=======
+	struct tmem_hashbucket *hb;
+
+>>>>>>> upstream/4.3_primoc
 	hb = &pool->hashbucket[tmem_oid_hash(oidp)];
 	spin_lock(&hb->lock);
 	obj = objfound = tmem_obj_find(hb, oidp);
@@ -521,7 +632,11 @@ int tmem_put(struct tmem_pool *pool, struct tmem_oid *oidp, uint32_t index,
 			/* if found, is a dup put, flush the old one */
 			pampd_del = tmem_pampd_delete_from_obj(obj, index);
 			BUG_ON(pampd_del != pampd);
+<<<<<<< HEAD
 			(*tmem_pamops.free)(pampd, pool);
+=======
+			(*tmem_pamops.free)(pampd, pool, oidp, index);
+>>>>>>> upstream/4.3_primoc
 			if (obj->pampd_count == 0) {
 				objnew = obj;
 				objfound = NULL;
@@ -538,7 +653,12 @@ int tmem_put(struct tmem_pool *pool, struct tmem_oid *oidp, uint32_t index,
 	}
 	BUG_ON(obj == NULL);
 	BUG_ON(((objnew != obj) && (objfound != obj)) || (objnew == objfound));
+<<<<<<< HEAD
 	pampd = (*tmem_pamops.create)(obj->pool, &obj->oid, index, page);
+=======
+	pampd = (*tmem_pamops.create)(data, size, raw, ephemeral,
+					obj->pool, &obj->oid, index);
+>>>>>>> upstream/4.3_primoc
 	if (unlikely(pampd == NULL))
 		goto free;
 	ret = tmem_pampd_add_to_obj(obj, index, pampd);
@@ -551,7 +671,11 @@ delete_and_free:
 	(void)tmem_pampd_delete_from_obj(obj, index);
 free:
 	if (pampd)
+<<<<<<< HEAD
 		(*tmem_pamops.free)(pampd, pool);
+=======
+		(*tmem_pamops.free)(pampd, pool, NULL, 0);
+>>>>>>> upstream/4.3_primoc
 	if (objnew) {
 		tmem_obj_free(objnew, hb);
 		(*tmem_hostops.obj_free)(objnew, pool);
@@ -573,12 +697,18 @@ out:
  * "put" done with the same handle).
 
  */
+<<<<<<< HEAD
 int tmem_get(struct tmem_pool *pool, struct tmem_oid *oidp,
 				uint32_t index, struct page *page)
+=======
+int tmem_get(struct tmem_pool *pool, struct tmem_oid *oidp, uint32_t index,
+		char *data, size_t *size, bool raw, int get_and_free)
+>>>>>>> upstream/4.3_primoc
 {
 	struct tmem_obj *obj;
 	void *pampd;
 	bool ephemeral = is_ephemeral(pool);
+<<<<<<< HEAD
 	uint32_t ret = -1;
 	struct tmem_hashbucket *hb;
 
@@ -589,25 +719,62 @@ int tmem_get(struct tmem_pool *pool, struct tmem_oid *oidp,
 		goto out;
 	ephemeral = is_ephemeral(pool);
 	if (ephemeral)
+=======
+	int ret = -1;
+	struct tmem_hashbucket *hb;
+	bool free = (get_and_free == 1) || ((get_and_free == 0) && ephemeral);
+	bool lock_held = false;
+
+	hb = &pool->hashbucket[tmem_oid_hash(oidp)];
+	spin_lock(&hb->lock);
+	lock_held = true;
+	obj = tmem_obj_find(hb, oidp);
+	if (obj == NULL)
+		goto out;
+	if (free)
+>>>>>>> upstream/4.3_primoc
 		pampd = tmem_pampd_delete_from_obj(obj, index);
 	else
 		pampd = tmem_pampd_lookup_in_obj(obj, index);
 	if (pampd == NULL)
 		goto out;
+<<<<<<< HEAD
 	ret = (*tmem_pamops.get_data)(page, pampd, pool);
 	if (ret < 0)
 		goto out;
 	if (ephemeral) {
 		(*tmem_pamops.free)(pampd, pool);
+=======
+	if (free) {
+>>>>>>> upstream/4.3_primoc
 		if (obj->pampd_count == 0) {
 			tmem_obj_free(obj, hb);
 			(*tmem_hostops.obj_free)(obj, pool);
 			obj = NULL;
 		}
 	}
+<<<<<<< HEAD
 	ret = 0;
 out:
 	spin_unlock(&hb->lock);
+=======
+	if (tmem_pamops.is_remote(pampd)) {
+		lock_held = false;
+		spin_unlock(&hb->lock);
+	}
+	if (free)
+		ret = (*tmem_pamops.get_data_and_free)(
+				data, size, raw, pampd, pool, oidp, index);
+	else
+		ret = (*tmem_pamops.get_data)(
+				data, size, raw, pampd, pool, oidp, index);
+	if (ret < 0)
+		goto out;
+	ret = 0;
+out:
+	if (lock_held)
+		spin_unlock(&hb->lock);
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 
@@ -632,7 +799,11 @@ int tmem_flush_page(struct tmem_pool *pool,
 	pampd = tmem_pampd_delete_from_obj(obj, index);
 	if (pampd == NULL)
 		goto out;
+<<<<<<< HEAD
 	(*tmem_pamops.free)(pampd, pool);
+=======
+	(*tmem_pamops.free)(pampd, pool, oidp, index);
+>>>>>>> upstream/4.3_primoc
 	if (obj->pampd_count == 0) {
 		tmem_obj_free(obj, hb);
 		(*tmem_hostops.obj_free)(obj, pool);
@@ -645,6 +816,33 @@ out:
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * If a page in tmem matches the handle, replace the page so that any
+ * subsequent "get" gets the new page.  Returns 0 if
+ * there was a page to replace, else returns -1.
+ */
+int tmem_replace(struct tmem_pool *pool, struct tmem_oid *oidp,
+			uint32_t index, void *new_pampd)
+{
+	struct tmem_obj *obj;
+	int ret = -1;
+	struct tmem_hashbucket *hb;
+
+	hb = &pool->hashbucket[tmem_oid_hash(oidp)];
+	spin_lock(&hb->lock);
+	obj = tmem_obj_find(hb, oidp);
+	if (obj == NULL)
+		goto out;
+	new_pampd = tmem_pampd_replace_in_obj(obj, index, new_pampd);
+	ret = (*tmem_pamops.replace_in_obj)(new_pampd, obj);
+out:
+	spin_unlock(&hb->lock);
+	return ret;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  * "Flush" all pages in tmem matching this oid.
  */
 int tmem_flush_object(struct tmem_pool *pool, struct tmem_oid *oidp)

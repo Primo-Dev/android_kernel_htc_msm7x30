@@ -140,12 +140,25 @@ static void reiserfs_vfs_truncate_file(struct inode *inode)
  * be removed...
  */
 
+<<<<<<< HEAD
 static int reiserfs_sync_file(struct file *filp, int datasync)
+=======
+static int reiserfs_sync_file(struct file *filp, loff_t start, loff_t end,
+			      int datasync)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode = filp->f_mapping->host;
 	int err;
 	int barrier_done;
 
+<<<<<<< HEAD
+=======
+	err = filemap_write_and_wait_range(inode->i_mapping, start, end);
+	if (err)
+		return err;
+
+	mutex_lock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 	BUG_ON(!S_ISREG(inode->i_mode));
 	err = sync_mapping_buffers(inode->i_mapping);
 	reiserfs_write_lock(inode->i_sb);
@@ -153,6 +166,10 @@ static int reiserfs_sync_file(struct file *filp, int datasync)
 	reiserfs_write_unlock(inode->i_sb);
 	if (barrier_done != 1 && reiserfs_barrier_flush(inode->i_sb))
 		blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
+<<<<<<< HEAD
+=======
+	mutex_unlock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 	if (barrier_done < 0)
 		return barrier_done;
 	return (err < 0) ? -EIO : 0;
@@ -312,4 +329,8 @@ const struct inode_operations reiserfs_file_inode_operations = {
 	.listxattr = reiserfs_listxattr,
 	.removexattr = reiserfs_removexattr,
 	.permission = reiserfs_permission,
+<<<<<<< HEAD
+=======
+	.get_acl = reiserfs_get_acl,
+>>>>>>> upstream/4.3_primoc
 };

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010, Code Aurora Forum. All rights reserved.
+=======
+/* Copyright (c) 2010-2012 Code Aurora Forum. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -67,11 +71,17 @@
 
 #define DDL_DEC_REQ_OUTPUT_FLUSH                0x1
 
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 enum ddl_mem_area {
 	DDL_MM_MEM	= 0x0
 };
 #endif
+=======
+enum ddl_mem_area {
+	DDL_MM_MEM	= 0x0
+};
+>>>>>>> upstream/4.3_primoc
 
 struct ddl_buf_addr {
 	u32 *physical_base_addr;
@@ -79,10 +89,16 @@ struct ddl_buf_addr {
 	u32 *align_physical_addr;
 	u32 *align_virtual_addr;
 	struct msm_mapped_buffer *mapped_buffer;
+<<<<<<< HEAD
 	u32 buffer_size;
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 	enum ddl_mem_area mem_type;
 #endif
+=======
+	struct ion_handle *alloc_handle;
+	u32 buffer_size;
+	enum ddl_mem_area mem_type;
+>>>>>>> upstream/4.3_primoc
 };
 
 enum ddl_cmd_state {
@@ -229,6 +245,10 @@ struct ddl_context {
 	struct ddl_buf_addr dbg_core_dump;
 	u32 enable_dbg_core_dump;
 	struct ddl_client_context *ddl_clients[VCD_MAX_NO_CLIENT];
+<<<<<<< HEAD
+=======
+	struct ion_client *video_ion_client;
+>>>>>>> upstream/4.3_primoc
 	u32 device_state;
 	u32 ddl_busy;
 	u32  intr_status;

@@ -44,6 +44,10 @@
 #include <linux/mutex.h>
 
 #include <net/neighbour.h>
+<<<<<<< HEAD
+=======
+#include <net/sch_generic.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/atomic.h>
 
@@ -117,8 +121,14 @@ struct ipoib_header {
 	u16	reserved;
 };
 
+<<<<<<< HEAD
 struct ipoib_pseudoheader {
 	u8  hwaddr[INFINIBAND_ALEN];
+=======
+struct ipoib_cb {
+	struct qdisc_skb_cb	qdisc_cb;
+	u8			hwaddr[INFINIBAND_ALEN];
+>>>>>>> upstream/4.3_primoc
 };
 
 /* Used for all multicast joins (broadcast, IPv4 mcast and IPv6 mcast) */

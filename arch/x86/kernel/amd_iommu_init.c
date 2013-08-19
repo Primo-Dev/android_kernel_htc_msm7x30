@@ -1363,6 +1363,10 @@ static struct syscore_ops amd_iommu_syscore_ops = {
  */
 static int __init amd_iommu_init(void)
 {
+<<<<<<< HEAD
+=======
+	struct amd_iommu *iommu;
+>>>>>>> upstream/4.3_primoc
 	int i, ret = 0;
 
 	/*
@@ -1411,9 +1415,12 @@ static int __init amd_iommu_init(void)
 	if (amd_iommu_pd_alloc_bitmap == NULL)
 		goto free;
 
+<<<<<<< HEAD
 	/* init the device table */
 	init_device_table();
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * let all alias entries point to itself
 	 */
@@ -1463,6 +1470,15 @@ static int __init amd_iommu_init(void)
 	if (ret)
 		goto free_disable;
 
+<<<<<<< HEAD
+=======
+	/* init the device table */
+	init_device_table();
+
+	for_each_iommu(iommu)
+		iommu_flush_all_caches(iommu);
+
+>>>>>>> upstream/4.3_primoc
 	amd_iommu_init_api();
 
 	amd_iommu_init_notifier();

@@ -514,6 +514,14 @@ struct omap_dss_device {
 	int (*get_backlight)(struct omap_dss_device *dssdev);
 };
 
+<<<<<<< HEAD
+=======
+struct omap_dss_hdmi_data
+{
+	int hpd_gpio;
+};
+
+>>>>>>> upstream/4.3_primoc
 struct omap_dss_driver {
 	struct device_driver driver;
 

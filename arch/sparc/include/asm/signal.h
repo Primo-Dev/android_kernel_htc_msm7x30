@@ -191,6 +191,10 @@ struct __old_sigaction {
 	unsigned long		sa_flags;
 	void			(*sa_restorer)(void);  /* not used by Linux/SPARC yet */
 };
+<<<<<<< HEAD
+=======
+#define __ARCH_HAS_SA_RESTORER
+>>>>>>> upstream/4.3_primoc
 
 typedef struct sigaltstack {
 	void			__user *ss_sp;

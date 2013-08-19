@@ -281,10 +281,17 @@ static void pl330_free_chan_resources(struct dma_chan *chan)
 	struct dma_pl330_chan *pch = to_pchan(chan);
 	unsigned long flags;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&pch->lock, flags);
 
 	tasklet_kill(&pch->task);
 
+=======
+	tasklet_kill(&pch->task);
+
+	spin_lock_irqsave(&pch->lock, flags);
+
+>>>>>>> upstream/4.3_primoc
 	pl330_release_channel(pch->pl330_chid);
 	pch->pl330_chid = NULL;
 

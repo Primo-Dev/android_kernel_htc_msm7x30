@@ -1074,10 +1074,17 @@
 #define _SRL(x)					(((x) & 0x3F) << 8)
 
 #define _SIFS_CCK_CTX(x)			((x) & 0xFF)
+<<<<<<< HEAD
 #define _SIFS_CCK_TRX(x)			(((x) & 0xFF) << 8);
 
 #define _SIFS_OFDM_CTX(x)			((x) & 0xFF)
 #define _SIFS_OFDM_TRX(x)			(((x) & 0xFF) << 8);
+=======
+#define _SIFS_CCK_TRX(x)			(((x) & 0xFF) << 8)
+
+#define _SIFS_OFDM_CTX(x)			((x) & 0xFF)
+#define _SIFS_OFDM_TRX(x)			(((x) & 0xFF) << 8)
+>>>>>>> upstream/4.3_primoc
 
 #define _TBTT_PROHIBIT_HOLD(x)			(((x) & 0xFF) << 8)
 

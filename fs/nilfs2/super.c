@@ -175,8 +175,11 @@ static void nilfs_i_callback(struct rcu_head *head)
 	struct inode *inode = container_of(head, struct inode, i_rcu);
 	struct nilfs_mdt_info *mdi = NILFS_MDT(inode);
 
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (mdi) {
 		kfree(mdi->mi_bgl); /* kfree(NULL) is safe */
 		kfree(mdi);

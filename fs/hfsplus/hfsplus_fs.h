@@ -404,7 +404,12 @@ int hfsplus_cat_read_inode(struct inode *, struct hfs_find_data *);
 int hfsplus_cat_write_inode(struct inode *);
 struct inode *hfsplus_new_inode(struct super_block *, int);
 void hfsplus_delete_inode(struct inode *);
+<<<<<<< HEAD
 int hfsplus_file_fsync(struct file *file, int datasync);
+=======
+int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
+		       int datasync);
+>>>>>>> upstream/4.3_primoc
 
 /* ioctl.c */
 long hfsplus_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);

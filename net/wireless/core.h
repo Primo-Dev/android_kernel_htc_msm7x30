@@ -54,6 +54,11 @@ struct cfg80211_registered_device {
 	int opencount; /* also protected by devlist_mtx */
 	wait_queue_head_t dev_wait;
 
+<<<<<<< HEAD
+=======
+	u32 ap_beacons_nlpid;
+
+>>>>>>> upstream/4.3_primoc
 	/* BSSes/scanning */
 	spinlock_t bss_lock;
 	struct list_head bss_list;

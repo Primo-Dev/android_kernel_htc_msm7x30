@@ -35,7 +35,11 @@ struct compact_control {
 	unsigned long migrate_pfn;	/* isolate_migratepages search base */
 	bool sync;			/* Synchronous migration */
 
+<<<<<<< HEAD
 	unsigned int order;		/* order a direct compactor needs */
+=======
+	int order;			/* order a direct compactor needs */
+>>>>>>> upstream/4.3_primoc
 	int migratetype;		/* MOVABLE, RECLAIMABLE etc */
 	struct zone *zone;
 };
@@ -54,6 +58,7 @@ static unsigned long release_freepages(struct list_head *freelist)
 	return count;
 }
 
+<<<<<<< HEAD
 /* Isolate free pages onto a private freelist. Must hold zone->lock */
 static unsigned long isolate_freepages_block(struct zone *zone,
 				unsigned long blockpfn,
@@ -72,6 +77,22 @@ static unsigned long isolate_freepages_block(struct zone *zone,
 		if (pfn_valid_within(blockpfn))
 			break;
 	}
+=======
+/*
+ * Isolate free pages onto a private freelist. Caller must hold zone->lock.
+ * If @strict is true, will abort returning 0 on any invalid PFNs or non-free
+ * pages inside of the pageblock (even though it may still end up isolating
+ * some pages).
+ */
+static unsigned long isolate_freepages_block(unsigned long blockpfn,
+				unsigned long end_pfn,
+				struct list_head *freelist,
+				bool strict)
+{
+	int nr_scanned = 0, total_isolated = 0;
+	struct page *cursor;
+
+>>>>>>> upstream/4.3_primoc
 	cursor = pfn_to_page(blockpfn);
 
 	/* Isolate free pages. This assumes the block is valid */
@@ -79,6 +100,7 @@ static unsigned long isolate_freepages_block(struct zone *zone,
 		int isolated, i;
 		struct page *page = cursor;
 
+<<<<<<< HEAD
 		if (!pfn_valid_within(blockpfn))
 			continue;
 		nr_scanned++;
@@ -88,6 +110,25 @@ static unsigned long isolate_freepages_block(struct zone *zone,
 
 		/* Found a free page, break it into order-0 pages */
 		isolated = split_free_page(page);
+=======
+		if (!pfn_valid_within(blockpfn)) {
+			if (strict)
+				return 0;
+			continue;
+		}
+		nr_scanned++;
+
+		if (!PageBuddy(page)) {
+			if (strict)
+				return 0;
+			continue;
+		}
+
+		/* Found a free page, break it into order-0 pages */
+		isolated = split_free_page(page);
+		if (!isolated && strict)
+			return 0;
+>>>>>>> upstream/4.3_primoc
 		total_isolated += isolated;
 		for (i = 0; i < isolated; i++) {
 			list_add(&page->lru, freelist);
@@ -105,6 +146,19 @@ static unsigned long isolate_freepages_block(struct zone *zone,
 	return total_isolated;
 }
 
+<<<<<<< HEAD
+=======
+static void map_pages(struct list_head *list)
+{
+	struct page *page;
+
+	list_for_each_entry(page, list, lru) {
+		arch_alloc_page(page, 0);
+		kernel_map_pages(page, 1, 1);
+	}
+}
+
+>>>>>>> upstream/4.3_primoc
 /* Returns true if the page is within a block suitable for migration to */
 static bool suitable_migration_target(struct page *page)
 {
@@ -135,7 +189,11 @@ static void isolate_freepages(struct zone *zone,
 				struct compact_control *cc)
 {
 	struct page *page;
+<<<<<<< HEAD
 	unsigned long high_pfn, low_pfn, pfn;
+=======
+	unsigned long high_pfn, low_pfn, pfn, zone_end_pfn, end_pfn;
+>>>>>>> upstream/4.3_primoc
 	unsigned long flags;
 	int nr_freepages = cc->nr_freepages;
 	struct list_head *freelist = &cc->freepages;
@@ -155,6 +213,11 @@ static void isolate_freepages(struct zone *zone,
 	 */
 	high_pfn = min(low_pfn, pfn);
 
+<<<<<<< HEAD
+=======
+	zone_end_pfn = zone->zone_start_pfn + zone->spanned_pages;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Isolate free pages until enough are available to migrate the
 	 * pages on cc->migratepages. We stop searching if the migrate
@@ -191,7 +254,13 @@ static void isolate_freepages(struct zone *zone,
 		isolated = 0;
 		spin_lock_irqsave(&zone->lock, flags);
 		if (suitable_migration_target(page)) {
+<<<<<<< HEAD
 			isolated = isolate_freepages_block(zone, pfn, freelist);
+=======
+			end_pfn = min(pfn + pageblock_nr_pages, zone_end_pfn);
+			isolated = isolate_freepages_block(pfn, end_pfn,
+							   freelist, false);
+>>>>>>> upstream/4.3_primoc
 			nr_freepages += isolated;
 		}
 		spin_unlock_irqrestore(&zone->lock, flags);
@@ -206,10 +275,14 @@ static void isolate_freepages(struct zone *zone,
 	}
 
 	/* split_free_page does not map the pages */
+<<<<<<< HEAD
 	list_for_each_entry(page, freelist, lru) {
 		arch_alloc_page(page, 0);
 		kernel_map_pages(page, 1, 1);
 	}
+=======
+	map_pages(freelist);
+>>>>>>> upstream/4.3_primoc
 
 	cc->free_pfn = high_pfn;
 	cc->nr_freepages = nr_freepages;
@@ -250,6 +323,7 @@ typedef enum {
 	ISOLATE_SUCCESS,	/* Pages isolated, migrate */
 } isolate_migrate_t;
 
+<<<<<<< HEAD
 /*
  * Isolate all pages that can be migrated from the block pointed to by
  * the migrate scanner within compact_control.
@@ -258,11 +332,37 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 					struct compact_control *cc)
 {
 	unsigned long low_pfn, end_pfn;
+=======
+/**
+ * isolate_migratepages_range() - isolate all migrate-able pages in range.
+ * @zone:	Zone pages are in.
+ * @cc:		Compaction control structure.
+ * @low_pfn:	The first PFN of the range.
+ * @end_pfn:	The one-past-the-last PFN of the range.
+ *
+ * Isolate all pages that can be migrated from the range specified by
+ * [low_pfn, end_pfn).  Returns zero if there is a fatal signal
+ * pending), otherwise PFN of the first page that was not scanned
+ * (which may be both less, equal to or more then end_pfn).
+ *
+ * Assumes that cc->migratepages is empty and cc->nr_migratepages is
+ * zero.
+ *
+ * Apart from cc->migratepages and cc->nr_migratetypes this function
+ * does not modify any cc's fields, in particular it does not modify
+ * (or read for that matter) cc->migrate_pfn.
+ */
+static unsigned long
+isolate_migratepages_range(struct zone *zone, struct compact_control *cc,
+			   unsigned long low_pfn, unsigned long end_pfn)
+{
+>>>>>>> upstream/4.3_primoc
 	unsigned long last_pageblock_nr = 0, pageblock_nr;
 	unsigned long nr_scanned = 0, nr_isolated = 0;
 	struct list_head *migratelist = &cc->migratepages;
 	isolate_mode_t mode = ISOLATE_ACTIVE|ISOLATE_INACTIVE;
 
+<<<<<<< HEAD
 	/* Do not scan outside zone boundaries */
 	low_pfn = max(cc->migrate_pfn, zone->zone_start_pfn);
 
@@ -275,6 +375,8 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 		return ISOLATE_NONE;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Ensure that there are not too many pages isolated from the LRU
 	 * list by either parallel reclaimers or compaction. If there are,
@@ -283,12 +385,20 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 	while (unlikely(too_many_isolated(zone))) {
 		/* async migration should just abort */
 		if (!cc->sync)
+<<<<<<< HEAD
 			return ISOLATE_ABORT;
+=======
+			return 0;
+>>>>>>> upstream/4.3_primoc
 
 		congestion_wait(BLK_RW_ASYNC, HZ/10);
 
 		if (fatal_signal_pending(current))
+<<<<<<< HEAD
 			return ISOLATE_ABORT;
+=======
+			return 0;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	/* Time to isolate some pages for migration */
@@ -371,8 +481,11 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 			continue;
 		}
 
+<<<<<<< HEAD
 		if (!cc->sync)
 				mode |= ISOLATE_CLEAN;
+=======
+>>>>>>> upstream/4.3_primoc
 		/* Try isolate the page */
 		if (__isolate_lru_page(page, mode, 0) != 0)
 			continue;
@@ -386,17 +499,61 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 		nr_isolated++;
 
 		/* Avoid isolating too much */
+<<<<<<< HEAD
 		if (cc->nr_migratepages == COMPACT_CLUSTER_MAX)
 			break;
+=======
+		if (cc->nr_migratepages == COMPACT_CLUSTER_MAX) {
+			++low_pfn;
+			break;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 
 	acct_isolated(zone, cc);
 
 	spin_unlock_irq(&zone->lru_lock);
+<<<<<<< HEAD
 	cc->migrate_pfn = low_pfn;
 
 	trace_mm_compaction_isolate_migratepages(nr_scanned, nr_isolated);
 
+=======
+
+	trace_mm_compaction_isolate_migratepages(nr_scanned, nr_isolated);
+
+	return low_pfn;
+}
+
+/*
+ * Isolate all pages that can be migrated from the block pointed to by
+ * the migrate scanner within compact_control.
+ */
+static isolate_migrate_t isolate_migratepages(struct zone *zone,
+					struct compact_control *cc)
+{
+	unsigned long low_pfn, end_pfn;
+
+	/* Do not scan outside zone boundaries */
+	low_pfn = max(cc->migrate_pfn, zone->zone_start_pfn);
+
+	/* Only scan within a pageblock boundary */
+	end_pfn = ALIGN(low_pfn + pageblock_nr_pages, pageblock_nr_pages);
+
+	/* Do not cross the free scanner or scan within a memory hole */
+	if (end_pfn > cc->free_pfn || !pfn_valid(low_pfn)) {
+		cc->migrate_pfn = end_pfn;
+		return ISOLATE_NONE;
+	}
+
+	/* Perform the isolation */
+	low_pfn = isolate_migratepages_range(zone, cc, low_pfn, end_pfn);
+	if (!low_pfn)
+		return ISOLATE_ABORT;
+
+	cc->migrate_pfn = low_pfn;
+
+>>>>>>> upstream/4.3_primoc
 	return ISOLATE_SUCCESS;
 }
 
@@ -576,7 +733,11 @@ static int compact_zone(struct zone *zone, struct compact_control *cc)
 		nr_migrate = cc->nr_migratepages;
 		err = migrate_pages(&cc->migratepages, compaction_alloc,
 				(unsigned long)cc, false,
+<<<<<<< HEAD
 				cc->sync);
+=======
+				cc->sync ? MIGRATE_SYNC_LIGHT : MIGRATE_ASYNC);
+>>>>>>> upstream/4.3_primoc
 		update_nr_listpages(cc);
 		nr_remaining = cc->nr_migratepages;
 
@@ -675,6 +836,7 @@ unsigned long try_to_compact_pages(struct zonelist *zonelist,
 
 
 /* Compact all zones within a node */
+<<<<<<< HEAD
 static int compact_node(int nid)
 {
 	int zoneid;
@@ -694,11 +856,20 @@ static int compact_node(int nid)
 			.nr_migratepages = 0,
 			.order = -1,
 		};
+=======
+static int __compact_pgdat(pg_data_t *pgdat, struct compact_control *cc)
+{
+	int zoneid;
+	struct zone *zone;
+
+	for (zoneid = 0; zoneid < MAX_NR_ZONES; zoneid++) {
+>>>>>>> upstream/4.3_primoc
 
 		zone = &pgdat->node_zones[zoneid];
 		if (!populated_zone(zone))
 			continue;
 
+<<<<<<< HEAD
 		cc.zone = zone;
 		INIT_LIST_HEAD(&cc.freepages);
 		INIT_LIST_HEAD(&cc.migratepages);
@@ -707,16 +878,68 @@ static int compact_node(int nid)
 
 		VM_BUG_ON(!list_empty(&cc.freepages));
 		VM_BUG_ON(!list_empty(&cc.migratepages));
+=======
+		cc->nr_freepages = 0;
+		cc->nr_migratepages = 0;
+		cc->zone = zone;
+		INIT_LIST_HEAD(&cc->freepages);
+		INIT_LIST_HEAD(&cc->migratepages);
+
+		if (cc->order == -1 || !compaction_deferred(zone, cc->order))
+			compact_zone(zone, cc);
+
+		if (cc->order > 0) {
+			int ok = zone_watermark_ok(zone, cc->order,
+						low_wmark_pages(zone), 0, 0);
+			if (ok && cc->order > zone->compact_order_failed)
+				zone->compact_order_failed = cc->order + 1;
+			/* Currently async compaction is never deferred. */
+			else if (!ok && cc->sync)
+				defer_compaction(zone, cc->order);
+		}
+
+		VM_BUG_ON(!list_empty(&cc->freepages));
+		VM_BUG_ON(!list_empty(&cc->migratepages));
+>>>>>>> upstream/4.3_primoc
 	}
 
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+int compact_pgdat(pg_data_t *pgdat, int order)
+{
+	struct compact_control cc = {
+		.order = order,
+		.sync = false,
+	};
+
+	return __compact_pgdat(pgdat, &cc);
+}
+
+static int compact_node(int nid)
+{
+	struct compact_control cc = {
+		.order = -1,
+		.sync = true,
+	};
+
+	return __compact_pgdat(NODE_DATA(nid), &cc);
+}
+
+>>>>>>> upstream/4.3_primoc
 /* Compact all nodes in the system */
 static void compact_nodes(void)
 {
 	int nid;
 
+<<<<<<< HEAD
+=======
+	/* Flush pending updates to the LRU lists */
+	lru_add_drain_all();
+
+>>>>>>> upstream/4.3_primoc
 	for_each_online_node(nid)
 		compact_node(nid);
 }
@@ -743,6 +966,7 @@ int sysctl_extfrag_handler(struct ctl_table *table, int write,
 }
 
 #if defined(CONFIG_SYSFS) && defined(CONFIG_NUMA)
+<<<<<<< HEAD
 ssize_t sysfs_compact_node(struct sys_device *dev,
 			struct sysdev_attribute *attr,
 			const char *buf, size_t count)
@@ -756,10 +980,36 @@ static SYSDEV_ATTR(compact, S_IWUSR, NULL, sysfs_compact_node);
 int compaction_register_node(struct node *node)
 {
 	return sysdev_create_file(&node->sysdev, &attr_compact);
+=======
+ssize_t sysfs_compact_node(struct device *dev,
+			struct device_attribute *attr,
+			const char *buf, size_t count)
+{
+	int nid = dev->id;
+
+	if (nid >= 0 && nid < nr_node_ids && node_online(nid)) {
+		/* Flush pending updates to the LRU lists */
+		lru_add_drain_all();
+
+		compact_node(nid);
+	}
+
+	return count;
+}
+static DEVICE_ATTR(compact, S_IWUSR, NULL, sysfs_compact_node);
+
+int compaction_register_node(struct node *node)
+{
+	return device_create_file(&node->dev, &dev_attr_compact);
+>>>>>>> upstream/4.3_primoc
 }
 
 void compaction_unregister_node(struct node *node)
 {
+<<<<<<< HEAD
 	return sysdev_remove_file(&node->sysdev, &attr_compact);
+=======
+	return device_remove_file(&node->dev, &dev_attr_compact);
+>>>>>>> upstream/4.3_primoc
 }
 #endif /* CONFIG_SYSFS && CONFIG_NUMA */

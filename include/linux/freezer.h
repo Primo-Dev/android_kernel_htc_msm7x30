@@ -45,7 +45,11 @@ static inline bool should_send_signal(struct task_struct *p)
 }
 
 /* Takes and releases task alloc lock using task_lock() */
+<<<<<<< HEAD
 extern int thaw_process(struct task_struct *p);
+=======
+extern void __thaw_task(struct task_struct *t);
+>>>>>>> upstream/4.3_primoc
 
 extern void refrigerator(void);
 extern int freeze_processes(void);
@@ -168,7 +172,10 @@ static inline int frozen(struct task_struct *p) { return 0; }
 static inline int freezing(struct task_struct *p) { return 0; }
 static inline void set_freeze_flag(struct task_struct *p) {}
 static inline void clear_freeze_flag(struct task_struct *p) {}
+<<<<<<< HEAD
 static inline int thaw_process(struct task_struct *p) { return 1; }
+=======
+>>>>>>> upstream/4.3_primoc
 
 static inline void refrigerator(void) {}
 static inline int freeze_processes(void) { BUG(); return 0; }

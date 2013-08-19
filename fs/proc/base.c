@@ -86,6 +86,10 @@
 #ifdef CONFIG_HARDWALL
 #include <asm/hardwall.h>
 #endif
+<<<<<<< HEAD
+=======
+#include <trace/events/oom.h>
+>>>>>>> upstream/4.3_primoc
 #include "internal.h"
 
 /* NOTE:
@@ -200,6 +204,7 @@ static int proc_root_link(struct inode *inode, struct path *path)
 	return result;
 }
 
+<<<<<<< HEAD
 static struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 {
 	struct mm_struct *mm;
@@ -221,6 +226,8 @@ static struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 	return mm;
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 struct mm_struct *mm_for_maps(struct task_struct *task)
 {
 	return mm_access(task, PTRACE_MODE_READ);
@@ -627,7 +634,11 @@ static int mounts_open_common(struct inode *inode, struct file *file,
 	p->m.private = p;
 	p->ns = ns;
 	p->root = root;
+<<<<<<< HEAD
 	p->event = ns->event;
+=======
+	p->m.poll_event = ns->event;
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 
@@ -802,7 +813,11 @@ static ssize_t mem_rw(struct file *file, char __user *buf,
 	struct mm_struct *mm = file->private_data;
 	unsigned long addr = *ppos;
 	ssize_t copied;
+<<<<<<< HEAD
 	char *page;
+=======
+ 	char *page;
+>>>>>>> upstream/4.3_primoc
 
 	if (!mm)
 		return 0;
@@ -838,7 +853,11 @@ static ssize_t mem_rw(struct file *file, char __user *buf,
 		buf += this_len;
 		addr += this_len;
 		copied += this_len;
+<<<<<<< HEAD
 		count -= this_len;
+=======
+		count -= this_len;			
+>>>>>>> upstream/4.3_primoc
 	}
 	*ppos = addr;
 
@@ -1033,6 +1052,7 @@ static ssize_t oom_adjust_write(struct file *file, const char __user *buf,
 		goto err_sighand;
 	}
 
+<<<<<<< HEAD
 	if (oom_adjust != task->signal->oom_adj) {
 		if (oom_adjust == OOM_DISABLE)
 			atomic_inc(&task->mm->oom_disable_count);
@@ -1040,6 +1060,8 @@ static ssize_t oom_adjust_write(struct file *file, const char __user *buf,
 			atomic_dec(&task->mm->oom_disable_count);
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Warn that /proc/pid/oom_adj is deprecated, see
 	 * Documentation/feature-removal-schedule.txt.
@@ -1058,6 +1080,10 @@ static ssize_t oom_adjust_write(struct file *file, const char __user *buf,
 	else
 		task->signal->oom_score_adj = (oom_adjust * OOM_SCORE_ADJ_MAX) /
 								-OOM_DISABLE;
+<<<<<<< HEAD
+=======
+	trace_oom_score_adj_update(task);
+>>>>>>> upstream/4.3_primoc
 err_sighand:
 	unlock_task_sighand(task, &flags);
 err_task_lock:
@@ -1067,15 +1093,22 @@ out:
 	return err < 0 ? err : count;
 }
 
+<<<<<<< HEAD
 static int oom_adjust_permission(struct inode *inode, int mask,
 				 unsigned int flags)
+=======
+static int oom_adjust_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	uid_t uid;
 	struct task_struct *p;
 
+<<<<<<< HEAD
 	if (flags & IPERM_FLAG_RCU)
 		return -ECHILD;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	p = get_proc_task(inode);
 	if(p) {
 		uid = task_uid(p);
@@ -1093,7 +1126,11 @@ static int oom_adjust_permission(struct inode *inode, int mask,
 	}
 
 	/* Fall back to default. */
+<<<<<<< HEAD
 	return generic_permission(inode, mask, flags, NULL);
+=======
+	return generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 }
 
 static const struct inode_operations proc_oom_adjust_inode_operations = {
@@ -1175,6 +1212,7 @@ static ssize_t oom_score_adj_write(struct file *file, const char __user *buf,
 		goto err_sighand;
 	}
 
+<<<<<<< HEAD
 	if (oom_score_adj != task->signal->oom_score_adj) {
 		if (oom_score_adj == OOM_SCORE_ADJ_MIN)
 			atomic_inc(&task->mm->oom_disable_count);
@@ -1184,6 +1222,12 @@ static ssize_t oom_score_adj_write(struct file *file, const char __user *buf,
 	task->signal->oom_score_adj = oom_score_adj;
 	if (has_capability_noaudit(current, CAP_SYS_RESOURCE))
 		task->signal->oom_score_adj_min = oom_score_adj;
+=======
+	task->signal->oom_score_adj = oom_score_adj;
+	if (has_capability_noaudit(current, CAP_SYS_RESOURCE))
+		task->signal->oom_score_adj_min = oom_score_adj;
+	trace_oom_score_adj_update(task);
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Scale /proc/pid/oom_adj appropriately ensuring that OOM_DISABLE is
 	 * always attainable.
@@ -2134,9 +2178,15 @@ static const struct file_operations proc_fd_operations = {
  * /proc/pid/fd needs a special permission handler so that a process can still
  * access /proc/self/fd after it has executed a setuid().
  */
+<<<<<<< HEAD
 static int proc_fd_permission(struct inode *inode, int mask, unsigned int flags)
 {
 	int rv = generic_permission(inode, mask, flags, NULL);
+=======
+static int proc_fd_permission(struct inode *inode, int mask)
+{
+	int rv = generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 	if (rv == 0)
 		return 0;
 	if (task_pid(current) == proc_pid(inode))

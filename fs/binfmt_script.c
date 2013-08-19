@@ -22,15 +22,22 @@ static int load_script(struct linux_binprm *bprm,struct pt_regs *regs)
 	char interp[BINPRM_BUF_SIZE];
 	int retval;
 
+<<<<<<< HEAD
 	if ((bprm->buf[0] != '#') || (bprm->buf[1] != '!') ||
 	    (bprm->recursion_depth > BINPRM_MAX_RECURSION))
+=======
+	if ((bprm->buf[0] != '#') || (bprm->buf[1] != '!'))
+>>>>>>> upstream/4.3_primoc
 		return -ENOEXEC;
 	/*
 	 * This section does the #! interpretation.
 	 * Sorta complicated, but hopefully it will work.  -TYT
 	 */
 
+<<<<<<< HEAD
 	bprm->recursion_depth++;
+=======
+>>>>>>> upstream/4.3_primoc
 	allow_write_access(bprm->file);
 	fput(bprm->file);
 	bprm->file = NULL;

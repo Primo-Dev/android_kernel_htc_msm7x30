@@ -211,8 +211,13 @@ static ssize_t fat_direct_IO(int rw, struct kiocb *iocb,
 	 * FAT need to use the DIO_LOCKING for avoiding the race
 	 * condition of fat_get_block() and ->truncate().
 	 */
+<<<<<<< HEAD
 	ret = blockdev_direct_IO(rw, iocb, inode, inode->i_sb->s_bdev,
 				 iov, offset, nr_segs, fat_get_block, NULL);
+=======
+	ret = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
+				 fat_get_block);
+>>>>>>> upstream/4.3_primoc
 	if (ret < 0 && (rw & WRITE))
 		fat_write_failed(mapping, offset + iov_length(iov, nr_segs));
 
@@ -224,9 +229,15 @@ static sector_t _fat_bmap(struct address_space *mapping, sector_t block)
 	sector_t blocknr;
 
 	/* fat_get_cluster() assumes the requested blocknr isn't truncated. */
+<<<<<<< HEAD
 	down_read(&mapping->host->i_alloc_sem);
 	blocknr = generic_block_bmap(mapping, block, fat_get_block);
 	up_read(&mapping->host->i_alloc_sem);
+=======
+	down_read(&MSDOS_I(mapping->host)->truncate_lock);
+	blocknr = generic_block_bmap(mapping, block, fat_get_block);
+	up_read(&MSDOS_I(mapping->host)->truncate_lock);
+>>>>>>> upstream/4.3_primoc
 
 	return blocknr;
 }
@@ -510,13 +521,21 @@ static struct inode *fat_alloc_inode(struct super_block *sb)
 	ei = kmem_cache_alloc(fat_inode_cachep, GFP_NOFS);
 	if (!ei)
 		return NULL;
+<<<<<<< HEAD
+=======
+
+	init_rwsem(&ei->truncate_lock);
+>>>>>>> upstream/4.3_primoc
 	return &ei->vfs_inode;
 }
 
 static void fat_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(fat_inode_cachep, MSDOS_I(inode));
 }
 
@@ -1236,6 +1255,22 @@ static int fat_read_root(struct inode *inode)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static unsigned long calc_fat_clusters(struct super_block *sb)
+{
+	struct msdos_sb_info *sbi = MSDOS_SB(sb);
+
+	/* Divide first to avoid overflow */
+	if (sbi->fat_bits != 12) {
+		unsigned long ent_per_sec = sb->s_blocksize * 8 / sbi->fat_bits;
+		return ent_per_sec * sbi->fat_length;
+	}
+
+	return sbi->fat_length * sb->s_blocksize * 8 / sbi->fat_bits;
+}
+
+>>>>>>> upstream/4.3_primoc
 /*
  * Read the super block of an MS-DOS FS.
  */
@@ -1442,7 +1477,11 @@ int fat_fill_super(struct super_block *sb, void *data, int silent, int isvfat,
 		sbi->fat_bits = (total_clusters > MAX_FAT12) ? 16 : 12;
 
 	/* check that FAT table does not overflow */
+<<<<<<< HEAD
 	fat_clusters = sbi->fat_length * sb->s_blocksize * 8 / sbi->fat_bits;
+=======
+	fat_clusters = calc_fat_clusters(sb);
+>>>>>>> upstream/4.3_primoc
 	total_clusters = min(total_clusters, fat_clusters - FAT_START_ENT);
 	if (total_clusters > MAX_FAT(sb)) {
 		if (!silent)
@@ -1548,6 +1587,7 @@ static int writeback_inode(struct inode *inode)
 {
 
 	int ret;
+<<<<<<< HEAD
 	struct address_space *mapping = inode->i_mapping;
 	struct writeback_control wbc = {
 	       .sync_mode = WB_SYNC_NONE,
@@ -1560,6 +1600,16 @@ static int writeback_inode(struct inode *inode)
 	ret = sync_inode(inode, &wbc);
 	if (!ret)
 	       ret = filemap_fdatawrite(mapping);
+=======
+
+	/* if we used wait=1, sync_inode_metadata waits for the io for the
+	* inode to finish.  So wait=0 is sent down to sync_inode_metadata
+	* and filemap_fdatawrite is used for the data blocks
+	*/
+	ret = sync_inode_metadata(inode, 0);
+	if (!ret)
+	       ret = filemap_fdatawrite(inode->i_mapping);
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 

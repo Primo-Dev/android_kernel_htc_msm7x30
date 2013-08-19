@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
    Copyright (c) 2010-2012 Code Aurora Forum.  All rights reserved.
+=======
+   Copyright (c) 2010-2011 The Linux Foundation.  All rights reserved.
+>>>>>>> upstream/4.3_primoc
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 2 and
@@ -11,7 +15,10 @@
    GNU General Public License for more details.
 */
 
+<<<<<<< HEAD
 #include <linux/interrupt.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <linux/module.h>
 #include <linux/types.h>
 #include <linux/errno.h>
@@ -88,15 +95,24 @@ static struct amp_mgr *get_amp_mgr_sk(struct sock *sk)
 	return found;
 }
 
+<<<<<<< HEAD
 static struct amp_mgr *get_create_amp_mgr(struct hci_conn *hcon,
+=======
+static struct amp_mgr *get_create_amp_mgr(struct l2cap_conn *conn,
+>>>>>>> upstream/4.3_primoc
 						struct sk_buff *skb)
 {
 	struct amp_mgr *mgr;
 
 	write_lock(&amp_mgr_list_lock);
 	list_for_each_entry(mgr, &amp_mgr_list, list) {
+<<<<<<< HEAD
 		if (mgr->l2cap_conn == hcon->l2cap_data) {
 			BT_DBG("found %p", mgr);
+=======
+		if (mgr->l2cap_conn == conn) {
+			BT_DBG("conn %p found %p", conn, mgr);
+>>>>>>> upstream/4.3_primoc
 			write_unlock(&amp_mgr_list_lock);
 			goto gc_finished;
 		}
@@ -107,13 +123,22 @@ static struct amp_mgr *get_create_amp_mgr(struct hci_conn *hcon,
 	if (!mgr)
 		return NULL;
 
+<<<<<<< HEAD
 	mgr->l2cap_conn = hcon->l2cap_data;
+=======
+	mgr->l2cap_conn = conn;
+>>>>>>> upstream/4.3_primoc
 	mgr->next_ident = 1;
 	INIT_LIST_HEAD(&mgr->ctx_list);
 	rwlock_init(&mgr->ctx_list_lock);
 	mgr->skb = skb;
+<<<<<<< HEAD
 	BT_DBG("hcon %p mgr %p", hcon, mgr);
 	mgr->a2mp_sock = open_fixed_channel(&hcon->hdev->bdaddr, &hcon->dst);
+=======
+	BT_DBG("conn %p mgr %p", conn, mgr);
+	mgr->a2mp_sock = open_fixed_channel(conn->src, conn->dst);
+>>>>>>> upstream/4.3_primoc
 	if (!mgr->a2mp_sock) {
 		kfree(mgr);
 		return NULL;
@@ -375,11 +400,19 @@ static void send_a2mp_change_notify(void)
 {
 	struct amp_mgr *mgr;
 
+<<<<<<< HEAD
+=======
+	read_lock(&amp_mgr_list_lock);
+>>>>>>> upstream/4.3_primoc
 	list_for_each_entry(mgr, &amp_mgr_list, list) {
 		if (mgr->discovered)
 			send_a2mp_cl(mgr, next_ident(mgr),
 					A2MP_CHANGE_NOTIFY, 0, NULL);
 	}
+<<<<<<< HEAD
+=======
+	read_unlock(&amp_mgr_list_lock);
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline int discover_req(struct amp_mgr *mgr, struct sk_buff *skb)
@@ -483,7 +516,11 @@ static void create_physical(struct l2cap_conn *conn, struct sock *sk)
 	struct amp_ctx *ctx = NULL;
 
 	BT_DBG("conn %p", conn);
+<<<<<<< HEAD
 	mgr = get_create_amp_mgr(conn->hcon, NULL);
+=======
+	mgr = get_create_amp_mgr(conn, NULL);
+>>>>>>> upstream/4.3_primoc
 	if (!mgr)
 		goto cp_finished;
 	BT_DBG("mgr %p", mgr);
@@ -513,7 +550,11 @@ static void accept_physical(struct l2cap_conn *lcon, u8 id, struct sock *sk)
 	if (!hdev)
 		goto ap_finished;
 	BT_DBG("hdev %p", hdev);
+<<<<<<< HEAD
 	mgr = get_create_amp_mgr(lcon->hcon, NULL);
+=======
+	mgr = get_create_amp_mgr(lcon, NULL);
+>>>>>>> upstream/4.3_primoc
 	if (!mgr)
 		goto ap_finished;
 	BT_DBG("mgr %p", mgr);
@@ -1772,6 +1813,7 @@ static struct socket *open_fixed_channel(bdaddr_t *src, bdaddr_t *dst)
 static void conn_ind_worker(struct work_struct *w)
 {
 	struct amp_work_conn_ind *work = (struct amp_work_conn_ind *) w;
+<<<<<<< HEAD
 	struct hci_conn *hcon = work->hcon;
 	struct sk_buff *skb = work->skb;
 	struct amp_mgr *mgr;
@@ -1779,6 +1821,14 @@ static void conn_ind_worker(struct work_struct *w)
 	mgr = get_create_amp_mgr(hcon, skb);
 	BT_DBG("mgr %p", mgr);
 	hci_conn_put(hcon);
+=======
+	struct l2cap_conn *conn = work->conn;
+	struct sk_buff *skb = work->skb;
+	struct amp_mgr *mgr;
+
+	mgr = get_create_amp_mgr(conn, skb);
+	BT_DBG("mgr %p", mgr);
+>>>>>>> upstream/4.3_primoc
 	kfree(work);
 }
 
@@ -1804,6 +1854,7 @@ static void accept_physical_worker(struct work_struct *w)
 
 /* L2CAP Fixed Channel interface */
 
+<<<<<<< HEAD
 void amp_conn_ind(struct hci_conn *hcon, struct sk_buff *skb)
 {
 	struct amp_work_conn_ind *work;
@@ -1818,6 +1869,19 @@ void amp_conn_ind(struct hci_conn *hcon, struct sk_buff *skb)
 			hci_conn_put(hcon);
 			kfree(work);
 		}
+=======
+void amp_conn_ind(struct l2cap_conn *conn, struct sk_buff *skb)
+{
+	struct amp_work_conn_ind *work;
+	BT_DBG("conn %p, skb %p", conn, skb);
+	work = kmalloc(sizeof(*work), GFP_ATOMIC);
+	if (work) {
+		INIT_WORK((struct work_struct *) work, conn_ind_worker);
+		work->conn = conn;
+		work->skb = skb;
+		if (queue_work(amp_workqueue, (struct work_struct *) work) == 0)
+			kfree(work);
+>>>>>>> upstream/4.3_primoc
 	}
 }
 

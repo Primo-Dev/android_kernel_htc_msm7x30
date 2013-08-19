@@ -250,7 +250,10 @@ static void hostfs_evict_inode(struct inode *inode)
 static void hostfs_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kfree(HOSTFS_I(inode));
 }
 
@@ -362,9 +365,26 @@ retry:
 	return 0;
 }
 
+<<<<<<< HEAD
 int hostfs_fsync(struct file *file, int datasync)
 {
 	return fsync_file(HOSTFS_I(file->f_mapping->host)->fd, datasync);
+=======
+int hostfs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+{
+	struct inode *inode = file->f_mapping->host;
+	int ret;
+
+	ret = filemap_write_and_wait_range(inode->i_mapping, start, end);
+	if (ret)
+		return ret;
+
+	mutex_lock(&inode->i_mutex);
+	ret = fsync_file(HOSTFS_I(inode)->fd, datasync);
+	mutex_unlock(&inode->i_mutex);
+
+	return ret;
+>>>>>>> upstream/4.3_primoc
 }
 
 static const struct file_operations hostfs_file_fops = {
@@ -541,7 +561,11 @@ static int read_name(struct inode *ino, char *name)
 	return 0;
 }
 
+<<<<<<< HEAD
 int hostfs_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+int hostfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		  struct nameidata *nd)
 {
 	struct inode *inode;
@@ -690,7 +714,11 @@ int hostfs_rmdir(struct inode *ino, struct dentry *dentry)
 	return err;
 }
 
+<<<<<<< HEAD
 int hostfs_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev)
+=======
+static int hostfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode;
 	char *name;
@@ -748,12 +776,20 @@ int hostfs_rename(struct inode *from_ino, struct dentry *from,
 	return err;
 }
 
+<<<<<<< HEAD
 int hostfs_permission(struct inode *ino, int desired, unsigned int flags)
+=======
+int hostfs_permission(struct inode *ino, int desired)
+>>>>>>> upstream/4.3_primoc
 {
 	char *name;
 	int r = 0, w = 0, x = 0, err;
 
+<<<<<<< HEAD
 	if (flags & IPERM_FLAG_RCU)
+=======
+	if (desired & MAY_NOT_BLOCK)
+>>>>>>> upstream/4.3_primoc
 		return -ECHILD;
 
 	if (desired & MAY_READ) r = 1;
@@ -770,7 +806,11 @@ int hostfs_permission(struct inode *ino, int desired, unsigned int flags)
 		err = access_file(name, r, w, x);
 	__putname(name);
 	if (!err)
+<<<<<<< HEAD
 		err = generic_permission(ino, desired, flags, NULL);
+=======
+		err = generic_permission(ino, desired);
+>>>>>>> upstream/4.3_primoc
 	return err;
 }
 

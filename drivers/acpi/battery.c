@@ -145,7 +145,11 @@ struct acpi_battery {
 	unsigned long flags;
 };
 
+<<<<<<< HEAD
 #define to_acpi_battery(x) container_of(x, struct acpi_battery, bat);
+=======
+#define to_acpi_battery(x) container_of(x, struct acpi_battery, bat)
+>>>>>>> upstream/4.3_primoc
 
 inline int acpi_battery_present(struct acpi_battery *battery)
 {

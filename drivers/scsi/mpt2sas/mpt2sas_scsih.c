@@ -974,8 +974,13 @@ _scsih_get_chain_buffer_tracker(struct MPT2SAS_ADAPTER *ioc, u16 smid)
 	spin_lock_irqsave(&ioc->scsi_lookup_lock, flags);
 	if (list_empty(&ioc->free_chain_list)) {
 		spin_unlock_irqrestore(&ioc->scsi_lookup_lock, flags);
+<<<<<<< HEAD
 		printk(MPT2SAS_WARN_FMT "chain buffers not available\n",
 		    ioc->name);
+=======
+		dfailprintk(ioc, printk(MPT2SAS_WARN_FMT "chain buffers not "
+			"available\n", ioc->name));
+>>>>>>> upstream/4.3_primoc
 		return NULL;
 	}
 	chain_req = list_entry(ioc->free_chain_list.next,
@@ -3740,11 +3745,15 @@ _scsih_qcmd_lck(struct scsi_cmnd *scmd, void (*done)(struct scsi_cmnd *))
 			else
 				mpi_control |= MPI2_SCSIIO_CONTROL_SIMPLEQ;
 		} else
+<<<<<<< HEAD
 /* MPI Revision I (UNIT = 0xA) - removed MPI2_SCSIIO_CONTROL_UNTAGGED */
 /*			mpi_control |= MPI2_SCSIIO_CONTROL_UNTAGGED;
  */
 			mpi_control |= (0x500);
 
+=======
+			mpi_control |= MPI2_SCSIIO_CONTROL_SIMPLEQ;
+>>>>>>> upstream/4.3_primoc
 	} else
 		mpi_control |= MPI2_SCSIIO_CONTROL_SIMPLEQ;
 	/* Make sure Device is not raid volume.
@@ -6425,6 +6434,10 @@ _scsih_mark_responding_raid_device(struct MPT2SAS_ADAPTER *ioc, u64 wwid,
 			} else
 				sas_target_priv_data = NULL;
 			raid_device->responding = 1;
+<<<<<<< HEAD
+=======
+			spin_unlock_irqrestore(&ioc->raid_device_lock, flags);
+>>>>>>> upstream/4.3_primoc
 			starget_printk(KERN_INFO, raid_device->starget,
 			    "handle(0x%04x), wwid(0x%016llx)\n", handle,
 			    (unsigned long long)raid_device->wwid);
@@ -6435,16 +6448,27 @@ _scsih_mark_responding_raid_device(struct MPT2SAS_ADAPTER *ioc, u64 wwid,
 			 */
 			_scsih_init_warpdrive_properties(ioc, raid_device);
 			if (raid_device->handle == handle)
+<<<<<<< HEAD
 				goto out;
+=======
+				return;
+>>>>>>> upstream/4.3_primoc
 			printk(KERN_INFO "\thandle changed from(0x%04x)!!!\n",
 			    raid_device->handle);
 			raid_device->handle = handle;
 			if (sas_target_priv_data)
 				sas_target_priv_data->handle = handle;
+<<<<<<< HEAD
 			goto out;
 		}
 	}
  out:
+=======
+			return;
+		}
+	}
+
+>>>>>>> upstream/4.3_primoc
 	spin_unlock_irqrestore(&ioc->raid_device_lock, flags);
 }
 
@@ -7211,6 +7235,10 @@ _scsih_remove(struct pci_dev *pdev)
 	}
 
 	sas_remove_host(shost);
+<<<<<<< HEAD
+=======
+	mpt2sas_base_detach(ioc);
+>>>>>>> upstream/4.3_primoc
 	list_del(&ioc->list);
 	scsi_remove_host(shost);
 	scsi_host_put(shost);

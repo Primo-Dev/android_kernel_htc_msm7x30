@@ -85,6 +85,10 @@ struct pv_lazy_ops {
 	/* Set deferred update mode, used for batching operations. */
 	void (*enter)(void);
 	void (*leave)(void);
+<<<<<<< HEAD
+=======
+	void (*flush)(void);
+>>>>>>> upstream/4.3_primoc
 };
 
 struct pv_time_ops {
@@ -673,6 +677,10 @@ void paravirt_end_context_switch(struct task_struct *next);
 
 void paravirt_enter_lazy_mmu(void);
 void paravirt_leave_lazy_mmu(void);
+<<<<<<< HEAD
+=======
+void paravirt_flush_lazy_mmu(void);
+>>>>>>> upstream/4.3_primoc
 
 void _paravirt_nop(void);
 u32 _paravirt_ident_32(u32);

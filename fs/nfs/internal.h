@@ -316,7 +316,11 @@ void nfs_commit_release_pages(struct nfs_write_data *data);
 
 #ifdef CONFIG_MIGRATION
 extern int nfs_migrate_page(struct address_space *,
+<<<<<<< HEAD
 		struct page *, struct page *);
+=======
+		struct page *, struct page *, enum migrate_mode);
+>>>>>>> upstream/4.3_primoc
 #else
 #define nfs_migrate_page NULL
 #endif

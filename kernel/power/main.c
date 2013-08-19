@@ -15,10 +15,13 @@
 
 #include "power.h"
 
+<<<<<<< HEAD
 #ifdef CONFIG_PERFLOCK
 #include <mach/perflock.h>
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 DEFINE_MUTEX(pm_mutex);
 
 #ifdef CONFIG_PM_SLEEP
@@ -41,8 +44,14 @@ EXPORT_SYMBOL_GPL(unregister_pm_notifier);
 
 int pm_notifier_call_chain(unsigned long val)
 {
+<<<<<<< HEAD
 	return (blocking_notifier_call_chain(&pm_chain_head, val, NULL)
 			== NOTIFY_BAD) ? -EINVAL : 0;
+=======
+	int ret = blocking_notifier_call_chain(&pm_chain_head, val, NULL);
+
+	return notifier_to_errno(ret);
+>>>>>>> upstream/4.3_primoc
 }
 
 /* If set, devices may be suspended and resumed asynchronously. */
@@ -317,6 +326,7 @@ power_attr(wake_lock);
 power_attr(wake_unlock);
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_PERFLOCK
 static struct perf_lock user_perf_lock;
 static struct perf_lock user_cpufreq_ceiling;
@@ -410,6 +420,8 @@ state_onchg_store(struct kobject *kobj, struct kobj_attribute *attr,
 power_attr(state_onchg);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 static struct attribute * g[] = {
 	&state_attr.attr,
 #ifdef CONFIG_PM_TRACE
@@ -426,6 +438,7 @@ static struct attribute * g[] = {
 	&wake_lock_attr.attr,
 	&wake_unlock_attr.attr,
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_ONMODE_CHARGING
 	&state_onchg_attr.attr,
 #endif
@@ -433,6 +446,8 @@ static struct attribute * g[] = {
 #ifdef CONFIG_PERFLOCK
 	&perflock_attr.attr,
 	&cpufreq_ceiling_attr.attr,
+=======
+>>>>>>> upstream/4.3_primoc
 #endif
 	NULL,
 };
@@ -463,10 +478,13 @@ static int __init pm_init(void)
 	hibernate_image_size_init();
 	hibernate_reserved_size_init();
 	power_kobj = kobject_create_and_add("power", NULL);
+<<<<<<< HEAD
 #ifdef CONFIG_PERFLOCK
 	perf_lock_init(&user_perf_lock, PERF_LOCK_HIGHEST, "User Perflock");
 	perf_lock_init_v2(&user_cpufreq_ceiling, CEILING_LEVEL_HIGHEST, "User cpufreq_ceiling Lock");
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!power_kobj)
 		return -ENOMEM;
 	return sysfs_create_group(power_kobj, &attr_group);

@@ -37,7 +37,11 @@ enum {
 	MSM_SERIAL_UART1	= 0,
 	MSM_SERIAL_UART2,
 	MSM_SERIAL_UART3,
+<<<<<<< HEAD
 #if defined(CONFIG_SERIAL_MSM_HS) || defined(CONFIG_SERIAL_MSM_HS_LPM)
+=======
+#ifdef CONFIG_SERIAL_MSM_HS
+>>>>>>> upstream/4.3_primoc
 	MSM_SERIAL_UART1DM,
 	MSM_SERIAL_UART2DM,
 #endif
@@ -101,16 +105,26 @@ struct t_usb_status_notifier{
 /* END: add USB connected notify function */
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_RESET_BY_CABLE_IN
 void reset_dflipflop(void);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 int __init board_mfg_mode(void);
 int __init parse_tag_smi(const struct tag *tags);
 int __init parse_tag_hwid(const struct tag * tags);
 int __init parse_tag_skuid(const struct tag * tags);
 int parse_tag_engineerid(const struct tag * tags);
 void board_get_sku_color_tag(char **);
+<<<<<<< HEAD
+=======
+void board_get_keycaps_tag(char **);
+void board_get_cid_tag(char **);
+void board_get_carrier_tag(char **);
+int board_emmc_boot(void);
+>>>>>>> upstream/4.3_primoc
 
 char *board_serialno(void);
 unsigned long get_kernel_flag(void);

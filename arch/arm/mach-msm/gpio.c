@@ -113,7 +113,11 @@ static void msm_gpio_update_both_edge_detect(struct msm_gpio_chip *msm_chip)
 		if (((val ^ val2) & msm_chip->both_edge_detect & ~intstat) == 0)
 			return;
 	} while (loop_limit-- > 0);
+<<<<<<< HEAD
 	printk(KERN_ERR "[K] msm_gpio_update_both_edge_detect, "
+=======
+	printk(KERN_ERR "msm_gpio_update_both_edge_detect, "
+>>>>>>> upstream/4.3_primoc
 	       "failed to reach stable state %x != %x\n", val, val2);
 }
 
@@ -346,7 +350,11 @@ static void msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 		while (val) {
 			mask = val & -val;
 			j = fls(mask) - 1;
+<<<<<<< HEAD
 			/* printk("[K] %s %08x %08x bit %d gpio %d irq %d\n",
+=======
+			/* printk("%s %08x %08x bit %d gpio %d irq %d\n",
+>>>>>>> upstream/4.3_primoc
 				__func__, v, m, j, msm_chip->chip.start + j,
 				FIRST_GPIO_IRQ + msm_chip->chip.start + j); */
 			val &= ~mask;
@@ -421,7 +429,11 @@ void msm_gpio_enter_sleep(int from_idle)
 		unsigned int int_en = msm_gpio_chips[i].int_enable[!from_idle] & ~msm_gpio_chips[i].int_enable_mask[!from_idle];
 		__raw_writel(int_en, msm_gpio_chips[i].regs.int_en);
 		if ((msm_gpio_debug_mask & GPIO_DEBUG_SLEEP) && !from_idle)
+<<<<<<< HEAD
 			printk(KERN_INFO "[K] gpio[%3d,%3d]: int_enable=0x%08x int_mask_en=0x%08x int_edge=0x%8p int_pos=0x%8p\n",
+=======
+			printk(KERN_INFO "gpio[%3d,%3d]: int_enable=0x%08x int_mask_en=0x%08x int_edge=0x%8p int_pos=0x%8p\n",
+>>>>>>> upstream/4.3_primoc
 				msm_gpio_chips[i].chip.base,
 				msm_gpio_chips[i].chip.base + msm_gpio_chips[i].chip.ngpio - 1,
 				msm_gpio_chips[i].int_enable[!from_idle],
@@ -457,7 +469,11 @@ void msm_gpio_enter_sleep(int from_idle)
 	if (smem_gpio) {
 		if (msm_gpio_debug_mask & GPIO_DEBUG_SLEEP)
 			for (i = 0; i < ARRAY_SIZE(smem_gpio->enabled); i++) {
+<<<<<<< HEAD
 				printk("[K] msm_gpio_enter_sleep gpio %d-%d: enable"
+=======
+				printk("msm_gpio_enter_sleep gpio %d-%d: enable"
+>>>>>>> upstream/4.3_primoc
 				       " %08x, edge %08x, polarity %08x\n",
 				       i * 32, i * 32 + 31,
 				       smem_gpio->enabled[i],
@@ -484,7 +500,11 @@ void msm_gpio_exit_sleep(void)
 
 	if (smem_gpio && (smem_gpio->num_fired[0] || smem_gpio->num_fired[1])) {
 		if (msm_gpio_debug_mask & GPIO_DEBUG_SLEEP)
+<<<<<<< HEAD
 			printk(KERN_INFO "[K] gpio: fired %x %x\n",
+=======
+			printk(KERN_INFO "gpio: fired %x %x\n",
+>>>>>>> upstream/4.3_primoc
 			      smem_gpio->num_fired[0], smem_gpio->num_fired[1]);
 		tasklet_schedule(&msm_gpio_sleep_int_tasklet);
 	}
@@ -683,7 +703,11 @@ void config_gpio_table(uint32_t *table, int len)
 	for (n = 0; n < len; n++) {
 		id = table[n];
 		if (msm_proc_comm(PCOM_RPC_GPIO_TLMM_CONFIG_EX, &id, 0))
+<<<<<<< HEAD
 			printk(KERN_ERR "[K] %s: config gpio fail\n", __func__);
+=======
+			printk(KERN_ERR "%s: config gpio fail\n", __func__);
+>>>>>>> upstream/4.3_primoc
 	}
 }
 EXPORT_SYMBOL(config_gpio_table);

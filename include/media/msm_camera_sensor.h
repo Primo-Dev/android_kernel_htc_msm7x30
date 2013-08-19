@@ -78,7 +78,11 @@
 #endif
 #endif
 
+<<<<<<< HEAD
 #define CFG_DEINIT 100
+=======
+
+>>>>>>> upstream/4.3_primoc
 
 
 #define MOVE_NEAR	0

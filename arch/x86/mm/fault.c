@@ -376,10 +376,19 @@ static noinline __kprobes int vmalloc_fault(unsigned long address)
 	if (pgd_none(*pgd_ref))
 		return -1;
 
+<<<<<<< HEAD
 	if (pgd_none(*pgd))
 		set_pgd(pgd, *pgd_ref);
 	else
 		BUG_ON(pgd_page_vaddr(*pgd) != pgd_page_vaddr(*pgd_ref));
+=======
+	if (pgd_none(*pgd)) {
+		set_pgd(pgd, *pgd_ref);
+		arch_flush_lazy_mmu_mode();
+	} else {
+		BUG_ON(pgd_page_vaddr(*pgd) != pgd_page_vaddr(*pgd_ref));
+	}
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Below here mismatches are bugs because these lower tables
@@ -720,12 +729,24 @@ __bad_area_nosemaphore(struct pt_regs *regs, unsigned long error_code,
 		if (is_errata100(regs, address))
 			return;
 
+<<<<<<< HEAD
 		if (unlikely(show_unhandled_signals))
 			show_signal_msg(regs, error_code, address, tsk);
 
 		/* Kernel addresses are always protection faults: */
 		tsk->thread.cr2		= address;
 		tsk->thread.error_code	= error_code | (address >= TASK_SIZE);
+=======
+		/* Kernel addresses are always protection faults: */
+		if (address >= TASK_SIZE)
+			error_code |= PF_PROT;
+
+		if (likely(show_unhandled_signals))
+			show_signal_msg(regs, error_code, address, tsk);
+
+		tsk->thread.cr2		= address;
+		tsk->thread.error_code	= error_code;
+>>>>>>> upstream/4.3_primoc
 		tsk->thread.trap_no	= 14;
 
 		force_sig_info_fault(SIGSEGV, si_code, address, tsk, 0);
@@ -1154,6 +1175,19 @@ good_area:
 	}
 
 	/*
+<<<<<<< HEAD
+=======
+	 * Pagefault was interrupted by SIGKILL. We have no reason to
+	 * continue pagefault.
+	 */
+	if ((fault & VM_FAULT_RETRY) && fatal_signal_pending(current)) {
+		if (!(error_code & PF_USER))
+			no_context(regs, error_code, address);
+		return;
+	}
+
+	/*
+>>>>>>> upstream/4.3_primoc
 	 * Major/minor page fault accounting is only done on the
 	 * initial attempt. If we go through a retry, it is extremely
 	 * likely that the page will be found in page cache at that point.
@@ -1172,6 +1206,10 @@ good_area:
 			/* Clear FAULT_FLAG_ALLOW_RETRY to avoid any risk
 			 * of starvation. */
 			flags &= ~FAULT_FLAG_ALLOW_RETRY;
+<<<<<<< HEAD
+=======
+			flags |= FAULT_FLAG_TRIED;
+>>>>>>> upstream/4.3_primoc
 			goto retry;
 		}
 	}

@@ -233,6 +233,11 @@ do {									\
 		if (!ret)						\
 			break;						\
 	}								\
+<<<<<<< HEAD
+=======
+	if (!ret && (condition))					\
+		ret = 1;						\
+>>>>>>> upstream/4.3_primoc
 	finish_wait(&wq, &__wait);					\
 } while (0)
 
@@ -249,8 +254,14 @@ do {									\
  * wake_up() has to be called after changing any variable that could
  * change the result of the wait condition.
  *
+<<<<<<< HEAD
  * The function returns 0 if the @timeout elapsed, and the remaining
  * jiffies if the condition evaluated to true before the timeout elapsed.
+=======
+ * The function returns 0 if the @timeout elapsed, or the remaining
+ * jiffies (at least 1) if the @condition evaluated to %true before
+ * the @timeout elapsed.
+>>>>>>> upstream/4.3_primoc
  */
 #define wait_event_timeout(wq, condition, timeout)			\
 ({									\
@@ -318,6 +329,11 @@ do {									\
 		ret = -ERESTARTSYS;					\
 		break;							\
 	}								\
+<<<<<<< HEAD
+=======
+	if (!ret && (condition))					\
+		ret = 1;						\
+>>>>>>> upstream/4.3_primoc
 	finish_wait(&wq, &__wait);					\
 } while (0)
 
@@ -334,9 +350,16 @@ do {									\
  * wake_up() has to be called after changing any variable that could
  * change the result of the wait condition.
  *
+<<<<<<< HEAD
  * The function returns 0 if the @timeout elapsed, -ERESTARTSYS if it
  * was interrupted by a signal, and the remaining jiffies otherwise
  * if the condition evaluated to true before the timeout elapsed.
+=======
+ * Returns:
+ * 0 if the @timeout elapsed, -%ERESTARTSYS if it was interrupted by
+ * a signal, or the remaining jiffies (at least 1) if the @condition
+ * evaluated to %true before the @timeout elapsed.
+>>>>>>> upstream/4.3_primoc
  */
 #define wait_event_interruptible_timeout(wq, condition, timeout)	\
 ({									\

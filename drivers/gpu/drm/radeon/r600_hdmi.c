@@ -196,6 +196,7 @@ static void r600_hdmi_videoinfoframe(
 	frame[0xD] = (right_bar >> 8);
 
 	r600_hdmi_infoframe_checksum(0x82, 0x02, 0x0D, frame);
+<<<<<<< HEAD
 	/* Our header values (type, version, length) should be alright, Intel
 	 * is using the same. Checksum function also seems to be OK, it works
 	 * fine for audio infoframe. However calculated value is always lower
@@ -203,6 +204,8 @@ static void r600_hdmi_videoinfoframe(
 	 * of TVs that strictly check the checksum. Hack it manually here to
 	 * workaround this issue. */
 	frame[0x0] += 2;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	WREG32(offset+R600_HDMI_VIDEOINFOFRAME_0,
 		frame[0x0] | (frame[0x1] << 8) | (frame[0x2] << 16) | (frame[0x3] << 24));

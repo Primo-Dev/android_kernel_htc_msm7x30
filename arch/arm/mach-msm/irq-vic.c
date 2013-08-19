@@ -321,7 +321,11 @@ static int msm_irq_set_wake(struct irq_data *d, unsigned int on)
 	int smsm_irq = msm_irq_to_smsm[d->irq];
 
 	if (smsm_irq == 0) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[K] msm_irq_set_wake: bad wakeup irq %d\n", d->irq);
+=======
+		printk(KERN_ERR "msm_irq_set_wake: bad wakeup irq %d\n", d->irq);
+>>>>>>> upstream/4.3_primoc
 		return -EINVAL;
 	}
 	if (on)
@@ -406,7 +410,11 @@ void msm_irq_enter_sleep1(bool modem_wake, int from_idle, uint32_t *irq_mask)
 		*irq_mask = msm_irq_smsm_wake_enable[!from_idle];
 		if (msm_irq_debug_mask & IRQ_DEBUG_SLEEP)
 			printk(KERN_INFO
+<<<<<<< HEAD
 				"[K] %s irq_mask %x\n", __func__, *irq_mask);
+=======
+				"%s irq_mask %x\n", __func__, *irq_mask);
+>>>>>>> upstream/4.3_primoc
 	}
 }
 
@@ -462,7 +470,11 @@ int msm_irq_enter_sleep2(bool modem_wake, int from_idle)
 			break;
 		pend_irq = readl(VIC_IRQ_VEC_PEND_RD);
 		if (msm_irq_debug_mask & IRQ_DEBUG_SLEEP_INT)
+<<<<<<< HEAD
 			printk(KERN_INFO "[K] %s cleared int %d (%d)\n",
+=======
+			printk(KERN_INFO "%s cleared int %d (%d)\n",
+>>>>>>> upstream/4.3_primoc
 				__func__, irq, pend_irq);
 	}
 

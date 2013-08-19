@@ -154,6 +154,11 @@
 #define NR_BOARD_IRQS		NR_MAX8957_IRQS
 #endif
 
+<<<<<<< HEAD
+=======
+#define NR_MICROP_IRQS 16
+
+>>>>>>> upstream/4.3_primoc
 #define INT_ADSP_A11_SMSM	INT_ADSP_A11
 
 #endif /* __ASM_ARCH_MSM_IRQS_7X30_H */

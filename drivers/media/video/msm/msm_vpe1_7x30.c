@@ -22,7 +22,11 @@
 #include <linux/io.h>
 #include "msm_vpe1_7x30.h"
 #include <mach/msm_reqs.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/clk.h>
 #include <linux/slab.h>
 #include <mach/clk.h>
@@ -1225,6 +1229,10 @@ static int __msm_vpe_probe(struct platform_device *pdev)
 
 	iounmap(vpe_device->vpebase);  /* this path should never occur */
 
+<<<<<<< HEAD
+=======
+	vpe_device->vpebase = NULL;
+>>>>>>> upstream/4.3_primoc
 /* from this part it is error handling. */
 vpe_release_mem_region:
 	release_mem_region(vpemem->start, (vpemem->end -vpemem->start) + 1);
@@ -1238,6 +1246,10 @@ static int __msm_vpe_remove(struct platform_device *pdev)
 	vpemem = vpe_device->vpemem;
 
 	iounmap(vpe_device->vpebase);
+<<<<<<< HEAD
+=======
+	vpe_device->vpebase = NULL;
+>>>>>>> upstream/4.3_primoc
 	release_mem_region(vpemem->start,
 					(vpemem->end -vpemem->start) + 1);
 	return 0;

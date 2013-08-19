@@ -15,7 +15,11 @@ obj-$(CONFIG_HTC_QUICKBOOT_OFFMODE_ALARM) += offmode-alarm.o
 rtc-core-$(CONFIG_RTC_INTF_DEV)	+= rtc-dev.o
 rtc-core-$(CONFIG_RTC_INTF_PROC) += rtc-proc.o
 rtc-core-$(CONFIG_RTC_INTF_SYSFS) += rtc-sysfs.o
+<<<<<<< HEAD
 
+=======
+obj-$(CONFIG_RTC_INTF_ALARM_DEV)      += offmode-alarm.o
+>>>>>>> upstream/4.3_primoc
 
 # Keep the list ordered.
 

@@ -183,6 +183,7 @@ struct dentry *isofs_lookup(struct inode *dir, struct dentry *dentry, struct nam
 				1024 + page_address(page));
 	__free_page(page);
 
+<<<<<<< HEAD
 	inode = NULL;
 	if (found) {
 		inode = isofs_iget(dir->i_sb, block, offset);
@@ -192,5 +193,11 @@ struct dentry *isofs_lookup(struct inode *dir, struct dentry *dentry, struct nam
 		}
 	}
 	mutex_unlock(&sbi->s_mutex);
+=======
+	inode = found ? isofs_iget(dir->i_sb, block, offset) : NULL;
+
+	mutex_unlock(&sbi->s_mutex);
+
+>>>>>>> upstream/4.3_primoc
 	return d_splice_alias(inode, dentry);
 }

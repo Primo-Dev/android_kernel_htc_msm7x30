@@ -7,6 +7,15 @@
 menu "Miscellaneous I2C Chip support"
 
 
+<<<<<<< HEAD
+=======
+config SENSORS_BMA150
+	tristate "BMA150 G-sensor Driver"
+	depends on I2C=y
+	help
+	 BMA150 G-sensor Driver implemented by HTC.
+
+>>>>>>> upstream/4.3_primoc
 config SENSORS_ONLY_BMA250
 	tristate "BMA250 acceleration sensor support"
 	depends on I2C=y
@@ -25,6 +34,21 @@ config SENSORS_AKM8975
         help
          AKM8975 Compass Driver implemented by HTC.
 
+<<<<<<< HEAD
+=======
+config SENSORS_CAPSENSE
+	tristate "CapSense Driver"
+	depends on I2C
+	help
+	 CapSense Driver implemented by HTC.
+
+config SENSORS_CAPSENSE_EXPRESS
+	tristate "CapSense Express Driver"
+	depends on I2C
+	help
+	 CapSense Express Driver implemented by HTC.
+
+>>>>>>> upstream/4.3_primoc
 config SENSORS_AKM8975_PANA_GYRO
         tristate "AKM8973 Compass Driver for Pana Gyro"
         depends on I2C
@@ -47,12 +71,15 @@ config TPS65200
 
 	  PANASONIC GYR Driver implemented by HTC.
 
+<<<<<<< HEAD
 config SENSORS_BMA150
 	tristate "BMA150 G-sensor Driver"
 	depends on I2C
 	help
 	 BMA150 G-sensor Driver implemented by HTC.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config SENSORS_BMA250
 	tristate "BMA250 acceleration sensor support"
 	depends on I2C=y
@@ -127,4 +154,20 @@ config CODEC_AIC3008
 	help
 	  AIC3008 Driver implemented by HTC.
 
+<<<<<<< HEAD
+=======
+config SOUND_CONTROL_HAX_GPL
+	tristate "TPA2051D3 sound control hax"
+	default y
+	help
+	  FauxSound TPA2051D3 chipset sound control hacks
+
+config SND_CONTROL_HAS_BEATS
+	bool "Supports HTC Beats Headphones"
+	depends on SOUND_CONTROL_HAX_GPL
+	default n
+	help
+	  enable this for HTC Beats Headphone support
+
+>>>>>>> upstream/4.3_primoc
 endmenu

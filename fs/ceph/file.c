@@ -768,13 +768,24 @@ static loff_t ceph_llseek(struct file *file, loff_t offset, int origin)
 
 	mutex_lock(&inode->i_mutex);
 	__ceph_do_pending_vmtruncate(inode);
+<<<<<<< HEAD
 	switch (origin) {
 	case SEEK_END:
+=======
+	if (origin != SEEK_CUR || origin != SEEK_SET) {
+>>>>>>> upstream/4.3_primoc
 		ret = ceph_do_getattr(inode, CEPH_STAT_CAP_SIZE);
 		if (ret < 0) {
 			offset = ret;
 			goto out;
 		}
+<<<<<<< HEAD
+=======
+	}
+
+	switch (origin) {
+	case SEEK_END:
+>>>>>>> upstream/4.3_primoc
 		offset += inode->i_size;
 		break;
 	case SEEK_CUR:
@@ -790,6 +801,22 @@ static loff_t ceph_llseek(struct file *file, loff_t offset, int origin)
 		}
 		offset += file->f_pos;
 		break;
+<<<<<<< HEAD
+=======
+	case SEEK_DATA:
+		if (offset >= inode->i_size) {
+			ret = -ENXIO;
+			goto out;
+		}
+		break;
+	case SEEK_HOLE:
+		if (offset >= inode->i_size) {
+			ret = -ENXIO;
+			goto out;
+		}
+		offset = inode->i_size;
+		break;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (offset < 0 || offset > inode->i_sb->s_maxbytes) {

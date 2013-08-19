@@ -795,12 +795,23 @@ printer_write(struct file *fd, const char __user *buf, size_t len, loff_t *ptr)
 }
 
 static int
+<<<<<<< HEAD
 printer_fsync(struct file *fd, int datasync)
 {
 	struct printer_dev	*dev = fd->private_data;
 	unsigned long		flags;
 	int			tx_list_empty;
 
+=======
+printer_fsync(struct file *fd, loff_t start, loff_t end, int datasync)
+{
+	struct printer_dev	*dev = fd->private_data;
+	struct inode *inode = fd->f_path.dentry->d_inode;
+	unsigned long		flags;
+	int			tx_list_empty;
+
+	mutex_lock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 	spin_lock_irqsave(&dev->lock, flags);
 	tx_list_empty = (likely(list_empty(&dev->tx_reqs)));
 	spin_unlock_irqrestore(&dev->lock, flags);
@@ -810,6 +821,10 @@ printer_fsync(struct file *fd, int datasync)
 		wait_event_interruptible(dev->tx_flush_wait,
 				(likely(list_empty(&dev->tx_reqs_active))));
 	}
+<<<<<<< HEAD
+=======
+	mutex_unlock(&inode->i_mutex);
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 }

@@ -51,7 +51,10 @@
 #define POLLING_DELAY		200
 #define TH_ADD			3
 #endif
+<<<<<<< HEAD
 static int kcalibrated;
+=======
+>>>>>>> upstream/4.3_primoc
 static int record_init_fail = 0;
 static void sensor_irq_do_work(struct work_struct *work);
 static DECLARE_WORK(sensor_irq_work, sensor_irq_do_work);
@@ -150,7 +153,10 @@ static struct mutex als_enable_mutex, als_disable_mutex, als_get_adc_mutex;
 static int lightsensor_enable(struct cm3629_info *lpi);
 static int lightsensor_disable(struct cm3629_info *lpi);
 static void psensor_initial_cmd(struct cm3629_info *lpi);
+<<<<<<< HEAD
 static void dump_info(struct cm3629_info* lpi);
+=======
+>>>>>>> upstream/4.3_primoc
 #if (0)
 static int I2C_RxData(uint16_t slaveAddr, uint8_t *rxData, int length)
 {
@@ -224,7 +230,11 @@ static int I2C_RxData_2(char *rxData, int length)
 		val = gpio_get_value(lpi->intr_pin);
 		/*check intr GPIO when i2c error*/
 
+<<<<<<< HEAD
 		D("[PS][cm3629 warning] %s, i2c err, ISR gpio %d  = %d \n",
+=======
+		D("[PS][cm3629 error] %s, i2c err, ISR gpio %d  = %d \n",
+>>>>>>> upstream/4.3_primoc
 				__func__, lpi->intr_pin, val);
 		msleep(10);
 	}
@@ -385,7 +395,11 @@ static int _cm3629_I2C_Write_Byte(uint16_t SlaveAddress,
 	return ret;
 }
 #endif
+<<<<<<< HEAD
 static int get_ls_adc_value(uint32_t *als_step, bool resume)
+=======
+static int get_ls_adc_value(uint16_t *als_step, bool resume)
+>>>>>>> upstream/4.3_primoc
 {
 
 	struct cm3629_info *lpi = lp_info;
@@ -431,9 +445,15 @@ static int get_ls_adc_value(uint32_t *als_step, bool resume)
 	lsb = cmd[0];
 	msb = cmd[1];
 
+<<<<<<< HEAD
 	*als_step = (uint32_t)msb;
 	*als_step <<= 8;
 	*als_step |= (uint32_t)lsb;
+=======
+	*als_step = (uint16_t)msb;
+	*als_step <<= 8;
+	*als_step |= (uint16_t)lsb;
+>>>>>>> upstream/4.3_primoc
 
 	D("[LS][cm3629] %s: raw adc = 0x%X, ls_calibrate = %d\n",
 		__func__, *als_step, lpi->ls_calibrate);
@@ -507,12 +527,21 @@ static void report_near_do_work(struct work_struct *w)
 {
 	struct cm3629_info *lpi = lp_info;
 
+<<<<<<< HEAD
 	blocking_notifier_call_chain(&psensor_notifier_list, 2, NULL);
 	D("[PS][cm3629]  %s: delay 500ms, report proximity NEAR\n", __func__);
 	if (lpi->phantom_gpio > 0)
 		gpio_set_value(lpi->phantom_gpio, 1);
 	input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, 0);
 	input_sync(lpi->ps_input_dev);
+=======
+	D("[PS][cm3629]  %s: delay 500ms, report proximity NEAR\n", __func__);
+	if (lpi->phantom_gpio > 0)
+		gpio_set_value(lpi->phantom_gpio, 0);
+	input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, 0);
+	input_sync(lpi->ps_input_dev);
+	blocking_notifier_call_chain(&psensor_notifier_list, 2, NULL);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void report_psensor_input_event(struct cm3629_info *lpi, int interrupt_flag)
@@ -583,6 +612,7 @@ static void report_psensor_input_event(struct cm3629_info *lpi, int interrupt_fl
 		lpi->ps_pocket_mode = 1;
 	} else {
 		/* 0 is close, 1 is far */
+<<<<<<< HEAD
 		blocking_notifier_call_chain(&psensor_notifier_list, val+2, NULL);
 		input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, val);
 		if (lpi->phantom_gpio > 0) {
@@ -591,6 +621,13 @@ static void report_psensor_input_event(struct cm3629_info *lpi, int interrupt_fl
 			__func__, lpi->phantom_gpio, !val, gpio_get_value(lpi->phantom_gpio));
 		}
 		input_sync(lpi->ps_input_dev);
+=======
+		input_report_abs(lpi->ps_input_dev, ABS_DISTANCE, val);
+		if (lpi->phantom_gpio > 0)
+			gpio_set_value(lpi->phantom_gpio, val);
+		input_sync(lpi->ps_input_dev);
+		blocking_notifier_call_chain(&psensor_notifier_list, val+2, NULL);
+>>>>>>> upstream/4.3_primoc
 	}
 }
 
@@ -613,7 +650,11 @@ static void enable_als_interrupt(void)/*enable als interrupt*/
 
 static void report_lsensor_input_event(struct cm3629_info *lpi, bool resume)
 {/*when resume need report a data, so the paramerter need to quick reponse*/
+<<<<<<< HEAD
 	uint32_t adc_value = 0;
+=======
+	uint16_t adc_value = 0;
+>>>>>>> upstream/4.3_primoc
 	int level = 0, i, ret = 0;
 
 	mutex_lock(&als_get_adc_mutex);
@@ -704,6 +745,7 @@ static void enable_ps_interrupt(char *ps_conf)
 	D("[PS][cm3629] %s, read value => cmd[0] = 0x%x, cmd[1] = 0x%x\n", __func__, cmd[0], cmd[1]);
 }
 
+<<<<<<< HEAD
 static void dump_info(struct cm3629_info *lpi) {
 	uint8_t cmd[3] = {0};
 	uint8_t i;
@@ -718,6 +760,8 @@ static void dump_info(struct cm3629_info *lpi) {
 			__func__, lpi->intr_pin, val, record_init_fail);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 static void sensor_irq_do_work(struct work_struct *work)
 {
 	struct cm3629_info *lpi = lp_info;
@@ -739,11 +783,16 @@ static void sensor_irq_do_work(struct work_struct *work)
 		     ((add & CM3629_ALS_IF_H) == CM3629_ALS_IF_H))
 		report_lsensor_input_event(lpi, 0);
 	 else
+<<<<<<< HEAD
 		{
 		D("[PS][cm3629 warning]%s: unknown interrupt: 0x%x!\n",
 		__func__, add);
 		dump_info(lpi);
 		}
+=======
+		pr_err("[PS][cm3629 error]%s error: unkown interrupt: 0x%x!\n",
+		__func__, add);
+>>>>>>> upstream/4.3_primoc
 
 	enable_irq(lpi->irq);
 }
@@ -951,11 +1000,16 @@ static int psensor_enable(struct cm3629_info *lpi)
 		D("[PS][cm3629] %s: already enabled\n", __func__);
 		return 0;
 	}
+<<<<<<< HEAD
 	if (lpi->phantom_gpio > 0) {
 		gpio_set_value(lpi->phantom_gpio, 0);
 		pr_info("[PS][CM3629]%s: lpi->phantom_gpio %d!!\n",
 			__func__, lpi->phantom_gpio);
 	}
+=======
+	if (lpi->phantom_gpio > 0)
+		gpio_set_value(lpi->phantom_gpio, 1);
+>>>>>>> upstream/4.3_primoc
 	blocking_notifier_call_chain(&psensor_notifier_list, 1, NULL);
 	lpi->j_start = jiffies;
 	/*D("%s: j_start = %lu", __func__, lpi->j_start);*/
@@ -1177,7 +1231,10 @@ static void psensor_set_THH(struct cm3629_info *lpi, uint8_t ps1_thd_set)
 		lpi->ps2_thd_set = lpi->ps2_thd_no_cal;
 	} else {
 		lpi->ps1_thd_set = ps1_thd_set - lpi->ps1_thh_diff;
+<<<<<<< HEAD
 		kcalibrated = 1;
+=======
+>>>>>>> upstream/4.3_primoc
 	}
 	cmd[0] = lpi->ps1_thd_set;
 	if (lpi->ps1_thh_diff == 0)
@@ -1500,7 +1557,11 @@ static ssize_t ps_kadc_show(struct device *dev,
 	int ret = 0;
 	struct cm3629_info *lpi = lp_info;
 
+<<<<<<< HEAD
 	if (ps_kparam1 >> 16 == PS_CALIBRATED || kcalibrated == 1) {
+=======
+	if (ps_kparam1 >> 16 == PS_CALIBRATED) {
+>>>>>>> upstream/4.3_primoc
 		if (lpi->ps_calibration_rule != 5)
 			ret = sprintf(buf, "P-sensor calibrated,"
 			      "INTE_PS1_CANC = (0x%02X), "
@@ -1597,14 +1658,19 @@ static ssize_t ps_kadc_store(struct device *dev,
 		psensor_intelligent_cancel_cmd(lpi);
 		D("[PS][cm3629]%s: inte_ps1_canc = 0x%02X, inte_ps2_canc = 0x%02X, lpi->ps_conf1_val  = 0x%02X\n",
 			__func__, lpi->inte_ps1_canc, lpi->inte_ps2_canc, lpi->ps_conf1_val);
+<<<<<<< HEAD
 		kcalibrated = 1;
 	}
 
+=======
+	}
+>>>>>>> upstream/4.3_primoc
 	return count;
 }
 
 static DEVICE_ATTR(ps_kadc, 0664, ps_kadc_show, ps_kadc_store);
 
+<<<<<<< HEAD
 static ssize_t ps_debug_show(struct device* dev,
 			struct device_attribute *attr, char *buf)
 {
@@ -1615,6 +1681,8 @@ static ssize_t ps_debug_show(struct device* dev,
 }
 
 static DEVICE_ATTR(ps_debug, 0664, ps_debug_show, NULL);
+=======
+>>>>>>> upstream/4.3_primoc
 
 static ssize_t ps_canc_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
@@ -2176,8 +2244,11 @@ static int cm3629_probe(struct i2c_client *client,
 	lpi->model = pdata->model;
 	lpi->intr_pin = pdata->intr;
 	lpi->phantom_gpio = pdata->phantom_gpio;
+<<<<<<< HEAD
 	pr_info("[PS][CM3629]%s: lpi->phantom_gpio %d, lpi->intr_pin %d!!\n",
 			__func__, lpi->phantom_gpio, lpi->intr_pin);
+=======
+>>>>>>> upstream/4.3_primoc
 	lpi->adc_table = pdata->levels;
 	lpi->golden_adc = pdata->golden_adc;
 	lpi->power = pdata->power;
@@ -2347,11 +2418,14 @@ static int cm3629_probe(struct i2c_client *client,
 	if (ret)
 		goto err_create_ps_device;
 
+<<<<<<< HEAD
 
 	ret = device_create_file(lpi->ps_dev, &dev_attr_ps_debug);
 	if (ret)
 		goto err_create_ps_device;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	lpi->early_suspend.level =
 			EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
 	lpi->early_suspend.suspend = cm3629_early_suspend;

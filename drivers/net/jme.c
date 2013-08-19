@@ -2228,6 +2228,7 @@ jme_change_mtu(struct net_device *netdev, int new_mtu)
 		((new_mtu) < IPV6_MIN_MTU))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (new_mtu > 4000) {
 		jme->reg_rxcs &= ~RXCS_FIFOTHNP;
 		jme->reg_rxcs |= RXCS_FIFOTHNP_64QW;
@@ -2237,10 +2238,16 @@ jme_change_mtu(struct net_device *netdev, int new_mtu)
 		jme->reg_rxcs |= RXCS_FIFOTHNP_128QW;
 		jme_restart_rx_engine(jme);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 
 	netdev->mtu = new_mtu;
 	netdev_update_features(netdev);
 
+<<<<<<< HEAD
+=======
+	jme_restart_rx_engine(jme);
+>>>>>>> upstream/4.3_primoc
 	jme_reset_link(jme);
 
 	return 0;

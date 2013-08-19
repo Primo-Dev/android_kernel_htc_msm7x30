@@ -244,6 +244,38 @@ static void ftrace_clear_events(void)
 	mutex_unlock(&event_mutex);
 }
 
+<<<<<<< HEAD
+=======
+static void __put_system(struct event_subsystem *system)
+{
+	struct event_filter *filter = system->filter;
+
+	WARN_ON_ONCE(system->ref_count == 0);
+	if (--system->ref_count)
+		return;
+
+	if (filter) {
+		kfree(filter->filter_string);
+		kfree(filter);
+	}
+	kfree(system->name);
+	kfree(system);
+}
+
+static void __get_system(struct event_subsystem *system)
+{
+	WARN_ON_ONCE(system->ref_count == 0);
+	system->ref_count++;
+}
+
+static void put_system(struct event_subsystem *system)
+{
+	mutex_lock(&event_mutex);
+	__put_system(system);
+	mutex_unlock(&event_mutex);
+}
+
+>>>>>>> upstream/4.3_primoc
 /*
  * __ftrace_set_clr_event(NULL, NULL, NULL, set) will set/unset all events.
  */
@@ -834,6 +866,55 @@ event_filter_write(struct file *filp, const char __user *ubuf, size_t cnt,
 	return cnt;
 }
 
+<<<<<<< HEAD
+=======
+static LIST_HEAD(event_subsystems);
+
+static int subsystem_open(struct inode *inode, struct file *filp)
+{
+	struct event_subsystem *system = NULL;
+	int ret;
+
+	if (!inode->i_private)
+		goto skip_search;
+
+	/* Make sure the system still exists */
+	mutex_lock(&event_mutex);
+	list_for_each_entry(system, &event_subsystems, list) {
+		if (system == inode->i_private) {
+			/* Don't open systems with no events */
+			if (!system->nr_events) {
+				system = NULL;
+				break;
+			}
+			__get_system(system);
+			break;
+		}
+	}
+	mutex_unlock(&event_mutex);
+
+	if (system != inode->i_private)
+		return -ENODEV;
+
+ skip_search:
+	ret = tracing_open_generic(inode, filp);
+	if (ret < 0 && system)
+		put_system(system);
+
+	return ret;
+}
+
+static int subsystem_release(struct inode *inode, struct file *file)
+{
+	struct event_subsystem *system = inode->i_private;
+
+	if (system)
+		put_system(system);
+
+	return 0;
+}
+
+>>>>>>> upstream/4.3_primoc
 static ssize_t
 subsystem_filter_read(struct file *filp, char __user *ubuf, size_t cnt,
 		      loff_t *ppos)

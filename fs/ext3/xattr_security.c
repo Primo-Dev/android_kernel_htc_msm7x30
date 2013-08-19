@@ -48,6 +48,7 @@ ext3_xattr_security_set(struct dentry *dentry, const char *name,
 			      name, value, size, flags);
 }
 
+<<<<<<< HEAD
 int
 ext3_init_security(handle_t *handle, struct inode *inode, struct inode *dir,
 		   const struct qstr *qstr)
@@ -70,6 +71,34 @@ ext3_init_security(handle_t *handle, struct inode *inode, struct inode *dir,
 	return err;
 }
 
+=======
+int ext3_initxattrs(struct inode *inode, const struct xattr *xattr_array,
+		    void *fs_info)
+{
+	const struct xattr *xattr;
+	handle_t *handle = fs_info;
+	int err = 0;
+
+	for (xattr = xattr_array; xattr->name != NULL; xattr++) {
+		err = ext3_xattr_set_handle(handle, inode,
+					    EXT3_XATTR_INDEX_SECURITY,
+					    xattr->name, xattr->value,
+					    xattr->value_len, 0);
+		if (err < 0)
+			break;
+	}
+	return err;
+}
+
+int
+ext3_init_security(handle_t *handle, struct inode *inode, struct inode *dir,
+		   const struct qstr *qstr)
+{
+	return security_inode_init_security(inode, dir, qstr,
+					    &ext3_initxattrs, handle);
+}
+
+>>>>>>> upstream/4.3_primoc
 const struct xattr_handler ext3_xattr_security_handler = {
 	.prefix	= XATTR_SECURITY_PREFIX,
 	.list	= ext3_xattr_security_list,

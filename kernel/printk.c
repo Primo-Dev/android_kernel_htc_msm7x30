@@ -199,7 +199,11 @@ void __init setup_log_buf(int early)
 		unsigned long mem;
 
 		mem = memblock_alloc(new_log_buf_len, PAGE_SIZE);
+<<<<<<< HEAD
 		if (mem == MEMBLOCK_ERROR)
+=======
+		if (!mem)
+>>>>>>> upstream/4.3_primoc
 			return;
 		new_log_buf = __va(mem);
 	} else {

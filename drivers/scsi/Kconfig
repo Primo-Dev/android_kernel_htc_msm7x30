@@ -263,6 +263,7 @@ config SCSI_SCAN_ASYNC
 	  You can override this choice by specifying "scsi_mod.scan=sync"
 	  or async on the kernel's command line.
 
+<<<<<<< HEAD
 config SCSI_WAIT_SCAN
 	tristate  # No prompt here, this is an invisible symbol.
 	default m
@@ -280,6 +281,8 @@ config SCSI_WAIT_SCAN
 # disabling it, whereas people who accidentally switch it off may wonder why
 # their mkinitrd gets into trouble.
 
+=======
+>>>>>>> upstream/4.3_primoc
 menu "SCSI Transports"
 	depends on SCSI
 

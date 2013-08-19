@@ -117,13 +117,21 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
 
 	spin_lock(&brd->brd_lock);
 	idx = sector >> PAGE_SECTORS_SHIFT;
+<<<<<<< HEAD
+=======
+	page->index = idx;
+>>>>>>> upstream/4.3_primoc
 	if (radix_tree_insert(&brd->brd_pages, idx, page)) {
 		__free_page(page);
 		page = radix_tree_lookup(&brd->brd_pages, idx);
 		BUG_ON(!page);
 		BUG_ON(page->index != idx);
+<<<<<<< HEAD
 	} else
 		page->index = idx;
+=======
+	}
+>>>>>>> upstream/4.3_primoc
 	spin_unlock(&brd->brd_lock);
 
 	radix_tree_preload_end();
@@ -323,7 +331,11 @@ out:
 	return err;
 }
 
+<<<<<<< HEAD
 static int brd_make_request(struct request_queue *q, struct bio *bio)
+=======
+static void brd_make_request(struct request_queue *q, struct bio *bio)
+>>>>>>> upstream/4.3_primoc
 {
 	struct block_device *bdev = bio->bi_bdev;
 	struct brd_device *brd = bdev->bd_disk->private_data;
@@ -359,8 +371,11 @@ static int brd_make_request(struct request_queue *q, struct bio *bio)
 
 out:
 	bio_endio(bio, err);
+<<<<<<< HEAD
 
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 #ifdef CONFIG_BLK_DEV_XIP

@@ -21,7 +21,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: bcmsdh_linux.c 281719 2011-09-02 23:50:57Z $
+=======
+ * $Id: bcmsdh_linux.c 352863 2012-08-24 04:48:50Z $
+>>>>>>> upstream/4.3_primoc
  */
 
 /**
@@ -147,6 +151,7 @@ static int __devexit bcmsdh_remove(struct device *dev);
 #endif /* BCMLXSDMMC */
 
 #ifndef BCMLXSDMMC
+<<<<<<< HEAD
 static struct device_driver bcmsdh_driver = {
 	.name		= "pxa2xx-mci",
 	.bus		= &platform_bus_type,
@@ -158,6 +163,8 @@ static struct device_driver bcmsdh_driver = {
 #endif /* BCMLXSDMMC */
 
 #ifndef BCMLXSDMMC
+=======
+>>>>>>> upstream/4.3_primoc
 static
 #endif /* BCMLXSDMMC */
 int bcmsdh_probe(struct device *dev)
@@ -415,6 +422,13 @@ bcmsdh_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* match this pci device with what we support */
 	/* we can't solely rely on this to believe it is our SDIO Host Controller! */
 	if (!bcmsdh_chipmatch(pdev->vendor, pdev->device)) {
+<<<<<<< HEAD
+=======
+		if (pdev->vendor == VENDOR_BROADCOM) {
+			SDLX_MSG(("%s: Unknown Broadcom device (vendor: %#x, device: %#x).\n",
+				__FUNCTION__, pdev->vendor, pdev->device));
+		}
+>>>>>>> upstream/4.3_primoc
 		return -ENODEV;
 	}
 
@@ -531,6 +545,7 @@ bcmsdh_register(bcmsdh_driver_t *driver)
 	drvinfo = *driver;
 
 #if defined(BCMPLATFORM_BUS)
+<<<<<<< HEAD
 #if defined(BCMLXSDMMC)
 	SDLX_MSG(("Linux Kernel SDIO/MMC Driver\n"));
 	error = sdio_function_init();
@@ -538,6 +553,10 @@ bcmsdh_register(bcmsdh_driver_t *driver)
 	SDLX_MSG(("Intel PXA270 SDIO Driver\n"));
 	error = driver_register(&bcmsdh_driver);
 #endif /* defined(BCMLXSDMMC) */
+=======
+	SDLX_MSG(("Linux Kernel SDIO/MMC Driver\n"));
+	error = sdio_function_init();
+>>>>>>> upstream/4.3_primoc
 	return error;
 #endif /* defined(BCMPLATFORM_BUS) */
 
@@ -565,6 +584,7 @@ bcmsdh_unregister(void)
 	if (bcmsdh_pci_driver.node.next)
 #endif
 
+<<<<<<< HEAD
 #if defined(BCMPLATFORM_BUS) && !defined(BCMLXSDMMC)
 		driver_unregister(&bcmsdh_driver);
 #endif
@@ -573,6 +593,14 @@ bcmsdh_unregister(void)
 #endif /* BCMLXSDMMC */
 #if !defined(BCMPLATFORM_BUS) && !defined(BCMLXSDMMC)
 		pci_unregister_driver(&bcmsdh_pci_driver);
+=======
+#if defined(BCMLXSDMMC)
+	sdio_function_cleanup();
+#endif /* BCMLXSDMMC */
+
+#if !defined(BCMPLATFORM_BUS) && !defined(BCMLXSDMMC)
+	pci_unregister_driver(&bcmsdh_pci_driver);
+>>>>>>> upstream/4.3_primoc
 #endif /* BCMPLATFORM_BUS */
 }
 
@@ -599,6 +627,7 @@ static irqreturn_t wlan_oob_irq(int irq, void *dev_id)
 
 	dhdp = (dhd_pub_t *)dev_get_drvdata(sdhcinfo->dev);
 
+<<<<<<< HEAD
 #ifdef HW_OOB
 	bcmsdh_oob_intr_set(0);
 #endif
@@ -607,6 +636,11 @@ static irqreturn_t wlan_oob_irq(int irq, void *dev_id)
 #ifndef HW_OOB
 		bcmsdh_oob_intr_set(0);
 #endif
+=======
+	bcmsdh_oob_intr_set(0);
+
+	if (dhdp == NULL) {
+>>>>>>> upstream/4.3_primoc
 		SDLX_MSG(("Out of band GPIO interrupt fired way too early\n"));
 		return IRQ_HANDLED;
 	}
@@ -643,6 +677,7 @@ int bcmsdh_register_oob_intr(void * dhdp)
 	return 0;
 }
 
+<<<<<<< HEAD
 void *bcmsdh_get_drvdata(void)
 {
 	if (!sdhcinfo)
@@ -650,6 +685,8 @@ void *bcmsdh_get_drvdata(void)
 	return dev_get_drvdata(sdhcinfo->dev);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 void bcmsdh_set_irq(int flag)
 {
 	if (sdhcinfo->oob_irq_registered && sdhcinfo->oob_irq_enable_flag != flag) {
@@ -677,6 +714,18 @@ void bcmsdh_unregister_oob_intr(void)
 }
 #endif /* defined(OOB_INTR_ONLY) */
 
+<<<<<<< HEAD
+=======
+#if defined(BCMLXSDMMC)
+void *bcmsdh_get_drvdata(void)
+{
+	if (!sdhcinfo)
+		return NULL;
+	return dev_get_drvdata(sdhcinfo->dev);
+}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 /* Module parameters specific to each host-controller driver */
 
 extern uint sd_msglevel;	/* Debug message level */
@@ -701,9 +750,21 @@ extern uint sd_f2_blocksize;
 module_param(sd_f2_blocksize, int, 0);
 
 #ifdef BCMSDIOH_STD
+<<<<<<< HEAD
 module_param(sd_uhsimode, int, 0);
 #endif
 
+=======
+extern int sd_uhsimode;
+module_param(sd_uhsimode, int, 0);
+#endif
+
+#ifdef BCMSDIOH_TXGLOM
+extern uint sd_txglom;
+module_param(sd_txglom, uint, 0);
+#endif
+
+>>>>>>> upstream/4.3_primoc
 #ifdef BCMSDH_MODULE
 EXPORT_SYMBOL(bcmsdh_attach);
 EXPORT_SYMBOL(bcmsdh_detach);

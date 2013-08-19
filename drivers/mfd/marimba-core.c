@@ -374,6 +374,10 @@ static int marimba_add_child(struct marimba_platform_data *pdata,
 {
 	struct device	*child;
 
+<<<<<<< HEAD
+=======
+#if 0
+>>>>>>> upstream/4.3_primoc
 	if (cur_adie_type == MARIMBA_ID) {
 		child = add_child(MARIMBA_SLAVE_ID_FM, "marimba_fm",
 			driver_data, pdata->fm, sizeof(*pdata->fm));
@@ -386,7 +390,11 @@ static int marimba_add_child(struct marimba_platform_data *pdata,
 		if (IS_ERR(child))
 			return PTR_ERR(child);
 	}
+<<<<<<< HEAD
 
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 	/* Add Codec for Marimba and Timpani */
 	if (cur_adie_type == MARIMBA_ID) {
 		child = add_child(MARIMBA_SLAVE_ID_CDC, "marimba_codec",
@@ -826,7 +834,11 @@ static int marimba_probe(struct i2c_client *client,
 
 	for (i = 1; i <= (NUM_ADD - client_loop); i++) {
 		/* Skip adding BT/FM for Timpani */
+<<<<<<< HEAD
 		if (i == 1 && rc >= 1)
+=======
+	  if (i == 1 /* && rc >= 1*/)
+>>>>>>> upstream/4.3_primoc
 			i++;
 		marimba = &marimba_modules[i + adie_arry_idx];
 		if (i != MARIMBA_ID_TSADC)

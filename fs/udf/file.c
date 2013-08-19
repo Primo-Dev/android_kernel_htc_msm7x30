@@ -148,7 +148,10 @@ static ssize_t udf_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 			err = udf_expand_file_adinicb(inode);
 			if (err) {
 				udf_debug("udf_expand_adinicb: err=%d\n", err);
+<<<<<<< HEAD
 				up_write(&iinfo->i_data_sem);
+=======
+>>>>>>> upstream/4.3_primoc
 				return err;
 			}
 		} else {
@@ -156,9 +159,16 @@ static ssize_t udf_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 				iinfo->i_lenAlloc = pos + count;
 			else
 				iinfo->i_lenAlloc = inode->i_size;
+<<<<<<< HEAD
 		}
 	}
 	up_write(&iinfo->i_data_sem);
+=======
+			up_write(&iinfo->i_data_sem);
+		}
+	} else
+		up_write(&iinfo->i_data_sem);
+>>>>>>> upstream/4.3_primoc
 
 	retval = generic_file_aio_write(iocb, iov, nr_segs, ppos);
 	if (retval > 0)
@@ -173,7 +183,11 @@ long udf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	long old_block, new_block;
 	int result = -EINVAL;
 
+<<<<<<< HEAD
 	if (file_permission(filp, MAY_READ) != 0) {
+=======
+	if (inode_permission(inode, MAY_READ) != 0) {
+>>>>>>> upstream/4.3_primoc
 		udf_debug("no permission to access inode %lu\n", inode->i_ino);
 		result = -EPERM;
 		goto out;

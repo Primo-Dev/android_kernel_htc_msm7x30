@@ -21,7 +21,11 @@
 #include <linux/i2c.h>
 #include <linux/uaccess.h>
 #include <linux/miscdevice.h>
+<<<<<<< HEAD
 #include <media/msm_camera-7x30.h>
+=======
+//#include <media/msm_camera.h>
+>>>>>>> upstream/4.3_primoc
 #include <media/msm_camera_sensor.h>
 #include <mach/gpio.h>
 #include <mach/camera-7x30.h>
@@ -462,7 +466,11 @@ static struct s5k4e1gx_ctrl *s5k4e1gx_ctrl;
 static DECLARE_WAIT_QUEUE_HEAD(s5k4e1gx_wait_queue);
 DEFINE_MUTEX(s5k4e1gx_mutex);
 
+<<<<<<< HEAD
 #if 0
+=======
+
+>>>>>>> upstream/4.3_primoc
 #define MAX_I2C_RETRIES 20
 static int i2c_transfer_retry(struct i2c_adapter *adap,
 			struct i2c_msg *msgs,
@@ -483,7 +491,11 @@ static int i2c_transfer_retry(struct i2c_adapter *adap,
 
 	return ns == len ? 0 : -EIO;
 }
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 
 int s5k4e1gx_i2c_lens_tx_data(unsigned char slave_addr, char *txData, int length)
 {
@@ -497,7 +509,11 @@ int s5k4e1gx_i2c_lens_tx_data(unsigned char slave_addr, char *txData, int length
 		},
 	};
 
+<<<<<<< HEAD
 	rc = i2c_transfer(s5k4e1gx_client->adapter, msg, 1);
+=======
+	rc = i2c_transfer_retry(s5k4e1gx_client->adapter, msg, 1);
+>>>>>>> upstream/4.3_primoc
 	if (rc < 0) {
 		printk(KERN_ERR "s5k4e1gx_i2c_lens_tx_data: i2c_transfer error %d\n", rc);
 		return rc;
@@ -532,7 +548,11 @@ static int s5k4e1gx_i2c_rxdata(unsigned short saddr, unsigned char *rxdata,
 		},
 	};
 
+<<<<<<< HEAD
 	if (i2c_transfer(s5k4e1gx_client->adapter, msgs, 2) < 0) {
+=======
+	if (i2c_transfer_retry(s5k4e1gx_client->adapter, msgs, 2) < 0) {
+>>>>>>> upstream/4.3_primoc
 		pr_err("[CAM]s5k4e1gx_i2c_rxdata failed!\n");
 		return -EIO;
 	}
@@ -552,7 +572,11 @@ static int32_t s5k4e1gx_i2c_txdata(unsigned short saddr,
 		},
 	};
 
+<<<<<<< HEAD
 	if (i2c_transfer(s5k4e1gx_client->adapter, msg, 1) < 0) {
+=======
+	if (i2c_transfer_retry(s5k4e1gx_client->adapter, msg, 1) < 0) {
+>>>>>>> upstream/4.3_primoc
 		pr_err("[CAM]s5k4e1gx_i2c_txdata failed\n");
 		return -EIO;
 	}
@@ -699,6 +723,21 @@ static int s5k4e1gx_probe_init_sensor(const struct msm_camera_sensor_info *data)
 	if (rc < 0)
 		goto init_probe_fail;
 
+<<<<<<< HEAD
+=======
+	/* Add Lens Correction Common Setting For Maverick*/
+        /*
+	if (!sdata->sensor_lc_disable) {
+		pr_info("[CAM]sensor_lc_disable=%d\n", sdata->sensor_lc_disable);
+
+		rc = s5k4e1gx_i2c_write_table(s5k4e1gx_regs.lc_common,
+			s5k4e1gx_regs.lc_common_size);
+		if (rc < 0)
+			goto init_probe_fail;
+	}
+        */
+
+>>>>>>> upstream/4.3_primoc
     /* Add analog settings For Maverick*/
 	rc = s5k4e1gx_i2c_read_b(s5k4e1gx_client->addr, S5K4E1GX_REVISION_ID, &evt_ver);
 	if (!(rc < 0)) {
@@ -712,6 +751,14 @@ static int s5k4e1gx_probe_init_sensor(const struct msm_camera_sensor_info *data)
     /* Modified the Setting for different sensor revision */
 	if (machine_is_saga()) {
 		printk("[CAM]use analog_settings_saga\n");
+<<<<<<< HEAD
+=======
+		if (sdata->zero_shutter_mode)
+		rc = s5k4e1gx_i2c_write_table(
+			s5k4e1gx_regs.analog_settings_saga_zero_shutter,
+			s5k4e1gx_regs.analog_settings_saga_zero_shutter_size);
+		else
+>>>>>>> upstream/4.3_primoc
 		rc = s5k4e1gx_i2c_write_table(s5k4e1gx_regs.analog_settings_saga,
 				s5k4e1gx_regs.analog_settings_saga_size);
 		if (rc < 0)
@@ -1006,7 +1053,11 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 	struct msm_camera_sensor_info *sdata = s5k4e1_pdev->dev.platform_data;
 
 	if (sdata->csi_if) {
+<<<<<<< HEAD
 		if ((int)s5k4e1gx_ctrl->reg_update == (int)S_REG_INIT) {
+=======
+		if (s5k4e1gx_ctrl->reg_update == (int)S_REG_INIT) {
+>>>>>>> upstream/4.3_primoc
 			/* config mipi csi controller */
 			s5k4e1gx_csi_params.data_format = CSI_10BIT;
 			s5k4e1gx_csi_params.lane_cnt = 2;
@@ -1021,6 +1072,15 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 
 	switch (rupdate) {
 	case S_UPDATE_PERIODIC:
+<<<<<<< HEAD
+=======
+		/* 1126 for improve shutter of MIPI */
+		if (machine_is_saga() && sdata->zero_shutter_mode) {
+		pr_info("[CAM]%s:return 0 (S_UPDATE_PERIODIC state)\n", __func__);
+			return 0;
+		}
+
+>>>>>>> upstream/4.3_primoc
 		if (rt == S_RES_PREVIEW || rt == S_RES_CAPTURE) {
 			struct s5k4e1gx_i2c_reg_conf tbl_1[] = {
 			{
@@ -1094,6 +1154,25 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 				s5k4e1gx_extra_settings_for_mipi(rt);
 			}
 
+<<<<<<< HEAD
+=======
+			/* Lens Correction for Preview or Capture */
+                        if (!sdata->sensor_lc_disable) {
+                          pr_info("[CAM]sensor_lc_disable=%d\n", sdata->sensor_lc_disable);
+                          if (rt == S_RES_PREVIEW) {
+                            rc = s5k4e1gx_i2c_write_table(s5k4e1gx_regs.lc_preview,
+                                                          s5k4e1gx_regs.lc_preview_size);
+                            if (rc < 0)
+                              return rc;
+                          } else {
+                            rc = s5k4e1gx_i2c_write_table(s5k4e1gx_regs.lc_capture,
+                                                          s5k4e1gx_regs.lc_capture_size);
+                            if (rc < 0)
+                              return rc;
+                          }
+                        }
+
+>>>>>>> upstream/4.3_primoc
 			num_lperf = (uint16_t)
 				((s5k4e1gx_reg_pat[rt].frame_length_lines_msb << 8)
 				& 0xFF00)
@@ -1212,6 +1291,80 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 
 			};	/* end of struct s5k4e1gx_i2c_reg_conf tbl_3[] */
 
+<<<<<<< HEAD
+=======
+			/* 1126 for improve shutter of MIPI */
+		struct s5k4e1gx_i2c_reg_conf tbl_4[] =
+		{
+			     /* PLL setting */
+			{REG_PRE_PLL_CLK_DIV,
+			s5k4e1gx_reg_zero_shutter[rt].pre_pll_clk_div},
+			{REG_PLL_MULTIPLIER_MSB,
+			s5k4e1gx_reg_zero_shutter[rt].pll_multiplier_msb},
+			{REG_PLL_MULTIPLIER_LSB,
+			s5k4e1gx_reg_zero_shutter[rt].pll_multiplier_lsb},
+			{REG_VT_SYS_CLK_DIV,
+			s5k4e1gx_reg_zero_shutter[rt].vt_sys_clk_div},
+			{REG_MIPI_LANE_MODE,
+			s5k4e1gx_reg_zero_shutter[rt].MIPI_data_lane_modes},
+			{REG_DPHY_BANDCTRL,
+			s5k4e1gx_reg_zero_shutter[rt].DPHY_bandctrl},
+			/* Read Mode Setting */
+			{S5K4E1GX_REG_READ_MODE,
+			s5k4e1gx_reg_pat[rt].read_mode},
+			/* Output Size */
+			{REG_X_OUTPUT_SIZE_MSB,
+			s5k4e1gx_reg_zero_shutter[rt].x_output_size_msb},
+			{REG_X_OUTPUT_SIZE_LSB,
+			s5k4e1gx_reg_zero_shutter[rt].x_output_size_lsb},
+			{REG_Y_OUTPUT_SIZE_MSB,
+			s5k4e1gx_reg_zero_shutter[rt].y_output_size_msb},
+			{REG_Y_OUTPUT_SIZE_LSB,
+			s5k4e1gx_reg_zero_shutter[rt].y_output_size_lsb},
+
+			 /* Binning */
+			{REG_X_EVEN_INC,
+			s5k4e1gx_reg_pat[rt].x_even_inc},
+			{REG_X_ODD_INC,
+			s5k4e1gx_reg_pat[rt].x_odd_inc },
+			{REG_Y_EVEN_INC,
+			s5k4e1gx_reg_pat[rt].y_even_inc},
+			{REG_Y_ODD_INC,
+			s5k4e1gx_reg_zero_shutter[rt].y_odd_inc},
+			{REG_H_BINNING,
+			s5k4e1gx_reg_zero_shutter[rt].h_binning},
+			{REG_V_BINNING,
+			s5k4e1gx_reg_zero_shutter[rt].v_binning},
+			/* Frame format */
+			{REG_FRAME_LENGTH_LINES_MSB,
+			s5k4e1gx_reg_zero_shutter[rt].frame_length_lines_msb},
+			{REG_FRAME_LENGTH_LINES_LSB,
+			s5k4e1gx_reg_zero_shutter[rt].frame_length_lines_lsb},
+			{REG_LINE_LENGTH_PCK_MSB,
+			s5k4e1gx_reg_zero_shutter[rt].line_length_pck_msb},
+			{REG_LINE_LENGTH_PCK_LSB,
+			s5k4e1gx_reg_zero_shutter[rt].line_length_pck_lsb},
+			/* Integration Setting */
+			{REG_ANALOGUE_GAIN_CODE_GLOBAL_MSB,
+		s5k4e1gx_reg_zero_shutter[rt].analogue_gain_code_global_msb},
+			{REG_ANALOGUE_GAIN_CODE_GLOBAL_LSB,
+		s5k4e1gx_reg_zero_shutter[rt].analogue_gain_code_global_lsb},
+			{REG_COARSE_INTEGRATION_TIME_MSB,
+		s5k4e1gx_reg_zero_shutter[rt].coarse_integration_time_msb},
+			{REG_COARSE_INTEGRATION_TIME_LSB,
+		s5k4e1gx_reg_zero_shutter[rt].coarse_integration_time_lsb},
+
+			/* other MIPI setting */
+			/* outif_enable[7], data_type[5:0](2Bh = bayer 10bit) */
+			{0x30BF, 0xAB},
+			/* video_offset[7:4] 3260%12 */
+			{0x30C0, 0x80},
+			/* video_data_length 3260 = 2608 * 1.25 */
+			{0x30C8, 0x0C},
+			{0x30C9, 0xBC},
+		};	/* end of struct s5k4e1gx_i2c_reg_conf tbl_4[] */
+
+>>>>>>> upstream/4.3_primoc
 		    /* Standby */
 			rc = s5k4e1gx_i2c_write_b(s5k4e1gx_client->addr,
 					S5K4E1GX_REG_MODE_SELECT,
@@ -1221,7 +1374,15 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 
 
 			if (sdata->csi_if) {
+<<<<<<< HEAD
 				pr_info("[CAM]%s: improve shutter lag\n", __func__);
+=======
+				 /* 1126 for improve shutter of MIPI */
+                          if (!sdata->zero_shutter_mode)
+				s5k4e1gx_extra_settings_for_mipi(rt);
+                          else
+                            pr_info("[CAM]%s: improve shutter lag\n", __func__);
+>>>>>>> upstream/4.3_primoc
 			} else {
 				/*awii: for the analog*/
 				if (fps_mode_sel == 1) {
@@ -1242,16 +1403,40 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 			}
 
 		    /* Write Setting Table */
+<<<<<<< HEAD
+=======
+			/* 1126 for improve shutter of MIPI */
+                        if (sdata->csi_if && sdata->zero_shutter_mode) {
+                          pr_info("[CAM]s5k4e1gx_setting(): setup tb1_4\n");
+                          rc = s5k4e1gx_i2c_write_table(&tbl_4[0],
+                                                        ARRAY_SIZE(tbl_4));
+                        } else {
+>>>>>>> upstream/4.3_primoc
 			rc = s5k4e1gx_i2c_write_table(&tbl_3[0],
 					ARRAY_SIZE(tbl_3));
 				if (rc < 0)
 					return rc;
+<<<<<<< HEAD
+=======
+                }
+>>>>>>> upstream/4.3_primoc
 
 			/* Streaming ON */
 			/* 1126 for improve shutter of MIPI */
 			if (!sdata->csi_if)
 			s5k4e1gx_i2c_write_b(s5k4e1gx_client->addr, 0x3110, 0x10);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MSM_CAMERA_7X30
+	/*only streaming on in preview mode and zero_shutter_mode on MIPI*/
+	if (rt == S_RES_PREVIEW && sdata->csi_if && sdata->zero_shutter_mode) {
+		pr_info("[CAM]%s: delay 200ms before Streaming ON\n", __func__);
+		mdelay(200);
+	}
+#endif
+
+>>>>>>> upstream/4.3_primoc
 			rc = s5k4e1gx_i2c_write_b(s5k4e1gx_client->addr,
 					S5K4E1GX_REG_MODE_SELECT,
 					S5K4E1GX_MODE_SELECT_STREAM);
@@ -1399,6 +1584,15 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 	if (data)
 		s5k4e1gx_ctrl->sensordata = data;
 
+<<<<<<< HEAD
+=======
+	/* 1126 for improve shutter of MIPI */
+	if (data->csi_if && data->zero_shutter_mode) {
+		pr_info("[CAM]%s: set prev_res = S_FULL_SIZE\n", __func__);
+		s5k4e1gx_ctrl->prev_res = S_FULL_SIZE;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	/*switch PCLK and MCLK to Main cam*/
 	if (data && data->camera_clk_switch != NULL) {
 		pr_info("[CAM]%s: switch clk\n", __func__);
@@ -1414,6 +1608,18 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 	msm_camio_clk_rate_set(24000000);
 
 
+<<<<<<< HEAD
+=======
+	/* Force reset MIPI sensor for SAGA */
+	/*1126 for improve shutter of MIPI*/
+	if (machine_is_saga() && !data->zero_shutter_mode) {
+		rc = s5k4e1gx_probe_init_sensor(data);
+		if (rc < 0)
+			printk("[CAM]s5k4e1gx_sensor_open_init() call s5k4e1gx_probe_init_sensor() failed !!!\n");
+	}
+
+
+>>>>>>> upstream/4.3_primoc
 	/* for parallel interface */
 	if (!sinfo->csi_if) {
 		mdelay(20);
@@ -1424,7 +1630,14 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 	if (s5k4e1gx_ctrl->prev_res == S_QTR_SIZE)
 		rc = s5k4e1gx_setting(S_REG_INIT, S_RES_PREVIEW);
 	else {/*1126 for improve shutter of MIPI*/
+<<<<<<< HEAD
 		rc = s5k4e1gx_setting(S_REG_INIT, S_RES_CAPTURE);
+=======
+		if (machine_is_saga() && sinfo->zero_shutter_mode)
+			rc = s5k4e1gx_setting(S_REG_INIT, S_RES_PREVIEW);
+		else
+			rc = s5k4e1gx_setting(S_REG_INIT, S_RES_CAPTURE);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (rc < 0) {
@@ -1736,6 +1949,11 @@ static int32_t s5k4e1gx_set_pict_exp_gain(uint16_t gain, uint32_t line)
 {
 	int32_t rc = 0;
 	CDBG("Line:%d s5k4e1gx_set_pict_exp_gain \n", __LINE__);
+<<<<<<< HEAD
+=======
+	if (s5k4e1gx_ctrl->sensordata->zero_shutter_mode)
+		return rc;
+>>>>>>> upstream/4.3_primoc
 
 	rc = s5k4e1gx_write_exp_gain(gain, line);
 #ifdef CONFIG_MSM_CAMERA_7X30
@@ -2032,6 +2250,12 @@ static int32_t s5k4e1gx_set_default_focus(void)
 
 uint8_t s5k4e1gx_preview_skip_frame(void)
 {
+<<<<<<< HEAD
+=======
+	if (s5k4e1gx_ctrl->sensordata->zero_shutter_mode)
+		return 0;
+
+>>>>>>> upstream/4.3_primoc
 	if (s5k4e1gx_ctrl->sensormode == SENSOR_PREVIEW_MODE && preview_frame_count < 1) {
 		preview_frame_count++;
 		return 1;
@@ -2266,11 +2490,14 @@ static int s5k4e1gx_sensor_probe(struct msm_camera_sensor_info *info,
 	int rc = 0;
 	printk("[CAM]s5k4e1gx_sensor_probe()\n");
 
+<<<<<<< HEAD
 	if (info == NULL) {
 		pr_info("[CAM]info is a NULL pointer\n");
 		goto probe_fail;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	rc = i2c_add_driver(&s5k4e1gx_i2c_driver);
 	if (rc < 0 || s5k4e1gx_client == NULL) {
 		rc = -ENOTSUPP;
@@ -2353,14 +2580,23 @@ static int __s5k4e1gx_probe(struct platform_device *pdev)
 static struct platform_driver msm_camera_driver = {
 	.probe = __s5k4e1gx_probe,
 	.driver = {
+<<<<<<< HEAD
 		.name = "msm_camera_s5k4e1gx",
+=======
+    .name = "msm_camera_s5k4e1gx",
+    .owner = THIS_MODULE,
+>>>>>>> upstream/4.3_primoc
 	},
 };
 
 static int __init s5k4e1gx_init(void)
 {
 	printk("[CAM]s5k4e1gx_init\n");
+<<<<<<< HEAD
 	return platform_driver_register(&msm_camera_driver);
+=======
+        return platform_driver_register(&msm_camera_driver);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void __exit s5k4e1gx_exit(void){

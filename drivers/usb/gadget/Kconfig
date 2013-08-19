@@ -82,7 +82,11 @@ config USB_GADGET_DEBUG_FS
 config USB_GADGET_VBUS_DRAW
 	int "Maximum VBUS Power usage (2-500 mA)"
 	range 2 500
+<<<<<<< HEAD
 	default 2
+=======
+	default 500
+>>>>>>> upstream/4.3_primoc
 	help
 	   Some devices need to draw power from USB when they are
 	   configured, perhaps to operate circuitry or to recharge
@@ -1028,6 +1032,7 @@ config USB_ANDROID_RNDIS
 	help
 	  Provides RNDIS ethernet function for android gadget driver.
 
+<<<<<<< HEAD
 config USB_ETH_PASS_FW
 	boolean "Support internet pass through over firewall"
 	depends on USB_ANDROID_RNDIS
@@ -1035,6 +1040,8 @@ config USB_ETH_PASS_FW
 	help
 	  Support internet pass through over firewall.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config USB_ANDROID_RMNET
 	boolean "RmNet function driver"
 	depends on USB_G_ANDROID
@@ -1169,11 +1176,14 @@ config USB_ANDROID_PROJECTOR
 	depends on USB_G_ANDROID
 	help
 
+<<<<<<< HEAD
 config USB_ANDROID_PROJECTOR_HTC_MODE
 	boolean "Android gadget Projector HTC MODE function"
 	depends on USB_ANDROID_PROJECTOR
 	help
 
+=======
+>>>>>>> upstream/4.3_primoc
 config USB_ANDROID_ECM
 	boolean "Android gadget ECM function"
 	depends on USB_G_ANDROID
@@ -1330,6 +1340,13 @@ config USB_G_WEBCAM
 
 endchoice
 
+<<<<<<< HEAD
+=======
+config USB_ACCESSORY_DETECT
+	boolean "USB ACCESSORY DETECT"
+	default n
+
+>>>>>>> upstream/4.3_primoc
 config USB_ACCESSORY_DETECT_BY_ADC
         boolean "DETECT USB ACCESSORY BY PMIC ADC"
         default n
@@ -1341,12 +1358,15 @@ config USB_CSW_HACK
 	 This csw hack feature is for increasing the performance of the mass
 	 storage
 
+<<<<<<< HEAD
 config USB_MSC_PROFILING
 	bool "USB MSC performance profiling"
 	help
 	  If you say Y here, support will be added for collecting
 	  Mass-storage performance numbers at the VFS level.
 
+=======
+>>>>>>> upstream/4.3_primoc
 config MODEM_SUPPORT
 	boolean "modem support in generic serial function driver"
 	depends on USB_G_ANDROID
@@ -1430,10 +1450,13 @@ config USB_GADGET_VERIZON_PRODUCT_ID
 	depends on USB_G_ANDROID
 	default n
 
+<<<<<<< HEAD
 config SKU_VMUS
 	boolean "PrimoC VMUS SKU"
 	depends on USB_G_ANDROID
 	default n
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 endif # USB_GADGET

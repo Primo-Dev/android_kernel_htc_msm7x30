@@ -173,6 +173,18 @@ static unsigned long audlpa_pmem_fixup(struct audio *audio, void *addr,
 static void audlpa_async_send_data(struct audio *audio, unsigned needed,
 				uint32_t *payload);
 
+<<<<<<< HEAD
+=======
+static int lpa_enable = 0;
+
+int get_lpa_session(void)
+{
+	pr_aud_info("get lpa session\n");
+	return lpa_enable;
+}
+EXPORT_SYMBOL(get_lpa_session);
+
+>>>>>>> upstream/4.3_primoc
 static void lpa_listner(u32 evt_id, union auddev_evt_data *evt_payload,
 			void *private_data)
 {
@@ -1115,6 +1127,10 @@ static long audio_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	switch (cmd) {
 	case AUDIO_START:
 		MM_DBG("AUDIO_START\n");
+<<<<<<< HEAD
+=======
+		lpa_enable = 1;
+>>>>>>> upstream/4.3_primoc
 		rc = audio_enable(audio);
 		if (!rc) {
 			rc = wait_event_interruptible_timeout(audio->wait,
@@ -1136,6 +1152,10 @@ static long audio_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		audio_ioport_reset(audio);
 		audio->stopped = 0;
 		audio->drv_status &= ~ADRV_STATUS_PAUSE;
+<<<<<<< HEAD
+=======
+		lpa_enable = 0;
+>>>>>>> upstream/4.3_primoc
 		break;
 
 	case AUDIO_FLUSH:
@@ -1384,6 +1404,10 @@ static int audio_release(struct inode *inode, struct file *file)
 	if (audio->dentry)
 		debugfs_remove(audio->dentry);
 #endif
+<<<<<<< HEAD
+=======
+	lpa_enable = 0;
+>>>>>>> upstream/4.3_primoc
 	kfree(audio);
 	return 0;
 }
@@ -1620,6 +1644,10 @@ static int audio_open(struct inode *inode, struct file *file)
 			break;
 		}
 	}
+<<<<<<< HEAD
+=======
+	lpa_enable = 1;
+>>>>>>> upstream/4.3_primoc
 done:
 	return rc;
 event_err:

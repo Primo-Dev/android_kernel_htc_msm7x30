@@ -513,11 +513,21 @@ static u64 nop_for_index(int idx)
 
 static inline void sparc_pmu_enable_event(struct cpu_hw_events *cpuc, struct hw_perf_event *hwc, int idx)
 {
+<<<<<<< HEAD
 	u64 val, mask = mask_for_index(idx);
 
 	val = cpuc->pcr;
 	val &= ~mask;
 	val |= hwc->config;
+=======
+	u64 enc, val, mask = mask_for_index(idx);
+
+	enc = perf_event_get_enc(cpuc->events[idx]);
+
+	val = cpuc->pcr;
+	val &= ~mask;
+	val |= event_encoding(enc, idx);
+>>>>>>> upstream/4.3_primoc
 	cpuc->pcr = val;
 
 	pcr_ops->write(cpuc->pcr);
@@ -1380,8 +1390,11 @@ static void perf_callchain_user_64(struct perf_callchain_entry *entry,
 {
 	unsigned long ufp;
 
+<<<<<<< HEAD
 	perf_callchain_store(entry, regs->tpc);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ufp = regs->u_regs[UREG_I6] + STACK_BIAS;
 	do {
 		struct sparc_stackf *usf, sf;
@@ -1402,8 +1415,11 @@ static void perf_callchain_user_32(struct perf_callchain_entry *entry,
 {
 	unsigned long ufp;
 
+<<<<<<< HEAD
 	perf_callchain_store(entry, regs->tpc);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ufp = regs->u_regs[UREG_I6] & 0xffffffffUL;
 	do {
 		struct sparc_stackf32 *usf, sf;
@@ -1422,6 +1438,14 @@ static void perf_callchain_user_32(struct perf_callchain_entry *entry,
 void
 perf_callchain_user(struct perf_callchain_entry *entry, struct pt_regs *regs)
 {
+<<<<<<< HEAD
+=======
+	perf_callchain_store(entry, regs->tpc);
+
+	if (!current->mm)
+		return;
+
+>>>>>>> upstream/4.3_primoc
 	flushw_user();
 	if (test_thread_flag(TIF_32BIT))
 		perf_callchain_user_32(entry, regs);

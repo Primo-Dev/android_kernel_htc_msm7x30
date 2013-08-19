@@ -92,8 +92,13 @@ int usb_stor_ucr61s2b_init(struct us_data *us)
 	return 0;
 }
 
+<<<<<<< HEAD
 /* This places the HUAWEI usb dongles in multi-port mode */
 static int usb_stor_huawei_feature_init(struct us_data *us)
+=======
+/* This places the HUAWEI E220 devices in multi-port mode */
+int usb_stor_huawei_e220_init(struct us_data *us)
+>>>>>>> upstream/4.3_primoc
 {
 	int result;
 
@@ -104,6 +109,7 @@ static int usb_stor_huawei_feature_init(struct us_data *us)
 	US_DEBUGP("Huawei mode set result is %d\n", result);
 	return 0;
 }
+<<<<<<< HEAD
 
 /*
  * It will send a scsi switch command called rewind' to huawei dongle.
@@ -176,3 +182,5 @@ int usb_stor_huawei_init(struct us_data *us)
 	}
 	return result;
 }
+=======
+>>>>>>> upstream/4.3_primoc

@@ -6,7 +6,10 @@
  *
  *  Rewritten to use page cache, (C) 1998 Stephen Tweedie
  */
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <linux/mm.h>
 #include <linux/gfp.h>
 #include <linux/kernel_stat.h>
@@ -315,8 +318,29 @@ struct page *read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 		 * Swap entry may have been freed since our caller observed it.
 		 */
 		err = swapcache_prepare(entry);
+<<<<<<< HEAD
 		if (err == -EEXIST) {	/* seems racy */
 			radix_tree_preload_end();
+=======
+		if (err == -EEXIST) {
+			radix_tree_preload_end();
+			/*
+			 * We might race against get_swap_page() and stumble
+			 * across a SWAP_HAS_CACHE swap_map entry whose page
+			 * has not been brought into the swapcache yet, while
+			 * the other end is scheduled away waiting on discard
+			 * I/O completion at scan_swap_map().
+			 *
+			 * In order to avoid turning this transitory state
+			 * into a permanent loop around this -EEXIST case
+			 * if !CONFIG_PREEMPT and the I/O completion happens
+			 * to be waiting on the CPU waitqueue where we are now
+			 * busy looping, we just conditionally invoke the
+			 * scheduler here, if there are some more important
+			 * tasks to run.
+			 */
+			cond_resched();
+>>>>>>> upstream/4.3_primoc
 			continue;
 		}
 		if (err) {		/* swp entry is obsolete ? */
@@ -374,6 +398,7 @@ struct page *read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 struct page *swapin_readahead(swp_entry_t entry, gfp_t gfp_mask,
 			struct vm_area_struct *vma, unsigned long addr)
 {
+<<<<<<< HEAD
 	int nr_pages;
 	struct page *page;
 	unsigned long offset;
@@ -388,11 +413,24 @@ struct page *swapin_readahead(swp_entry_t entry, gfp_t gfp_mask,
 	 */
 	nr_pages = valid_swaphandles(entry, &offset);
 	for (end_offset = offset + nr_pages; offset < end_offset; offset++) {
+=======
+	struct page *page;
+	unsigned long offset = swp_offset(entry);
+	unsigned long end_offset;
+
+	get_swap_cluster(entry, &offset, &end_offset);
+
+	for (; offset <= end_offset ; offset++) {
+>>>>>>> upstream/4.3_primoc
 		/* Ok, do the async read-ahead now */
 		page = read_swap_cache_async(swp_entry(swp_type(entry), offset),
 						gfp_mask, vma, addr);
 		if (!page)
+<<<<<<< HEAD
 			break;
+=======
+			continue;
+>>>>>>> upstream/4.3_primoc
 		page_cache_release(page);
 	}
 	lru_add_drain();	/* Push any new pages onto the LRU now */

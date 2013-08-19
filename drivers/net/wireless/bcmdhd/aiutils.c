@@ -22,7 +22,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: aiutils.c 275693 2011-08-04 19:59:34Z $
+=======
+ * $Id: aiutils.c,v 1.26.2.1 2010-03-09 18:41:21 $
+>>>>>>> upstream/4.3_primoc
  */
 
 
@@ -37,7 +41,11 @@
 
 #include "siutils_priv.h"
 
+<<<<<<< HEAD
 #define BCM47162_DMP() (0)
+=======
+
+>>>>>>> upstream/4.3_primoc
 
 
 
@@ -417,10 +425,13 @@ ai_flag(si_t *sih)
 	aidmp_t *ai;
 
 	sii = SI_INFO(sih);
+<<<<<<< HEAD
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Attempting to read MIPS DMP registers on 47162a0", __FUNCTION__));
 		return sii->curidx;
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	ai = sii->curwrap;
 
 	return (R_REG(sii->osh, &ai->oobselouta30) & 0x1f);
@@ -544,12 +555,16 @@ ai_corereg(si_t *sih, uint coreidx, uint regoff, uint mask, uint val)
 		r = (uint32*) ((uchar*) ai_setcoreidx(&sii->pub, coreidx) + regoff);
 	}
 	ASSERT(r != NULL);
+<<<<<<< HEAD
 #ifdef HTC_KlocWork
     if(r == NULL) {
         printf("[HTCKW] r is NULL at ai_corereg\n");
         return 0;
     }
 #endif
+=======
+
+>>>>>>> upstream/4.3_primoc
 	
 	if (mask || val) {
 		w = (R_REG(sii->osh, r) & ~mask) | val;
@@ -629,6 +644,7 @@ ai_core_cflags_wo(si_t *sih, uint32 mask, uint32 val)
 	uint32 w;
 
 	sii = SI_INFO(sih);
+<<<<<<< HEAD
 
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (ioctrl) on 47162a0",
@@ -636,6 +652,8 @@ ai_core_cflags_wo(si_t *sih, uint32 mask, uint32 val)
 		return;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ASSERT(GOODREGS(sii->curwrap));
 	ai = sii->curwrap;
 
@@ -655,12 +673,15 @@ ai_core_cflags(si_t *sih, uint32 mask, uint32 val)
 	uint32 w;
 
 	sii = SI_INFO(sih);
+<<<<<<< HEAD
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (ioctrl) on 47162a0",
 		          __FUNCTION__));
 		return 0;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ASSERT(GOODREGS(sii->curwrap));
 	ai = sii->curwrap;
 
@@ -682,12 +703,15 @@ ai_core_sflags(si_t *sih, uint32 mask, uint32 val)
 	uint32 w;
 
 	sii = SI_INFO(sih);
+<<<<<<< HEAD
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (iostatus) on 47162a0",
 		          __FUNCTION__));
 		return 0;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ASSERT(GOODREGS(sii->curwrap));
 	ai = sii->curwrap;
 

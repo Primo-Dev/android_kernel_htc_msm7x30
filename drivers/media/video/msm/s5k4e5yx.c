@@ -146,6 +146,11 @@
 /* Color bar pattern selection */
 #define S5K4E5YX_COLOR_BAR_PATTERN_SEL_REG 0x0601
 
+<<<<<<< HEAD
+=======
+#define REG_LINE_LENGTH_MSB 0x0340
+#define REG_LINE_LENGTH_LSB 0x0341
+>>>>>>> upstream/4.3_primoc
 #define REG_LINE_LENGTH_PCK_MSB 0x0342
 #define REG_LINE_LENGTH_PCK_LSB 0x0343
 #define REG_ANALOGUE_GAIN_CODE_GLOBAL_MSB 0x0204
@@ -550,13 +555,22 @@ static int32_t s5k4e5yx_write_exp_gain
 	int32_t rc = 0;
 
 	uint16_t max_legal_gain = 0x0200;
+<<<<<<< HEAD
 	uint32_t ll_ratio; /* Q10 */
+=======
+>>>>>>> upstream/4.3_primoc
 	uint32_t ll_pck, fl_lines;
 	uint16_t offset = 8; /* 4; */     /* kipper */
 	uint32_t gain_msb, gain_lsb;
 	uint32_t intg_t_msb, intg_t_lsb;
 	uint32_t ll_pck_msb, ll_pck_lsb;
+<<<<<<< HEAD
 	struct s5k4e5yx_i2c_reg_conf tbl[3];
+=======
+	uint32_t fl_l_msb, fl_l_lsb;
+	uint32_t max_line = 0xFFFF - offset;
+	struct s5k4e5yx_i2c_reg_conf tbl[5];
+>>>>>>> upstream/4.3_primoc
 
 	CDBG("Line:%d s5k4e5yx_write_exp_gain \n", __LINE__);
 
@@ -604,19 +618,33 @@ static int32_t s5k4e5yx_write_exp_gain
 	if (gain > max_legal_gain)
 		gain = max_legal_gain;
 
+<<<<<<< HEAD
 	/* in Q10 */
 	line = (line * 0x400);/* s5k4e5yx_ctrl->fps_divider); */
+=======
+	if (line > max_line)
+		line = max_line;
+
+	/* Q10: 0x400*/
+	if (line * 0x400 > (fl_lines - offset) * s5k4e5yx_ctrl->fps_divider)
+		fl_lines = line + offset;
+	else
+		fl_lines = (fl_lines * s5k4e5yx_ctrl->fps_divider) / 0x400;
+>>>>>>> upstream/4.3_primoc
 
 	CDBG("s5k4e5yx_ctrl->fps_divider = %d\n", s5k4e5yx_ctrl->fps_divider);
 	CDBG("fl_lines = %d\n", fl_lines);
 	CDBG("line = %d\n", line);
 
+<<<<<<< HEAD
 	if ((fl_lines - offset) < (line / 0x400))
 		ll_ratio = (line / (fl_lines - offset));
 	else
 		ll_ratio = 0x400;
 	 CDBG("ll_ratio = %d\n", ll_ratio);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* update gain registers */
 	CDBG("gain = %d\n", gain);
 	gain_msb = (gain & 0xFF00) >> 8;
@@ -627,6 +655,7 @@ static int32_t s5k4e5yx_write_exp_gain
 	tbl[1].bdata = gain_msb;
 	tbl[2].waddr = REG_ANALOGUE_GAIN_CODE_GLOBAL_LSB;
 	tbl[2].bdata = gain_lsb;
+<<<<<<< HEAD
 	rc = s5k4e5yx_i2c_write_table(&tbl[0], ARRAY_SIZE(tbl));
 	if (rc < 0)
 		goto write_gain_done;
@@ -635,24 +664,53 @@ static int32_t s5k4e5yx_write_exp_gain
 	CDBG("ll_pck/0x400 = %d\n", ll_pck / 0x400);
 	ll_pck_msb = ((ll_pck / 0x400) & 0xFF00) >> 8;
 	ll_pck_lsb = (ll_pck / 0x400) & 0x00FF;
+=======
+	rc = s5k4e5yx_i2c_write_table(&tbl[0], ARRAY_SIZE(tbl)-2);
+	if (rc < 0)
+		goto write_gain_done;
+
+	CDBG("ll_pck = %d\n", ll_pck);
+	ll_pck_msb = (ll_pck & 0xFF00) >> 8;
+	ll_pck_lsb = ll_pck & 0x00FF;
+>>>>>>> upstream/4.3_primoc
 	tbl[0].waddr = REG_LINE_LENGTH_PCK_MSB;
 	tbl[0].bdata = ll_pck_msb;
 	tbl[1].waddr = REG_LINE_LENGTH_PCK_LSB;
 	tbl[1].bdata = ll_pck_lsb;
+<<<<<<< HEAD
 	rc = s5k4e5yx_i2c_write_table(&tbl[0], ARRAY_SIZE(tbl)-1);
 	if (rc < 0)
 		goto write_gain_done;
 
 	line = line / ll_ratio;
 	CDBG("line = %d\n", line);
+=======
+	rc = s5k4e5yx_i2c_write_table(&tbl[0], ARRAY_SIZE(tbl)-3);
+	if (rc < 0)
+		goto write_gain_done;
+
+	CDBG("line = %d\n", line);
+	CDBG("fl_lines = %d\n", fl_lines);
+	fl_l_msb = (fl_lines & 0xFF00) >> 8;
+	fl_l_lsb = (fl_lines & 0x00FF);
+>>>>>>> upstream/4.3_primoc
 	intg_t_msb = (line & 0xFF00) >> 8;
 	intg_t_lsb = (line & 0x00FF);
 	tbl[0].waddr = REG_COARSE_INTEGRATION_TIME_MSB;
 	tbl[0].bdata = intg_t_msb;
 	tbl[1].waddr = REG_COARSE_INTEGRATION_TIME_LSB;
 	tbl[1].bdata = intg_t_lsb;
+<<<<<<< HEAD
 	tbl[2].waddr = S5K4E5YX_REG_GROUP_PARAMETER_HOLD;
 	tbl[2].bdata = S5K4E5YX_GROUP_PARAMETER_UNHOLD;
+=======
+	tbl[2].waddr = REG_LINE_LENGTH_MSB;
+	tbl[2].bdata = fl_l_msb;
+	tbl[3].waddr = REG_LINE_LENGTH_LSB;
+	tbl[3].bdata = fl_l_lsb;
+	tbl[4].waddr = S5K4E5YX_REG_GROUP_PARAMETER_HOLD;
+	tbl[4].bdata = S5K4E5YX_GROUP_PARAMETER_UNHOLD;
+>>>>>>> upstream/4.3_primoc
 	rc = s5k4e5yx_i2c_write_table(&tbl[0], ARRAY_SIZE(tbl));
 
 write_gain_done:
@@ -708,7 +766,10 @@ static void s5k4e5yx_ADLC_conrtol(int rt)
 
 static void s5k4e5yx_stream_on(void)
 {
+<<<<<<< HEAD
 	msleep(20);
+=======
+>>>>>>> upstream/4.3_primoc
 	s5k4e5yx_i2c_write_b(s5k4e5yx_client->addr, S5K4E5YX_REG_MODE_SELECT, S5K4E5YX_MODE_SELECT_STREAM);
 	s5k4e5yx_set_internal_regulator(S5K4E5YX_MODE_INT_RGL_OFF);
 }
@@ -717,7 +778,10 @@ static void s5k4e5yx_stream_off(void)
 {
 	s5k4e5yx_i2c_write_b(s5k4e5yx_client->addr, S5K4E5YX_REG_MODE_SELECT, S5K4E5YX_MODE_SELECT_SW_STANDBY);
 	s5k4e5yx_set_internal_regulator(S5K4E5YX_MODE_INT_RGL_ON);
+<<<<<<< HEAD
 	msleep(100);
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 #ifdef CONFIG_RAWCHIP
@@ -1033,8 +1097,11 @@ int frame_thread(void* dummy)
 		printk("frmae=%d\n",i);
 		msleep(300);
 	}
+<<<<<<< HEAD
         //attempt at fixing a build error
         return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 void run_thread(void)
@@ -1066,7 +1133,11 @@ static int32_t s5k4e5yx_setting(int rt)
 			s5k4e5yx_csi_params.lane_cnt = 2;
 			s5k4e5yx_csi_params.lane_assign = 0xe4;
 			s5k4e5yx_csi_params.dpcm_scheme = 0;
+<<<<<<< HEAD
 			s5k4e5yx_csi_params.settle_cnt = 35;
+=======
+			s5k4e5yx_csi_params.settle_cnt = 20;
+>>>>>>> upstream/4.3_primoc
 			s5k4e5yx_csi_params.hs_impedence = 0x0F;
 			s5k4e5yx_csi_params.mipi_driving_strength = 0;
 			rc = msm_camio_csi_config(&s5k4e5yx_csi_params);
@@ -1951,6 +2022,7 @@ uint8_t s5k4e5yx_preview_skip_frame(void)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int s5k4e5yx_deinit(void)
 {
 	pr_info ("[CAM] s5k4e5yx_deinit\n");
@@ -1959,6 +2031,8 @@ static int s5k4e5yx_deinit(void)
 }
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 int s5k4e5yx_sensor_config(void __user *argp)
 {
   struct sensor_cfg_data cdata;
@@ -2089,10 +2163,14 @@ int s5k4e5yx_sensor_config(void __user *argp)
 			rc = -EFAULT;
 		}
 		break;
+<<<<<<< HEAD
   case CFG_DEINIT:
 	rc = s5k4e5yx_deinit ();
 	break;
   
+=======
+
+>>>>>>> upstream/4.3_primoc
   default:
     rc = -EFAULT;
     break;

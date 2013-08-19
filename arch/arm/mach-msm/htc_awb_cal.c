@@ -39,7 +39,11 @@ struct qct_lsc_struct{
 struct qct_awb_lsc_struct{
 	unsigned long int caBuff[8];/* AWB Calibartion */
 	struct qct_lsc_struct qct_lsc_data;/* LSC Calibration */
+<<<<<<< HEAD
 	unsigned long int flashcaBuff[8];  /* flash_camera */
+=======
+    unsigned long int flashcaBuff[8];  //flash_camera
+>>>>>>> upstream/4.3_primoc
 };
 
 static unsigned char cam_awb_ram[AWB_CAL_MAX_SIZE];

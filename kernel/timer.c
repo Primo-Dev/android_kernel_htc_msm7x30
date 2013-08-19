@@ -63,6 +63,10 @@ EXPORT_SYMBOL(jiffies_64);
 #define TVR_SIZE (1 << TVR_BITS)
 #define TVN_MASK (TVN_SIZE - 1)
 #define TVR_MASK (TVR_SIZE - 1)
+<<<<<<< HEAD
+=======
+#define MAX_TVAL ((unsigned long)((1ULL << (TVR_BITS + 4*TVN_BITS)) - 1))
+>>>>>>> upstream/4.3_primoc
 
 struct tvec {
 	struct list_head vec[TVN_SIZE];
@@ -144,9 +148,17 @@ static unsigned long round_jiffies_common(unsigned long j, int cpu,
 	/* now that we have rounded, subtract the extra skew again */
 	j -= cpu * 3;
 
+<<<<<<< HEAD
 	if (j <= jiffies) /* rounding ate our timeout entirely; */
 		return original;
 	return j;
+=======
+	/*
+	 * Make sure j is still in the future. Otherwise return the
+	 * unmodified value.
+	 */
+	return time_is_after_jiffies(j) ? j : original;
+>>>>>>> upstream/4.3_primoc
 }
 
 /**
@@ -356,11 +368,20 @@ static void internal_add_timer(struct tvec_base *base, struct timer_list *timer)
 		vec = base->tv1.vec + (base->timer_jiffies & TVR_MASK);
 	} else {
 		int i;
+<<<<<<< HEAD
 		/* If the timeout is larger than 0xffffffff on 64-bit
 		 * architectures then we use the maximum timeout:
 		 */
 		if (idx > 0xffffffffUL) {
 			idx = 0xffffffffUL;
+=======
+		/* If the timeout is larger than MAX_TVAL (on 64-bit
+		 * architectures or with CONFIG_BASE_SMALL=1) then we
+		 * use the maximum timeout.
+		 */
+		if (idx > MAX_TVAL) {
+			idx = MAX_TVAL;
+>>>>>>> upstream/4.3_primoc
 			expires = idx + base->timer_jiffies;
 		}
 		i = (expires >> (TVR_BITS + 3 * TVN_BITS)) & TVN_MASK;
@@ -679,6 +700,7 @@ __mod_timer(struct timer_list *timer, unsigned long expires,
 
 	debug_activate(timer, expires);
 
+<<<<<<< HEAD
 	cpu = smp_processor_id();
 
 #if defined(CONFIG_NO_HZ) && defined(CONFIG_SMP)
@@ -696,6 +718,25 @@ __mod_timer(struct timer_list *timer, unsigned long expires,
 		 * the timer is serialized wrt itself.
 		 */
 		if (likely(base->running_timer != timer)) {
+=======
+	/*
+	 * Should we try to migrate timer?
+	 * However we can't change timer's base while it is running, otherwise
+	 * del_timer_sync() can't detect that the timer's handler yet has not
+	 * finished. This also guarantees that the timer is serialized wrt
+	 * itself.
+	 */
+	if (likely(base->running_timer != timer)) {
+		cpu = smp_processor_id();
+
+#if defined(CONFIG_NO_HZ) && defined(CONFIG_SMP)
+		if (!pinned && get_sysctl_timer_migration() && idle_cpu(cpu))
+			cpu = get_nohz_timer_target();
+#endif
+		new_base = per_cpu(tvec_bases, cpu);
+
+		if (base != new_base) {
+>>>>>>> upstream/4.3_primoc
 			/* See the comment in lock_timer_base() */
 			timer_set_base(timer, NULL);
 			spin_unlock(&base->lock);
@@ -739,9 +780,13 @@ EXPORT_SYMBOL(mod_timer_pending);
  * Algorithm:
  *   1) calculate the maximum (absolute) time
  *   2) calculate the highest bit where the expires and new max are different
+<<<<<<< HEAD
  *   3) use this bit to make a mask
  *   4) use the bitmask to round down the maximum time, so that all last
  *      bits are zeros
+=======
+ *   3) round down the maximum time, so that all the lower bits are zeros
+>>>>>>> upstream/4.3_primoc
  */
 static inline
 unsigned long apply_slack(struct timer_list *timer, unsigned long expires)
@@ -763,11 +808,17 @@ unsigned long apply_slack(struct timer_list *timer, unsigned long expires)
 	if (mask == 0)
 		return expires;
 
+<<<<<<< HEAD
 	bit = find_last_bit(&mask, BITS_PER_LONG);
 
 	mask = (1 << bit) - 1;
 
 	expires_limit = expires_limit & ~(mask);
+=======
+	bit = __fls(mask);
+
+	expires_limit = (expires_limit >> bit) << bit;
+>>>>>>> upstream/4.3_primoc
 
 	return expires_limit;
 }
@@ -1052,7 +1103,13 @@ static void call_timer_fn(struct timer_list *timer, void (*fn)(unsigned long),
 	 * warnings as well as problems when looking into
 	 * timer->lockdep_map, make a copy and use that here.
 	 */
+<<<<<<< HEAD
 	struct lockdep_map lockdep_map = timer->lockdep_map;
+=======
+	struct lockdep_map lockdep_map;
+
+	lockdep_copy_map(&lockdep_map, &timer->lockdep_map);
+>>>>>>> upstream/4.3_primoc
 #endif
 	/*
 	 * Couple the lock chain with the lock chain at
@@ -1628,12 +1685,19 @@ static int __cpuinit init_timers_cpu(int cpu)
 			boot_done = 1;
 			base = &boot_tvec_bases;
 		}
+<<<<<<< HEAD
+=======
+		spin_lock_init(&base->lock);
+>>>>>>> upstream/4.3_primoc
 		tvec_base_done[cpu] = 1;
 	} else {
 		base = per_cpu(tvec_bases, cpu);
 	}
 
+<<<<<<< HEAD
 	spin_lock_init(&base->lock);
+=======
+>>>>>>> upstream/4.3_primoc
 
 	for (j = 0; j < TVN_SIZE; j++) {
 		INIT_LIST_HEAD(base->tv5.vec + j);
@@ -1769,6 +1833,7 @@ unsigned long msleep_interruptible(unsigned int msecs)
 
 EXPORT_SYMBOL(msleep_interruptible);
 
+<<<<<<< HEAD
 static void do_nsleep(unsigned int msecs, struct hrtimer_sleeper *sleeper,
 	int sigs)
 {
@@ -1835,6 +1900,17 @@ static int __sched do_usleep_range(unsigned long min, unsigned long max)
 	kmin = ktime_set(0, min * NSEC_PER_USEC);
 	delta = (max - min) * NSEC_PER_USEC;
 	return schedule_hrtimeout_range(&kmin, delta, HRTIMER_MODE_REL);
+=======
+static unsigned long __sched do_usleep_range(unsigned long min, unsigned long max)
+{
+	ktime_t kmin;
+	unsigned long elapsed, delta;
+
+	kmin = ktime_set(0, min * NSEC_PER_USEC);
+	delta = (max - min) * NSEC_PER_USEC;
+	return schedule_hrtimeout_range(&kmin, delta, HRTIMER_MODE_REL,
+					&elapsed) ? 0 : elapsed;
+>>>>>>> upstream/4.3_primoc
 }
 
 /**
@@ -1842,9 +1918,16 @@ static int __sched do_usleep_range(unsigned long min, unsigned long max)
  * @min: Minimum time in usecs to sleep
  * @max: Maximum time in usecs to sleep
  */
+<<<<<<< HEAD
 void usleep_range(unsigned long min, unsigned long max)
 {
 	__set_current_state(TASK_UNINTERRUPTIBLE);
 	do_usleep_range(min, max);
+=======
+unsigned long usleep_range(unsigned long min, unsigned long max)
+{
+	__set_current_state(TASK_UNINTERRUPTIBLE);
+	return do_usleep_range(min, max);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(usleep_range);

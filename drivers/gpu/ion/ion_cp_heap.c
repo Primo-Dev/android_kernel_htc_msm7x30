@@ -2,7 +2,11 @@
  * drivers/gpu/ion/ion_cp_heap.c
  *
  * Copyright (C) 2011 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
+=======
+ * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -93,7 +97,10 @@ struct ion_cp_heap {
 	int iommu_map_all;
 	int iommu_2x_map_domain;
 	unsigned int has_outer_cache;
+<<<<<<< HEAD
 	atomic_t protect_cnt;
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 enum {
@@ -128,7 +135,11 @@ static int ion_cp_protect(struct ion_heap *heap)
 		container_of(heap, struct ion_cp_heap, heap);
 	int ret_value = 0;
 
+<<<<<<< HEAD
 	if (atomic_inc_return(&cp_heap->protect_cnt) == 1) {
+=======
+	if (cp_heap->heap_protected == HEAP_NOT_PROTECTED) {
+>>>>>>> upstream/4.3_primoc
 		/* Make sure we are in C state when the heap is protected. */
 		if (cp_heap->reusable && !cp_heap->allocated_bytes) {
 			ret_value = fmem_set_state(FMEM_C_STATE);
@@ -147,7 +158,10 @@ static int ion_cp_protect(struct ion_heap *heap)
 					pr_err("%s: unable to transition heap to T-state\n",
 						__func__);
 			}
+<<<<<<< HEAD
 			atomic_dec(&cp_heap->protect_cnt);
+=======
+>>>>>>> upstream/4.3_primoc
 		} else {
 			cp_heap->heap_protected = HEAP_PROTECTED;
 			pr_debug("Protected heap %s @ 0x%lx\n",
@@ -155,9 +169,12 @@ static int ion_cp_protect(struct ion_heap *heap)
 		}
 	}
 out:
+<<<<<<< HEAD
 	pr_debug("%s: protect count is %d\n", __func__,
 		atomic_read(&cp_heap->protect_cnt));
 	BUG_ON(atomic_read(&cp_heap->protect_cnt) < 0);
+=======
+>>>>>>> upstream/4.3_primoc
 	return ret_value;
 }
 
@@ -171,7 +188,11 @@ static void ion_cp_unprotect(struct ion_heap *heap)
 	struct ion_cp_heap *cp_heap =
 		container_of(heap, struct ion_cp_heap, heap);
 
+<<<<<<< HEAD
 	if (atomic_dec_and_test(&cp_heap->protect_cnt)) {
+=======
+	if (cp_heap->heap_protected == HEAP_PROTECTED) {
+>>>>>>> upstream/4.3_primoc
 		int error_code = ion_cp_unprotect_mem(
 			cp_heap->secure_base, cp_heap->secure_size,
 			cp_heap->permission_type);
@@ -190,9 +211,12 @@ static void ion_cp_unprotect(struct ion_heap *heap)
 			}
 		}
 	}
+<<<<<<< HEAD
 	pr_debug("%s: protect count is %d\n", __func__,
 		atomic_read(&cp_heap->protect_cnt));
 	BUG_ON(atomic_read(&cp_heap->protect_cnt) < 0);
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 ion_phys_addr_t ion_cp_allocate(struct ion_heap *heap,
@@ -891,7 +915,10 @@ struct ion_heap *ion_cp_heap_create(struct ion_platform_heap *heap_data)
 	cp_heap->secure_base = cp_heap->base;
 	cp_heap->secure_size = heap_data->size;
 	cp_heap->has_outer_cache = heap_data->has_outer_cache;
+<<<<<<< HEAD
 	atomic_set(&cp_heap->protect_cnt, 0);
+=======
+>>>>>>> upstream/4.3_primoc
 	if (heap_data->extra_data) {
 		struct ion_cp_heap_pdata *extra_data =
 				heap_data->extra_data;

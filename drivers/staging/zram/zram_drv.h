@@ -18,7 +18,11 @@
 #include <linux/spinlock.h>
 #include <linux/mutex.h>
 
+<<<<<<< HEAD
 #include "xvmalloc.h"
+=======
+#include "../zsmalloc/zsmalloc.h"
+>>>>>>> upstream/4.3_primoc
 
 /*
  * Some arbitrary value. This is just to catch
@@ -26,6 +30,7 @@
  */
 static const unsigned max_num_devices = 32;
 
+<<<<<<< HEAD
 /*
  * Stored at beginning of each compressed object.
  *
@@ -43,15 +48,27 @@ struct zobj_header {
 /* Default zram disk size: 25% of total RAM */
 static const unsigned default_disksize_perc_ram = 25;
 
+=======
+/*-- Configurable parameters */
+
+>>>>>>> upstream/4.3_primoc
 /*
  * Pages that compress to size greater than this are stored
  * uncompressed in memory.
  */
+<<<<<<< HEAD
 static const unsigned max_zpage_size = PAGE_SIZE / 4 * 3;
 
 /*
  * NOTE: max_zpage_size must be less than or equal to:
  *   XV_MAX_ALLOC_SIZE - sizeof(struct zobj_header)
+=======
+static const size_t max_zpage_size = PAGE_SIZE / 4 * 3;
+
+/*
+ * NOTE: max_zpage_size must be less than or equal to:
+ *   ZS_MAX_ALLOC_SIZE - sizeof(struct zobj_header)
+>>>>>>> upstream/4.3_primoc
  * otherwise, xv_malloc() would always return failure.
  */
 
@@ -61,12 +78,22 @@ static const unsigned max_zpage_size = PAGE_SIZE / 4 * 3;
 #define SECTOR_SIZE		(1 << SECTOR_SHIFT)
 #define SECTORS_PER_PAGE_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
 #define SECTORS_PER_PAGE	(1 << SECTORS_PER_PAGE_SHIFT)
+<<<<<<< HEAD
 
 /* Flags for zram pages (table[page_no].flags) */
 enum zram_pageflags {
 	/* Page is stored uncompressed */
 	ZRAM_UNCOMPRESSED,
 
+=======
+#define ZRAM_LOGICAL_BLOCK_SHIFT 12
+#define ZRAM_LOGICAL_BLOCK_SIZE	(1 << ZRAM_LOGICAL_BLOCK_SHIFT)
+#define ZRAM_SECTOR_PER_LOGICAL_BLOCK	\
+	(1 << (ZRAM_LOGICAL_BLOCK_SHIFT - SECTOR_SHIFT))
+
+/* Flags for zram pages (table[page_no].flags) */
+enum zram_pageflags {
+>>>>>>> upstream/4.3_primoc
 	/* Page consists entirely of zeros */
 	ZRAM_ZERO,
 
@@ -77,11 +104,19 @@ enum zram_pageflags {
 
 /* Allocated for each disk page */
 struct table {
+<<<<<<< HEAD
 	struct page *page;
 	u16 offset;
 	u8 count;	/* object ref count (not yet used) */
 	u8 flags;
 } __attribute__((aligned(4)));
+=======
+	unsigned long handle;
+	u16 size;	/* object size (excluding header) */
+	u8 count;	/* object ref count (not yet used) */
+	u8 flags;
+} __aligned(4);
+>>>>>>> upstream/4.3_primoc
 
 struct zram_stats {
 	u64 compr_size;		/* compressed size of pages stored */
@@ -91,6 +126,7 @@ struct zram_stats {
 	u64 failed_writes;	/* can happen when memory is too low */
 	u64 invalid_io;		/* non-page-aligned I/O requests */
 	u64 notify_free;	/* no. of swap slot free notifications */
+<<<<<<< HEAD
 	u64 discard;		/* no. of block discard callbacks */
 	u32 pages_zero;		/* no. of zero filled pages */
 	u32 pages_stored;	/* no. of pages currently stored */
@@ -100,10 +136,21 @@ struct zram_stats {
 
 struct zram {
 	struct xv_pool *mem_pool;
+=======
+	u32 pages_zero;		/* no. of zero filled pages */
+	u32 pages_stored;	/* no. of pages currently stored */
+	u32 good_compress;	/* % of pages with compression ratio<=50% */
+	u32 bad_compress;	/* % of pages with compression ratio>=75% */
+};
+
+struct zram {
+	struct zs_pool *mem_pool;
+>>>>>>> upstream/4.3_primoc
 	void *compress_workmem;
 	void *compress_buffer;
 	struct table *table;
 	spinlock_t stat64_lock;	/* protect 64-bit stats */
+<<<<<<< HEAD
 	struct mutex lock;	/* protect compression buffers against
 				 * concurrent writes */
 	struct request_queue *queue;
@@ -111,6 +158,15 @@ struct zram {
 	int init_done;
 	/* Prevent concurrent execution of device init and reset */
 	struct mutex init_lock;
+=======
+	struct rw_semaphore lock; /* protect compression buffers and table
+				   * against concurrent read and writes */
+	struct request_queue *queue;
+	struct gendisk *disk;
+	int init_done;
+	/* Prevent concurrent execution of device init, reset and R/W request */
+	struct rw_semaphore init_lock;
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * This is the limit on amount of *uncompressed* worth of data
 	 * we can store in a disk.
@@ -121,7 +177,11 @@ struct zram {
 };
 
 extern struct zram *zram_devices;
+<<<<<<< HEAD
 extern unsigned int num_devices;
+=======
+unsigned int zram_get_num_devices(void);
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_SYSFS
 extern struct attribute_group zram_disk_attr_group;
 #endif
@@ -130,5 +190,8 @@ extern int zram_init_device(struct zram *zram);
 extern void zram_reset_device(struct zram *zram);
 
 #endif
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> upstream/4.3_primoc

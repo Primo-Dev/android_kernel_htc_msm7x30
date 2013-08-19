@@ -286,17 +286,31 @@ static DEFINE_SPINLOCK(all_mddevs_lock);
  * call has finished, the bio has been linked into some internal structure
  * and so is visible to ->quiesce(), so we don't need the refcount any more.
  */
+<<<<<<< HEAD
 static int md_make_request(struct request_queue *q, struct bio *bio)
 {
 	const int rw = bio_data_dir(bio);
 	mddev_t *mddev = q->queuedata;
 	int rv;
+=======
+static void md_make_request(struct request_queue *q, struct bio *bio)
+{
+	const int rw = bio_data_dir(bio);
+	mddev_t *mddev = q->queuedata;
+>>>>>>> upstream/4.3_primoc
 	int cpu;
 	unsigned int sectors;
 
 	if (mddev == NULL || mddev->pers == NULL
 	    || !mddev->ready) {
 		bio_io_error(bio);
+<<<<<<< HEAD
+=======
+		return;
+	}
+	if (mddev->ro == 1 && unlikely(rw == WRITE)) {
+		bio_endio(bio, bio_sectors(bio) == 0 ? 0 : -EROFS);
+>>>>>>> upstream/4.3_primoc
 		return 0;
 	}
 	smp_rmb(); /* Ensure implications of  'active' are visible */
@@ -322,7 +336,11 @@ static int md_make_request(struct request_queue *q, struct bio *bio)
 	 * go away inside make_request
 	 */
 	sectors = bio_sectors(bio);
+<<<<<<< HEAD
 	rv = mddev->pers->make_request(mddev, bio);
+=======
+	mddev->pers->make_request(mddev, bio);
+>>>>>>> upstream/4.3_primoc
 
 	cpu = part_stat_lock();
 	part_stat_inc(cpu, &mddev->gendisk->part0, ios[rw]);
@@ -331,8 +349,11 @@ static int md_make_request(struct request_queue *q, struct bio *bio)
 
 	if (atomic_dec_and_test(&mddev->active_io) && mddev->suspended)
 		wake_up(&mddev->sb_wait);
+<<<<<<< HEAD
 
 	return rv;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 /* mddev_suspend makes sure no new requests are submitted
@@ -433,8 +454,12 @@ static void md_submit_flush_data(struct work_struct *ws)
 		bio_endio(bio, 0);
 	else {
 		bio->bi_rw &= ~REQ_FLUSH;
+<<<<<<< HEAD
 		if (mddev->pers->make_request(mddev, bio))
 			generic_make_request(bio);
+=======
+		mddev->pers->make_request(mddev, bio);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	mddev->flush_bio = NULL;
@@ -4366,6 +4391,10 @@ static int md_alloc(dev_t dev, char *name)
 	mddev->queue->queuedata = mddev;
 
 	blk_queue_make_request(mddev->queue, md_make_request);
+<<<<<<< HEAD
+=======
+	blk_set_stacking_limits(&mddev->queue->limits);
+>>>>>>> upstream/4.3_primoc
 
 	disk = alloc_disk(1 << shift);
 	if (!disk) {
@@ -6424,16 +6453,22 @@ static void md_seq_stop(struct seq_file *seq, void *v)
 		mddev_put(mddev);
 }
 
+<<<<<<< HEAD
 struct mdstat_info {
 	int event;
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 static int md_seq_show(struct seq_file *seq, void *v)
 {
 	mddev_t *mddev = v;
 	sector_t sectors;
 	mdk_rdev_t *rdev;
+<<<<<<< HEAD
 	struct mdstat_info *mi = seq->private;
+=======
+>>>>>>> upstream/4.3_primoc
 	struct bitmap *bitmap;
 
 	if (v == (void*)1) {
@@ -6445,7 +6480,11 @@ static int md_seq_show(struct seq_file *seq, void *v)
 
 		spin_unlock(&pers_lock);
 		seq_printf(seq, "\n");
+<<<<<<< HEAD
 		mi->event = atomic_read(&md_event_count);
+=======
+		seq->poll_event = atomic_read(&md_event_count);
+>>>>>>> upstream/4.3_primoc
 		return 0;
 	}
 	if (v == (void*)2) {
@@ -6557,6 +6596,7 @@ static const struct seq_operations md_seq_ops = {
 
 static int md_seq_open(struct inode *inode, struct file *file)
 {
+<<<<<<< HEAD
 	int error;
 	struct mdstat_info *mi = kmalloc(sizeof(*mi), GFP_KERNEL);
 	if (mi == NULL)
@@ -6570,13 +6610,28 @@ static int md_seq_open(struct inode *inode, struct file *file)
 		p->private = mi;
 		mi->event = atomic_read(&md_event_count);
 	}
+=======
+	struct seq_file *seq;
+	int error;
+
+	error = seq_open(file, &md_seq_ops);
+	if (error)
+		return error;
+
+	seq = file->private_data;
+	seq->poll_event = atomic_read(&md_event_count);
+>>>>>>> upstream/4.3_primoc
 	return error;
 }
 
 static unsigned int mdstat_poll(struct file *filp, poll_table *wait)
 {
+<<<<<<< HEAD
 	struct seq_file *m = filp->private_data;
 	struct mdstat_info *mi = m->private;
+=======
+	struct seq_file *seq = filp->private_data;
+>>>>>>> upstream/4.3_primoc
 	int mask;
 
 	poll_wait(filp, &md_event_waiters, wait);
@@ -6584,7 +6639,11 @@ static unsigned int mdstat_poll(struct file *filp, poll_table *wait)
 	/* always allow read */
 	mask = POLLIN | POLLRDNORM;
 
+<<<<<<< HEAD
 	if (mi->event != atomic_read(&md_event_count))
+=======
+	if (seq->poll_event != atomic_read(&md_event_count))
+>>>>>>> upstream/4.3_primoc
 		mask |= POLLERR | POLLPRI;
 	return mask;
 }

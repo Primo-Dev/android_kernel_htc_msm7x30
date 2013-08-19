@@ -10,6 +10,10 @@
 
 #include <linux/suspend.h>
 #include <linux/smp.h>
+<<<<<<< HEAD
+=======
+#include <linux/perf_event.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <asm/pgtable.h>
 #include <asm/proto.h>
@@ -224,6 +228,10 @@ static void __restore_processor_state(struct saved_context *ctxt)
 
 	do_fpu_end();
 	mtrr_bp_restore();
+<<<<<<< HEAD
+=======
+	perf_restore_debug_store();
+>>>>>>> upstream/4.3_primoc
 }
 
 /* Needed by apm.c */

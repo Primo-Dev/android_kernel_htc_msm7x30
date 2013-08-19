@@ -284,7 +284,11 @@ static int omfs_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 	return omfs_add_node(dir, dentry, mode | S_IFDIR);
 }
 
+<<<<<<< HEAD
 static int omfs_create(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int omfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		struct nameidata *nd)
 {
 	return omfs_add_node(dir, dentry, mode | S_IFREG);

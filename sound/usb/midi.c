@@ -125,7 +125,10 @@ struct snd_usb_midi {
 		struct snd_usb_midi_in_endpoint *in;
 	} endpoints[MIDI_MAX_ENDPOINTS];
 	unsigned long input_triggered;
+<<<<<<< HEAD
 	bool autopm_reference;
+=======
+>>>>>>> upstream/4.3_primoc
 	unsigned int opened[2];
 	unsigned char disconnected;
 	unsigned char input_running;
@@ -1023,7 +1026,10 @@ static int substream_open(struct snd_rawmidi_substream *substream, int dir,
 {
 	struct snd_usb_midi* umidi = substream->rmidi->private_data;
 	struct snd_kcontrol *ctl;
+<<<<<<< HEAD
 	int err;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	down_read(&umidi->disc_rwsem);
 	if (umidi->disconnected) {
@@ -1034,6 +1040,7 @@ static int substream_open(struct snd_rawmidi_substream *substream, int dir,
 	mutex_lock(&umidi->mutex);
 	if (open) {
 		if (!umidi->opened[0] && !umidi->opened[1]) {
+<<<<<<< HEAD
 			err = usb_autopm_get_interface(umidi->iface);
 			umidi->autopm_reference = err >= 0;
 			if (err < 0 && err != -EACCES) {
@@ -1041,6 +1048,8 @@ static int substream_open(struct snd_rawmidi_substream *substream, int dir,
 				up_read(&umidi->disc_rwsem);
 				return -EIO;
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 			if (umidi->roland_load_ctl) {
 				ctl = umidi->roland_load_ctl;
 				ctl->vd[0].access |= SNDRV_CTL_ELEM_ACCESS_INACTIVE;
@@ -1063,8 +1072,11 @@ static int substream_open(struct snd_rawmidi_substream *substream, int dir,
 				snd_ctl_notify(umidi->card,
 				       SNDRV_CTL_EVENT_MASK_INFO, &ctl->id);
 			}
+<<<<<<< HEAD
 			if (umidi->autopm_reference)
 				usb_autopm_put_interface(umidi->iface);
+=======
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	mutex_unlock(&umidi->mutex);
@@ -2228,6 +2240,11 @@ int snd_usbmidi_create(struct snd_card *card,
 		return err;
 	}
 
+<<<<<<< HEAD
+=======
+	usb_autopm_get_interface_no_resume(umidi->iface);
+
+>>>>>>> upstream/4.3_primoc
 	list_add_tail(&umidi->list, midi_list);
 	return 0;
 }

@@ -37,7 +37,10 @@ struct acoustic_ops {
 	void (*enable_back_mic) (int en);
 	void (*enable_usb_headset)(int en);
 	void (*enable_beats)(int en);
+<<<<<<< HEAD
 	int (*support_aic3008) (void);
+=======
+>>>>>>> upstream/4.3_primoc
 };
 
 void acoustic_register_ops(struct acoustic_ops *ops);

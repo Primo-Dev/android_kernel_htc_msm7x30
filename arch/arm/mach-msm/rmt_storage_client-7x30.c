@@ -695,10 +695,17 @@ static long rmt_storage_ioctl(struct file *fp, unsigned int cmd,
 		if (rmc->final_call) {
 			if (atomic_dec_return(&rmc->wcount) == 0) {
 				rmc->final_call = 0;
+<<<<<<< HEAD
 				printk(KERN_INFO"[K] %s:rmc->final_call=%d\n", __func__, rmc->final_call);
 				wake_up(&rmc->final_waitq);
 			} else
 				printk(KERN_INFO"[K] %s: rmc->wcount != 0\n", __func__);
+=======
+				printk(KERN_INFO"%s:rmc->final_call=%d\n", __func__, rmc->final_call);
+				wake_up(&rmc->final_waitq);
+			} else
+				printk(KERN_INFO"%s: rmc->wcount != 0\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		}
 
 		if (ret < 0)
@@ -743,9 +750,15 @@ void wait_rmt_final_call_back(int timeout)
 	rc = wait_event_timeout(rmc->final_waitq, rmc->final_call == 0, timeout * HZ);
 	_rmc->smem_info->client_sts = 0;
 	if (!rc)
+<<<<<<< HEAD
 		printk(KERN_INFO"[K] %s: TIME OUT\n", __func__);
 	else
 		printk(KERN_INFO"[K] %s: rc = %d\n", __func__, rc);
+=======
+		printk(KERN_INFO"%s: TIME OUT\n", __func__);
+	else
+		printk(KERN_INFO"%s: rc = %d\n", __func__, rc);
+>>>>>>> upstream/4.3_primoc
 }
 
 struct rmt_storage_sync_recv_arg {

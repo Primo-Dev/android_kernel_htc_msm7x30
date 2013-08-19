@@ -88,7 +88,11 @@ static int expkey_parse(struct cache_detail *cd, char *mesg, int mlen)
 	struct svc_expkey key;
 	struct svc_expkey *ek = NULL;
 
+<<<<<<< HEAD
 	if (mesg[mlen-1] != '\n')
+=======
+	if (mlen < 1 || mesg[mlen-1] != '\n')
+>>>>>>> upstream/4.3_primoc
 		return -EINVAL;
 	mesg[mlen-1] = 0;
 

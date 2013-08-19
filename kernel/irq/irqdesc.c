@@ -286,8 +286,12 @@ static inline int alloc_descs(unsigned int start, unsigned int cnt, int node,
 
 	for (i = 0; i < cnt; i++) {
 		struct irq_desc *desc = irq_to_desc(start + i);
+<<<<<<< HEAD
 		/* we don't want it happened! */
 		BUG_ON(!desc);
+=======
+
+>>>>>>> upstream/4.3_primoc
 		desc->owner = owner;
 	}
 	return start;

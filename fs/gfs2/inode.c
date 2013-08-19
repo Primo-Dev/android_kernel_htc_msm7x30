@@ -307,7 +307,11 @@ struct inode *gfs2_lookupi(struct inode *dir, const struct qstr *name,
 	}
 
 	if (!is_root) {
+<<<<<<< HEAD
 		error = gfs2_permission(dir, MAY_EXEC, 0);
+=======
+		error = gfs2_permission(dir, MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 		if (error)
 			goto out;
 	}
@@ -337,7 +341,11 @@ static int create_ok(struct gfs2_inode *dip, const struct qstr *name,
 {
 	int error;
 
+<<<<<<< HEAD
 	error = gfs2_permission(&dip->i_inode, MAY_WRITE | MAY_EXEC, 0);
+=======
+	error = gfs2_permission(&dip->i_inode, MAY_WRITE | MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 	if (error)
 		return error;
 
@@ -624,6 +632,7 @@ fail:
 	return error;
 }
 
+<<<<<<< HEAD
 static int gfs2_security_init(struct gfs2_inode *dip, struct gfs2_inode *ip,
 			      const struct qstr *qstr)
 {
@@ -649,6 +658,31 @@ static int gfs2_security_init(struct gfs2_inode *dip, struct gfs2_inode *ip,
 	return err;
 }
 
+=======
+int gfs2_initxattrs(struct inode *inode, const struct xattr *xattr_array,
+		    void *fs_info)
+{
+	const struct xattr *xattr;
+	int err = 0;
+
+	for (xattr = xattr_array; xattr->name != NULL; xattr++) {
+		err = __gfs2_xattr_set(inode, xattr->name, xattr->value,
+				       xattr->value_len, 0,
+				       GFS2_EATYPE_SECURITY);
+		if (err < 0)
+			break;
+	}
+	return err;
+}
+
+static int gfs2_security_init(struct gfs2_inode *dip, struct gfs2_inode *ip,
+			      const struct qstr *qstr)
+{
+	return security_inode_init_security(&ip->i_inode, &dip->i_inode, qstr,
+					    &gfs2_initxattrs, NULL);
+}
+
+>>>>>>> upstream/4.3_primoc
 /**
  * gfs2_create_inode - Create a new inode
  * @dir: The parent directory
@@ -756,7 +790,11 @@ fail:
  */
 
 static int gfs2_create(struct inode *dir, struct dentry *dentry,
+<<<<<<< HEAD
 		       int mode, struct nameidata *nd)
+=======
+		       umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode;
 	int ret;
@@ -857,7 +895,11 @@ static int gfs2_link(struct dentry *old_dentry, struct inode *dir,
 	if (inode->i_nlink == 0)
 		goto out_gunlock;
 
+<<<<<<< HEAD
 	error = gfs2_permission(dir, MAY_WRITE | MAY_EXEC, 0);
+=======
+	error = gfs2_permission(dir, MAY_WRITE | MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 	if (error)
 		goto out_gunlock;
 
@@ -990,7 +1032,11 @@ static int gfs2_unlink_ok(struct gfs2_inode *dip, const struct qstr *name,
 	if (IS_APPEND(&dip->i_inode))
 		return -EPERM;
 
+<<<<<<< HEAD
 	error = gfs2_permission(&dip->i_inode, MAY_WRITE | MAY_EXEC, 0);
+=======
+	error = gfs2_permission(&dip->i_inode, MAY_WRITE | MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 	if (error)
 		return error;
 
@@ -1173,7 +1219,11 @@ static int gfs2_mkdir(struct inode *dir, struct dentry *dentry, int mode)
  *
  */
 
+<<<<<<< HEAD
 static int gfs2_mknod(struct inode *dir, struct dentry *dentry, int mode,
+=======
+static int gfs2_mknod(struct inode *dir, struct dentry *dentry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		      dev_t dev)
 {
 	return gfs2_create_inode(dir, dentry, mode, dev, NULL, 0);
@@ -1336,7 +1386,11 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 			}
 		}
 	} else {
+<<<<<<< HEAD
 		error = gfs2_permission(ndir, MAY_WRITE | MAY_EXEC, 0);
+=======
+		error = gfs2_permission(ndir, MAY_WRITE | MAY_EXEC);
+>>>>>>> upstream/4.3_primoc
 		if (error)
 			goto out_gunlock;
 
@@ -1371,7 +1425,11 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 	/* Check out the dir to be renamed */
 
 	if (dir_rename) {
+<<<<<<< HEAD
 		error = gfs2_permission(odentry->d_inode, MAY_WRITE, 0);
+=======
+		error = gfs2_permission(odentry->d_inode, MAY_WRITE);
+>>>>>>> upstream/4.3_primoc
 		if (error)
 			goto out_gunlock;
 	}
@@ -1543,7 +1601,11 @@ static void gfs2_put_link(struct dentry *dentry, struct nameidata *nd, void *p)
  * Returns: errno
  */
 
+<<<<<<< HEAD
 int gfs2_permission(struct inode *inode, int mask, unsigned int flags)
+=======
+int gfs2_permission(struct inode *inode, int mask)
+>>>>>>> upstream/4.3_primoc
 {
 	struct gfs2_inode *ip;
 	struct gfs2_holder i_gh;
@@ -1553,7 +1615,11 @@ int gfs2_permission(struct inode *inode, int mask, unsigned int flags)
 
 	ip = GFS2_I(inode);
 	if (gfs2_glock_is_locked_by_me(ip->i_gl) == NULL) {
+<<<<<<< HEAD
 		if (flags & IPERM_FLAG_RCU)
+=======
+		if (mask & MAY_NOT_BLOCK)
+>>>>>>> upstream/4.3_primoc
 			return -ECHILD;
 		error = gfs2_glock_nq_init(ip->i_gl, LM_ST_SHARED, LM_FLAG_ANY, &i_gh);
 		if (error)
@@ -1564,7 +1630,11 @@ int gfs2_permission(struct inode *inode, int mask, unsigned int flags)
 	if ((mask & MAY_WRITE) && IS_IMMUTABLE(inode))
 		error = -EACCES;
 	else
+<<<<<<< HEAD
 		error = generic_permission(inode, mask, flags, gfs2_check_acl);
+=======
+		error = generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 	if (unlock)
 		gfs2_glock_dq_uninit(&i_gh);
 
@@ -1854,6 +1924,10 @@ const struct inode_operations gfs2_file_iops = {
 	.listxattr = gfs2_listxattr,
 	.removexattr = gfs2_removexattr,
 	.fiemap = gfs2_fiemap,
+<<<<<<< HEAD
+=======
+	.get_acl = gfs2_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 const struct inode_operations gfs2_dir_iops = {
@@ -1874,6 +1948,10 @@ const struct inode_operations gfs2_dir_iops = {
 	.listxattr = gfs2_listxattr,
 	.removexattr = gfs2_removexattr,
 	.fiemap = gfs2_fiemap,
+<<<<<<< HEAD
+=======
+	.get_acl = gfs2_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 const struct inode_operations gfs2_symlink_iops = {
@@ -1888,5 +1966,9 @@ const struct inode_operations gfs2_symlink_iops = {
 	.listxattr = gfs2_listxattr,
 	.removexattr = gfs2_removexattr,
 	.fiemap = gfs2_fiemap,
+<<<<<<< HEAD
+=======
+	.get_acl = gfs2_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 

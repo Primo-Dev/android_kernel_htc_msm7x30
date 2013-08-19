@@ -1154,8 +1154,15 @@ static long do_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		event.data = &con2fb;
 		if (!lock_fb_info(info))
 			return -ENODEV;
+<<<<<<< HEAD
 		event.info = info;
 		ret = fb_notifier_call_chain(FB_EVENT_SET_CONSOLE_MAP, &event);
+=======
+		console_lock();
+		event.info = info;
+		ret = fb_notifier_call_chain(FB_EVENT_SET_CONSOLE_MAP, &event);
+		console_unlock();
+>>>>>>> upstream/4.3_primoc
 		unlock_fb_info(info);
 		break;
 	case FBIOBLANK:
@@ -1345,15 +1352,22 @@ fb_mmap(struct file *file, struct vm_area_struct * vma)
 {
 	struct fb_info *info = file_fb_info(file);
 	struct fb_ops *fb;
+<<<<<<< HEAD
 	unsigned long off;
+=======
+	unsigned long mmio_pgoff;
+>>>>>>> upstream/4.3_primoc
 	unsigned long start;
 	u32 len;
 
 	if (!info)
 		return -ENODEV;
+<<<<<<< HEAD
 	if (vma->vm_pgoff > (~0UL >> PAGE_SHIFT))
 		return -EINVAL;
 	off = vma->vm_pgoff << PAGE_SHIFT;
+=======
+>>>>>>> upstream/4.3_primoc
 	fb = info->fbops;
 	if (!fb)
 		return -ENODEV;
@@ -1365,6 +1379,7 @@ fb_mmap(struct file *file, struct vm_area_struct * vma)
 		return res;
 	}
 
+<<<<<<< HEAD
 	/* frame buffer memory */
 	start = info->fix.smem_start;
 	len = PAGE_ALIGN((start & ~PAGE_MASK) + info->fix.smem_len);
@@ -1392,6 +1407,26 @@ fb_mmap(struct file *file, struct vm_area_struct * vma)
 			     vma->vm_end - vma->vm_start, vma->vm_page_prot))
 		return -EAGAIN;
 	return 0;
+=======
+	/*
+	 * Ugh. This can be either the frame buffer mapping, or
+	 * if pgoff points past it, the mmio mapping.
+	 */
+	start = info->fix.smem_start;
+	len = info->fix.smem_len;
+	mmio_pgoff = PAGE_ALIGN((start & ~PAGE_MASK) + len) >> PAGE_SHIFT;
+	if (vma->vm_pgoff >= mmio_pgoff) {
+		vma->vm_pgoff -= mmio_pgoff;
+		start = info->fix.mmio_start;
+		len = info->fix.mmio_len;
+	}
+	mutex_unlock(&info->mm_lock);
+
+	vma->vm_page_prot = vm_get_page_prot(vma->vm_flags);
+	fb_pgprotect(file, vma, start);
+
+	return vm_iomap_memory(vma, start, len);
+>>>>>>> upstream/4.3_primoc
 }
 
 static int

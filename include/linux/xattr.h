@@ -67,6 +67,15 @@ struct xattr_handler {
 		   size_t size, int flags, int handler_flags);
 };
 
+<<<<<<< HEAD
+=======
+struct xattr {
+	char *name;
+	void *value;
+	size_t value_len;
+};
+
+>>>>>>> upstream/4.3_primoc
 ssize_t xattr_getsecurity(struct inode *, const char *, void *, size_t);
 ssize_t vfs_getxattr(struct dentry *, const char *, void *, size_t);
 ssize_t vfs_listxattr(struct dentry *d, char *list, size_t size);

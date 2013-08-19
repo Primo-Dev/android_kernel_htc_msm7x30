@@ -1520,11 +1520,19 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
 {
 	struct net_device *dev = ptr;
 	struct net *net = dev_net(dev);
+<<<<<<< HEAD
+=======
+	struct netns_ipvs *ipvs = net_ipvs(net);
+>>>>>>> upstream/4.3_primoc
 	struct ip_vs_service *svc;
 	struct ip_vs_dest *dest;
 	unsigned int idx;
 
+<<<<<<< HEAD
 	if (event != NETDEV_UNREGISTER)
+=======
+	if (event != NETDEV_UNREGISTER || !ipvs)
+>>>>>>> upstream/4.3_primoc
 		return NOTIFY_DONE;
 	IP_VS_DBG(3, "%s() dev=%s\n", __func__, dev->name);
 	EnterFunction(2);
@@ -1550,7 +1558,11 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
 		}
 	}
 
+<<<<<<< HEAD
 	list_for_each_entry(dest, &net_ipvs(net)->dest_trash, n_list) {
+=======
+	list_for_each_entry(dest, &ipvs->dest_trash, n_list) {
+>>>>>>> upstream/4.3_primoc
 		__ip_vs_dev_reset(dest, dev);
 	}
 	mutex_unlock(&__ip_vs_mutex);

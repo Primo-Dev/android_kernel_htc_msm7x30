@@ -18,6 +18,7 @@
 #include <linux/module.h>
 #include <linux/types.h>
 #include <asm/uaccess.h>
+<<<<<<< HEAD
 
 static inline char _tolower(const char c)
 {
@@ -43,6 +44,42 @@ static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 
 	acc = 0;
 	ok = 0;
+=======
+#include "kstrtox.h"
+
+const char *_parse_integer_fixup_radix(const char *s, unsigned int *base)
+{
+	if (*base == 0) {
+		if (s[0] == '0') {
+			if (_tolower(s[1]) == 'x' && isxdigit(s[2]))
+				*base = 16;
+			else
+				*base = 8;
+		} else
+			*base = 10;
+	}
+	if (*base == 16 && s[0] == '0' && _tolower(s[1]) == 'x')
+		s += 2;
+	return s;
+}
+
+/*
+ * Convert non-negative integer string representation in explicitly given radix
+ * to an integer.
+ * Return number of characters consumed maybe or-ed with overflow bit.
+ * If overflow occurs, result integer (incorrect) is still returned.
+ *
+ * Don't you dare use this function.
+ */
+unsigned int _parse_integer(const char *s, unsigned int base, unsigned long long *res)
+{
+	unsigned int rv;
+	int overflow;
+
+	*res = 0;
+	rv = 0;
+	overflow = 0;
+>>>>>>> upstream/4.3_primoc
 	while (*s) {
 		unsigned int val;
 
@@ -50,6 +87,7 @@ static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 			val = *s - '0';
 		else if ('a' <= _tolower(*s) && _tolower(*s) <= 'f')
 			val = _tolower(*s) - 'a' + 10;
+<<<<<<< HEAD
 		else if (*s == '\n' && *(s + 1) == '\0')
 			break;
 		else
@@ -67,6 +105,42 @@ static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 	if (!ok)
 		return -EINVAL;
 	*res = acc;
+=======
+		else
+			break;
+
+		if (val >= base)
+			break;
+		if (*res > div_u64(ULLONG_MAX - val, base))
+			overflow = 1;
+		*res = *res * base + val;
+		rv++;
+		s++;
+	}
+	if (overflow)
+		rv |= KSTRTOX_OVERFLOW;
+	return rv;
+}
+
+static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
+{
+	unsigned long long _res;
+	unsigned int rv;
+
+	s = _parse_integer_fixup_radix(s, &base);
+	rv = _parse_integer(s, base, &_res);
+	if (rv & KSTRTOX_OVERFLOW)
+		return -ERANGE;
+	rv &= ~KSTRTOX_OVERFLOW;
+	if (rv == 0)
+		return -EINVAL;
+	s += rv;
+	if (*s == '\n')
+		s++;
+	if (*s)
+		return -EINVAL;
+	*res = _res;
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 

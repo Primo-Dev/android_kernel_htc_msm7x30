@@ -179,12 +179,16 @@ static int restore_iwmmxt_context(struct iwmmxt_sigframe *frame)
 
 static int preserve_vfp_context(struct vfp_sigframe __user *frame)
 {
+<<<<<<< HEAD
 	struct thread_info *thread = current_thread_info();
 	struct vfp_hard_struct *h = &thread->vfpstate.hard;
+=======
+>>>>>>> upstream/4.3_primoc
 	const unsigned long magic = VFP_MAGIC;
 	const unsigned long size = VFP_STORAGE_SIZE;
 	int err = 0;
 
+<<<<<<< HEAD
 	vfp_sync_hwstate(thread);
 	__put_user_error(magic, &frame->magic, err);
 	__put_user_error(size, &frame->size, err);
@@ -208,15 +212,29 @@ static int preserve_vfp_context(struct vfp_sigframe __user *frame)
 	__put_user_error(h->fpinst2, &frame->ufp_exc.fpinst2, err);
 
 	return err ? -EFAULT : 0;
+=======
+	__put_user_error(magic, &frame->magic, err);
+	__put_user_error(size, &frame->size, err);
+
+	if (err)
+		return -EFAULT;
+
+	return vfp_preserve_user_hwstate(&frame->ufp, &frame->ufp_exc);
+>>>>>>> upstream/4.3_primoc
 }
 
 static int restore_vfp_context(struct vfp_sigframe __user *frame)
 {
+<<<<<<< HEAD
 	struct thread_info *thread = current_thread_info();
 	struct vfp_hard_struct *h = &thread->vfpstate.hard;
 	unsigned long magic;
 	unsigned long size;
 	unsigned long fpexc;
+=======
+	unsigned long magic;
+	unsigned long size;
+>>>>>>> upstream/4.3_primoc
 	int err = 0;
 
 	__get_user_error(magic, &frame->magic, err);
@@ -227,6 +245,7 @@ static int restore_vfp_context(struct vfp_sigframe __user *frame)
 	if (magic != VFP_MAGIC || size != VFP_STORAGE_SIZE)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	vfp_flush_hwstate(thread);
 
 	/*
@@ -254,6 +273,9 @@ static int restore_vfp_context(struct vfp_sigframe __user *frame)
 	__get_user_error(h->fpinst2, &frame->ufp_exc.fpinst2, err);
 
 	return err ? -EFAULT : 0;
+=======
+	return vfp_restore_user_hwstate(&frame->ufp, &frame->ufp_exc);
+>>>>>>> upstream/4.3_primoc
 }
 
 #endif

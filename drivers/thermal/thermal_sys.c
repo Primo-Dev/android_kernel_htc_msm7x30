@@ -1319,6 +1319,10 @@ static int __init thermal_init(void)
 		idr_destroy(&thermal_cdev_idr);
 		mutex_destroy(&thermal_idr_lock);
 		mutex_destroy(&thermal_list_lock);
+<<<<<<< HEAD
+=======
+		return result;
+>>>>>>> upstream/4.3_primoc
 	}
 	result = genetlink_init();
 	return result;

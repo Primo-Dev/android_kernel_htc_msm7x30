@@ -831,11 +831,14 @@ static int tcp_transmit_skb(struct sock *sk, struct sk_buff *skb, int clone_it,
 	tp = tcp_sk(sk);
 	tcb = TCP_SKB_CB(skb);
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(tcb) || (!tcb))
 		printk(KERN_ERR "[NET] tcb is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	memset(&opts, 0, sizeof(opts));
 
 	if (unlikely(tcb->flags & TCPHDR_SYN))
@@ -845,11 +848,21 @@ static int tcp_transmit_skb(struct sock *sk, struct sk_buff *skb, int clone_it,
 							   &md5);
 	tcp_header_size = tcp_options_size + sizeof(struct tcphdr);
 
+<<<<<<< HEAD
 	if (tcp_packets_in_flight(tp) == 0) {
 		tcp_ca_event(sk, CA_EVENT_TX_START);
 		skb->ooo_okay = 1;
 	} else
 		skb->ooo_okay = 0;
+=======
+	if (tcp_packets_in_flight(tp) == 0)
+		tcp_ca_event(sk, CA_EVENT_TX_START);
+
+	/* if no packet is in qdisc/device queue, then allow XPS to select
+	 * another queue.
+	 */
+	skb->ooo_okay = sk_wmem_alloc_get(sk) == 0;
+>>>>>>> upstream/4.3_primoc
 
 	skb_push(skb, tcp_header_size);
 	skb_reset_transport_header(skb);
@@ -1591,8 +1604,16 @@ static int tcp_tso_should_defer(struct sock *sk, struct sk_buff *skb)
 			goto send_now;
 	}
 
+<<<<<<< HEAD
 	/* Ok, it looks like it is advisable to defer.  */
 	tp->tso_deferred = 1 | (jiffies << 1);
+=======
+	/* Ok, it looks like it is advisable to defer.
+	 * Do not rearm the timer if already set to not break TCP ACK clocking.
+	 */
+	if (!tp->tso_deferred)
+		tp->tso_deferred = 1 | (jiffies << 1);
+>>>>>>> upstream/4.3_primoc
 
 	return 1;
 
@@ -1809,11 +1830,20 @@ static int tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 		tcp_event_new_data_sent(sk, skb);
 
 		tcp_minshall_update(tp, mss_now, skb);
+<<<<<<< HEAD
 		sent_pkts++;
+=======
+		sent_pkts += tcp_skb_pcount(skb);
+>>>>>>> upstream/4.3_primoc
 
 		if (push_one)
 			break;
 	}
+<<<<<<< HEAD
+=======
+	if (inet_csk(sk)->icsk_ca_state == TCP_CA_Recovery)
+		tp->prr_out += sent_pkts;
+>>>>>>> upstream/4.3_primoc
 
 	if (likely(sent_pkts)) {
 		tcp_cwnd_validate(sk);
@@ -2250,11 +2280,14 @@ void tcp_xmit_retransmit_queue(struct sock *sk)
 		last_lost = tp->snd_una;
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(skb) || (!skb))
 		printk(KERN_ERR "[NET] nat is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	tcp_for_write_queue_from(skb, sk) {
 		__u8 sacked = TCP_SKB_CB(skb)->sacked;
 
@@ -2312,6 +2345,12 @@ begin_fwd:
 			return;
 		NET_INC_STATS_BH(sock_net(sk), mib_idx);
 
+<<<<<<< HEAD
+=======
+		if (inet_csk(sk)->icsk_ca_state == TCP_CA_Recovery)
+			tp->prr_out += tcp_skb_pcount(skb);
+
+>>>>>>> upstream/4.3_primoc
 		if (skb == tcp_write_queue_head(sk))
 			inet_csk_reset_xmit_timer(sk, ICSK_TIME_RETRANS,
 						  inet_csk(sk)->icsk_rto,

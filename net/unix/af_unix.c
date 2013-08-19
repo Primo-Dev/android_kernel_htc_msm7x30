@@ -371,7 +371,11 @@ static void unix_sock_destructor(struct sock *sk)
 #endif
 }
 
+<<<<<<< HEAD
 static int unix_release_sock(struct sock *sk, int embrion)
+=======
+static void unix_release_sock(struct sock *sk, int embrion)
+>>>>>>> upstream/4.3_primoc
 {
 	struct unix_sock *u = unix_sk(sk);
 	struct dentry *dentry;
@@ -444,8 +448,11 @@ static int unix_release_sock(struct sock *sk, int embrion)
 
 	if (unix_tot_inflight)
 		unix_gc();		/* Garbage collect fds */
+<<<<<<< HEAD
 
 	return 0;
+=======
+>>>>>>> upstream/4.3_primoc
 }
 
 static void init_peercred(struct sock *sk)
@@ -682,9 +689,16 @@ static int unix_release(struct socket *sock)
 	if (!sk)
 		return 0;
 
+<<<<<<< HEAD
 	sock->sk = NULL;
 
 	return unix_release_sock(sk, 0);
+=======
+	unix_release_sock(sk, 0);
+	sock->sk = NULL;
+
+	return 0;
+>>>>>>> upstream/4.3_primoc
 }
 
 static int unix_autobind(struct socket *sock)
@@ -811,7 +825,11 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	struct dentry *dentry = NULL;
 	struct nameidata nd;
 	int err;
+<<<<<<< HEAD
 	unsigned hash;
+=======
+	unsigned hash = 0;
+>>>>>>> upstream/4.3_primoc
 	struct unix_address *addr;
 	struct hlist_head *list;
 
@@ -957,7 +975,11 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
 	struct net *net = sock_net(sk);
 	struct sockaddr_un *sunaddr = (struct sockaddr_un *)addr;
 	struct sock *other;
+<<<<<<< HEAD
 	unsigned hash;
+=======
+	unsigned hash = 0;
+>>>>>>> upstream/4.3_primoc
 	int err;
 
 	if (addr->sa_family != AF_UNSPEC) {
@@ -1055,7 +1077,11 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
 	struct sock *newsk = NULL;
 	struct sock *other = NULL;
 	struct sk_buff *skb = NULL;
+<<<<<<< HEAD
 	unsigned hash;
+=======
+	unsigned hash = 0;
+>>>>>>> upstream/4.3_primoc
 	int st;
 	int err;
 	long timeo;
@@ -1385,8 +1411,15 @@ static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
 static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool send_fds)
 {
 	int err = 0;
+<<<<<<< HEAD
 	UNIXCB(skb).pid  = get_pid(scm->pid);
 	UNIXCB(skb).cred = get_cred(scm->cred);
+=======
+
+	UNIXCB(skb).pid  = get_pid(scm->pid);
+	if (scm->cred)
+		UNIXCB(skb).cred = get_cred(scm->cred);
+>>>>>>> upstream/4.3_primoc
 	UNIXCB(skb).fp = NULL;
 	if (scm->fp && send_fds)
 		err = unix_attach_fds(scm, skb);
@@ -1396,6 +1429,27 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Some apps rely on write() giving SCM_CREDENTIALS
+ * We include credentials if source or destination socket
+ * asserted SOCK_PASSCRED.
+ */
+static void maybe_add_creds(struct sk_buff *skb, const struct socket *sock,
+			    const struct sock *other)
+{
+	if (UNIXCB(skb).cred)
+		return;
+	if (test_bit(SOCK_PASSCRED, &sock->flags) ||
+	    !other->sk_socket ||
+	    test_bit(SOCK_PASSCRED, &other->sk_socket->flags)) {
+		UNIXCB(skb).pid  = get_pid(task_tgid(current));
+		UNIXCB(skb).cred = get_current_cred();
+	}
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  *	Send AF_UNIX data.
  */
 
@@ -1410,7 +1464,11 @@ static int unix_dgram_sendmsg(struct kiocb *kiocb, struct socket *sock,
 	struct sock *other = NULL;
 	int namelen = 0; /* fake GCC */
 	int err;
+<<<<<<< HEAD
 	unsigned hash;
+=======
+	unsigned hash = 0;
+>>>>>>> upstream/4.3_primoc
 	struct sk_buff *skb;
 	long timeo;
 	struct scm_cookie tmp_scm;
@@ -1419,7 +1477,11 @@ static int unix_dgram_sendmsg(struct kiocb *kiocb, struct socket *sock,
 	if (NULL == siocb->scm)
 		siocb->scm = &tmp_scm;
 	wait_for_unix_gc();
+<<<<<<< HEAD
 	err = scm_send(sock, msg, siocb->scm);
+=======
+	err = scm_send(sock, msg, siocb->scm, false);
+>>>>>>> upstream/4.3_primoc
 	if (err < 0)
 		return err;
 
@@ -1542,6 +1604,10 @@ restart:
 
 	if (sock_flag(other, SOCK_RCVTSTAMP))
 		__net_timestamp(skb);
+<<<<<<< HEAD
+=======
+	maybe_add_creds(skb, sock, other);
+>>>>>>> upstream/4.3_primoc
 	skb_queue_tail(&other->sk_receive_queue, skb);
 	if (max_level > unix_sk(other)->recursion_level)
 		unix_sk(other)->recursion_level = max_level;
@@ -1579,7 +1645,11 @@ static int unix_stream_sendmsg(struct kiocb *kiocb, struct socket *sock,
 	if (NULL == siocb->scm)
 		siocb->scm = &tmp_scm;
 	wait_for_unix_gc();
+<<<<<<< HEAD
 	err = scm_send(sock, msg, siocb->scm);
+=======
+	err = scm_send(sock, msg, siocb->scm, false);
+>>>>>>> upstream/4.3_primoc
 	if (err < 0)
 		return err;
 
@@ -1656,6 +1726,10 @@ static int unix_stream_sendmsg(struct kiocb *kiocb, struct socket *sock,
 		    (other->sk_shutdown & RCV_SHUTDOWN))
 			goto pipe_err_free;
 
+<<<<<<< HEAD
+=======
+		maybe_add_creds(skb, sock, other);
+>>>>>>> upstream/4.3_primoc
 		skb_queue_tail(&other->sk_receive_queue, skb);
 		if (max_level > unix_sk(other)->recursion_level)
 			unix_sk(other)->recursion_level = max_level;
@@ -1941,7 +2015,11 @@ static int unix_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
 				skb_queue_head(&sk->sk_receive_queue, skb);
 				break;
 			}
+<<<<<<< HEAD
 		} else {
+=======
+		} else if (test_bit(SOCK_PASSCRED, &sock->flags)) {
+>>>>>>> upstream/4.3_primoc
 			/* Copy credentials */
 			scm_set_cred(siocb->scm, UNIXCB(skb).pid, UNIXCB(skb).cred);
 			check_creds = 1;

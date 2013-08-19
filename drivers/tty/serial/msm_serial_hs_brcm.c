@@ -2309,12 +2309,20 @@ static int __init msm_serial_hs_init(void)
 
 	ret = uart_register_driver(&msm_hs_driver);
 	if (unlikely(ret)) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "[BT]%s failed to load\n", __func__);
+=======
+		printk(KERN_ERR "[BT]%s failed to load\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		return ret;
 	}
 	ret = platform_driver_register(&msm_serial_hs_platform_driver);
 	if (ret) {
+<<<<<<< HEAD
 		printk(KERN_WARNING "[BT]%s failed to load\n", __func__);
+=======
+		printk(KERN_ERR "[BT]%s failed to load\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		uart_unregister_driver(&msm_hs_driver);
 		return ret;
 	}

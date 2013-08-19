@@ -4,11 +4,16 @@ CFLAGS_REMOVE_msm_vfe8x.o = -Wframe-larger-than=1024
 endif
 
 ifeq ($(CONFIG_MSM_CAMERA_V4L2),y)
+<<<<<<< HEAD
   EXTRA_CFLAGS += -Idrivers/media/video/msm/csi
   EXTRA_CFLAGS += -Idrivers/media/video/msm/io
   EXTRA_CFLAGS += -Idrivers/media/video/msm/sensors
   obj-$(CONFIG_MSM_CAMERA) += msm_isp.o msm.o msm_mem.o msm_mctl.o msm_mctl_buf.o msm_mctl_pp.o
   obj-$(CONFIG_MSM_CAMERA) += rawchip-v4l2/ io/ sensors/ actuators/ csi/
+=======
+  obj-$(CONFIG_MSM_CAMERA) += msm_isp.o msm.o msm_mem.o msm_mctl.o msm_mctl_buf.o msm_mctl_pp.o
+  obj-$(CONFIG_MSM_CAMERA) += rawchip/ io/ sensors/ actuators/
+>>>>>>> upstream/4.3_primoc
 else
 ifeq ($(CONFIG_ARCH_MSM8X60),y)
   obj-$(CONFIG_MSM_CAMERA) += msm_camera-8x60.o sensors/
@@ -29,7 +34,11 @@ obj-$(CONFIG_MSM_CAMERA) += msm_axi_qos.o
 
 ifeq ($(CONFIG_MSM_CAMERA_V4L2),y)
 	obj-$(CONFIG_MSM_CAMERA) += gemini/
+<<<<<<< HEAD
 	obj-$(CONFIG_MSM_CAMERA_FLASH) += flash_v4l2.o
+=======
+	obj-$(CONFIG_MSM_CAMERA_FLASH) += flash.o
+>>>>>>> upstream/4.3_primoc
 else
 	obj-$(CONFIG_MSM_CAMERA) += gemini_8x60/
 ifeq ($(CONFIG_ARCH_MSM7X27A),y)
@@ -48,6 +57,7 @@ obj-$(CONFIG_MACH_BLISS) += s5k4e5yx.o s5k4e5yx_reg_bls.o
 obj-$(CONFIG_MACH_BLISSC) += s5k4e5yx.o s5k4e5yx_reg_bls.o
 obj-$(CONFIG_MACH_PRIMOU) += s5k4e5yx.o s5k4e5yx_reg_pro.o
 obj-$(CONFIG_MACH_PRIMOC) += s5k4e5yx.o s5k4e5yx_reg_pro.o
+<<<<<<< HEAD
 obj-$(CONFIG_MACH_KINGDOM) += s5k4e5yx.o s5k4e5yx_reg_kin.o
 endif
 
@@ -58,6 +68,17 @@ endif
 ifeq ($(CONFIG_MSM_CAMERA_V4L2),y)
   obj-$(CONFIG_ARCH_MSM8X60) += msm_io_8x60_v4l2.o msm_vfe31_v4l2.o msm_vpe_8x60_v4l2.o
 else
+=======
+obj-$(CONFIG_MACH_KINGDOM) += s5k4e5yx.o s5k4e5yx_reg.o
+endif
+
+obj-$(CONFIG_S5K4E1GX) += s5k4e1gx.o s5k4e1gx_reg.o
+ifdef CONFIG_S5K6AAFX
+obj-$(CONFIG_MACH_FLYER) += s5k6aafx.o s5k6aafx_reg_flyer.o s5k6aafx_reg_flyer_cob.o
+endif
+obj-$(CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE) += msm_v4l2_video.o
+
+>>>>>>> upstream/4.3_primoc
 ifdef CONFIG_CAMERA_ZSL
 	obj-$(CONFIG_ARCH_MSM8X60) += msm_io_8x60.o msm_vfe_8x60_ZSL.o msm_vpe1_8x60.o
 else
@@ -68,12 +89,16 @@ else
 		obj-$(CONFIG_ARCH_MSM8X60) += msm_io_8x60.o msm_vfe_8x60.o msm_vpe1_8x60.o
 	endif
 endif
+<<<<<<< HEAD
 endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 obj-$(CONFIG_ARCH_MSM8960) += msm_io_8960.o msm_ispif.o msm_vfe32.o msm_vpe.o
 obj-$(CONFIG_MT9T013) += mt9t013.o mt9t013_reg.o
 obj-$(CONFIG_SN12M0PZ) += sn12m0pz.o sn12m0pz_reg.o
 obj-$(CONFIG_MT9P012) += mt9p012_reg.o
+<<<<<<< HEAD
 
 ifeq ($(CONFIG_S5K4E1),y)
 ifdef CONFIG_MACH_PRIMOTD
@@ -87,11 +112,19 @@ endif
 endif
 endif
 
+=======
+ifdef CONFIG_MACH_PRIMOTD
+obj-$(CONFIG_S5K4E1) += s5k4e1_td.o s5k4e1_reg_td.o
+else
+obj-$(CONFIG_S5K4E1) += s5k4e1.o s5k4e1_reg.o
+endif
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_MSM_CAMERA_AF_FOXCONN) += mt9p012_fox.o
 obj-$(CONFIG_MSM_CAMERA_AF_BAM) += mt9p012_bam.o
 obj-$(CONFIG_MT9P012_KM) += mt9p012_km.o mt9p012_km_reg.o
 obj-$(CONFIG_MT9E013) += mt9e013.o mt9e013_reg.o
 obj-$(CONFIG_S5K3E2FX) += s5k3e2fx.o
+<<<<<<< HEAD
 
 ifdef CONFIG_MACH_PYRAMID
 obj-$(CONFIG_S5K3H1GX) += s5k3h1gx.o s5k3h1gx_reg.o
@@ -103,13 +136,31 @@ obj-$(CONFIG_MACH_VIVO) += s5k3h1gx.o s5k3h1gx_reg.o
 obj-$(CONFIG_MACH_VIVOW) += s5k3h1gx.o s5k3h1gx_reg.o
 obj-$(CONFIG_MACH_VIVOW_CT) += s5k3h1gx.o s5k3h1gx_reg.o
 endif
+=======
+obj-$(CONFIG_OV8810) += ov8810.o
+obj-$(CONFIG_S5K3H1GX) += s5k3h1gx.o s5k3h1gx_reg.o
+>>>>>>> upstream/4.3_primoc
 
 #FIXME: Merge the two ifeq causes VX6953 preview not coming up.
 ifeq ($(CONFIG_MSM_CAMERA_V4L2),y)
   obj-$(CONFIG_VX6953) += vx6953_v4l2.o vx6953_reg_v4l2.o
+<<<<<<< HEAD
   obj-$(CONFIG_MT9V113) += mt9v113_v4l2.o mt9v113_ville_reg_lens_9251.o
 else
   obj-$(CONFIG_MT9V113) += mt9v113.o mt9v113_reg_lens_9251.o
+=======
+  obj-$(CONFIG_MT9V113) += mt9v113_v4l2.o mt9v113_reg_lens_9251.o
+else
+  ifdef CONFIG_MACH_BLISS
+    obj-$(CONFIG_MT9V113) += mt9v113.o mt9v113_reg_lens_9251.o
+  else
+    ifdef CONFIG_MACH_BLISSC
+      obj-$(CONFIG_MT9V113) += mt9v113.o mt9v113_reg_lens_9251.o
+    else
+      obj-$(CONFIG_MT9V113) += mt9v113.o mt9v113_reg.o
+    endif
+  endif
+>>>>>>> upstream/4.3_primoc
   obj-$(CONFIG_VX6953) += vx6953.o vx6953_reg.o
   obj-$(CONFIG_IMX074) += imx074.o imx074_reg.o
 endif
@@ -118,7 +169,10 @@ obj-$(CONFIG_VB6801) += vb6801.o
 obj-$(CONFIG_IMX072) += imx072.o imx072_reg.o
 obj-$(CONFIG_WEBCAM_OV9726) += ov9726.o ov9726_reg.o
 obj-$(CONFIG_WEBCAM_OV7692) += ov7692.o
+<<<<<<< HEAD
 obj-$(CONFIG_OV8810) += ov8810.o
+=======
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_MT9D112) += mt9d112.o mt9d112_reg.o
 
 obj-$(CONFIG_MT9D113) += mt9d113.o mt9d113_reg.o

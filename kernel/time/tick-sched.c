@@ -26,7 +26,11 @@
 
 #include "tick-internal.h"
 
+<<<<<<< HEAD
 
+=======
+const int softirq_stop_idle_mask = (~(1 << RCU_SOFTIRQ));
+>>>>>>> upstream/4.3_primoc
 struct rq_data rq_info;
 struct workqueue_struct *rq_wq;
 spinlock_t rq_lock;
@@ -145,7 +149,10 @@ static void tick_nohz_update_jiffies(ktime_t now)
 	struct tick_sched *ts = &per_cpu(tick_cpu_sched, cpu);
 	unsigned long flags;
 
+<<<<<<< HEAD
 	cpumask_clear_cpu(cpu, nohz_cpu_mask);
+=======
+>>>>>>> upstream/4.3_primoc
 	ts->idle_waketime = now;
 
 	local_irq_save(flags);
@@ -165,9 +172,16 @@ update_ts_time_stats(int cpu, struct tick_sched *ts, ktime_t now, u64 *last_upda
 
 	if (ts->idle_active) {
 		delta = ktime_sub(now, ts->idle_entrytime);
+<<<<<<< HEAD
 		ts->idle_sleeptime = ktime_add(ts->idle_sleeptime, delta);
 		if (nr_iowait_cpu(cpu) > 0)
 			ts->iowait_sleeptime = ktime_add(ts->iowait_sleeptime, delta);
+=======
+		if (nr_iowait_cpu(cpu) > 0)
+			ts->iowait_sleeptime = ktime_add(ts->iowait_sleeptime, delta);
+		else
+			ts->idle_sleeptime = ktime_add(ts->idle_sleeptime, delta);
+>>>>>>> upstream/4.3_primoc
 		ts->idle_entrytime = now;
 	}
 
@@ -192,8 +206,11 @@ static ktime_t tick_nohz_start_idle(int cpu, struct tick_sched *ts)
 
 	now = ktime_get();
 
+<<<<<<< HEAD
 	update_ts_time_stats(cpu, ts, now, NULL);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	ts->idle_entrytime = now;
 	ts->idle_active = 1;
 	sched_clock_idle_sleep_event();
@@ -203,11 +220,19 @@ static ktime_t tick_nohz_start_idle(int cpu, struct tick_sched *ts)
 /**
  * get_cpu_idle_time_us - get the total idle time of a cpu
  * @cpu: CPU number to query
+<<<<<<< HEAD
  * @last_update_time: variable to store update time in
  *
  * Return the cummulative idle time (since boot) for a given
  * CPU, in microseconds. The idle time returned includes
  * the iowait time (unlike what "top" and co report).
+=======
+ * @last_update_time: variable to store update time in. Do not update
+ * counters if NULL.
+ *
+ * Return the cummulative idle time (since boot) for a given
+ * CPU, in microseconds.
+>>>>>>> upstream/4.3_primoc
  *
  * This time is measured via accounting rather than sampling,
  * and is as accurate as ktime_get() is.
@@ -217,10 +242,15 @@ static ktime_t tick_nohz_start_idle(int cpu, struct tick_sched *ts)
 u64 get_cpu_idle_time_us(int cpu, u64 *last_update_time)
 {
 	struct tick_sched *ts = &per_cpu(tick_cpu_sched, cpu);
+<<<<<<< HEAD
+=======
+	ktime_t now, idle;
+>>>>>>> upstream/4.3_primoc
 
 	if (!tick_nohz_enabled)
 		return -1;
 
+<<<<<<< HEAD
 	update_ts_time_stats(cpu, ts, ktime_get(), last_update_time);
 
 	return ktime_to_us(ts->idle_sleeptime);
@@ -231,6 +261,32 @@ EXPORT_SYMBOL_GPL(get_cpu_idle_time_us);
  * get_cpu_iowait_time_us - get the total iowait time of a cpu
  * @cpu: CPU number to query
  * @last_update_time: variable to store update time in
+=======
+	now = ktime_get();
+	if (last_update_time) {
+		update_ts_time_stats(cpu, ts, now, last_update_time);
+		idle = ts->idle_sleeptime;
+	} else {
+		if (ts->idle_active && !nr_iowait_cpu(cpu)) {
+			ktime_t delta = ktime_sub(now, ts->idle_entrytime);
+
+			idle = ktime_add(ts->idle_sleeptime, delta);
+		} else {
+			idle = ts->idle_sleeptime;
+		}
+	}
+
+	return ktime_to_us(idle);
+
+}
+EXPORT_SYMBOL_GPL(get_cpu_idle_time_us);
+
+/**
+ * get_cpu_iowait_time_us - get the total iowait time of a cpu
+ * @cpu: CPU number to query
+ * @last_update_time: variable to store update time in. Do not update
+ * counters if NULL.
+>>>>>>> upstream/4.3_primoc
  *
  * Return the cummulative iowait time (since boot) for a given
  * CPU, in microseconds.
@@ -243,13 +299,35 @@ EXPORT_SYMBOL_GPL(get_cpu_idle_time_us);
 u64 get_cpu_iowait_time_us(int cpu, u64 *last_update_time)
 {
 	struct tick_sched *ts = &per_cpu(tick_cpu_sched, cpu);
+<<<<<<< HEAD
+=======
+	ktime_t now, iowait;
+>>>>>>> upstream/4.3_primoc
 
 	if (!tick_nohz_enabled)
 		return -1;
 
+<<<<<<< HEAD
 	update_ts_time_stats(cpu, ts, ktime_get(), last_update_time);
 
 	return ktime_to_us(ts->iowait_sleeptime);
+=======
+	now = ktime_get();
+	if (last_update_time) {
+		update_ts_time_stats(cpu, ts, now, last_update_time);
+		iowait = ts->iowait_sleeptime;
+	} else {
+		if (ts->idle_active && nr_iowait_cpu(cpu) > 0) {
+			ktime_t delta = ktime_sub(now, ts->idle_entrytime);
+
+			iowait = ktime_add(ts->iowait_sleeptime, delta);
+		} else {
+			iowait = ts->iowait_sleeptime;
+		}
+	}
+
+	return ktime_to_us(iowait);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(get_cpu_iowait_time_us);
 
@@ -312,7 +390,12 @@ void tick_nohz_stop_sched_tick(int inidle)
 	if (unlikely(local_softirq_pending() && cpu_online(cpu))) {
 		static int ratelimit;
 
+<<<<<<< HEAD
 		if (ratelimit < 10) {
+=======
+		if (ratelimit < 10 &&
+		    (local_softirq_pending() & softirq_stop_idle_mask)) {
+>>>>>>> upstream/4.3_primoc
 			printk(KERN_ERR "NOHZ: local_softirq_pending %02x\n",
 			       (unsigned int) local_softirq_pending());
 			ratelimit++;
@@ -395,9 +478,12 @@ void tick_nohz_stop_sched_tick(int inidle)
 		else
 			expires.tv64 = KTIME_MAX;
 
+<<<<<<< HEAD
 		if (delta_jiffies > 1)
 			cpumask_set_cpu(cpu, nohz_cpu_mask);
 
+=======
+>>>>>>> upstream/4.3_primoc
 		/* Skip reprogram of event if its not changed */
 		if (ts->tick_stopped && ktime_equal(expires, dev->next_event))
 			goto out;
@@ -415,7 +501,10 @@ void tick_nohz_stop_sched_tick(int inidle)
 			ts->idle_tick = hrtimer_get_expires(&ts->sched_timer);
 			ts->tick_stopped = 1;
 			ts->idle_jiffies = last_jiffies;
+<<<<<<< HEAD
 			rcu_enter_nohz();
+=======
+>>>>>>> upstream/4.3_primoc
 		}
 
 		ts->idle_sleeps++;
@@ -447,7 +536,10 @@ void tick_nohz_stop_sched_tick(int inidle)
 		 * softirq.
 		 */
 		tick_do_update_jiffies64(ktime_get());
+<<<<<<< HEAD
 		cpumask_clear_cpu(cpu, nohz_cpu_mask);
+=======
+>>>>>>> upstream/4.3_primoc
 	}
 	raise_softirq_irqoff(TIMER_SOFTIRQ);
 out:
@@ -455,6 +547,11 @@ out:
 	ts->last_jiffies = last_jiffies;
 	ts->sleep_length = ktime_sub(dev->next_event, now);
 end:
+<<<<<<< HEAD
+=======
+	if (inidle)
+		rcu_idle_enter();
+>>>>>>> upstream/4.3_primoc
 	local_irq_restore(flags);
 }
 
@@ -511,18 +608,32 @@ void tick_nohz_restart_sched_tick(void)
 	ktime_t now;
 
 	local_irq_disable();
+<<<<<<< HEAD
 	if (ts->idle_active || (ts->inidle && ts->tick_stopped))
+=======
+	rcu_idle_exit();
+	WARN_ON_ONCE(!ts->inidle);
+
+	ts->inidle = 0;
+
+	if (ts->idle_active || ts->tick_stopped)
+>>>>>>> upstream/4.3_primoc
 		now = ktime_get();
 
 	if (ts->idle_active)
 		tick_nohz_stop_idle(cpu, now);
 
+<<<<<<< HEAD
 	if (!ts->inidle || !ts->tick_stopped) {
 		ts->inidle = 0;
+=======
+	if (!ts->tick_stopped) {
+>>>>>>> upstream/4.3_primoc
 		local_irq_enable();
 		return;
 	}
 
+<<<<<<< HEAD
 	ts->inidle = 0;
 
 	rcu_exit_nohz();
@@ -531,6 +642,11 @@ void tick_nohz_restart_sched_tick(void)
 	select_nohz_load_balancer(0);
 	tick_do_update_jiffies64(now);
 	cpumask_clear_cpu(cpu, nohz_cpu_mask);
+=======
+	/* Update jiffies first */
+	select_nohz_load_balancer(0);
+	tick_do_update_jiffies64(now);
+>>>>>>> upstream/4.3_primoc
 
 #ifndef CONFIG_VIRT_CPU_ACCOUNTING
 	/*
@@ -871,7 +987,11 @@ void tick_cancel_sched_timer(int cpu)
 		hrtimer_cancel(&ts->sched_timer);
 # endif
 
+<<<<<<< HEAD
 	ts->nohz_mode = NOHZ_MODE_INACTIVE;
+=======
+	memset(ts, 0, sizeof(*ts));
+>>>>>>> upstream/4.3_primoc
 }
 #endif
 

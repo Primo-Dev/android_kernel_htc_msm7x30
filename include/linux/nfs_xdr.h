@@ -591,8 +591,18 @@ struct nfs_getaclargs {
 	struct nfs4_sequence_args 	seq_args;
 };
 
+<<<<<<< HEAD
 struct nfs_getaclres {
 	size_t				acl_len;
+=======
+/* getxattr ACL interface flags */
+#define NFS4_ACL_LEN_REQUEST	0x0001	/* zero length getxattr buffer */
+struct nfs_getaclres {
+	size_t				acl_len;
+	size_t				acl_data_offset;
+	int				acl_flags;
+	struct page *			acl_scratch;
+>>>>>>> upstream/4.3_primoc
 	struct nfs4_sequence_res	seq_res;
 };
 

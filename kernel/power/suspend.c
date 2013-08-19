@@ -23,7 +23,10 @@
 #include <linux/slab.h>
 #include <linux/suspend.h>
 #include <linux/syscore_ops.h>
+<<<<<<< HEAD
 #include <linux/ftrace.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <trace/events/power.h>
 
 #include "power.h"
@@ -48,6 +51,10 @@ void suspend_set_ops(const struct platform_suspend_ops *ops)
 	suspend_ops = ops;
 	mutex_unlock(&pm_mutex);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(suspend_set_ops);
+>>>>>>> upstream/4.3_primoc
 
 bool valid_state(suspend_state_t state)
 {
@@ -69,6 +76,10 @@ int suspend_valid_only_mem(suspend_state_t state)
 {
 	return state == PM_SUSPEND_MEM;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(suspend_valid_only_mem);
+>>>>>>> upstream/4.3_primoc
 
 static int suspend_test(int level)
 {
@@ -130,12 +141,22 @@ void __attribute__ ((weak)) arch_suspend_enable_irqs(void)
 }
 
 /**
+<<<<<<< HEAD
  *	suspend_enter - enter the desired system sleep state.
  *	@state:		state to enter
  *
  *	This function should be called after devices have been suspended.
  */
 static int suspend_enter(suspend_state_t state)
+=======
+ * suspend_enter - enter the desired system sleep state.
+ * @state: State to enter
+ * @wakeup: Returns information that suspend should not be entered again.
+ *
+ * This function should be called after devices have been suspended.
+ */
+static int suspend_enter(suspend_state_t state, bool *wakeup)
+>>>>>>> upstream/4.3_primoc
 {
 	int error;
 
@@ -147,7 +168,11 @@ static int suspend_enter(suspend_state_t state)
 
 	error = dpm_suspend_noirq(PMSG_SUSPEND);
 	if (error) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[K] PM: Some devices failed to power down\n");
+=======
+		printk(KERN_ERR "PM: Some devices failed to power down\n");
+>>>>>>> upstream/4.3_primoc
 		goto Platform_finish;
 	}
 
@@ -169,7 +194,12 @@ static int suspend_enter(suspend_state_t state)
 
 	error = syscore_suspend();
 	if (!error) {
+<<<<<<< HEAD
 		if (!(suspend_test(TEST_CORE) || pm_wakeup_pending())) {
+=======
+		*wakeup = pm_wakeup_pending();
+		if (!(suspend_test(TEST_CORE) || *wakeup)) {
+>>>>>>> upstream/4.3_primoc
 			error = suspend_ops->enter(state);
 			events_check_enabled = false;
 		}
@@ -203,6 +233,10 @@ static int suspend_enter(suspend_state_t state)
 int suspend_devices_and_enter(suspend_state_t state)
 {
 	int error;
+<<<<<<< HEAD
+=======
+	bool wakeup = false;
+>>>>>>> upstream/4.3_primoc
 
 	if (!suspend_ops)
 		return -ENOSYS;
@@ -213,26 +247,45 @@ int suspend_devices_and_enter(suspend_state_t state)
 		if (error)
 			goto Close;
 	}
+<<<<<<< HEAD
 	if (!suspend_console_deferred)
 		suspend_console();
 	suspend_test_start();
 	error = dpm_suspend_start(PMSG_SUSPEND);
 	if (error) {
 		printk(KERN_ERR "[K] PM: Some devices failed to suspend\n");
+=======
+	suspend_console();
+	suspend_test_start();
+	error = dpm_suspend_start(PMSG_SUSPEND);
+	if (error) {
+		printk(KERN_ERR "PM: Some devices failed to suspend\n");
+>>>>>>> upstream/4.3_primoc
 		goto Recover_platform;
 	}
 	suspend_test_finish("suspend devices");
 	if (suspend_test(TEST_DEVICES))
 		goto Recover_platform;
 
+<<<<<<< HEAD
 	error = suspend_enter(state);
+=======
+	do {
+		error = suspend_enter(state, &wakeup);
+	} while (!error && !wakeup
+		&& suspend_ops->suspend_again && suspend_ops->suspend_again());
+>>>>>>> upstream/4.3_primoc
 
  Resume_devices:
 	suspend_test_start();
 	dpm_resume_end(PMSG_RESUME);
 	suspend_test_finish("resume devices");
+<<<<<<< HEAD
 	if (!suspend_console_deferred)
 		resume_console();
+=======
+	resume_console();
+>>>>>>> upstream/4.3_primoc
  Close:
 	if (suspend_ops->end)
 		suspend_ops->end();

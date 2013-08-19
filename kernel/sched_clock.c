@@ -74,7 +74,11 @@
  */
 unsigned long long __attribute__((weak)) sched_clock(void)
 {
+<<<<<<< HEAD
 	return (unsigned long long)(jiffies - INITIAL_JIFFIES)
+=======
+	return (unsigned long long)(get_jiffies_64() - INITIAL_JIFFIES)
+>>>>>>> upstream/4.3_primoc
 					* (NSEC_PER_SEC / HZ);
 }
 EXPORT_SYMBOL_GPL(sched_clock);
@@ -176,10 +180,42 @@ static u64 sched_clock_remote(struct sched_clock_data *scd)
 	u64 this_clock, remote_clock;
 	u64 *ptr, old_val, val;
 
+<<<<<<< HEAD
+=======
+#if BITS_PER_LONG != 64
+again:
+	/*
+	 * Careful here: The local and the remote clock values need to
+	 * be read out atomic as we need to compare the values and
+	 * then update either the local or the remote side. So the
+	 * cmpxchg64 below only protects one readout.
+	 *
+	 * We must reread via sched_clock_local() in the retry case on
+	 * 32bit as an NMI could use sched_clock_local() via the
+	 * tracer and hit between the readout of
+	 * the low32bit and the high 32bit portion.
+	 */
+	this_clock = sched_clock_local(my_scd);
+	/*
+	 * We must enforce atomic readout on 32bit, otherwise the
+	 * update on the remote cpu can hit inbetween the readout of
+	 * the low32bit and the high 32bit portion.
+	 */
+	remote_clock = cmpxchg64(&scd->clock, 0, 0);
+#else
+	/*
+	 * On 64bit the read of [my]scd->clock is atomic versus the
+	 * update, so we can avoid the above 32bit dance.
+	 */
+>>>>>>> upstream/4.3_primoc
 	sched_clock_local(my_scd);
 again:
 	this_clock = my_scd->clock;
 	remote_clock = scd->clock;
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Use the opportunity that we have both locks

@@ -276,7 +276,11 @@ static void __call_usermodehelper(struct work_struct *work)
  * (used for preventing user land processes from being created after the user
  * land has been frozen during a system-wide hibernation or suspend operation).
  */
+<<<<<<< HEAD
 static int usermodehelper_disabled;
+=======
+static int usermodehelper_disabled = 1;
+>>>>>>> upstream/4.3_primoc
 
 /* Number of helpers running */
 static atomic_t running_helpers = ATOMIC_INIT(0);
@@ -421,6 +425,14 @@ int call_usermodehelper_exec(struct subprocess_info *sub_info,
 	int retval = 0;
 
 	helper_lock();
+<<<<<<< HEAD
+=======
+	if (!sub_info->path) {
+		retval = -EINVAL;
+		goto out;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	if (sub_info->path[0] == '\0')
 		goto out;
 

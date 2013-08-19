@@ -56,11 +56,19 @@
 
 #define RX51_USB_TRANSCEIVER_RST_GPIO	67
 
+<<<<<<< HEAD
 /* list all spi devices here */
 enum {
 	RX51_SPI_WL1251,
 	RX51_SPI_MIPID,		/* LCD panel */
 	RX51_SPI_TSC2005,	/* Touch Controller */
+=======
+/* List all SPI devices here. Note that the list/probe order seems to matter! */
+enum {
+	RX51_SPI_WL1251,
+	RX51_SPI_TSC2005,	/* Touch Controller */
+	RX51_SPI_MIPID,		/* LCD panel */
+>>>>>>> upstream/4.3_primoc
 };
 
 static struct wl12xx_platform_data wl1251_pdata;

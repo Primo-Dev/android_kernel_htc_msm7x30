@@ -83,10 +83,17 @@ static int xfrm4_mode_tunnel_input(struct xfrm_state *x, struct sk_buff *skb)
 	if (!(x->props.flags & XFRM_STATE_NOECN))
 		ipip_ecn_decapsulate(skb);
 
+<<<<<<< HEAD
 	skb_reset_network_header(skb);
 	skb_mac_header_rebuild(skb);
 	
 	err = 0;
+=======
+ 	skb_reset_network_header(skb);
+	skb_mac_header_rebuild(skb);
+
+ 	err = 0;
+>>>>>>> upstream/4.3_primoc
 
 out:
 	return err;

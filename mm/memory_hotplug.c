@@ -34,6 +34,20 @@
 
 #include "internal.h"
 
+<<<<<<< HEAD
+=======
+/*
+ * online_page_callback contains pointer to current page onlining function.
+ * Initially it is generic_online_page(). If it is required it could be
+ * changed by calling set_online_page_callback() for callback registration
+ * and restore_online_page_callback() for generic callback restore.
+ */
+
+static void generic_online_page(struct page *page);
+
+static online_page_callback_t online_page_callback = generic_online_page;
+
+>>>>>>> upstream/4.3_primoc
 DEFINE_MUTEX(mem_hotplug_mutex);
 
 void lock_memory_hotplug(void)
@@ -112,10 +126,16 @@ void __ref put_page_bootmem(struct page *page)
 
 static void register_page_bootmem_info_section(unsigned long start_pfn)
 {
+<<<<<<< HEAD
 	unsigned long *usemap, mapsize, page_mapsize, section_nr, i, j;
 	struct mem_section *ms;
 	struct page *page, *memmap, *page_page;
 	int memmap_page_valid;
+=======
+	unsigned long *usemap, mapsize, section_nr, i;
+	struct mem_section *ms;
+	struct page *page, *memmap;
+>>>>>>> upstream/4.3_primoc
 
 	section_nr = pfn_to_section_nr(start_pfn);
 	ms = __nr_to_section(section_nr);
@@ -131,6 +151,7 @@ static void register_page_bootmem_info_section(unsigned long start_pfn)
 	mapsize = sizeof(struct page) * PAGES_PER_SECTION;
 	mapsize = PAGE_ALIGN(mapsize) >> PAGE_SHIFT;
 
+<<<<<<< HEAD
 	page_mapsize = PAGE_SIZE/sizeof(struct page);
 
 	/* remember memmap's page, except those that reference only holes */
@@ -146,6 +167,11 @@ static void register_page_bootmem_info_section(unsigned long start_pfn)
 		if (memmap_page_valid)
 			get_page_bootmem(section_nr, page, SECTION_INFO);
 	}
+=======
+	/* remember memmap's page */
+	for (i = 0; i < mapsize; i++, page++)
+		get_page_bootmem(section_nr, page, SECTION_INFO);
+>>>>>>> upstream/4.3_primoc
 
 	usemap = __nr_to_section(section_nr)->pageblock_flags;
 	page = virt_to_page(usemap);
@@ -378,6 +404,7 @@ int __remove_pages(struct zone *zone, unsigned long phys_start_pfn,
 }
 EXPORT_SYMBOL_GPL(__remove_pages);
 
+<<<<<<< HEAD
 void online_page(struct page *page)
 {
 	unsigned long pfn = page_to_pfn(page);
@@ -389,16 +416,83 @@ void online_page(struct page *page)
 #endif
 	if (pfn >= num_physpages)
 		num_physpages = pfn + 1;
+=======
+int set_online_page_callback(online_page_callback_t callback)
+{
+	int rc = -EINVAL;
+
+	lock_memory_hotplug();
+
+	if (online_page_callback == generic_online_page) {
+		online_page_callback = callback;
+		rc = 0;
+	}
+
+	unlock_memory_hotplug();
+
+	return rc;
+}
+EXPORT_SYMBOL_GPL(set_online_page_callback);
+
+int restore_online_page_callback(online_page_callback_t callback)
+{
+	int rc = -EINVAL;
+
+	lock_memory_hotplug();
+
+	if (online_page_callback == callback) {
+		online_page_callback = generic_online_page;
+		rc = 0;
+	}
+
+	unlock_memory_hotplug();
+
+	return rc;
+}
+EXPORT_SYMBOL_GPL(restore_online_page_callback);
+
+void __online_page_set_limits(struct page *page)
+{
+	unsigned long pfn = page_to_pfn(page);
+
+	if (pfn >= num_physpages)
+		num_physpages = pfn + 1;
+}
+EXPORT_SYMBOL_GPL(__online_page_set_limits);
+
+void __online_page_increment_counters(struct page *page)
+{
+	totalram_pages++;
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_HIGHMEM
 	if (PageHighMem(page))
 		totalhigh_pages++;
 #endif
+<<<<<<< HEAD
 
+=======
+}
+EXPORT_SYMBOL_GPL(__online_page_increment_counters);
+
+void __online_page_free(struct page *page)
+{
+>>>>>>> upstream/4.3_primoc
 	ClearPageReserved(page);
 	init_page_count(page);
 	__free_page(page);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(__online_page_free);
+
+static void generic_online_page(struct page *page)
+{
+	__online_page_set_limits(page);
+	__online_page_increment_counters(page);
+	__online_page_free(page);
+}
+>>>>>>> upstream/4.3_primoc
 
 static int online_pages_range(unsigned long start_pfn, unsigned long nr_pages,
 			void *arg)
@@ -409,7 +503,11 @@ static int online_pages_range(unsigned long start_pfn, unsigned long nr_pages,
 	if (PageReserved(pfn_to_page(start_pfn)))
 		for (i = 0; i < nr_pages; i++) {
 			page = pfn_to_page(start_pfn + i);
+<<<<<<< HEAD
 			online_page(page);
+=======
+			(*online_page_callback)(page);
+>>>>>>> upstream/4.3_primoc
 			onlined_pages++;
 		}
 	*(unsigned long *)arg = onlined_pages;
@@ -470,19 +568,34 @@ int __ref online_pages(unsigned long pfn, unsigned long nr_pages)
 
 	zone->present_pages += onlined_pages;
 	zone->zone_pgdat->node_present_pages += onlined_pages;
+<<<<<<< HEAD
 	if (need_zonelists_rebuild)
 		build_all_zonelists(zone);
 	else
 		zone_pcp_update(zone);
+=======
+	if (onlined_pages) {
+		node_set_state(zone_to_nid(zone), N_HIGH_MEMORY);
+		if (need_zonelists_rebuild)
+			build_all_zonelists(zone);
+		else
+			zone_pcp_update(zone);
+	}
+>>>>>>> upstream/4.3_primoc
 
 	mutex_unlock(&zonelists_mutex);
 
 	init_per_zone_wmark_min();
 
+<<<<<<< HEAD
 	if (onlined_pages) {
 		kswapd_run(zone_to_nid(zone));
 		node_set_state(zone_to_nid(zone), N_HIGH_MEMORY);
 	}
+=======
+	if (onlined_pages)
+		kswapd_run(zone_to_nid(zone));
+>>>>>>> upstream/4.3_primoc
 
 	vm_total_pages = nr_free_pagecache_pages();
 
@@ -617,6 +730,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(add_memory);
 
+<<<<<<< HEAD
 int __ref physical_remove_memory(u64 start, u64 size)
 {
 	int ret;
@@ -665,6 +779,8 @@ int __ref physical_low_power_memory(u64 start, u64 size)
 }
 EXPORT_SYMBOL_GPL(physical_low_power_memory);
 
+=======
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_MEMORY_HOTREMOVE
 /*
  * A free page on the buddy free lists (not the per-cpu lists) has PageBuddy
@@ -817,7 +933,11 @@ do_migrate_range(unsigned long start_pfn, unsigned long end_pfn)
 		}
 		/* this function returns # of failed pages */
 		ret = migrate_pages(&source, hotremove_migrate_alloc, 0,
+<<<<<<< HEAD
 								true, true);
+=======
+							true, MIGRATE_SYNC);
+>>>>>>> upstream/4.3_primoc
 		if (ret)
 			putback_lru_pages(&source);
 	}
@@ -973,10 +1093,13 @@ repeat:
 	zone->zone_pgdat->node_present_pages -= offlined_pages;
 	totalram_pages -= offlined_pages;
 
+<<<<<<< HEAD
 #ifdef CONFIG_FIX_MOVABLE_ZONE
 	if (zone_idx(zone) != ZONE_MOVABLE)
 		total_unmovable_pages -= offlined_pages;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 	init_per_zone_wmark_min();
 
 	if (!node_present_pages(node)) {
@@ -1011,7 +1134,10 @@ int remove_memory(u64 start, u64 size)
 	end_pfn = start_pfn + PFN_DOWN(size);
 	return offline_pages(start_pfn, end_pfn, 120 * HZ);
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 #else
 int remove_memory(u64 start, u64 size)
 {

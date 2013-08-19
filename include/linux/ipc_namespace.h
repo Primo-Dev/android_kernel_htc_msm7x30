@@ -42,8 +42,13 @@ struct ipc_namespace {
 
 	size_t		shm_ctlmax;
 	size_t		shm_ctlall;
+<<<<<<< HEAD
 	int		shm_ctlmni;
 	int		shm_tot;
+=======
+	unsigned long	shm_tot;
+	int		shm_ctlmni;
+>>>>>>> upstream/4.3_primoc
 
 	struct notifier_block ipcns_nb;
 

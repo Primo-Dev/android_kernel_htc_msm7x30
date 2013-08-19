@@ -78,10 +78,14 @@
  *  ->i_mutex			(generic_file_buffered_write)
  *    ->mmap_sem		(fault_in_pages_readable->do_page_fault)
  *
+<<<<<<< HEAD
  *  ->i_mutex
  *    ->i_alloc_sem             (various)
  *
  *  inode_wb_list_lock
+=======
+ *  bdi->wb.list_lock
+>>>>>>> upstream/4.3_primoc
  *    sb_lock			(fs/fs-writeback.c)
  *    ->mapping->tree_lock	(__sync_single_inode)
  *
@@ -99,9 +103,15 @@
  *    ->zone.lru_lock		(check_pte_range->isolate_lru_page)
  *    ->private_lock		(page_remove_rmap->set_page_dirty)
  *    ->tree_lock		(page_remove_rmap->set_page_dirty)
+<<<<<<< HEAD
  *    inode_wb_list_lock	(page_remove_rmap->set_page_dirty)
  *    ->inode->i_lock		(page_remove_rmap->set_page_dirty)
  *    inode_wb_list_lock	(zap_pte_range->set_page_dirty)
+=======
+ *    bdi.wb->list_lock		(page_remove_rmap->set_page_dirty)
+ *    ->inode->i_lock		(page_remove_rmap->set_page_dirty)
+ *    bdi.wb->list_lock		(zap_pte_range->set_page_dirty)
+>>>>>>> upstream/4.3_primoc
  *    ->inode->i_lock		(zap_pte_range->set_page_dirty)
  *    ->private_lock		(zap_pte_range->__set_page_dirty_buffers)
  *
@@ -127,7 +137,11 @@ void __delete_from_page_cache(struct page *page)
 	if (PageUptodate(page) && PageMappedToDisk(page))
 		cleancache_put_page(page);
 	else
+<<<<<<< HEAD
 		cleancache_flush_page(mapping, page);
+=======
+		cleancache_invalidate_page(mapping, page);
+>>>>>>> upstream/4.3_primoc
 
 	radix_tree_delete(&mapping->page_tree, page->index);
 	page->mapping = NULL;
@@ -516,10 +530,20 @@ struct page *__page_cache_alloc(gfp_t gfp)
 	struct page *page;
 
 	if (cpuset_do_page_mem_spread()) {
+<<<<<<< HEAD
 		get_mems_allowed();
 		n = cpuset_mem_spread_node();
 		page = alloc_pages_exact_node(n, gfp, 0);
 		put_mems_allowed();
+=======
+		unsigned int cpuset_mems_cookie;
+		do {
+			cpuset_mems_cookie = get_mems_allowed();
+			n = cpuset_mem_spread_node();
+			page = alloc_pages_exact_node(n, gfp, 0);
+		} while (!put_mems_allowed(cpuset_mems_cookie) && !page);
+
+>>>>>>> upstream/4.3_primoc
 		return page;
 	}
 	return alloc_pages(gfp, 0);
@@ -701,9 +725,22 @@ repeat:
 		page = radix_tree_deref_slot(pagep);
 		if (unlikely(!page))
 			goto out;
+<<<<<<< HEAD
 		if (radix_tree_deref_retry(page))
 			goto repeat;
 
+=======
+		if (radix_tree_exception(page)) {
+			if (radix_tree_deref_retry(page))
+				goto repeat;
+			/*
+			 * Otherwise, shmem/tmpfs must be storing a swap entry
+			 * here as an exceptional entry: so return it without
+			 * attempting to raise page count.
+			 */
+			goto out;
+		}
+>>>>>>> upstream/4.3_primoc
 		if (!page_cache_get_speculative(page))
 			goto repeat;
 
@@ -740,7 +777,11 @@ struct page *find_lock_page(struct address_space *mapping, pgoff_t offset)
 
 repeat:
 	page = find_get_page(mapping, offset);
+<<<<<<< HEAD
 	if (page) {
+=======
+	if (page && !radix_tree_exception(page)) {
+>>>>>>> upstream/4.3_primoc
 		lock_page(page);
 		/* Has the page been truncated? */
 		if (unlikely(page->mapping != mapping)) {
@@ -822,13 +863,23 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
 {
 	unsigned int i;
 	unsigned int ret;
+<<<<<<< HEAD
 	unsigned int nr_found;
+=======
+	unsigned int nr_found, nr_skip;
+>>>>>>> upstream/4.3_primoc
 
 	rcu_read_lock();
 restart:
 	nr_found = radix_tree_gang_lookup_slot(&mapping->page_tree,
+<<<<<<< HEAD
 				(void ***)pages, start, nr_pages);
 	ret = 0;
+=======
+				(void ***)pages, NULL, start, nr_pages);
+	ret = 0;
+	nr_skip = 0;
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < nr_found; i++) {
 		struct page *page;
 repeat:
@@ -836,6 +887,7 @@ repeat:
 		if (unlikely(!page))
 			continue;
 
+<<<<<<< HEAD
 		/*
 		 * This can only trigger when the entry at index 0 moves out
 		 * of or back to the root: none yet gotten, safe to restart.
@@ -843,6 +895,25 @@ repeat:
 		if (radix_tree_deref_retry(page)) {
 			WARN_ON(start | i);
 			goto restart;
+=======
+		if (radix_tree_exception(page)) {
+			if (radix_tree_deref_retry(page)) {
+				/*
+				 * Transient condition which can only trigger
+				 * when entry at index 0 moves out of or back
+				 * to root: none yet gotten, safe to restart.
+				 */
+				WARN_ON(start | i);
+				goto restart;
+			}
+			/*
+			 * Otherwise, shmem/tmpfs must be storing a swap entry
+			 * here as an exceptional entry: so skip over it -
+			 * we only reach this from invalidate_mapping_pages().
+			 */
+			nr_skip++;
+			continue;
+>>>>>>> upstream/4.3_primoc
 		}
 
 		if (!page_cache_get_speculative(page))
@@ -862,7 +933,11 @@ repeat:
 	 * If all entries were removed before we could secure them,
 	 * try again, because callers stop trying once 0 is returned.
 	 */
+<<<<<<< HEAD
 	if (unlikely(!ret && nr_found))
+=======
+	if (unlikely(!ret && nr_found > nr_skip))
+>>>>>>> upstream/4.3_primoc
 		goto restart;
 	rcu_read_unlock();
 	return ret;
@@ -890,7 +965,11 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
 	rcu_read_lock();
 restart:
 	nr_found = radix_tree_gang_lookup_slot(&mapping->page_tree,
+<<<<<<< HEAD
 				(void ***)pages, index, nr_pages);
+=======
+				(void ***)pages, NULL, index, nr_pages);
+>>>>>>> upstream/4.3_primoc
 	ret = 0;
 	for (i = 0; i < nr_found; i++) {
 		struct page *page;
@@ -899,12 +978,31 @@ repeat:
 		if (unlikely(!page))
 			continue;
 
+<<<<<<< HEAD
 		/*
 		 * This can only trigger when the entry at index 0 moves out
 		 * of or back to the root: none yet gotten, safe to restart.
 		 */
 		if (radix_tree_deref_retry(page))
 			goto restart;
+=======
+		if (radix_tree_exception(page)) {
+			if (radix_tree_deref_retry(page)) {
+				/*
+				 * Transient condition which can only trigger
+				 * when entry at index 0 moves out of or back
+				 * to root: none yet gotten, safe to restart.
+				 */
+				goto restart;
+			}
+			/*
+			 * Otherwise, shmem/tmpfs must be storing a swap entry
+			 * here as an exceptional entry: so stop looking for
+			 * contiguous pages.
+			 */
+			break;
+		}
+>>>>>>> upstream/4.3_primoc
 
 		if (!page_cache_get_speculative(page))
 			goto repeat;
@@ -964,12 +1062,30 @@ repeat:
 		if (unlikely(!page))
 			continue;
 
+<<<<<<< HEAD
 		/*
 		 * This can only trigger when the entry at index 0 moves out
 		 * of or back to the root: none yet gotten, safe to restart.
 		 */
 		if (radix_tree_deref_retry(page))
 			goto restart;
+=======
+		if (radix_tree_exception(page)) {
+			if (radix_tree_deref_retry(page)) {
+				/*
+				 * Transient condition which can only trigger
+				 * when entry at index 0 moves out of or back
+				 * to root: none yet gotten, safe to restart.
+				 */
+				goto restart;
+			}
+			/*
+			 * This function is never used on a shmem/tmpfs
+			 * mapping, so a swap entry won't be found here.
+			 */
+			BUG();
+		}
+>>>>>>> upstream/4.3_primoc
 
 		if (!page_cache_get_speculative(page))
 			goto repeat;
@@ -1360,6 +1476,7 @@ int generic_segment_checks(const struct iovec *iov,
 }
 EXPORT_SYMBOL(generic_segment_checks);
 
+<<<<<<< HEAD
 /**
  * generic_file_aio_read - generic filesystem read routine
  * @iocb:	kernel I/O control block
@@ -1385,6 +1502,58 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 	if (retval)
 		return retval;
 
+=======
+static ssize_t mapping_direct_IO(struct address_space *mapping, int rw,
+				 struct kiocb *iocb, struct iov_iter *iter,
+				 loff_t pos)
+{
+	if (iov_iter_has_iovec(iter))
+		return mapping->a_ops->direct_IO(rw, iocb, iov_iter_iovec(iter),
+						 pos, iter->nr_segs);
+	else if (iov_iter_has_bvec(iter))
+		return mapping->a_ops->direct_IO_bvec(rw, iocb,
+						      iov_iter_bvec(iter), pos,
+						      iter->nr_segs);
+	else
+		BUG();
+}
+
+static int file_read_iter_actor(read_descriptor_t *desc, struct page *page,
+				unsigned long offset, unsigned long size)
+{
+	struct iov_iter *iter = desc->arg.data;
+	unsigned long copied = 0;
+
+	if (size > desc->count)
+		size = desc->count;
+
+	copied = iov_iter_copy_to_user(page, iter, offset, size);
+	if (copied < size)
+		desc->error = -EFAULT;
+
+	iov_iter_advance(iter, copied);
+	desc->count -= copied;
+	desc->written += copied;
+
+	return copied;
+}
+
+/**
+ * generic_file_read_iter - generic filesystem read routine
+ * @iocb:	kernel I/O control block
+ * @iov_iter:	memory vector
+ * @pos:	current file position
+ */
+ssize_t
+generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter, loff_t pos)
+{
+	struct file *filp = iocb->ki_filp;
+	read_descriptor_t desc;
+	ssize_t retval = 0;
+	size_t count = iov_iter_count(iter);
+	loff_t *ppos = &iocb->ki_pos;
+
+>>>>>>> upstream/4.3_primoc
 	/* coalesce the iovecs and go direct-to-BIO for O_DIRECT */
 	if (filp->f_flags & O_DIRECT) {
 		loff_t size;
@@ -1398,13 +1567,22 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 		size = i_size_read(inode);
 		if (pos < size) {
 			retval = filemap_write_and_wait_range(mapping, pos,
+<<<<<<< HEAD
 					pos + iov_length(iov, nr_segs) - 1);
+=======
+					pos + count - 1);
+>>>>>>> upstream/4.3_primoc
 			if (!retval) {
 				struct blk_plug plug;
 
 				blk_start_plug(&plug);
+<<<<<<< HEAD
 				retval = mapping->a_ops->direct_IO(READ, iocb,
 							iov, pos, nr_segs);
+=======
+				retval = mapping_direct_IO(mapping, READ,
+							   iocb, iter, pos);
+>>>>>>> upstream/4.3_primoc
 				blk_finish_plug(&plug);
 			}
 			if (retval > 0) {
@@ -1427,6 +1605,7 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 		}
 	}
 
+<<<<<<< HEAD
 	count = retval;
 	for (seg = 0; seg < nr_segs; seg++) {
 		read_descriptor_t desc;
@@ -1463,6 +1642,49 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 out:
 	return retval;
 }
+=======
+	desc.written = 0;
+	desc.arg.data = iter;
+	desc.count = count;
+	desc.error = 0;
+	do_generic_file_read(filp, ppos, &desc, file_read_iter_actor);
+	if (desc.written)
+		retval = desc.written;
+	else
+		retval = desc.error;
+out:
+	return retval;
+}
+EXPORT_SYMBOL(generic_file_read_iter);
+
+/**
+ * generic_file_aio_read - generic filesystem read routine
+ * @iocb:	kernel I/O control block
+ * @iov:	io vector request
+ * @nr_segs:	number of segments in the iovec
+ * @pos:	current file position
+ *
+ * This is the "read()" routine for all filesystems
+ * that can use the page cache directly.
+ */
+ssize_t
+generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
+		unsigned long nr_segs, loff_t pos)
+{
+	struct iov_iter iter;
+	int ret;
+	size_t count;
+
+	count = 0;
+	ret = generic_segment_checks(iov, &nr_segs, &count, VERIFY_WRITE);
+	if (ret)
+		return ret;
+
+	iov_iter_init(&iter, iov, nr_segs, count, 0);
+
+	return generic_file_read_iter(iocb, &iter, pos);
+}
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(generic_file_aio_read);
 
 static ssize_t
@@ -1637,13 +1859,21 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	 * Do we have something in the page cache already?
 	 */
 	page = find_get_page(mapping, offset);
+<<<<<<< HEAD
 	if (likely(page)) {
+=======
+	if (likely(page) && !(vmf->flags & FAULT_FLAG_TRIED)) {
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * We found the page, so try async readahead before
 		 * waiting for the lock.
 		 */
 		do_async_mmap_readahead(vma, ra, file, page, offset);
+<<<<<<< HEAD
 	} else {
+=======
+	} else if (!page) {
+>>>>>>> upstream/4.3_primoc
 		/* No page in the page cache at all */
 		do_sync_mmap_readahead(vma, ra, file, offset);
 		count_vm_event(PGMAJFAULT);
@@ -1933,7 +2163,11 @@ EXPORT_SYMBOL(read_cache_page);
  */
 int should_remove_suid(struct dentry *dentry)
 {
+<<<<<<< HEAD
 	mode_t mode = dentry->d_inode->i_mode;
+=======
+	umode_t mode = dentry->d_inode->i_mode;
+>>>>>>> upstream/4.3_primoc
 	int kill = 0;
 
 	/* suid always must be killed */
@@ -1990,6 +2224,7 @@ int file_remove_suid(struct file *file)
 }
 EXPORT_SYMBOL(file_remove_suid);
 
+<<<<<<< HEAD
 static size_t __iovec_copy_from_user_inatomic(char *vaddr,
 			const struct iovec *iov, size_t base, size_t bytes)
 {
@@ -2131,6 +2366,8 @@ size_t iov_iter_single_seg_count(struct iov_iter *i)
 }
 EXPORT_SYMBOL(iov_iter_single_seg_count);
 
+=======
+>>>>>>> upstream/4.3_primoc
 /*
  * Performs necessary checks before doing a write
  *
@@ -2236,9 +2473,14 @@ int pagecache_write_end(struct file *file, struct address_space *mapping,
 EXPORT_SYMBOL(pagecache_write_end);
 
 ssize_t
+<<<<<<< HEAD
 generic_file_direct_write(struct kiocb *iocb, const struct iovec *iov,
 		unsigned long *nr_segs, loff_t pos, loff_t *ppos,
 		size_t count, size_t ocount)
+=======
+generic_file_direct_write_iter(struct kiocb *iocb, struct iov_iter *iter,
+		loff_t pos, loff_t *ppos, size_t count)
+>>>>>>> upstream/4.3_primoc
 {
 	struct file	*file = iocb->ki_filp;
 	struct address_space *mapping = file->f_mapping;
@@ -2247,10 +2489,20 @@ generic_file_direct_write(struct kiocb *iocb, const struct iovec *iov,
 	size_t		write_len;
 	pgoff_t		end;
 
+<<<<<<< HEAD
 	if (count != ocount)
 		*nr_segs = iov_shorten((struct iovec *)iov, *nr_segs, count);
 
 	write_len = iov_length(iov, *nr_segs);
+=======
+	if (count != iov_iter_count(iter)) {
+		written = iov_iter_shorten(iter, count);
+		if (written)
+			goto out;
+	}
+
+	write_len = count;
+>>>>>>> upstream/4.3_primoc
 	end = (pos + write_len - 1) >> PAGE_CACHE_SHIFT;
 
 	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
@@ -2277,7 +2529,11 @@ generic_file_direct_write(struct kiocb *iocb, const struct iovec *iov,
 		}
 	}
 
+<<<<<<< HEAD
 	written = mapping->a_ops->direct_IO(WRITE, iocb, iov, pos, *nr_segs);
+=======
+	written = mapping_direct_IO(mapping, WRITE, iocb, iter, pos);
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * Finally, try again to invalidate clean pages which might have been
@@ -2303,6 +2559,26 @@ generic_file_direct_write(struct kiocb *iocb, const struct iovec *iov,
 out:
 	return written;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(generic_file_direct_write_iter);
+
+ssize_t
+generic_file_direct_write(struct kiocb *iocb, const struct iovec *iov,
+		unsigned long *nr_segs, loff_t pos, loff_t *ppos,
+		size_t count, size_t ocount)
+{
+	struct iov_iter iter;
+	ssize_t ret;
+
+	iov_iter_init(&iter, iov, *nr_segs, ocount, 0);
+	ret = generic_file_direct_write_iter(iocb, &iter, pos, ppos, count);
+	/* generic_file_direct_write_iter() might have shortened the vec */
+	if (*nr_segs != iter.nr_segs)
+		*nr_segs = iter.nr_segs;
+	return ret;
+}
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(generic_file_direct_write);
 
 /*
@@ -2313,16 +2589,30 @@ struct page *grab_cache_page_write_begin(struct address_space *mapping,
 					pgoff_t index, unsigned flags)
 {
 	int status;
+<<<<<<< HEAD
 	struct page *page;
 	gfp_t gfp_notmask = 0;
+=======
+	gfp_t gfp_mask;
+	struct page *page;
+	gfp_t gfp_notmask = 0;
+
+	gfp_mask = mapping_gfp_mask(mapping) | __GFP_WRITE;
+>>>>>>> upstream/4.3_primoc
 	if (flags & AOP_FLAG_NOFS)
 		gfp_notmask = __GFP_FS;
 repeat:
 	page = find_lock_page(mapping, index);
 	if (page)
+<<<<<<< HEAD
 		goto found;
 
 	page = __page_cache_alloc(mapping_gfp_mask(mapping) & ~gfp_notmask);
+=======
+		return page;
+
+	page = __page_cache_alloc(gfp_mask & ~gfp_notmask);
+>>>>>>> upstream/4.3_primoc
 	if (!page)
 		return NULL;
 	status = add_to_page_cache_lru(page, mapping, index,
@@ -2333,8 +2623,11 @@ repeat:
 			goto repeat;
 		return NULL;
 	}
+<<<<<<< HEAD
 found:
 	wait_on_page_writeback(page);
+=======
+>>>>>>> upstream/4.3_primoc
 	return page;
 }
 EXPORT_SYMBOL(grab_cache_page_write_begin);
@@ -2366,7 +2659,10 @@ static ssize_t generic_perform_write(struct file *file,
 						iov_iter_count(i));
 
 again:
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * Bring in the user page that we will copy from _first_.
 		 * Otherwise there's a nasty deadlock on copying from the
@@ -2422,13 +2718,21 @@ again:
 		written += copied;
 
 		balance_dirty_pages_ratelimited(mapping);
+<<<<<<< HEAD
 
+=======
+		if (fatal_signal_pending(current)) {
+			status = -EINTR;
+			break;
+		}
+>>>>>>> upstream/4.3_primoc
 	} while (iov_iter_count(i));
 
 	return written ? written : status;
 }
 
 ssize_t
+<<<<<<< HEAD
 generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
 		unsigned long nr_segs, loff_t pos, loff_t *ppos,
 		size_t count, ssize_t written)
@@ -2439,6 +2743,15 @@ generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
 
 	iov_iter_init(&i, iov, nr_segs, count, written);
 	status = generic_perform_write(file, &i, pos);
+=======
+generic_file_buffered_write_iter(struct kiocb *iocb, struct iov_iter *iter,
+		loff_t pos, loff_t *ppos, ssize_t written)
+{
+	struct file *file = iocb->ki_filp;
+	ssize_t status;
+
+	status = generic_perform_write(file, iter, pos);
+>>>>>>> upstream/4.3_primoc
 
 	if (likely(status >= 0)) {
 		written += status;
@@ -2447,13 +2760,32 @@ generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
 	
 	return written ? written : status;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(generic_file_buffered_write_iter);
+
+ssize_t
+generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
+		unsigned long nr_segs, loff_t pos, loff_t *ppos,
+		size_t count, ssize_t written)
+{
+	struct iov_iter iter;
+	iov_iter_init(&iter, iov, nr_segs, count, written);
+	return generic_file_buffered_write_iter(iocb, &iter, pos, ppos,
+						written);
+}
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(generic_file_buffered_write);
 
 /**
  * __generic_file_aio_write - write data to a file
  * @iocb:	IO state structure (file, offset, etc.)
+<<<<<<< HEAD
  * @iov:	vector with data to write
  * @nr_segs:	number of segments in the vector
+=======
+ * @iter:	iov_iter specifying memory to write
+>>>>>>> upstream/4.3_primoc
  * @ppos:	position where to write
  *
  * This function does all the work needed for actually writing data to a
@@ -2468,24 +2800,36 @@ EXPORT_SYMBOL(generic_file_buffered_write);
  * A caller has to handle it. This is mainly due to the fact that we want to
  * avoid syncing under i_mutex.
  */
+<<<<<<< HEAD
 ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 				 unsigned long nr_segs, loff_t *ppos)
 {
 	struct file *file = iocb->ki_filp;
 	struct address_space * mapping = file->f_mapping;
 	size_t ocount;		/* original count */
+=======
+ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *iter,
+				  loff_t *ppos)
+{
+	struct file *file = iocb->ki_filp;
+	struct address_space * mapping = file->f_mapping;
+>>>>>>> upstream/4.3_primoc
 	size_t count;		/* after file limit checks */
 	struct inode 	*inode = mapping->host;
 	loff_t		pos;
 	ssize_t		written;
 	ssize_t		err;
 
+<<<<<<< HEAD
 	ocount = 0;
 	err = generic_segment_checks(iov, &nr_segs, &ocount, VERIFY_READ);
 	if (err)
 		return err;
 
 	count = ocount;
+=======
+	count = iov_iter_count(iter);
+>>>>>>> upstream/4.3_primoc
 	pos = *ppos;
 
 	vfs_check_frozen(inode->i_sb, SB_FREEZE_WRITE);
@@ -2512,8 +2856,13 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 		loff_t endbyte;
 		ssize_t written_buffered;
 
+<<<<<<< HEAD
 		written = generic_file_direct_write(iocb, iov, &nr_segs, pos,
 							ppos, count, ocount);
+=======
+		written = generic_file_direct_write_iter(iocb, iter, pos,
+							 ppos, count);
+>>>>>>> upstream/4.3_primoc
 		if (written < 0 || written == count)
 			goto out;
 		/*
@@ -2522,9 +2871,15 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 		 */
 		pos += written;
 		count -= written;
+<<<<<<< HEAD
 		written_buffered = generic_file_buffered_write(iocb, iov,
 						nr_segs, pos, ppos, count,
 						written);
+=======
+		iov_iter_advance(iter, written);
+		written_buffered = generic_file_buffered_write_iter(iocb, iter,
+						pos, ppos, written);
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * If generic_file_buffered_write() retuned a synchronous error
 		 * then we want to return the number of bytes which were
@@ -2556,13 +2911,65 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 			 */
 		}
 	} else {
+<<<<<<< HEAD
 		written = generic_file_buffered_write(iocb, iov, nr_segs,
 				pos, ppos, count, written);
+=======
+		iter->count = count;
+		written = generic_file_buffered_write_iter(iocb, iter,
+				pos, ppos, written);
+>>>>>>> upstream/4.3_primoc
 	}
 out:
 	current->backing_dev_info = NULL;
 	return written ? written : err;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(__generic_file_write_iter);
+
+ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *iter,
+				loff_t pos)
+{
+	struct file *file = iocb->ki_filp;
+	struct inode *inode = file->f_mapping->host;
+	ssize_t ret;
+
+	mutex_lock(&inode->i_mutex);
+	ret = __generic_file_write_iter(iocb, iter, &iocb->ki_pos);
+	mutex_unlock(&inode->i_mutex);
+
+	if (ret > 0 || ret == -EIOCBQUEUED) {
+		ssize_t err;
+
+		err = generic_write_sync(file, pos, ret);
+		if (err < 0 && ret > 0)
+			ret = err;
+	}
+	return ret;
+}
+EXPORT_SYMBOL(generic_file_write_iter);
+
+ssize_t
+__generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+			 unsigned long nr_segs, loff_t *ppos)
+{
+	struct iov_iter iter;
+	size_t count;
+	int ret;
+
+	count = 0;
+	ret = generic_segment_checks(iov, &nr_segs, &count, VERIFY_READ);
+	if (ret)
+		goto out;
+
+	iov_iter_init(&iter, iov, nr_segs, count, 0);
+
+	ret = __generic_file_write_iter(iocb, &iter, ppos);
+out:
+	return ret;
+}
+>>>>>>> upstream/4.3_primoc
 EXPORT_SYMBOL(__generic_file_aio_write);
 
 /**

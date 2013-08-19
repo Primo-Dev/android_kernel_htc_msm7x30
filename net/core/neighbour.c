@@ -237,7 +237,11 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev)
 				   we must kill timers etc. and move
 				   it to safe state.
 				 */
+<<<<<<< HEAD
 				skb_queue_purge(&n->arp_queue);
+=======
+				__skb_queue_purge(&n->arp_queue);
+>>>>>>> upstream/4.3_primoc
 				n->output = neigh_blackhole;
 				if (n->nud_state & NUD_VALID)
 					n->nud_state = NUD_NOARP;
@@ -291,7 +295,11 @@ static struct neighbour *neigh_alloc(struct neigh_table *tbl)
 	if (!n)
 		goto out_entries;
 
+<<<<<<< HEAD
 	skb_queue_head_init(&n->arp_queue);
+=======
+	__skb_queue_head_init(&n->arp_queue);
+>>>>>>> upstream/4.3_primoc
 	rwlock_init(&n->lock);
 	seqlock_init(&n->ha_lock);
 	n->updated	  = n->used = now;
@@ -712,7 +720,13 @@ void neigh_destroy(struct neighbour *neigh)
 		hh_cache_put(hh);
 	}
 
+<<<<<<< HEAD
 	skb_queue_purge(&neigh->arp_queue);
+=======
+	write_lock_bh(&neigh->lock);
+	__skb_queue_purge(&neigh->arp_queue);
+	write_unlock_bh(&neigh->lock);
+>>>>>>> upstream/4.3_primoc
 
 	dev_put(neigh->dev);
 	neigh_parms_put(neigh->parms);
@@ -864,7 +878,11 @@ static void neigh_invalidate(struct neighbour *neigh)
 		neigh->ops->error_report(neigh, skb);
 		write_lock(&neigh->lock);
 	}
+<<<<<<< HEAD
 	skb_queue_purge(&neigh->arp_queue);
+=======
+	__skb_queue_purge(&neigh->arp_queue);
+>>>>>>> upstream/4.3_primoc
 }
 
 /* Called when a timer expires for a neighbour entry. */
@@ -950,6 +968,7 @@ static void neigh_timer_handler(unsigned long arg)
 		write_unlock(&neigh->lock);
 		neigh->ops->solicit(neigh, skb);
 		atomic_inc(&neigh->probes);
+<<<<<<< HEAD
 
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (!IS_ERR(skb) && (skb))
@@ -957,6 +976,9 @@ static void neigh_timer_handler(unsigned long arg)
 #else
 	kfree_skb(skb);
 #endif
+=======
+		kfree_skb(skb);
+>>>>>>> upstream/4.3_primoc
 	} else {
 out:
 		write_unlock(&neigh->lock);
@@ -1194,7 +1216,11 @@ int neigh_update(struct neighbour *neigh, const u8 *lladdr, u8 new,
 
 			write_lock_bh(&neigh->lock);
 		}
+<<<<<<< HEAD
 		skb_queue_purge(&neigh->arp_queue);
+=======
+		__skb_queue_purge(&neigh->arp_queue);
+>>>>>>> upstream/4.3_primoc
 	}
 out:
 	if (update_isrouter) {
@@ -1319,8 +1345,11 @@ int neigh_resolve_output(struct sk_buff *skb)
 	if (!dst)
 		goto discard;
 
+<<<<<<< HEAD
 	__skb_pull(skb, skb_network_offset(skb));
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!neigh_event_send(neigh, skb)) {
 		int err;
 		struct net_device *dev = neigh->dev;
@@ -1332,6 +1361,10 @@ int neigh_resolve_output(struct sk_buff *skb)
 			neigh_hh_init(neigh, dst, dst->ops->protocol);
 
 		do {
+<<<<<<< HEAD
+=======
+			__skb_pull(skb, skb_network_offset(skb));
+>>>>>>> upstream/4.3_primoc
 			seq = read_seqbegin(&neigh->ha_lock);
 			err = dev_hard_header(skb, dev, ntohs(skb->protocol),
 					      neigh->ha, NULL, skb->len);
@@ -1364,9 +1397,14 @@ int neigh_connected_output(struct sk_buff *skb)
 	struct net_device *dev = neigh->dev;
 	unsigned int seq;
 
+<<<<<<< HEAD
 	__skb_pull(skb, skb_network_offset(skb));
 
 	do {
+=======
+	do {
+		__skb_pull(skb, skb_network_offset(skb));
+>>>>>>> upstream/4.3_primoc
 		seq = read_seqbegin(&neigh->ha_lock);
 		err = dev_hard_header(skb, dev, ntohs(skb->protocol),
 				      neigh->ha, NULL, skb->len);

@@ -4,7 +4,11 @@
  * Author:       Michael Hennerich <hennerich@blackfin.uclinux.org>
  *
  * Created:
+<<<<<<< HEAD
  * Description:  Blackfin LCD Framebufer driver
+=======
+ * Description:  Blackfin LCD Framebuffer driver
+>>>>>>> upstream/4.3_primoc
  *
  *
  * Modified:

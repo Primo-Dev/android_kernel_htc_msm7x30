@@ -133,7 +133,10 @@ void __init early_init_devtree(void *params)
 	of_scan_flat_dt(early_init_dt_scan_chosen, cmd_line);
 
 	/* Scan memory nodes and rebuild MEMBLOCKs */
+<<<<<<< HEAD
 	memblock_init();
+=======
+>>>>>>> upstream/4.3_primoc
 	of_scan_flat_dt(early_init_dt_scan_root, NULL);
 	of_scan_flat_dt(early_init_dt_scan_memory, NULL);
 
@@ -141,7 +144,11 @@ void __init early_init_devtree(void *params)
 	strlcpy(boot_command_line, cmd_line, COMMAND_LINE_SIZE);
 	parse_early_param();
 
+<<<<<<< HEAD
 	memblock_analyze();
+=======
+	memblock_allow_resize();
+>>>>>>> upstream/4.3_primoc
 
 	pr_debug("Phys. mem: %lx\n", (unsigned long) memblock_phys_mem_size());
 

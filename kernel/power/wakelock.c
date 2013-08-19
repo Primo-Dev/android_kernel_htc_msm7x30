@@ -19,7 +19,10 @@
 #include <linux/suspend.h>
 #include <linux/syscalls.h> /* sys_sync */
 #include <linux/wakelock.h>
+<<<<<<< HEAD
 #include <linux/syscore_ops.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_WAKELOCK_STAT
 #include <linux/proc_fs.h>
 #endif
@@ -51,9 +54,20 @@ static struct workqueue_struct *suspend_sys_sync_work_queue;
 static DECLARE_COMPLETION(suspend_sys_sync_comp);
 struct workqueue_struct *suspend_work_queue;
 struct wake_lock main_wake_lock;
+<<<<<<< HEAD
 struct wake_lock no_suspend_wake_lock;
 suspend_state_t requested_suspend_state = PM_SUSPEND_MEM;
 static struct wake_lock unknown_wakeup;
+=======
+suspend_state_t requested_suspend_state = PM_SUSPEND_MEM;
+static struct wake_lock unknown_wakeup;
+static struct wake_lock suspend_backoff_lock;
+
+#define SUSPEND_BACKOFF_THRESHOLD	10
+#define SUSPEND_BACKOFF_INTERVAL	10000
+
+static unsigned suspend_short_count;
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_WAKELOCK_STAT
 static struct wake_lock deleted_wake_locks;
@@ -230,6 +244,7 @@ static void print_active_locks(int type)
 	}
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM8X60_LTE) || defined(CONFIG_ARCH_MSM7X27)
 void htc_print_active_wake_locks(int type)
 {
@@ -257,6 +272,8 @@ void htc_print_active_wake_locks(int type)
 }
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 static long has_wake_lock_locked(int type)
 {
 	struct wake_lock *lock, *n;
@@ -352,10 +369,21 @@ int suspend_sys_sync_wait(void)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static void suspend_backoff(void)
+{
+	pr_info("suspend: too many immediate wakeups, back off\n");
+	wake_lock_timeout(&suspend_backoff_lock,
+			  msecs_to_jiffies(SUSPEND_BACKOFF_INTERVAL));
+}
+
+>>>>>>> upstream/4.3_primoc
 static void suspend(struct work_struct *work)
 {
 	int ret;
 	int entry_event_num;
+<<<<<<< HEAD
 
 	pr_info("[R] suspend start\n");
 	if (has_wake_lock(WAKE_LOCK_SUSPEND)) {
@@ -364,10 +392,18 @@ static void suspend(struct work_struct *work)
 		htc_print_active_wake_locks(WAKE_LOCK_SUSPEND);
 		#endif
 		pr_info("[R] suspend: abort suspend\n");
+=======
+	struct timespec ts_entry, ts_exit;
+
+	if (has_wake_lock(WAKE_LOCK_SUSPEND)) {
+		if (debug_mask & DEBUG_SUSPEND)
+			pr_info("suspend: abort suspend\n");
+>>>>>>> upstream/4.3_primoc
 		return;
 	}
 
 	entry_event_num = current_event_num;
+<<<<<<< HEAD
 
 	suspend_sys_sync_queue();
 
@@ -384,12 +420,44 @@ static void suspend(struct work_struct *work)
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, ts.tv_nsec);
 	}
+=======
+	suspend_sys_sync_queue();
+	if (debug_mask & DEBUG_SUSPEND)
+		pr_info("suspend: enter suspend\n");
+	getnstimeofday(&ts_entry);
+	ret = pm_suspend(requested_suspend_state);
+	getnstimeofday(&ts_exit);
+
+	if (debug_mask & DEBUG_EXIT_SUSPEND) {
+		struct rtc_time tm;
+		rtc_time_to_tm(ts_exit.tv_sec, &tm);
+		pr_info("suspend: exit suspend, ret = %d "
+			"(%d-%02d-%02d %02d:%02d:%02d.%09lu UTC)\n", ret,
+			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, ts_exit.tv_nsec);
+	}
+
+	if (ts_exit.tv_sec - ts_entry.tv_sec <= 1) {
+		++suspend_short_count;
+
+		if (suspend_short_count == SUSPEND_BACKOFF_THRESHOLD) {
+			suspend_backoff();
+			suspend_short_count = 0;
+		}
+	} else {
+		suspend_short_count = 0;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	if (current_event_num == entry_event_num) {
 		if (debug_mask & DEBUG_SUSPEND)
 			pr_info("suspend: pm_suspend returned with no event\n");
 		wake_lock_timeout(&unknown_wakeup, HZ / 2);
 	}
+<<<<<<< HEAD
 	pr_info("[R] resume end\n");
+=======
+>>>>>>> upstream/4.3_primoc
 }
 static DECLARE_WORK(suspend_work, suspend);
 
@@ -411,7 +479,11 @@ static void expire_wake_locks(unsigned long data)
 }
 static DEFINE_TIMER(expire_timer, expire_wake_locks, 0, 0);
 
+<<<<<<< HEAD
 static int power_suspend_late(void)
+=======
+static int power_suspend_late(struct device *dev)
+>>>>>>> upstream/4.3_primoc
 {
 	int ret = has_wake_lock(WAKE_LOCK_SUSPEND) ? -EAGAIN : 0;
 #ifdef CONFIG_WAKELOCK_STAT
@@ -419,6 +491,7 @@ static int power_suspend_late(void)
 #endif
 	if (debug_mask & DEBUG_SUSPEND)
 		pr_info("power_suspend_late return %d\n", ret);
+<<<<<<< HEAD
 
 	#ifdef CONFIG_ARCH_MSM8X60_LTE
 	if (ret == -EAGAIN) {
@@ -431,6 +504,21 @@ static int power_suspend_late(void)
 
 static struct syscore_ops power_syscore_ops = {
 	.suspend = power_suspend_late,
+=======
+	return ret;
+}
+
+static struct dev_pm_ops power_driver_pm_ops = {
+	.suspend_noirq = power_suspend_late,
+};
+
+static struct platform_driver power_driver = {
+	.driver.name = "power",
+	.driver.pm = &power_driver_pm_ops,
+};
+static struct platform_device power_device = {
+	.name = "power",
+>>>>>>> upstream/4.3_primoc
 };
 
 void wake_lock_init(struct wake_lock *lock, int type, const char *name)
@@ -650,9 +738,25 @@ static int __init wakelocks_init(void)
 	wake_lock_init(&main_wake_lock, WAKE_LOCK_SUSPEND, "main");
 	wake_lock(&main_wake_lock);
 	wake_lock_init(&unknown_wakeup, WAKE_LOCK_SUSPEND, "unknown_wakeups");
+<<<<<<< HEAD
 	wake_lock_init(&no_suspend_wake_lock, WAKE_LOCK_SUSPEND, "no_suspend_wake_lock");
 
 	register_syscore_ops(&power_syscore_ops);
+=======
+	wake_lock_init(&suspend_backoff_lock, WAKE_LOCK_SUSPEND,
+		       "suspend_backoff");
+
+	ret = platform_device_register(&power_device);
+	if (ret) {
+		pr_err("wakelocks_init: platform_device_register failed\n");
+		goto err_platform_device_register;
+	}
+	ret = platform_driver_register(&power_driver);
+	if (ret) {
+		pr_err("wakelocks_init: platform_driver_register failed\n");
+		goto err_platform_driver_register;
+	}
+>>>>>>> upstream/4.3_primoc
 
 	INIT_COMPLETION(suspend_sys_sync_comp);
 	suspend_sys_sync_work_queue =
@@ -674,12 +778,24 @@ static int __init wakelocks_init(void)
 
 	return 0;
 
+<<<<<<< HEAD
 err_suspend_sys_sync_work_queue:
 err_suspend_work_queue:
 	unregister_syscore_ops(&power_syscore_ops);
 	wake_lock_destroy(&unknown_wakeup);
 	wake_lock_destroy(&main_wake_lock);
 	wake_lock_destroy(&no_suspend_wake_lock);
+=======
+err_suspend_work_queue:
+err_suspend_sys_sync_work_queue:
+	platform_driver_unregister(&power_driver);
+err_platform_driver_register:
+	platform_device_unregister(&power_device);
+err_platform_device_register:
+	wake_lock_destroy(&suspend_backoff_lock);
+	wake_lock_destroy(&unknown_wakeup);
+	wake_lock_destroy(&main_wake_lock);
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_WAKELOCK_STAT
 	wake_lock_destroy(&deleted_wake_locks);
 #endif
@@ -693,10 +809,18 @@ static void  __exit wakelocks_exit(void)
 #endif
 	destroy_workqueue(suspend_work_queue);
 	destroy_workqueue(suspend_sys_sync_work_queue);
+<<<<<<< HEAD
 	unregister_syscore_ops(&power_syscore_ops);
 	wake_lock_destroy(&unknown_wakeup);
 	wake_lock_destroy(&main_wake_lock);
 	wake_lock_destroy(&no_suspend_wake_lock);
+=======
+	platform_driver_unregister(&power_driver);
+	platform_device_unregister(&power_device);
+	wake_lock_destroy(&suspend_backoff_lock);
+	wake_lock_destroy(&unknown_wakeup);
+	wake_lock_destroy(&main_wake_lock);
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_WAKELOCK_STAT
 	wake_lock_destroy(&deleted_wake_locks);
 #endif

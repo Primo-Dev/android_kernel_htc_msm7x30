@@ -350,11 +350,19 @@ int sysfs_hash_and_remove(struct sysfs_dirent *dir_sd, const void *ns, const cha
 		return -ENOENT;
 }
 
+<<<<<<< HEAD
 int sysfs_permission(struct inode *inode, int mask, unsigned int flags)
 {
 	struct sysfs_dirent *sd;
 
 	if (flags & IPERM_FLAG_RCU)
+=======
+int sysfs_permission(struct inode *inode, int mask)
+{
+	struct sysfs_dirent *sd;
+
+	if (mask & MAY_NOT_BLOCK)
+>>>>>>> upstream/4.3_primoc
 		return -ECHILD;
 
 	sd = inode->i_private;
@@ -363,5 +371,9 @@ int sysfs_permission(struct inode *inode, int mask, unsigned int flags)
 	sysfs_refresh_inode(sd, inode);
 	mutex_unlock(&sysfs_mutex);
 
+<<<<<<< HEAD
 	return generic_permission(inode, mask, flags, NULL);
+=======
+	return generic_permission(inode, mask);
+>>>>>>> upstream/4.3_primoc
 }

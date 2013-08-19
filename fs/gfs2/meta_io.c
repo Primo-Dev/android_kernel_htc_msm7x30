@@ -37,7 +37,11 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
 {
 	struct buffer_head *bh, *head;
 	int nr_underway = 0;
+<<<<<<< HEAD
 	int write_op = REQ_META |
+=======
+	int write_op = REQ_META | REQ_PRIO |
+>>>>>>> upstream/4.3_primoc
 		(wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : WRITE);
 
 	BUG_ON(!PageLocked(page));
@@ -225,7 +229,11 @@ int gfs2_meta_read(struct gfs2_glock *gl, u64 blkno, int flags,
 	}
 	bh->b_end_io = end_buffer_read_sync;
 	get_bh(bh);
+<<<<<<< HEAD
 	submit_bh(READ_SYNC | REQ_META, bh);
+=======
+	submit_bh(READ_SYNC | REQ_META | REQ_PRIO, bh);
+>>>>>>> upstream/4.3_primoc
 	if (!(flags & DIO_WAIT))
 		return 0;
 
@@ -435,7 +443,11 @@ struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)
 	if (buffer_uptodate(first_bh))
 		goto out;
 	if (!buffer_locked(first_bh))
+<<<<<<< HEAD
 		ll_rw_block(READ_SYNC | REQ_META, 1, &first_bh);
+=======
+		ll_rw_block(READ_SYNC | REQ_META | REQ_PRIO, 1, &first_bh);
+>>>>>>> upstream/4.3_primoc
 
 	dblock++;
 	extlen--;

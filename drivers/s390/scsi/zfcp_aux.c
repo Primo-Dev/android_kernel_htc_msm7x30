@@ -3,7 +3,11 @@
  *
  * Module interface and handling of zfcp data structures.
  *
+<<<<<<< HEAD
  * Copyright IBM Corporation 2002, 2010
+=======
+ * Copyright IBM Corp. 2002, 2013
+>>>>>>> upstream/4.3_primoc
  */
 
 /*
@@ -23,6 +27,10 @@
  *            Christof Schmitt
  *            Martin Petermann
  *            Sven Schuetz
+<<<<<<< HEAD
+=======
+ *            Steffen Maier
+>>>>>>> upstream/4.3_primoc
  */
 
 #define KMSG_COMPONENT "zfcp"
@@ -414,6 +422,11 @@ struct zfcp_adapter *zfcp_adapter_enqueue(struct ccw_device *ccw_device)
 	adapter->dma_parms.max_segment_size = ZFCP_QDIO_SBALE_LEN;
 	adapter->ccw_device->dev.dma_parms = &adapter->dma_parms;
 
+<<<<<<< HEAD
+=======
+	adapter->stat_read_buf_num = FSF_STATUS_READS_RECOM;
+
+>>>>>>> upstream/4.3_primoc
 	if (!zfcp_scsi_adapter_register(adapter))
 		return adapter;
 

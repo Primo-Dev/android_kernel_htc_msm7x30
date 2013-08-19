@@ -27,9 +27,13 @@
 #include <linux/utsname.h>
 
 #include <linux/usb/composite.h>
+<<<<<<< HEAD
 /*USB-IF failed because mute uevent if switching usb functions without vbus changes.
 For this case, driver needs to send uevent to notfiy mtp service*/
 static bool is_mtp_enabled;
+=======
+
+>>>>>>> upstream/4.3_primoc
 
 /*
  * The code in this file is utility code, used to build a gadget driver
@@ -612,7 +616,11 @@ done:
 	return status;
 }
 
+<<<<<<< HEAD
 static int remove_config(struct usb_composite_dev *cdev,
+=======
+static int unbind_config(struct usb_composite_dev *cdev,
+>>>>>>> upstream/4.3_primoc
 			      struct usb_configuration *config)
 {
 	while (!list_empty(&config->functions)) {
@@ -627,7 +635,10 @@ static int remove_config(struct usb_composite_dev *cdev,
 			/* may free memory for "f" */
 		}
 	}
+<<<<<<< HEAD
 	list_del(&config->list);
+=======
+>>>>>>> upstream/4.3_primoc
 	if (config->unbind) {
 		DBG(cdev, "unbind config '%s'/%p\n", config->label, config);
 		config->unbind(config);
@@ -646,9 +657,17 @@ int usb_remove_config(struct usb_composite_dev *cdev,
 	if (cdev->config == config)
 		reset_config(cdev);
 
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&cdev->lock, flags);
 
 	return remove_config(cdev, config);
+=======
+	list_del(&config->list);
+
+	spin_unlock_irqrestore(&cdev->lock, flags);
+
+	return unbind_config(cdev, config);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1107,7 +1126,30 @@ static void composite_disconnect(struct usb_gadget *gadget)
 	spin_lock_irqsave(&cdev->lock, flags);
 	if (cdev->config)
 		reset_config(cdev);
+<<<<<<< HEAD
 
+=======
+	if (composite->disconnect)
+		composite->disconnect(cdev);
+	if (cdev->delayed_status != 0) {
+		WARN(cdev, "%s: delayed_status is not 0 in disconnect status\n", __func__);
+		cdev->delayed_status = 0;
+	}
+	spin_unlock_irqrestore(&cdev->lock, flags);
+}
+
+static void composite_mute_disconnect(struct usb_gadget *gadget)
+{
+	struct usb_composite_dev	*cdev = get_gadget_data(gadget);
+	unsigned long			flags;
+
+	/* REVISIT:  should we have config and device level
+	 * disconnect callbacks?
+	 */
+	spin_lock_irqsave(&cdev->lock, flags);
+	if (cdev->config)
+		reset_config(cdev);
+>>>>>>> upstream/4.3_primoc
 	if (cdev->delayed_status != 0) {
 		WARN(cdev, "%s: delayed_status is not 0 in disconnect status\n", __func__);
 		cdev->delayed_status = 0;
@@ -1145,7 +1187,12 @@ composite_unbind(struct usb_gadget *gadget)
 		struct usb_configuration	*c;
 		c = list_first_entry(&cdev->configs,
 				struct usb_configuration, list);
+<<<<<<< HEAD
 		remove_config(cdev, c);
+=======
+		list_del(&c->list);
+		unbind_config(cdev, c);
+>>>>>>> upstream/4.3_primoc
 	}
 	if (composite->unbind)
 		composite->unbind(cdev);
@@ -1335,6 +1382,11 @@ static struct usb_gadget_driver composite_driver = {
 	.unbind		= composite_unbind,
 
 	.setup		= composite_setup,
+<<<<<<< HEAD
+=======
+	.disconnect	= composite_disconnect,
+	.mute_disconnect = composite_mute_disconnect,
+>>>>>>> upstream/4.3_primoc
 
 	.suspend	= composite_suspend,
 	.resume		= composite_resume,
@@ -1383,7 +1435,10 @@ int usb_composite_probe(struct usb_composite_driver *driver,
 	INIT_WORK(&cdusbcmdwork, ctusbcmd_do_work);
 	if (rc < 0)
 		pr_err("%s: switch_dev_register fail", __func__);
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/4.3_primoc
 	return usb_gadget_probe_driver(&composite_driver, composite_bind);
 }
 

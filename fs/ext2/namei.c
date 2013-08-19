@@ -67,6 +67,7 @@ static struct dentry *ext2_lookup(struct inode * dir, struct dentry *dentry, str
 	inode = NULL;
 	if (ino) {
 		inode = ext2_iget(dir->i_sb, ino);
+<<<<<<< HEAD
 		if (IS_ERR(inode)) {
 			if (PTR_ERR(inode) == -ESTALE) {
 				ext2_error(dir->i_sb, __func__,
@@ -76,6 +77,13 @@ static struct dentry *ext2_lookup(struct inode * dir, struct dentry *dentry, str
 			} else {
 				return ERR_CAST(inode);
 			}
+=======
+		if (inode == ERR_PTR(-ESTALE)) {
+			ext2_error(dir->i_sb, __func__,
+					"deleted inode referenced: %lu",
+					(unsigned long) ino);
+			return ERR_PTR(-EIO);
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	return d_splice_alias(inode, dentry);
@@ -98,7 +106,11 @@ struct dentry *ext2_get_parent(struct dentry *child)
  * If the create succeeds, we fill in the inode information
  * with d_instantiate(). 
  */
+<<<<<<< HEAD
 static int ext2_create (struct inode * dir, struct dentry * dentry, int mode, struct nameidata *nd)
+=======
+static int ext2_create (struct inode * dir, struct dentry * dentry, umode_t mode, struct nameidata *nd)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode *inode;
 
@@ -123,7 +135,11 @@ static int ext2_create (struct inode * dir, struct dentry * dentry, int mode, st
 	return ext2_add_nondir(dentry, inode);
 }
 
+<<<<<<< HEAD
 static int ext2_mknod (struct inode * dir, struct dentry *dentry, int mode, dev_t rdev)
+=======
+static int ext2_mknod (struct inode * dir, struct dentry *dentry, umode_t mode, dev_t rdev)
+>>>>>>> upstream/4.3_primoc
 {
 	struct inode * inode;
 	int err;
@@ -412,7 +428,11 @@ const struct inode_operations ext2_dir_inode_operations = {
 	.removexattr	= generic_removexattr,
 #endif
 	.setattr	= ext2_setattr,
+<<<<<<< HEAD
 	.check_acl	= ext2_check_acl,
+=======
+	.get_acl	= ext2_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 const struct inode_operations ext2_special_inode_operations = {
@@ -423,5 +443,9 @@ const struct inode_operations ext2_special_inode_operations = {
 	.removexattr	= generic_removexattr,
 #endif
 	.setattr	= ext2_setattr,
+<<<<<<< HEAD
 	.check_acl	= ext2_check_acl,
+=======
+	.get_acl	= ext2_get_acl,
+>>>>>>> upstream/4.3_primoc
 };

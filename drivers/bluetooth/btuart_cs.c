@@ -689,7 +689,11 @@ static void btuart_release(struct pcmcia_device *link)
 	pcmcia_disable_device(link);
 }
 
+<<<<<<< HEAD
 static const struct pcmcia_device_id btuart_ids[] = {
+=======
+static struct pcmcia_device_id btuart_ids[] = {
+>>>>>>> upstream/4.3_primoc
 	/* don't use this driver. Use serial_cs + hci_uart instead */
 	PCMCIA_DEVICE_NULL
 };

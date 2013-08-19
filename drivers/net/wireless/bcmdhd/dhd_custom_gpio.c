@@ -20,7 +20,11 @@
 * software in any way with any other Broadcom software provided under a license
 * other than the GPL, without Broadcom's express prior written consent.
 *
+<<<<<<< HEAD
 * $Id: dhd_custom_gpio.c 275786 2011-08-04 22:42:42Z $
+=======
+* $Id: dhd_custom_gpio.c 339054 2012-06-15 04:56:55Z $
+>>>>>>> upstream/4.3_primoc
 */
 
 #include <typedefs.h>
@@ -41,13 +45,28 @@
 extern  void bcm_wlan_power_off(int);
 extern  void bcm_wlan_power_on(int);
 #endif /* CUSTOMER_HW */
+<<<<<<< HEAD
 #if  defined(CUSTOMER_HW2)
 int wifi_set_carddetect(int on);
+=======
+#if defined(CUSTOMER_HW2)
+#ifdef CONFIG_WIFI_CONTROL_FUNC
+>>>>>>> upstream/4.3_primoc
 int wifi_set_power(int on, unsigned long msec);
 int wifi_get_irq_number(unsigned long *irq_flags_ptr);
 int wifi_get_mac_addr(unsigned char *buf);
 void *wifi_get_country_code(char *ccode);
+<<<<<<< HEAD
 #endif
+=======
+#else
+int wifi_set_power(int on, unsigned long msec) { return -1; }
+int wifi_get_irq_number(unsigned long *irq_flags_ptr) { return -1; }
+int wifi_get_mac_addr(unsigned char *buf) { return -1; }
+void *wifi_get_country_code(char *ccode) { return NULL; }
+#endif /* CONFIG_WIFI_CONTROL_FUNC */
+#endif /* CUSTOMER_HW2 */
+>>>>>>> upstream/4.3_primoc
 
 #if defined(OOB_INTR_ONLY)
 
@@ -91,13 +110,21 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 #endif /* CUSTOMER_HW2 */
 
 	if (dhd_oob_gpio_num < 0) {
+<<<<<<< HEAD
 		WL_ERROR(("%s: ERROR customer specific Host GPIO is NOT defined \n",
+=======
+		WL_ERROR(("%s: ERROR customer specific Host GPIO is NOT defined\n",
+>>>>>>> upstream/4.3_primoc
 			__FUNCTION__));
 		return (dhd_oob_gpio_num);
 	}
 
 	WL_ERROR(("%s: customer specific Host GPIO number is (%d)\n",
+<<<<<<< HEAD
 	         __FUNCTION__, dhd_oob_gpio_num));
+=======
+		__FUNCTION__, dhd_oob_gpio_num));
+>>>>>>> upstream/4.3_primoc
 
 #if defined CUSTOMER_HW
 	host_oob_irq = MSM_GPIO_TO_INT(dhd_oob_gpio_num);
@@ -235,6 +262,7 @@ const struct cntry_locales_custom translate_custom_table[] = {
 	{"CH", "CH", 0},
 	{"TR", "TR", 0},
 	{"NO", "NO", 0},
+<<<<<<< HEAD
 #else
 	{"KR", "KR", 3},
 	{"AD", "XW", 0},
@@ -245,6 +273,8 @@ const struct cntry_locales_custom translate_custom_table[] = {
 	{"PS", "XW", 0},
 	{"SD", "XW", 0},
 	{"TL", "XW", 0},
+=======
+>>>>>>> upstream/4.3_primoc
 #endif /* EXMAPLE_TABLE */
 };
 
@@ -293,5 +323,9 @@ void get_customized_country_code(char *country_iso_code, wl_country_t *cspec)
 	cspec->rev = translate_custom_table[0].custom_locale_rev;
 #endif /* EXMAPLE_TABLE */
 	return;
+<<<<<<< HEAD
 #endif /* defined(CUSTOMER_HW2) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36)) */
+=======
+#endif /* defined(CUSTOMER_HW2) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 39)) */
+>>>>>>> upstream/4.3_primoc
 }

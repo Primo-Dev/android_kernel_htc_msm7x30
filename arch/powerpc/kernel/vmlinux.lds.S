@@ -38,9 +38,12 @@ jiffies = jiffies_64 + 4;
 #endif
 SECTIONS
 {
+<<<<<<< HEAD
 	. = 0;
 	reloc_start = .;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	. = KERNELBASE;
 
 /*

@@ -186,9 +186,12 @@ static void fat16_ent_put(struct fat_entry *fatent, int new)
 
 static void fat32_ent_put(struct fat_entry *fatent, int new)
 {
+<<<<<<< HEAD
 	if (new == FAT_ENT_EOF)
 		new = EOF_FAT32;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	WARN_ON(new & 0xf0000000);
 	new |= le32_to_cpu(*fatent->u.ent32_p) & ~0x0fffffff;
 	*fatent->u.ent32_p = cpu_to_le32(new);

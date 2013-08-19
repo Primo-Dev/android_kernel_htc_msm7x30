@@ -1,7 +1,11 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
    Copyright (C) 2000-2001 Qualcomm Incorporated
+<<<<<<< HEAD
    Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+=======
+   Copyright (c) 2011, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
 
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
@@ -25,7 +29,10 @@
 
 /* Bluetooth SCO sockets. */
 
+<<<<<<< HEAD
 #include <linux/interrupt.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <linux/module.h>
 
 #include <linux/types.h>
@@ -52,7 +59,11 @@
 #include <net/bluetooth/hci_core.h>
 #include <net/bluetooth/sco.h>
 
+<<<<<<< HEAD
 static bool disable_esco;
+=======
+static int disable_esco;
+>>>>>>> upstream/4.3_primoc
 
 static const struct proto_ops sco_sock_ops;
 
@@ -394,6 +405,21 @@ static void __sco_sock_close(struct sock *sk)
 
 	case BT_CONNECTED:
 	case BT_CONFIG:
+<<<<<<< HEAD
+=======
+		if (sco_pi(sk)->conn) {
+			sk->sk_state = BT_DISCONN;
+			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+			if (sco_pi(sk)->conn->hcon != NULL) {
+				hci_conn_put(sco_pi(sk)->conn->hcon);
+				sco_pi(sk)->conn->hcon = NULL;
+			}
+		} else
+			sco_chan_del(sk, ECONNRESET);
+		break;
+
+	case BT_CONNECT2:
+>>>>>>> upstream/4.3_primoc
 	case BT_CONNECT:
 	case BT_DISCONN:
 		sco_chan_del(sk, ECONNRESET);
@@ -803,6 +829,12 @@ static int sco_sock_shutdown(struct socket *sock, int how)
 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
 			err = bt_sock_wait_state(sk, BT_CLOSED,
 							sk->sk_lingertime);
+<<<<<<< HEAD
+=======
+		else
+			err = bt_sock_wait_state(sk, BT_CLOSED,
+							SCO_DISCONN_TIMEOUT);
+>>>>>>> upstream/4.3_primoc
 	}
 	release_sock(sk);
 	return err;
@@ -824,6 +856,14 @@ static int sco_sock_release(struct socket *sock)
 		lock_sock(sk);
 		err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);
 		release_sock(sk);
+<<<<<<< HEAD
+=======
+	} else {
+		lock_sock(sk);
+		err = bt_sock_wait_state(sk, BT_CLOSED,
+							SCO_DISCONN_TIMEOUT);
+		release_sock(sk);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	sock_orphan(sk);
@@ -857,7 +897,13 @@ static void sco_chan_del(struct sock *sk, int err)
 		conn->sk = NULL;
 		sco_pi(sk)->conn = NULL;
 		sco_conn_unlock(conn);
+<<<<<<< HEAD
 		hci_conn_put(conn->hcon);
+=======
+
+		if (conn->hcon)
+			hci_conn_put(conn->hcon);
+>>>>>>> upstream/4.3_primoc
 	}
 
 	sk->sk_state = BT_CLOSED;

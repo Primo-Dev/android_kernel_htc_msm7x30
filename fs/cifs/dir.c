@@ -141,7 +141,11 @@ cifs_bp_rename_retry:
 /* Inode operations in similar order to how they appear in Linux file fs.h */
 
 int
+<<<<<<< HEAD
 cifs_create(struct inode *inode, struct dentry *direntry, int mode,
+=======
+cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		struct nameidata *nd)
 {
 	int rc = -ENOENT;
@@ -357,7 +361,11 @@ cifs_create_out:
 	return rc;
 }
 
+<<<<<<< HEAD
 int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
+=======
+int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+>>>>>>> upstream/4.3_primoc
 		dev_t device_number)
 {
 	int rc = -EPERM;
@@ -583,10 +591,33 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
 			 * If either that or op not supported returned, follow
 			 * the normal lookup.
 			 */
+<<<<<<< HEAD
 			if ((rc == 0) || (rc == -ENOENT))
 				posix_open = true;
 			else if ((rc == -EINVAL) || (rc != -EOPNOTSUPP))
 				pTcon->broken_posix_open = true;
+=======
+			switch (rc) {
+			case 0:
+				/*
+				 * The server may allow us to open things like
+				 * FIFOs, but the client isn't set up to deal
+				 * with that. If it's not a regular file, just
+				 * close it and proceed as if it were a normal
+				 * lookup.
+				 */
+				if (newInode && !S_ISREG(newInode->i_mode)) {
+					CIFSSMBClose(xid, pTcon, fileHandle);
+					break;
+				}
+			case -ENOENT:
+				posix_open = true;
+			case -EOPNOTSUPP:
+				break;
+			default:
+				pTcon->broken_posix_open = true;
+			}
+>>>>>>> upstream/4.3_primoc
 		}
 		if (!posix_open)
 			rc = cifs_get_inode_info_unix(&newInode, full_path,

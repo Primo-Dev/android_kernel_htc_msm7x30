@@ -79,6 +79,12 @@
 #define MSM_TCSR_PHYS	      0xAB600000
 #define MSM_TCSR_SIZE	      SZ_4K
 
+<<<<<<< HEAD
+=======
+#define MSM_SPI_PHYS          0xA8000000
+#define MSM_SPI_SIZE          SZ_4K
+
+>>>>>>> upstream/4.3_primoc
 #define MSM_SHARED_RAM_BASE   IOMEM(0xFE100000)
 #define MSM_SHARED_RAM_PHYS   0x00400000
 #define MSM_SHARED_RAM_SIZE   SZ_1M

@@ -630,9 +630,12 @@ config TCP_MD5SIG
 	  on the Internet.
 
 	  If unsure, say N.
+<<<<<<< HEAD
 
 config HTC_NETWORK_MODIFY
 	tristate
 	---help---
 	  HTC NET MODIFY
 
+=======
+>>>>>>> upstream/4.3_primoc

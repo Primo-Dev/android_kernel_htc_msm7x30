@@ -7,9 +7,17 @@
 
 #include <linux/compiler.h>
 #include <linux/types.h>
+<<<<<<< HEAD
 
 #ifdef __KERNEL__
 #include <asm/atomic.h>
+=======
+#include <linux/rcupdate.h>
+
+#ifdef __KERNEL__
+#include <asm/atomic.h>
+#include <linux/rcu_types.h>
+>>>>>>> upstream/4.3_primoc
 #endif
 
 /*

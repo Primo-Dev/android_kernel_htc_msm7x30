@@ -23,6 +23,10 @@
 #include <linux/string.h>
 #include <linux/ctype.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/memcopy.h>
+>>>>>>> upstream/4.3_primoc
 
 #ifndef __HAVE_ARCH_STRNICMP
 /**
@@ -360,7 +364,10 @@ char *strim(char *s)
 	size_t size;
 	char *end;
 
+<<<<<<< HEAD
 	s = skip_spaces(s);
+=======
+>>>>>>> upstream/4.3_primoc
 	size = strlen(s);
 	if (!size)
 		return s;
@@ -370,7 +377,11 @@ char *strim(char *s)
 		end--;
 	*(end + 1) = '\0';
 
+<<<<<<< HEAD
 	return s;
+=======
+	return skip_spaces(s);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(strim);
 
@@ -596,11 +607,19 @@ EXPORT_SYMBOL(memset);
  */
 void *memcpy(void *dest, const void *src, size_t count)
 {
+<<<<<<< HEAD
 	char *tmp = dest;
 	const char *s = src;
 
 	while (count--)
 		*tmp++ = *s++;
+=======
+	unsigned long dstp = (unsigned long)dest; 
+	unsigned long srcp = (unsigned long)src; 
+
+	/* Copy from the beginning to the end */ 
+	mem_copy_fwd(dstp, srcp, count); 
+>>>>>>> upstream/4.3_primoc
 	return dest;
 }
 EXPORT_SYMBOL(memcpy);
@@ -617,6 +636,7 @@ EXPORT_SYMBOL(memcpy);
  */
 void *memmove(void *dest, const void *src, size_t count)
 {
+<<<<<<< HEAD
 	char *tmp;
 	const char *s;
 
@@ -632,6 +652,17 @@ void *memmove(void *dest, const void *src, size_t count)
 		s += count;
 		while (count--)
 			*--tmp = *--s;
+=======
+	unsigned long dstp = (unsigned long)dest; 
+	unsigned long srcp = (unsigned long)src; 
+
+	if (dest - src >= count) { 
+		/* Copy from the beginning to the end */ 
+		mem_copy_fwd(dstp, srcp, count); 
+	} else {
+		/* Copy from the end to the beginning */ 
+		mem_copy_bwd(dstp, srcp, count); 
+>>>>>>> upstream/4.3_primoc
 	}
 	return dest;
 }
@@ -756,3 +787,60 @@ void *memchr(const void *s, int c, size_t n)
 }
 EXPORT_SYMBOL(memchr);
 #endif
+<<<<<<< HEAD
+=======
+
+static void *check_bytes8(const u8 *start, u8 value, unsigned int bytes)
+{
+	while (bytes) {
+		if (*start != value)
+			return (void *)start;
+		start++;
+		bytes--;
+	}
+	return NULL;
+}
+
+/**
+ * memchr_inv - Find an unmatching character in an area of memory.
+ * @start: The memory area
+ * @c: Find a character other than c
+ * @bytes: The size of the area.
+ *
+ * returns the address of the first character other than @c, or %NULL
+ * if the whole buffer contains just @c.
+ */
+void *memchr_inv(const void *start, int c, size_t bytes)
+{
+	u8 value = c;
+	u64 value64;
+	unsigned int words, prefix;
+
+	if (bytes <= 16)
+		return check_bytes8(start, value, bytes);
+
+	value64 = value | value << 8 | value << 16 | value << 24;
+	value64 = (value64 & 0xffffffff) | value64 << 32;
+	prefix = 8 - ((unsigned long)start) % 8;
+
+	if (prefix) {
+		u8 *r = check_bytes8(start, value, prefix);
+		if (r)
+			return r;
+		start += prefix;
+		bytes -= prefix;
+	}
+
+	words = bytes / 8;
+
+	while (words) {
+		if (*(u64 *)start != value64)
+			return check_bytes8(start, value, 8);
+		start += 8;
+		words--;
+	}
+
+	return check_bytes8(start, value, bytes % 8);
+}
+EXPORT_SYMBOL(memchr_inv);
+>>>>>>> upstream/4.3_primoc

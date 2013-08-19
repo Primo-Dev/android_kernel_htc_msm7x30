@@ -48,7 +48,11 @@
 #include "acl.h"
 
 static int
+<<<<<<< HEAD
 v9fs_vfs_mknod_dotl(struct inode *dir, struct dentry *dentry, int omode,
+=======
+v9fs_vfs_mknod_dotl(struct inode *dir, struct dentry *dentry, umode_t omode,
+>>>>>>> upstream/4.3_primoc
 		    dev_t rdev);
 
 /**
@@ -253,13 +257,21 @@ int v9fs_open_to_dotl_flags(int flags)
  */
 
 static int
+<<<<<<< HEAD
 v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, int omode,
+=======
+v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, umode_t omode,
+>>>>>>> upstream/4.3_primoc
 		struct nameidata *nd)
 {
 	int err = 0;
 	gid_t gid;
 	int flags;
+<<<<<<< HEAD
 	mode_t mode;
+=======
+	umode_t mode;
+>>>>>>> upstream/4.3_primoc
 	char *name = NULL;
 	struct file *filp;
 	struct p9_qid qid;
@@ -284,7 +296,11 @@ v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, int omode,
 
 	name = (char *) dentry->d_name.name;
 	P9_DPRINTK(P9_DEBUG_VFS, "v9fs_vfs_create_dotl: name:%s flags:0x%x "
+<<<<<<< HEAD
 			"mode:0x%x\n", name, flags, omode);
+=======
+			"mode:0x%hx\n", name, flags, omode);
+>>>>>>> upstream/4.3_primoc
 
 	dfid = v9fs_fid_lookup(dentry->d_parent);
 	if (IS_ERR(dfid)) {
@@ -402,7 +418,11 @@ static int v9fs_vfs_mkdir_dotl(struct inode *dir,
 	struct p9_fid *fid = NULL, *dfid = NULL;
 	gid_t gid;
 	char *name;
+<<<<<<< HEAD
 	mode_t mode;
+=======
+	umode_t mode;
+>>>>>>> upstream/4.3_primoc
 	struct inode *inode;
 	struct p9_qid qid;
 	struct dentry *dir_dentry;
@@ -799,13 +819,21 @@ v9fs_vfs_link_dotl(struct dentry *old_dentry, struct inode *dir,
  *
  */
 static int
+<<<<<<< HEAD
 v9fs_vfs_mknod_dotl(struct inode *dir, struct dentry *dentry, int omode,
+=======
+v9fs_vfs_mknod_dotl(struct inode *dir, struct dentry *dentry, umode_t omode,
+>>>>>>> upstream/4.3_primoc
 		dev_t rdev)
 {
 	int err;
 	gid_t gid;
 	char *name;
+<<<<<<< HEAD
 	mode_t mode;
+=======
+	umode_t mode;
+>>>>>>> upstream/4.3_primoc
 	struct v9fs_session_info *v9ses;
 	struct p9_fid *fid = NULL, *dfid = NULL;
 	struct inode *inode;
@@ -814,7 +842,11 @@ v9fs_vfs_mknod_dotl(struct inode *dir, struct dentry *dentry, int omode,
 	struct posix_acl *dacl = NULL, *pacl = NULL;
 
 	P9_DPRINTK(P9_DEBUG_VFS,
+<<<<<<< HEAD
 		" %lu,%s mode: %x MAJOR: %u MINOR: %u\n", dir->i_ino,
+=======
+		" %lu,%s mode: %hx MAJOR: %u MINOR: %u\n", dir->i_ino,
+>>>>>>> upstream/4.3_primoc
 		dentry->d_name.name, omode, MAJOR(rdev), MINOR(rdev));
 
 	if (!new_valid_dev(rdev))
@@ -977,7 +1009,11 @@ const struct inode_operations v9fs_dir_inode_operations_dotl = {
 	.getxattr = generic_getxattr,
 	.removexattr = generic_removexattr,
 	.listxattr = v9fs_listxattr,
+<<<<<<< HEAD
 	.check_acl = v9fs_check_acl,
+=======
+	.get_acl = v9fs_iop_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 const struct inode_operations v9fs_file_inode_operations_dotl = {
@@ -987,7 +1023,11 @@ const struct inode_operations v9fs_file_inode_operations_dotl = {
 	.getxattr = generic_getxattr,
 	.removexattr = generic_removexattr,
 	.listxattr = v9fs_listxattr,
+<<<<<<< HEAD
 	.check_acl = v9fs_check_acl,
+=======
+	.get_acl = v9fs_iop_get_acl,
+>>>>>>> upstream/4.3_primoc
 };
 
 const struct inode_operations v9fs_symlink_inode_operations_dotl = {

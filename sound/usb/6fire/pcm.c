@@ -541,7 +541,11 @@ static snd_pcm_uframes_t usb6fire_pcm_pointer(
 	snd_pcm_uframes_t ret;
 
 	if (rt->panic || !sub)
+<<<<<<< HEAD
 		return SNDRV_PCM_STATE_XRUN;
+=======
+		return SNDRV_PCM_POS_XRUN;
+>>>>>>> upstream/4.3_primoc
 
 	spin_lock_irqsave(&sub->lock, flags);
 	ret = sub->dma_off;

@@ -21,7 +21,10 @@
 #include <linux/interrupt.h>
 #include <linux/sched.h>
 #include <linux/gpio.h>
+<<<<<<< HEAD
 #include <linux/slab.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <mach/msm_fb.h>
 
 static DECLARE_WAIT_QUEUE_HEAD(nt35399_vsync_wait);

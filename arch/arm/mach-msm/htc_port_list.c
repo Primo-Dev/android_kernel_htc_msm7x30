@@ -64,34 +64,61 @@ static ssize_t htc_store(struct device *dev, struct device_attribute *attr,  con
 	mutex_lock(&port_lock);
 	if (!strncmp(buf, "0", strlen("0"))) {
 		packet_filter_flag = 0;
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Disable Packet filter\n");
+=======
+		printk(KERN_INFO "[Port list] Disable Packet filter\n");
+>>>>>>> upstream/4.3_primoc
 #ifdef PACKET_FILTER_UDP
 		if (port_list_udp != NULL)
 			port_list_udp[0] = packet_filter_flag;
 		else
+<<<<<<< HEAD
 			printk(KERN_ERR "[K][Port list] port_list_udp == NULL\n");
+=======
+			printk(KERN_ERR "[Port list] port_list_udp == NULL\n");
+>>>>>>> upstream/4.3_primoc
 #endif
 		if (port_list != NULL)
 			port_list[0] = packet_filter_flag;
 		else
+<<<<<<< HEAD
 			printk(KERN_ERR "[K][Port list] port_list == NULL\n");
 		ret = count;
 	} else if (!strncmp(buf, "1", strlen("1"))) {
 		packet_filter_flag = 1;
 		printk(KERN_INFO "[K][Port list] Enable Packet filter\n");
+=======
+			printk(KERN_ERR "[Port list] port_list == NULL\n");
+		ret = count;
+	} else if (!strncmp(buf, "1", strlen("1"))) {
+		packet_filter_flag = 1;
+		printk(KERN_INFO "[Port list] Enable Packet filter\n");
+>>>>>>> upstream/4.3_primoc
 #ifdef PACKET_FILTER_UDP
 		if (port_list_udp != NULL)
 			port_list_udp[0] = packet_filter_flag;
 		else
+<<<<<<< HEAD
 			printk(KERN_ERR "[K][Port list] port_list_udp == NULL\n");
+=======
+			printk(KERN_ERR "[Port list] port_list_udp == NULL\n");
+>>>>>>> upstream/4.3_primoc
 #endif
 		if (port_list != NULL)
 			port_list[0] = packet_filter_flag;
 		else
+<<<<<<< HEAD
 			printk(KERN_ERR "[K][Port list] port_list == NULL\n");
 		ret = count;
 	} else {
 		printk(KERN_ERR "[K][Port list] flag: invalid argument\n");
+=======
+			printk(KERN_ERR "[Port list] port_list == NULL\n");
+		ret = count;
+	} else {
+		printk(KERN_ERR "[Port list] flag: invalid argument\n");
+>>>>>>> upstream/4.3_primoc
 		ret = -EINVAL;
 	}
 	mutex_unlock(&port_lock);
@@ -106,9 +133,15 @@ static int port_list_enable(int enable)
 	if (port_list[0] != enable) {
 		port_list[0] = enable;
 		if (enable)
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] port_list is enabled.\n");
 		else
 			printk(KERN_INFO "[K][Port list] port_list is disabled.\n");
+=======
+			printk(KERN_INFO "[Port list] port_list is enabled.\n");
+		else
+			printk(KERN_INFO "[Port list] port_list is disabled.\n");
+>>>>>>> upstream/4.3_primoc
 	}
 	return 0;
 }
@@ -119,9 +152,15 @@ static int port_list_enable_udp(int enable)
 	if (port_list_udp[0] != enable) {
 		port_list_udp[0] = enable;
 		if (enable)
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] port_list_udp is enabled.\n");
 		else
 			printk(KERN_INFO "[K][Port list] port_list_udp is disabled.\n");
+=======
+			printk(KERN_INFO "[Port list] port_list_udp is enabled.\n");
+		else
+			printk(KERN_INFO "[Port list] port_list_udp is disabled.\n");
+>>>>>>> upstream/4.3_primoc
 	}
 	return 0;
 }
@@ -137,7 +176,11 @@ static void update_port_list(void)
 	list_for_each(listptr, &curr_port_list.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		count++;
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] [%d] = %d\n", count, entry->no);
+=======
+		printk(KERN_INFO "[Port list] [%d] = %d\n", count, entry->no);
+>>>>>>> upstream/4.3_primoc
 		if (count <= 127)
 			port_list[count] = entry->no;
 	}
@@ -159,7 +202,11 @@ static void update_port_list(void)
 	list_for_each(listptr, &curr_port_list_udp.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		count++;
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] UDP [%d] = %d\n", count, entry->no);
+=======
+		printk(KERN_INFO "[Port list] UDP [%d] = %d\n", count, entry->no);
+>>>>>>> upstream/4.3_primoc
 		if (count <= 127)
 			port_list_udp[count] = entry->no;
 	}
@@ -188,7 +235,11 @@ static struct p_list *add_list(int no)
 	list_for_each(listptr, &curr_port_list.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		if (entry->no == no) {
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Port %d is already in the list!", entry->no);
+=======
+			printk(KERN_INFO "[Port list] Port %d is already in the list!", entry->no);
+>>>>>>> upstream/4.3_primoc
 			get_list = 1;
 			break;
 		}
@@ -198,7 +249,11 @@ static struct p_list *add_list(int no)
 		if (ptr) {
 			ptr->no = no;
 			list_add_tail(&ptr->list, &curr_port_list.list);
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Add port [%d]\n", no);
+=======
+			printk(KERN_INFO "[Port list] Add port [%d]\n", no);
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	return (ptr);
@@ -214,7 +269,11 @@ static struct p_list *add_list_udp(int no)
 	list_for_each(listptr, &curr_port_list_udp.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		if (entry->no == no) {
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Port_udp %d is already in the list!", entry->no);
+=======
+			printk(KERN_INFO "[Port list] Port_udp %d is already in the list!", entry->no);
+>>>>>>> upstream/4.3_primoc
 			get_list = 1;
 			break;
 		}
@@ -224,7 +283,11 @@ static struct p_list *add_list_udp(int no)
 		if (ptr) {
 			ptr->no = no;
 			list_add_tail(&ptr->list, &curr_port_list_udp.list);
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Add port_udp [%d]\n", no);
+=======
+			printk(KERN_INFO "[Port list] Add port_udp [%d]\n", no);
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	return (ptr);
@@ -240,7 +303,11 @@ static void remove_list(int no)
 	list_for_each(listptr, &curr_port_list.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		if (entry->no == no) {
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Remove port [%d]\n", entry->no);
+=======
+			printk(KERN_INFO "[Port list] Remove port [%d]\n", entry->no);
+>>>>>>> upstream/4.3_primoc
 			list_del(&entry->list);
 			kfree(entry);
 			get_list = 1;
@@ -248,7 +315,11 @@ static void remove_list(int no)
 		}
 	}
 	if (!get_list)
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Remove failed! Port number is not in list!\n");
+=======
+		printk(KERN_INFO "[Port list] Remove failed! Port number is not in list!\n");
+>>>>>>> upstream/4.3_primoc
 }
 #ifdef PACKET_FILTER_UDP
 static void remove_list_udp(int no)
@@ -260,7 +331,11 @@ static void remove_list_udp(int no)
 	list_for_each(listptr, &curr_port_list_udp.list) {
 		entry = list_entry(listptr, struct p_list, list);
 		if (entry->no == no) {
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Remove port_udp [%d]\n", entry->no);
+=======
+			printk(KERN_INFO "[Port list] Remove port_udp [%d]\n", entry->no);
+>>>>>>> upstream/4.3_primoc
 			list_del(&entry->list);
 			kfree(entry);
 			get_list = 1;
@@ -268,7 +343,11 @@ static void remove_list_udp(int no)
 		}
 	}
 	if (!get_list)
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Remove failed! Port_udp number is not in list!\n");
+=======
+		printk(KERN_INFO "[Port list] Remove failed! Port_udp number is not in list!\n");
+>>>>>>> upstream/4.3_primoc
 }
 #endif
 
@@ -299,10 +378,17 @@ int add_or_remove_port(struct sock *sk, int add_or_remove)
 			port_list = smem_alloc(SMEM_ID_VENDOR2, sizeof(uint16_t)*128);
 			#endif
 			port_list_phy_addr = MSM_SHARED_RAM_PHYS + ((uint32_t)port_list - (uint32_t)MSM_SHARED_RAM_BASE);
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Virtual Address of port_list: [%p]\n", port_list);
 			printk(KERN_INFO "[K][Port list] Physical Address of port_list: [%X]\n", port_list_phy_addr);
 			if (port_list == NULL) {
 				printk(KERN_INFO "[K][Port list] port_list is NULL.\n");
+=======
+			printk(KERN_INFO "[Port list] Virtual Address of port_list: [%p]\n", port_list);
+			printk(KERN_INFO "[Port list] Physical Address of port_list: [%X]\n", port_list_phy_addr);
+			if (port_list == NULL) {
+				printk(KERN_INFO "[Port list] port_list is NULL.\n");
+>>>>>>> upstream/4.3_primoc
 				wake_unlock(&port_suspend_lock);
 				return 0;
 			} else {
@@ -314,12 +400,21 @@ int add_or_remove_port(struct sock *sk, int add_or_remove)
 			}
 		}
 		#ifdef PACKET_FILTER_UDP
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Address of port_list: [%p]\n", port_list);
 		printk(KERN_INFO "[K][Port list] Address of port_list_udp: [%p]\n", port_list_udp);
 		#endif
 
 		mutex_lock(&port_lock);
 		printk(KERN_INFO "[K][Port list] TCP port#: [%d]\n", srcp);
+=======
+		printk(KERN_INFO "[Port list] Address of port_list: [%p]\n", port_list);
+		printk(KERN_INFO "[Port list] Address of port_list_udp: [%p]\n", port_list_udp);
+		#endif
+
+		mutex_lock(&port_lock);
+		printk(KERN_INFO "[Port list] TCP port#: [%d]\n", srcp);
+>>>>>>> upstream/4.3_primoc
 		if (add_or_remove)
 			add_list(srcp);
 		else
@@ -333,10 +428,17 @@ int add_or_remove_port(struct sock *sk, int add_or_remove)
 		if (port_list == NULL) {
 			port_list = smem_alloc(SMEM_ID_VENDOR2, sizeof(uint16_t)*256);
 			port_list_phy_addr = MSM_SHARED_RAM_PHYS + ((uint32_t)port_list - (uint32_t)MSM_SHARED_RAM_BASE);
+<<<<<<< HEAD
 			printk(KERN_INFO "[K][Port list] Virtual Address of port_list: [%p]\n", port_list);
 			printk(KERN_INFO "[K][Port list] Physical Address of port_list: [%X]\n", port_list_phy_addr);
 			if (port_list == NULL) {
 				printk(KERN_INFO "[K][Port list] port_list is NULL.\n");
+=======
+			printk(KERN_INFO "[Port list] Virtual Address of port_list: [%p]\n", port_list);
+			printk(KERN_INFO "[Port list] Physical Address of port_list: [%X]\n", port_list_phy_addr);
+			if (port_list == NULL) {
+				printk(KERN_INFO "[Port list] port_list is NULL.\n");
+>>>>>>> upstream/4.3_primoc
 				wake_unlock(&port_suspend_lock);
 				return 0;
 			} else {
@@ -345,11 +447,19 @@ int add_or_remove_port(struct sock *sk, int add_or_remove)
 				port_list_udp[0] = packet_filter_flag;
 			}
 		}
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Address of port_list: [%p]\n", port_list);
 		printk(KERN_INFO "[K][Port list] Address of port_list_udp: [%p]\n", port_list_udp);
 
 		mutex_lock(&port_lock);
 		printk(KERN_INFO "[K][Port list] UDP port#: [%d]\n", srcp);
+=======
+		printk(KERN_INFO "[Port list] Address of port_list: [%p]\n", port_list);
+		printk(KERN_INFO "[Port list] Address of port_list_udp: [%p]\n", port_list_udp);
+
+		mutex_lock(&port_lock);
+		printk(KERN_INFO "[Port list] UDP port#: [%d]\n", srcp);
+>>>>>>> upstream/4.3_primoc
 		if (add_or_remove)
 			add_list_udp(srcp);
 		else
@@ -375,7 +485,11 @@ int update_port_list_charging_state(int enable)
 	}
 
 	if (port_list == NULL) {
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] port_list is NULL.\n");
+=======
+		printk(KERN_INFO "[Port list] port_list is NULL.\n");
+>>>>>>> upstream/4.3_primoc
 		wake_unlock(&port_suspend_lock);
 		return 0;
 	}
@@ -433,6 +547,7 @@ static int __init port_list_init(void)
 	#endif
 
 	port_list_phy_addr = MSM_SHARED_RAM_PHYS + ((uint32_t)port_list - (uint32_t)MSM_SHARED_RAM_BASE);
+<<<<<<< HEAD
 	printk(KERN_INFO "[K][Port list] init()\n");
 	printk(KERN_INFO "[K][Port list] Virtual Address for port_list: [%p]\n", port_list);
 	printk(KERN_INFO "[K][Port list] Physical Address for port_list: [%X]\n", port_list_phy_addr);
@@ -440,6 +555,15 @@ static int __init port_list_init(void)
 	ret = misc_register(&portlist_misc);
 	if (ret < 0) {
 		printk(KERN_ERR "[K][Port list] failed to register misc device!\n");
+=======
+	printk(KERN_INFO "[Port list] init()\n");
+	printk(KERN_INFO "[Port list] Virtual Address for port_list: [%p]\n", port_list);
+	printk(KERN_INFO "[Port list] Physical Address for port_list: [%X]\n", port_list_phy_addr);
+
+	ret = misc_register(&portlist_misc);
+	if (ret < 0) {
+		printk(KERN_ERR "[Port list] failed to register misc device!\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_misc_register;
 	}
 
@@ -447,7 +571,11 @@ static int __init port_list_init(void)
 	if (IS_ERR(p_class)) {
 		ret = PTR_ERR(p_class);
 		p_class = NULL;
+<<<<<<< HEAD
 		printk(KERN_ERR "[K][Port list] class_create failed!\n");
+=======
+		printk(KERN_ERR "[Port list] class_create failed!\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_class_create;
 	}
 
@@ -455,26 +583,44 @@ static int __init port_list_init(void)
 	if (IS_ERR(portlist_misc.this_device)) {
 		ret = PTR_ERR(portlist_misc.this_device);
 		portlist_misc.this_device = NULL;
+<<<<<<< HEAD
 		printk(KERN_ERR "[K][Port list] device_create failed!\n");
+=======
+		printk(KERN_ERR "[Port list] device_create failed!\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_device_create;
 	}
 
 	ret = device_create_file(portlist_misc.this_device, &dev_attr_flag);
 	if (ret < 0) {
+<<<<<<< HEAD
 		printk(KERN_ERR "[K][Port list] devices_create_file failed!\n");
+=======
+		printk(KERN_ERR "[Port list] devices_create_file failed!\n");
+>>>>>>> upstream/4.3_primoc
 		goto err_device_create_file;
 	}
 	if (port_list != NULL) {
 		port_list[0] = packet_filter_flag;
 		#ifdef PACKET_FILTER_UDP
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] Address of port_list: [%p]\n", port_list);
 		printk(KERN_INFO "[K][Port list] Address of port_list_udp: [%p]\n", port_list_udp);
+=======
+		printk(KERN_INFO "[Port list] Address of port_list: [%p]\n", port_list);
+		printk(KERN_INFO "[Port list] Address of port_list_udp: [%p]\n", port_list_udp);
+>>>>>>> upstream/4.3_primoc
 		port_list_udp = port_list + 128;
 		port_list_udp[0] = packet_filter_flag;
 		#endif
 	} else {
+<<<<<<< HEAD
 		printk(KERN_INFO "[K][Port list] port_list is NULL.\n");
 		printk(KERN_INFO "[K][Port list] packet filter is disabled.\n");
+=======
+		printk(KERN_INFO "[Port list] port_list is NULL.\n");
+		printk(KERN_INFO "[Port list] packet filter is disabled.\n");
+>>>>>>> upstream/4.3_primoc
 	}
 
 	return 0;
@@ -501,7 +647,11 @@ static void __exit port_list_exit(void)
 
 	ret = misc_deregister(&portlist_misc);
 	if (ret < 0)
+<<<<<<< HEAD
 		printk(KERN_ERR "[K][Port list] failed to unregister misc device!\n");
+=======
+		printk(KERN_ERR "[Port list] failed to unregister misc device!\n");
+>>>>>>> upstream/4.3_primoc
 
 	list_for_each(listptr, &curr_port_list.list) {
 		entry = list_entry(listptr, struct p_list, list);

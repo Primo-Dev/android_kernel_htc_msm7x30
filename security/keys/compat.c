@@ -38,14 +38,24 @@ long compat_keyctl_instantiate_key_iov(
 
 	ret = compat_rw_copy_check_uvector(WRITE, _payload_iov, ioc,
 					   ARRAY_SIZE(iovstack),
+<<<<<<< HEAD
 					   iovstack, &iov);
 	if (ret < 0)
 		return ret;
+=======
+					   iovstack, &iov, 1);
+	if (ret < 0)
+		goto err;
+>>>>>>> upstream/4.3_primoc
 	if (ret == 0)
 		goto no_payload_free;
 
 	ret = keyctl_instantiate_key_common(id, iov, ioc, ret, ringid);
+<<<<<<< HEAD
 
+=======
+err:
+>>>>>>> upstream/4.3_primoc
 	if (iov != iovstack)
 		kfree(iov);
 	return ret;

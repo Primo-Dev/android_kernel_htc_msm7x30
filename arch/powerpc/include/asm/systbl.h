@@ -354,3 +354,8 @@ COMPAT_SYS_SPU(clock_adjtime)
 SYSCALL_SPU(syncfs)
 COMPAT_SYS_SPU(sendmmsg)
 SYSCALL_SPU(setns)
+<<<<<<< HEAD
+=======
+COMPAT_SYS(process_vm_readv)
+COMPAT_SYS(process_vm_writev)
+>>>>>>> upstream/4.3_primoc

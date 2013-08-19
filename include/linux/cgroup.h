@@ -152,6 +152,7 @@ enum {
 	CGRP_CLONE_CHILDREN,
 };
 
+<<<<<<< HEAD
 /* which pidlist file are we talking about? */
 enum cgroup_filetype {
 	CGROUP_FILE_PROCS,
@@ -184,6 +185,8 @@ struct cgroup_pidlist {
 	struct rw_semaphore mutex;
 };
 
+=======
+>>>>>>> upstream/4.3_primoc
 struct cgroup {
 	unsigned long flags;		/* "unsigned long" so bitops work */
 
@@ -450,6 +453,31 @@ void cgroup_exclude_rmdir(struct cgroup_subsys_state *css);
 void cgroup_release_and_wakeup_rmdir(struct cgroup_subsys_state *css);
 
 /*
+<<<<<<< HEAD
+=======
+ * Control Group taskset, used to pass around set of tasks to cgroup_subsys
+ * methods.
+ */
+struct cgroup_taskset;
+struct task_struct *cgroup_taskset_first(struct cgroup_taskset *tset);
+struct task_struct *cgroup_taskset_next(struct cgroup_taskset *tset);
+struct cgroup *cgroup_taskset_cur_cgroup(struct cgroup_taskset *tset);
+int cgroup_taskset_size(struct cgroup_taskset *tset);
+
+/**
+ * cgroup_taskset_for_each - iterate cgroup_taskset
+ * @task: the loop cursor
+ * @skip_cgrp: skip if task's cgroup matches this, %NULL to iterate through all
+ * @tset: taskset to iterate
+ */
+#define cgroup_taskset_for_each(task, skip_cgrp, tset)			\
+	for ((task) = cgroup_taskset_first((tset)); (task);		\
+	     (task) = cgroup_taskset_next((tset)))			\
+		if (!(skip_cgrp) ||					\
+		    cgroup_taskset_cur_cgroup((tset)) != (skip_cgrp))
+
+/*
+>>>>>>> upstream/4.3_primoc
  * Control Group subsystem type.
  * See Documentation/cgroups/cgroups.txt for details
  */
@@ -461,6 +489,7 @@ struct cgroup_subsys {
 	void (*destroy)(struct cgroup_subsys *ss, struct cgroup *cgrp);
 	int (*allow_attach)(struct cgroup *cgrp, struct task_struct *tsk);
 	int (*can_attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,
+<<<<<<< HEAD
 			  struct task_struct *tsk);
 	int (*can_attach_task)(struct cgroup *cgrp, struct task_struct *tsk);
 	void (*cancel_attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,
@@ -469,6 +498,16 @@ struct cgroup_subsys {
 	void (*attach_task)(struct cgroup *cgrp, struct task_struct *tsk);
 	void (*attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,
 		       struct cgroup *old_cgrp, struct task_struct *tsk);
+=======
+			  struct cgroup_taskset *tset);
+	int (*can_attach_task)(struct cgroup *cgrp, struct task_struct *tsk);
+	void (*cancel_attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,
+			      struct cgroup_taskset *tset);
+	void (*pre_attach)(struct cgroup *cgrp);
+	void (*attach_task)(struct cgroup *cgrp, struct task_struct *tsk);
+	void (*attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,
+		       struct cgroup_taskset *tset);
+>>>>>>> upstream/4.3_primoc
 	void (*fork)(struct cgroup_subsys *ss, struct task_struct *task);
 	void (*exit)(struct cgroup_subsys *ss, struct cgroup *cgrp,
 			struct cgroup *old_cgrp, struct task_struct *task);
@@ -510,7 +549,11 @@ struct cgroup_subsys {
 	struct list_head sibling;
 	/* used when use_id == true */
 	struct idr idr;
+<<<<<<< HEAD
 	spinlock_t id_lock;
+=======
+	rwlock_t id_lock;
+>>>>>>> upstream/4.3_primoc
 
 	/* should be defined only by modular subsystems */
 	struct module *module;
@@ -533,7 +576,10 @@ static inline struct cgroup_subsys_state *cgroup_subsys_state(
  */
 #define task_subsys_state_check(task, subsys_id, __c)			\
 	rcu_dereference_check(task->cgroups->subsys[subsys_id],		\
+<<<<<<< HEAD
 			      rcu_read_lock_held() ||			\
+=======
+>>>>>>> upstream/4.3_primoc
 			      lockdep_is_held(&task->alloc_lock) ||	\
 			      cgroup_lock_is_held() || (__c))
 
@@ -578,11 +624,14 @@ int cgroup_scan_tasks(struct cgroup_scanner *scan);
 int cgroup_attach_task(struct cgroup *, struct task_struct *);
 int cgroup_attach_task_all(struct task_struct *from, struct task_struct *);
 
+<<<<<<< HEAD
 static inline int cgroup_attach_task_current_cg(struct task_struct *tsk)
 {
 	return cgroup_attach_task_all(current, tsk);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /*
  * CSS ID is ID for cgroup_subsys_state structs under subsys. This only works
  * if cgroup_subsys.use_id == true. It can be used for looking up and scanning.
@@ -645,10 +694,13 @@ static inline int cgroup_attach_task_all(struct task_struct *from,
 {
 	return 0;
 }
+<<<<<<< HEAD
 static inline int cgroup_attach_task_current_cg(struct task_struct *t)
 {
 	return 0;
 }
+=======
+>>>>>>> upstream/4.3_primoc
 
 #endif /* !CONFIG_CGROUPS */
 

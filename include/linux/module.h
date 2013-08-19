@@ -16,6 +16,10 @@
 #include <linux/kobject.h>
 #include <linux/moduleparam.h>
 #include <linux/tracepoint.h>
+<<<<<<< HEAD
+=======
+#include <linux/export.h>
+>>>>>>> upstream/4.3_primoc
 
 #include <linux/percpu.h>
 #include <asm/module.h>
@@ -25,6 +29,7 @@
 /* Not Yet Implemented */
 #define MODULE_SUPPORTED_DEVICE(name)
 
+<<<<<<< HEAD
 /* Some toolchains use a `_' prefix for all user symbols. */
 #ifdef CONFIG_SYMBOL_PREFIX
 #define MODULE_SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
@@ -40,6 +45,10 @@ struct kernel_symbol
 	const char *name;
 };
 
+=======
+#define MODULE_NAME_LEN MAX_PARAM_PREFIX_LEN
+
+>>>>>>> upstream/4.3_primoc
 struct modversion_info
 {
 	unsigned long crc;
@@ -96,11 +105,16 @@ void trim_init_extable(struct module *m);
 extern const struct gtype##_id __mod_##gtype##_table		\
   __attribute__ ((unused, alias(__stringify(name))))
 
+<<<<<<< HEAD
 extern struct module __this_module;
 #define THIS_MODULE (&__this_module)
 #else  /* !MODULE */
 #define MODULE_GENERIC_TABLE(gtype,name)
 #define THIS_MODULE ((struct module *)0)
+=======
+#else  /* !MODULE */
+#define MODULE_GENERIC_TABLE(gtype,name)
+>>>>>>> upstream/4.3_primoc
 #endif
 
 /* Generic info of form tag = "info" */
@@ -216,6 +230,7 @@ struct module_use {
 	struct module *source, *target;
 };
 
+<<<<<<< HEAD
 #ifndef __GENKSYMS__
 #ifdef CONFIG_MODVERSIONS
 /* Mark the CRC weak since genksyms apparently decides not to
@@ -262,6 +277,8 @@ struct module_use {
 
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 enum module_state
 {
 	MODULE_STATE_LIVE,
@@ -582,11 +599,14 @@ extern void module_update_tracepoints(void);
 extern int module_get_iter_tracepoints(struct tracepoint_iter *iter);
 
 #else /* !CONFIG_MODULES... */
+<<<<<<< HEAD
 #define EXPORT_SYMBOL(sym)
 #define EXPORT_SYMBOL_GPL(sym)
 #define EXPORT_SYMBOL_GPL_FUTURE(sym)
 #define EXPORT_UNUSED_SYMBOL(sym)
 #define EXPORT_UNUSED_SYMBOL_GPL(sym)
+=======
+>>>>>>> upstream/4.3_primoc
 
 /* Given an address, look for it in the exception tables. */
 static inline const struct exception_table_entry *

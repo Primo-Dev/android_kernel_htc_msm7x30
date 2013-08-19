@@ -13,7 +13,10 @@
 #include <linux/pagemap.h>
 #include <linux/swapops.h>
 #include <linux/rmap.h>
+<<<<<<< HEAD
 #include <linux/module.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <linux/syscalls.h>
 #include <linux/mmu_notifier.h>
 

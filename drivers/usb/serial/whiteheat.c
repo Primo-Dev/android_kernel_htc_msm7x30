@@ -1209,7 +1209,11 @@ static void firm_setup_port(struct tty_struct *tty)
 	struct whiteheat_port_settings port_settings;
 	unsigned int cflag = tty->termios->c_cflag;
 
+<<<<<<< HEAD
 	port_settings.port = port->number + 1;
+=======
+	port_settings.port = port->number - port->serial->minor + 1;
+>>>>>>> upstream/4.3_primoc
 
 	/* get the byte size */
 	switch (cflag & CSIZE) {

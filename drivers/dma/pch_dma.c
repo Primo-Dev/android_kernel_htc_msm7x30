@@ -489,7 +489,11 @@ static struct pch_dma_desc *pdc_desc_get(struct pch_dma_chan *pd_chan)
 	dev_dbg(chan2dev(&pd_chan->chan), "scanned %d descriptors\n", i);
 
 	if (!ret) {
+<<<<<<< HEAD
 		ret = pdc_alloc_desc(&pd_chan->chan, GFP_NOIO);
+=======
+		ret = pdc_alloc_desc(&pd_chan->chan, GFP_ATOMIC);
+>>>>>>> upstream/4.3_primoc
 		if (ret) {
 			spin_lock(&pd_chan->lock);
 			pd_chan->descs_allocated++;

@@ -1065,14 +1065,24 @@ long keyctl_instantiate_key_iov(key_serial_t id,
 		goto no_payload;
 
 	ret = rw_copy_check_uvector(WRITE, _payload_iov, ioc,
+<<<<<<< HEAD
 				    ARRAY_SIZE(iovstack), iovstack, &iov);
 	if (ret < 0)
 		return ret;
+=======
+				    ARRAY_SIZE(iovstack), iovstack, &iov, 1);
+	if (ret < 0)
+		goto err;
+>>>>>>> upstream/4.3_primoc
 	if (ret == 0)
 		goto no_payload_free;
 
 	ret = keyctl_instantiate_key_common(id, iov, ioc, ret, ringid);
+<<<<<<< HEAD
 
+=======
+err:
+>>>>>>> upstream/4.3_primoc
 	if (iov != iovstack)
 		kfree(iov);
 	return ret;

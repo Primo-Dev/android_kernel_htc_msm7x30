@@ -1951,11 +1951,14 @@ ctnetlink_del_expect(struct sock *ctnl, struct sk_buff *skb,
 						  hnode) {
 				m_help = nfct_help(exp->master);
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 				if (IS_ERR(m_help) || (!m_help))
 					printk(KERN_ERR "[NET] m_help is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 				if (!strcmp(m_help->helper->name, name) &&
 				    del_timer(&exp->timeout)) {
 					nf_ct_unlink_expect_report(exp,

@@ -1256,6 +1256,14 @@ out:
 	case 0:
 	case -ERESTARTSYS:
 	case -EINTR:
+<<<<<<< HEAD
+=======
+	case -EBUSY:
+		/*
+		 * EBUSY is ok: this just means that another thread
+		 * already did the job.
+		 */
+>>>>>>> upstream/4.3_primoc
 		return VM_FAULT_NOPAGE;
 	case -ENOMEM:
 		return VM_FAULT_OOM;
@@ -1475,7 +1483,11 @@ i915_gem_mmap_gtt(struct drm_file *file,
 
 	if (obj->base.size > dev_priv->mm.gtt_mappable_end) {
 		ret = -E2BIG;
+<<<<<<< HEAD
 		goto out;
+=======
+		goto unlock;
+>>>>>>> upstream/4.3_primoc
 	}
 
 	if (obj->madv != I915_MADV_WILLNEED) {

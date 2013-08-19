@@ -28,7 +28,10 @@
 #include <asm/irq.h>
 #include <asm/timer.h>
 #include <asm/nmi.h>
+<<<<<<< HEAD
 #include <asm/compat.h>
+=======
+>>>>>>> upstream/4.3_primoc
 #include <asm/smp.h>
 #include "entry.h"
 

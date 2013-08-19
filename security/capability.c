@@ -12,6 +12,29 @@
 
 #include <linux/security.h>
 
+<<<<<<< HEAD
+=======
+static int cap_binder_set_context_mgr(struct task_struct *mgr)
+{
+	return 0;
+}
+
+static int cap_binder_transaction(struct task_struct *from, struct task_struct *to)
+{
+	return 0;
+}
+
+static int cap_binder_transfer_binder(struct task_struct *from, struct task_struct *to)
+{
+	return 0;
+}
+
+static int cap_binder_transfer_file(struct task_struct *from, struct task_struct *to, struct file *file)
+{
+	return 0;
+}
+
+>>>>>>> upstream/4.3_primoc
 static int cap_syslog(int type)
 {
 	return 0;
@@ -125,7 +148,11 @@ static int cap_inode_init_security(struct inode *inode, struct inode *dir,
 }
 
 static int cap_inode_create(struct inode *inode, struct dentry *dentry,
+<<<<<<< HEAD
 			    int mask)
+=======
+			    umode_t mask)
+>>>>>>> upstream/4.3_primoc
 {
 	return 0;
 }
@@ -159,7 +186,11 @@ static int cap_inode_rmdir(struct inode *inode, struct dentry *dentry)
 }
 
 static int cap_inode_mknod(struct inode *inode, struct dentry *dentry,
+<<<<<<< HEAD
 			   int mode, dev_t dev)
+=======
+			   umode_t mode, dev_t dev)
+>>>>>>> upstream/4.3_primoc
 {
 	return 0;
 }
@@ -874,6 +905,13 @@ static void cap_audit_rule_free(void *lsmrule)
 
 void __init security_fixup_ops(struct security_operations *ops)
 {
+<<<<<<< HEAD
+=======
+	set_to_cap_if_null(ops, binder_set_context_mgr);
+	set_to_cap_if_null(ops, binder_transaction);
+	set_to_cap_if_null(ops, binder_transfer_binder);
+	set_to_cap_if_null(ops, binder_transfer_file);
+>>>>>>> upstream/4.3_primoc
 	set_to_cap_if_null(ops, ptrace_access_check);
 	set_to_cap_if_null(ops, ptrace_traceme);
 	set_to_cap_if_null(ops, capget);

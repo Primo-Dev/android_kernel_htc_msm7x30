@@ -91,13 +91,20 @@
 
 extern unsigned int ps_kparam1;
 extern unsigned int ps_kparam2;
+<<<<<<< HEAD
 extern unsigned int als_kadc;
+=======
+
+>>>>>>> upstream/4.3_primoc
 struct cm3628_platform_data {
 	int intr;
 	uint16_t levels[10];
 	uint16_t golden_adc;
 	int (*power)(int, uint8_t); /* power to the chip */
+<<<<<<< HEAD
 	int (*re_power)(uint8_t); /* power to the chip */
+=======
+>>>>>>> upstream/4.3_primoc
 	uint8_t ALS_IT;
 	uint8_t ALS_PERS;
 	uint8_t ALS_AV;

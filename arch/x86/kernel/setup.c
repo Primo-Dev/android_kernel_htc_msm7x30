@@ -306,7 +306,12 @@ static void __init cleanup_highmap(void)
 static void __init reserve_brk(void)
 {
 	if (_brk_end > _brk_start)
+<<<<<<< HEAD
 		memblock_x86_reserve_range(__pa(_brk_start), __pa(_brk_end), "BRK");
+=======
+		memblock_reserve(__pa(_brk_start),
+				 __pa(_brk_end) - __pa(_brk_start));
+>>>>>>> upstream/4.3_primoc
 
 	/* Mark brk area as locked down and no longer taking any
 	   new allocations */
@@ -331,13 +336,21 @@ static void __init relocate_initrd(void)
 	ramdisk_here = memblock_find_in_range(0, end_of_lowmem, area_size,
 					 PAGE_SIZE);
 
+<<<<<<< HEAD
 	if (ramdisk_here == MEMBLOCK_ERROR)
+=======
+	if (!ramdisk_here)
+>>>>>>> upstream/4.3_primoc
 		panic("Cannot find place for new RAMDISK of size %lld\n",
 			 ramdisk_size);
 
 	/* Note: this includes all the lowmem currently occupied by
 	   the initrd, we rely on that fact to keep the data intact. */
+<<<<<<< HEAD
 	memblock_x86_reserve_range(ramdisk_here, ramdisk_here + area_size, "NEW RAMDISK");
+=======
+	memblock_reserve(ramdisk_here, area_size);
+>>>>>>> upstream/4.3_primoc
 	initrd_start = ramdisk_here + PAGE_OFFSET;
 	initrd_end   = initrd_start + ramdisk_size;
 	printk(KERN_INFO "Allocated new RAMDISK: %08llx - %08llx\n",
@@ -393,7 +406,11 @@ static void __init reserve_initrd(void)
 	initrd_start = 0;
 
 	if (ramdisk_size >= (end_of_lowmem>>1)) {
+<<<<<<< HEAD
 		memblock_x86_free_range(ramdisk_image, ramdisk_end);
+=======
+		memblock_free(ramdisk_image, ramdisk_end - ramdisk_image);
+>>>>>>> upstream/4.3_primoc
 		printk(KERN_ERR "initrd too large to handle, "
 		       "disabling initrd\n");
 		return;
@@ -416,7 +433,11 @@ static void __init reserve_initrd(void)
 
 	relocate_initrd();
 
+<<<<<<< HEAD
 	memblock_x86_free_range(ramdisk_image, ramdisk_end);
+=======
+	memblock_free(ramdisk_image, ramdisk_end - ramdisk_image);
+>>>>>>> upstream/4.3_primoc
 }
 #else
 static void __init reserve_initrd(void)
@@ -490,15 +511,22 @@ static void __init memblock_x86_reserve_range_setup_data(void)
 {
 	struct setup_data *data;
 	u64 pa_data;
+<<<<<<< HEAD
 	char buf[32];
+=======
+>>>>>>> upstream/4.3_primoc
 
 	if (boot_params.hdr.version < 0x0209)
 		return;
 	pa_data = boot_params.hdr.setup_data;
 	while (pa_data) {
 		data = early_memremap(pa_data, sizeof(*data));
+<<<<<<< HEAD
 		sprintf(buf, "setup data %x", data->type);
 		memblock_x86_reserve_range(pa_data, pa_data+sizeof(*data)+data->len, buf);
+=======
+		memblock_reserve(pa_data, sizeof(*data) + data->len);
+>>>>>>> upstream/4.3_primoc
 		pa_data = data->next;
 		early_iounmap(data, sizeof(*data));
 	}
@@ -554,7 +582,11 @@ static void __init reserve_crashkernel(void)
 		crash_base = memblock_find_in_range(alignment,
 			       CRASH_KERNEL_ADDR_MAX, crash_size, alignment);
 
+<<<<<<< HEAD
 		if (crash_base == MEMBLOCK_ERROR) {
+=======
+		if (!crash_base) {
+>>>>>>> upstream/4.3_primoc
 			pr_info("crashkernel reservation failed - No suitable area found.\n");
 			return;
 		}
@@ -568,7 +600,11 @@ static void __init reserve_crashkernel(void)
 			return;
 		}
 	}
+<<<<<<< HEAD
 	memblock_x86_reserve_range(crash_base, crash_base + crash_size, "CRASH KERNEL");
+=======
+	memblock_reserve(crash_base, crash_size);
+>>>>>>> upstream/4.3_primoc
 
 	printk(KERN_INFO "Reserving %ldMB of memory at %ldMB "
 			"for crashkernel (System RAM: %ldMB)\n",
@@ -626,7 +662,11 @@ static __init void reserve_ibft_region(void)
 	addr = find_ibft_region(&size);
 
 	if (size)
+<<<<<<< HEAD
 		memblock_x86_reserve_range(addr, addr + size, "* ibft");
+=======
+		memblock_reserve(addr, size);
+>>>>>>> upstream/4.3_primoc
 }
 
 static unsigned reserve_low = CONFIG_X86_RESERVE_LOW << 10;
@@ -1017,8 +1057,26 @@ void __init setup_arch(char **cmdline_p)
 
 #ifdef CONFIG_X86_64
 	if (max_pfn > max_low_pfn) {
+<<<<<<< HEAD
 		max_pfn_mapped = init_memory_mapping(1UL<<32,
 						     max_pfn<<PAGE_SHIFT);
+=======
+		int i;
+		for (i = 0; i < e820.nr_map; i++) {
+			struct e820entry *ei = &e820.map[i];
+
+			if (ei->addr + ei->size <= 1UL << 32)
+				continue;
+
+			if (ei->type == E820_RESERVED)
+				continue;
+
+			max_pfn_mapped = init_memory_mapping(
+				ei->addr < 1UL << 32 ? 1UL << 32 : ei->addr,
+				ei->addr + ei->size);
+		}
+
+>>>>>>> upstream/4.3_primoc
 		/* can we preseve max_low_pfn ?*/
 		max_low_pfn = max_pfn;
 	}

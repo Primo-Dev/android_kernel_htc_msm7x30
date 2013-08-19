@@ -2759,8 +2759,13 @@ static struct rtable *ip_route_output_slow(struct net *net, struct flowi4 *fl4)
 		fl4->saddr = FIB_RES_PREFSRC(net, res);
 
 	dev_out = FIB_RES_DEV(res);
+<<<<<<< HEAD
 	if (dev_out == NULL) {
 		printk(KERN_ERR "[NET] dev_null is NULL in %s!\n", __func__);
+=======
+	if (dev_out==NULL) {
+		printk(KERN_ERR "[NET] dev_out is NULL in %s!\n", __func__);
+>>>>>>> upstream/4.3_primoc
 		goto out;
 	}
 	fl4->flowi4_oif = dev_out->ifindex;
@@ -2784,6 +2789,7 @@ out:
 
 struct rtable *__ip_route_output_key(struct net *net, struct flowi4 *flp4)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	struct rtable *rth = NULL;
 #else
@@ -2798,6 +2804,11 @@ struct rtable *__ip_route_output_key(struct net *net, struct flowi4 *flp4)
     }
 #endif
 
+=======
+	struct rtable *rth;
+	unsigned int hash;
+
+>>>>>>> upstream/4.3_primoc
 	if (!rt_caching(net))
 		goto slow_output;
 
@@ -3109,11 +3120,14 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr* nlh, void 
 	if (err)
 		goto errout_free;
 
+<<<<<<< HEAD
 #ifdef CONFIG_HTC_NETWORK_MODIFY
 	if (IS_ERR(rt) || (!rt))
 		printk(KERN_ERR "[NET] rt is NULL in %s!\n", __func__);
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	skb_dst_set(skb, &rt->dst);
 	if (rtm->rtm_flags & RTM_F_NOTIFY)
 		rt->rt_flags |= RTCF_NOTIFY;

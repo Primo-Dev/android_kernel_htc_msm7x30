@@ -867,8 +867,13 @@ again:
 	/* step one, lock all the pages */
 	for (i = 0; i < num_pages; i++) {
 		struct page *page;
+<<<<<<< HEAD
 		page = grab_cache_page(inode->i_mapping,
 					    start_index + i);
+=======
+		page = find_or_create_page(inode->i_mapping,
+					    start_index + i, GFP_NOFS);
+>>>>>>> upstream/4.3_primoc
 		if (!page)
 			break;
 
@@ -938,7 +943,13 @@ again:
 			  GFP_NOFS);
 
 	if (i_done != num_pages) {
+<<<<<<< HEAD
 		atomic_inc(&BTRFS_I(inode)->outstanding_extents);
+=======
+		spin_lock(&BTRFS_I(inode)->lock);
+		BTRFS_I(inode)->outstanding_extents++;
+		spin_unlock(&BTRFS_I(inode)->lock);
+>>>>>>> upstream/4.3_primoc
 		btrfs_delalloc_release_space(inode,
 				     (num_pages - i_done) << PAGE_CACHE_SHIFT);
 	}
@@ -1053,7 +1064,20 @@ int btrfs_defrag_file(struct inode *inode, struct file *file,
 	if (!max_to_defrag)
 		max_to_defrag = last_index - 1;
 
+<<<<<<< HEAD
 	while (i <= last_index && defrag_count < max_to_defrag) {
+=======
+	/*
+	 * make writeback starts from i, so the defrag range can be
+	 * written sequentially.
+	 */
+	if (i < inode->i_mapping->writeback_index)
+		inode->i_mapping->writeback_index = i;
+
+	while (i <= last_index && defrag_count < max_to_defrag &&
+	       (i < (i_size_read(inode) + PAGE_CACHE_SIZE - 1) >>
+		PAGE_CACHE_SHIFT)) {
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * make sure we stop running if someone unmounts
 		 * the FS
@@ -1539,7 +1563,15 @@ static noinline int copy_to_sk(struct btrfs_root *root,
 		item_off = btrfs_item_ptr_offset(leaf, i);
 		item_len = btrfs_item_size_nr(leaf, i);
 
+<<<<<<< HEAD
 		if (item_len > BTRFS_SEARCH_ARGS_BUFSIZE)
+=======
+		btrfs_item_key_to_cpu(leaf, key, i);
+		if (!key_in_sk(key, sk))
+			continue;
+
+		if (sizeof(sh) + item_len > BTRFS_SEARCH_ARGS_BUFSIZE)
+>>>>>>> upstream/4.3_primoc
 			item_len = 0;
 
 		if (sizeof(sh) + item_len + *sk_offset >
@@ -1548,10 +1580,13 @@ static noinline int copy_to_sk(struct btrfs_root *root,
 			goto overflow;
 		}
 
+<<<<<<< HEAD
 		btrfs_item_key_to_cpu(leaf, key, i);
 		if (!key_in_sk(key, sk))
 			continue;
 
+=======
+>>>>>>> upstream/4.3_primoc
 		sh.objectid = key->objectid;
 		sh.offset = key->offset;
 		sh.type = key->type;
@@ -1755,11 +1790,18 @@ static noinline int btrfs_search_path_in_tree(struct btrfs_fs_info *info,
 		key.objectid = key.offset;
 		key.offset = (u64)-1;
 		dirid = key.objectid;
+<<<<<<< HEAD
 
 	}
 	if (ptr < name)
 		goto out;
 	memcpy(name, ptr, total_len);
+=======
+	}
+	if (ptr < name)
+		goto out;
+	memmove(name, ptr, total_len);
+>>>>>>> upstream/4.3_primoc
 	name[total_len]='\0';
 	ret = 0;
 out:
@@ -2184,6 +2226,14 @@ static noinline long btrfs_ioctl_clone(struct file *file, unsigned long srcfd,
 	if (!(src_file->f_mode & FMODE_READ))
 		goto out_fput;
 
+<<<<<<< HEAD
+=======
+	/* don't make the dst file partly checksummed */
+	if ((BTRFS_I(src)->flags & BTRFS_INODE_NODATASUM) !=
+	    (BTRFS_I(inode)->flags & BTRFS_INODE_NODATASUM))
+		goto out_fput;
+
+>>>>>>> upstream/4.3_primoc
 	ret = -EISDIR;
 	if (S_ISDIR(src->i_mode) || S_ISDIR(inode->i_mode))
 		goto out_fput;
@@ -2227,6 +2277,19 @@ static noinline long btrfs_ioctl_clone(struct file *file, unsigned long srcfd,
 	    !IS_ALIGNED(destoff, bs))
 		goto out_unlock;
 
+<<<<<<< HEAD
+=======
+	if (destoff > inode->i_size) {
+		ret = btrfs_cont_expand(inode, inode->i_size, destoff);
+		if (ret)
+			goto out_unlock;
+	}
+
+	/* truncate page cache pages from target inode range */
+	truncate_inode_pages_range(&inode->i_data, destoff,
+				   PAGE_CACHE_ALIGN(destoff + len) - 1);
+
+>>>>>>> upstream/4.3_primoc
 	/* do any pending delalloc/csum calc on src, one way or
 	   another, and lock file content */
 	while (1) {
@@ -2320,7 +2383,16 @@ static noinline long btrfs_ioctl_clone(struct file *file, unsigned long srcfd,
 			else
 				new_key.offset = destoff;
 
+<<<<<<< HEAD
 			trans = btrfs_start_transaction(root, 1);
+=======
+			/*
+			 * 1 - adjusting old extent (we may have to split it)
+			 * 1 - add new extent
+			 * 1 - inode update
+			 */
+			trans = btrfs_start_transaction(root, 3);
+>>>>>>> upstream/4.3_primoc
 			if (IS_ERR(trans)) {
 				ret = PTR_ERR(trans);
 				goto out;
@@ -2328,14 +2400,30 @@ static noinline long btrfs_ioctl_clone(struct file *file, unsigned long srcfd,
 
 			if (type == BTRFS_FILE_EXTENT_REG ||
 			    type == BTRFS_FILE_EXTENT_PREALLOC) {
+<<<<<<< HEAD
+=======
+				/*
+				 *    a  | --- range to clone ---|  b
+				 * | ------------- extent ------------- |
+				 */
+
+				/* substract range b */
+				if (key.offset + datal > off + len)
+					datal = off + len - key.offset;
+
+				/* substract range a */
+>>>>>>> upstream/4.3_primoc
 				if (off > key.offset) {
 					datao += off - key.offset;
 					datal -= off - key.offset;
 				}
 
+<<<<<<< HEAD
 				if (key.offset + datal > off + len)
 					datal = off + len - key.offset;
 
+=======
+>>>>>>> upstream/4.3_primoc
 				ret = btrfs_drop_extents(trans, inode,
 							 new_key.offset,
 							 new_key.offset + datal,
@@ -2432,7 +2520,10 @@ static noinline long btrfs_ioctl_clone(struct file *file, unsigned long srcfd,
 			if (endoff > inode->i_size)
 				btrfs_i_size_write(inode, endoff);
 
+<<<<<<< HEAD
 			BTRFS_I(inode)->flags = BTRFS_I(src)->flags;
+=======
+>>>>>>> upstream/4.3_primoc
 			ret = btrfs_update_inode(trans, root, inode);
 			BUG_ON(ret);
 			btrfs_end_transaction(trans, root);

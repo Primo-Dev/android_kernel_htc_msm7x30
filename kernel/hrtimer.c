@@ -61,6 +61,10 @@
 DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 {
 
+<<<<<<< HEAD
+=======
+	.lock = __RAW_SPIN_LOCK_UNLOCKED(hrtimer_bases.lock),
+>>>>>>> upstream/4.3_primoc
 	.clock_base =
 	{
 		{
@@ -297,6 +301,13 @@ ktime_t ktime_sub_ns(const ktime_t kt, u64 nsec)
 	} else {
 		unsigned long rem = do_div(nsec, NSEC_PER_SEC);
 
+<<<<<<< HEAD
+=======
+		/* Make sure nsec fits into long */
+		if (unlikely(nsec > KTIME_SEC_MAX))
+			return (ktime_t){ .tv64 = KTIME_MAX };
+
+>>>>>>> upstream/4.3_primoc
 		tmp = ktime_set((long)nsec, rem);
 	}
 
@@ -702,6 +713,7 @@ static int hrtimer_switch_to_hres(void)
 	return 1;
 }
 
+<<<<<<< HEAD
 /*
  * Called from timekeeping code to reprogramm the hrtimer interrupt
  * device. If called from the timer interrupt context we defer it to
@@ -713,6 +725,22 @@ void clock_was_set_delayed(void)
 
 	cpu_base->clock_was_set = 1;
 	__raise_softirq_irqoff(HRTIMER_SOFTIRQ);
+=======
+static void clock_was_set_work(struct work_struct *work)
+{
+	clock_was_set();
+}
+
+static DECLARE_WORK(hrtimer_work, clock_was_set_work);
+
+/*
+ * Called from timekeeping and resume code to reprogramm the hrtimer
+ * interrupt device on all cpus.
+ */
+void clock_was_set_delayed(void)
+{
+	schedule_work(&hrtimer_work);
+>>>>>>> upstream/4.3_primoc
 }
 
 #else
@@ -761,8 +789,15 @@ void hrtimers_resume(void)
 	WARN_ONCE(!irqs_disabled(),
 		  KERN_INFO "hrtimers_resume() called with IRQs enabled!");
 
+<<<<<<< HEAD
 	retrigger_next_event(NULL);
 	timerfd_clock_was_set();
+=======
+	/* Retrigger on the local CPU */
+	retrigger_next_event(NULL);
+	/* And schedule a retrigger for all others */
+	clock_was_set_delayed();
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline void timer_stats_hrtimer_set_start_info(struct hrtimer *timer)
@@ -1307,6 +1342,11 @@ retry:
 
 				expires = ktime_sub(hrtimer_get_expires(timer),
 						    base->offset);
+<<<<<<< HEAD
+=======
+				if (expires.tv64 < 0)
+					expires.tv64 = KTIME_MAX;
+>>>>>>> upstream/4.3_primoc
 				if (expires.tv64 < expires_next.tv64)
 					expires_next = expires;
 				break;
@@ -1409,6 +1449,7 @@ void hrtimer_peek_ahead_timers(void)
 
 static void run_hrtimer_softirq(struct softirq_action *h)
 {
+<<<<<<< HEAD
 	struct hrtimer_cpu_base *cpu_base = &__get_cpu_var(hrtimer_bases);
 
 	if (cpu_base->clock_was_set) {
@@ -1416,6 +1457,8 @@ static void run_hrtimer_softirq(struct softirq_action *h)
 		clock_was_set();
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	hrtimer_peek_ahead_timers();
 }
 
@@ -1496,6 +1539,15 @@ static enum hrtimer_restart hrtimer_wakeup(struct hrtimer *timer)
 	struct hrtimer_sleeper *t =
 		container_of(timer, struct hrtimer_sleeper, timer);
 	struct task_struct *task = t->task;
+<<<<<<< HEAD
+=======
+	struct hrtimer_clock_base *base;
+	unsigned long flags;
+
+	base = lock_hrtimer_base(timer, &flags);
+	t->elapsed = ktime_sub(base->get_time(), t->elapsed);
+	unlock_hrtimer_base(timer, &flags);
+>>>>>>> upstream/4.3_primoc
 
 	t->task = NULL;
 	if (task)
@@ -1506,6 +1558,16 @@ static enum hrtimer_restart hrtimer_wakeup(struct hrtimer *timer)
 
 void hrtimer_init_sleeper(struct hrtimer_sleeper *sl, struct task_struct *task)
 {
+<<<<<<< HEAD
+=======
+	struct hrtimer_clock_base *base;
+	unsigned long flags;
+
+	base = lock_hrtimer_base(&sl->timer, &flags);
+	sl->elapsed = base->get_time();
+	unlock_hrtimer_base(&sl->timer, &flags);
+
+>>>>>>> upstream/4.3_primoc
 	sl->timer.function = hrtimer_wakeup;
 	sl->task = task;
 }
@@ -1640,8 +1702,11 @@ static void __cpuinit init_hrtimers_cpu(int cpu)
 	struct hrtimer_cpu_base *cpu_base = &per_cpu(hrtimer_bases, cpu);
 	int i;
 
+<<<<<<< HEAD
 	raw_spin_lock_init(&cpu_base->lock);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	for (i = 0; i < HRTIMER_MAX_CLOCK_BASES; i++) {
 		cpu_base->clock_base[i].cpu_base = cpu_base;
 		timerqueue_init_head(&cpu_base->clock_base[i].active);
@@ -1771,10 +1836,20 @@ void __init hrtimers_init(void)
  * @delta:	slack in expires timeout (ktime_t)
  * @mode:	timer mode, HRTIMER_MODE_ABS or HRTIMER_MODE_REL
  * @clock:	timer clock, CLOCK_MONOTONIC or CLOCK_REALTIME
+<<<<<<< HEAD
  */
 int __sched
 schedule_hrtimeout_range_clock(ktime_t *expires, unsigned long delta,
 			       const enum hrtimer_mode mode, int clock)
+=======
+ * @elapsed:	pointer to unsigned long variable where to store
+ * 		the time actually slept in timeout (usecs)
+ */
+int __sched
+schedule_hrtimeout_range_clock(ktime_t *expires, unsigned long delta,
+			       const enum hrtimer_mode mode, int clock,
+			       unsigned long *elapsed)
+>>>>>>> upstream/4.3_primoc
 {
 	struct hrtimer_sleeper t;
 
@@ -1808,6 +1883,11 @@ schedule_hrtimeout_range_clock(ktime_t *expires, unsigned long delta,
 	if (likely(t.task))
 		schedule();
 
+<<<<<<< HEAD
+=======
+	if (elapsed)
+		*elapsed = ktime_to_us(t.elapsed);
+>>>>>>> upstream/4.3_primoc
 	hrtimer_cancel(&t.timer);
 	destroy_hrtimer_on_stack(&t.timer);
 
@@ -1821,6 +1901,11 @@ schedule_hrtimeout_range_clock(ktime_t *expires, unsigned long delta,
  * @expires:	timeout value (ktime_t)
  * @delta:	slack in expires timeout (ktime_t)
  * @mode:	timer mode, HRTIMER_MODE_ABS or HRTIMER_MODE_REL
+<<<<<<< HEAD
+=======
+ * @elapsed:	pointer to unsigned long variable where to store
+ *		the time actually slept in timeout (usecs)
+>>>>>>> upstream/4.3_primoc
  *
  * Make the current task sleep until the given expiry time has
  * elapsed. The routine will return immediately unless
@@ -1845,10 +1930,17 @@ schedule_hrtimeout_range_clock(ktime_t *expires, unsigned long delta,
  * Returns 0 when the timer has expired otherwise -EINTR
  */
 int __sched schedule_hrtimeout_range(ktime_t *expires, unsigned long delta,
+<<<<<<< HEAD
 				     const enum hrtimer_mode mode)
 {
 	return schedule_hrtimeout_range_clock(expires, delta, mode,
 					      CLOCK_MONOTONIC);
+=======
+				     const enum hrtimer_mode mode, unsigned long *elapsed)
+{
+	return schedule_hrtimeout_range_clock(expires, delta, mode,
+					      CLOCK_MONOTONIC, elapsed);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(schedule_hrtimeout_range);
 
@@ -1877,6 +1969,10 @@ EXPORT_SYMBOL_GPL(schedule_hrtimeout_range);
 int __sched schedule_hrtimeout(ktime_t *expires,
 			       const enum hrtimer_mode mode)
 {
+<<<<<<< HEAD
 	return schedule_hrtimeout_range(expires, 0, mode);
+=======
+	return schedule_hrtimeout_range(expires, 0, mode, NULL);
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL_GPL(schedule_hrtimeout);

@@ -177,6 +177,20 @@ static int __btrfs_lookup_bio_sums(struct btrfs_root *root,
 
 	WARN_ON(bio->bi_vcnt <= 0);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * the free space stuff is only read when it hasn't been
+	 * updated in the current transaction.  So, we can safely
+	 * read from the commit root and sidestep a nasty deadlock
+	 * between reading the free space cache and updating the csum tree.
+	 */
+	if (btrfs_is_free_space_inode(root, inode)) {
+		path->search_commit_root = 1;
+		path->skip_locking = 1;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	disk_bytenr = (u64)bio->bi_sector << 9;
 	if (dio)
 		offset = logical_offset;
@@ -282,7 +296,12 @@ int btrfs_lookup_csums_range(struct btrfs_root *root, u64 start, u64 end,
 	u16 csum_size = btrfs_super_csum_size(&root->fs_info->super_copy);
 
 	path = btrfs_alloc_path();
+<<<<<<< HEAD
 	BUG_ON(!path);
+=======
+	if (!path)
+		return -ENOMEM;
+>>>>>>> upstream/4.3_primoc
 
 	if (search_commit) {
 		path->skip_locking = 1;
@@ -664,15 +683,24 @@ int btrfs_csum_file_blocks(struct btrfs_trans_handle *trans,
 	struct btrfs_sector_sum *sector_sum;
 	u32 nritems;
 	u32 ins_size;
+<<<<<<< HEAD
 	char *eb_map;
 	char *eb_token;
 	unsigned long map_len;
 	unsigned long map_start;
+=======
+>>>>>>> upstream/4.3_primoc
 	u16 csum_size =
 		btrfs_super_csum_size(&root->fs_info->super_copy);
 
 	path = btrfs_alloc_path();
+<<<<<<< HEAD
 	BUG_ON(!path);
+=======
+	if (!path)
+		return -ENOMEM;
+
+>>>>>>> upstream/4.3_primoc
 	sector_sum = sums->sums;
 again:
 	next_offset = (u64)-1;
@@ -814,6 +842,7 @@ found:
 	item_end = btrfs_item_ptr(leaf, path->slots[0], struct btrfs_csum_item);
 	item_end = (struct btrfs_csum_item *)((unsigned char *)item_end +
 				      btrfs_item_size_nr(leaf, path->slots[0]));
+<<<<<<< HEAD
 	eb_token = NULL;
 next_sector:
 
@@ -838,6 +867,11 @@ next_sector:
 		write_extent_buffer(leaf, &sector_sum->sum,
 				    (unsigned long)item, csum_size);
 	}
+=======
+next_sector:
+
+	write_extent_buffer(leaf, &sector_sum->sum, (unsigned long)item, csum_size);
+>>>>>>> upstream/4.3_primoc
 
 	total_bytes += root->sectorsize;
 	sector_sum++;
@@ -850,10 +884,14 @@ next_sector:
 			goto next_sector;
 		}
 	}
+<<<<<<< HEAD
 	if (eb_token) {
 		unmap_extent_buffer(leaf, eb_token, KM_USER1);
 		eb_token = NULL;
 	}
+=======
+
+>>>>>>> upstream/4.3_primoc
 	btrfs_mark_buffer_dirty(path->nodes[0]);
 	if (total_bytes < sums->len) {
 		btrfs_release_path(path);

@@ -47,9 +47,15 @@ obj-$(CONFIG_LEDS_NS2)			+= leds-ns2.o
 obj-$(CONFIG_LEDS_NETXBIG)		+= leds-netxbig.o
 obj-$(CONFIG_LEDS_ASIC3)		+= leds-asic3.o
 obj-$(CONFIG_LEDS_PM8029)		+= leds-pm8029.o
+<<<<<<< HEAD
 #obj-$(CONFIG_LEDS_PM8058)		+= leds-pmic8058.o
 obj-$(CONFIG_LEDS_PM8058)		+= leds-pm8058.o
 obj-$(CONFIG_MICROP_COMMON)             += leds-microp.o
+=======
+obj-$(CONFIG_MICROP_COMMON)		+= leds-microp.o
+#obj-$(CONFIG_LEDS_PM8058)		+= leds-pmic8058.o
+obj-$(CONFIG_LEDS_PM8058)		+= leds-pm8058.o
+>>>>>>> upstream/4.3_primoc
 obj-$(CONFIG_LEDS_MAX8957_LPG)		+= leds-max8957-lpg.o
 obj-$(CONFIG_LEDS_QCIBL)		+= leds-qci-backlight.o
 obj-$(CONFIG_LEDS_MSM_PDM)		+= leds-msm-pdm.o

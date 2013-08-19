@@ -59,6 +59,11 @@
 #include <asm/uaccess.h>
 #include <asm/mmu_context.h>
 #include <asm/tlb.h>
+<<<<<<< HEAD
+=======
+
+#include <trace/events/task.h>
+>>>>>>> upstream/4.3_primoc
 #include "internal.h"
 
 int core_uses_pid;
@@ -848,10 +853,13 @@ static int exec_mmap(struct mm_struct *mm)
 	tsk->mm = mm;
 	tsk->active_mm = mm;
 	activate_mm(active_mm, mm);
+<<<<<<< HEAD
 	if (old_mm && tsk->signal->oom_score_adj == OOM_SCORE_ADJ_MIN) {
 		atomic_dec(&old_mm->oom_disable_count);
 		atomic_inc(&tsk->mm->oom_disable_count);
 	}
+=======
+>>>>>>> upstream/4.3_primoc
 	task_unlock(tsk);
 	arch_pick_mmap_layout(mm);
 	if (old_mm) {
@@ -1056,6 +1064,11 @@ void set_task_comm(struct task_struct *tsk, char *buf)
 {
 	task_lock(tsk);
 
+<<<<<<< HEAD
+=======
+	trace_task_rename(tsk, buf);
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Threads may access current->comm without holding
 	 * the task lock, so write the string carefully.
@@ -1105,6 +1118,16 @@ out:
 }
 EXPORT_SYMBOL(flush_old_exec);
 
+<<<<<<< HEAD
+=======
+void would_dump(struct linux_binprm *bprm, struct file *file)
+{
+	if (inode_permission(file->f_path.dentry->d_inode, MAY_READ) < 0)
+		bprm->interp_flags |= BINPRM_FLAGS_ENFORCE_NONDUMP;
+}
+EXPORT_SYMBOL(would_dump);
+
+>>>>>>> upstream/4.3_primoc
 void setup_new_exec(struct linux_binprm * bprm)
 {
 	int i, ch;
@@ -1144,6 +1167,7 @@ void setup_new_exec(struct linux_binprm * bprm)
 	if (bprm->cred->uid != current_euid() ||
 	    bprm->cred->gid != current_egid()) {
 		current->pdeath_signal = 0;
+<<<<<<< HEAD
 	} else if (file_permission(bprm->file, MAY_READ) ||
 		   bprm->interp_flags & BINPRM_FLAGS_ENFORCE_NONDUMP) {
 		set_dumpable(current->mm, suid_dumpable);
@@ -1156,6 +1180,14 @@ void setup_new_exec(struct linux_binprm * bprm)
 	if (!get_dumpable(current->mm))
 		perf_event_exit_task(current);
 
+=======
+	} else {
+		would_dump(bprm, bprm->file);
+		if (bprm->interp_flags & BINPRM_FLAGS_ENFORCE_NONDUMP)
+			set_dumpable(current->mm, suid_dumpable);
+	}
+
+>>>>>>> upstream/4.3_primoc
 	/* An exec changes our domain. We are no longer part of the thread
 	   group */
 
@@ -1219,6 +1251,18 @@ void install_exec_creds(struct linux_binprm *bprm)
 
 	commit_creds(bprm->cred);
 	bprm->cred = NULL;
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Disable monitoring for regular users
+	 * when executing setuid binaries. Must
+	 * wait until new credentials are committed
+	 * by commit_creds() above
+	 */
+	if (get_dumpable(current->mm) != SUID_DUMP_USER)
+		perf_event_exit_task(current);
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * cred_guard_mutex must be held at least to this point to prevent
 	 * ptrace_attach() from altering our determination of the task's
@@ -1234,7 +1278,11 @@ EXPORT_SYMBOL(install_exec_creds);
  * - the caller must hold ->cred_guard_mutex to protect against
  *   PTRACE_ATTACH
  */
+<<<<<<< HEAD
 int check_unsafe_exec(struct linux_binprm *bprm)
+=======
+static int check_unsafe_exec(struct linux_binprm *bprm)
+>>>>>>> upstream/4.3_primoc
 {
 	struct task_struct *p = current, *t;
 	unsigned n_fs;
@@ -1369,6 +1417,13 @@ int search_binary_handler(struct linux_binprm *bprm,struct pt_regs *regs)
 	int try,retval;
 	struct linux_binfmt *fmt;
 
+<<<<<<< HEAD
+=======
+	/* This allows 4 levels of binfmt rewrites before failing hard. */
+	if (depth > 5)
+		return -ELOOP;
+
+>>>>>>> upstream/4.3_primoc
 	retval = security_bprm_check(bprm);
 	if (retval)
 		return retval;
@@ -1387,12 +1442,17 @@ int search_binary_handler(struct linux_binprm *bprm,struct pt_regs *regs)
 			if (!try_module_get(fmt->module))
 				continue;
 			read_unlock(&binfmt_lock);
+<<<<<<< HEAD
 			retval = fn(bprm, regs);
 			/*
 			 * Restore the depth counter to its starting value
 			 * in this call, so we don't have to rely on every
 			 * load_binary function to restore it on return.
 			 */
+=======
+			bprm->recursion_depth = depth + 1;
+			retval = fn(bprm, regs);
+>>>>>>> upstream/4.3_primoc
 			bprm->recursion_depth = depth;
 			if (retval >= 0) {
 				if (depth == 0)

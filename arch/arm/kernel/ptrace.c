@@ -746,8 +746,13 @@ static int vfp_set(struct task_struct *target,
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	vfp_flush_hwstate(thread);
 	thread->vfpstate.hard = new_vfp;
+=======
+	thread->vfpstate.hard = new_vfp;
+	vfp_flush_hwstate(thread);
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 }

@@ -1,7 +1,11 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
    Copyright (C) 2000-2001 Qualcomm Incorporated
+<<<<<<< HEAD
    Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+=======
+   Copyright (c) 2011, The Linux Foundation. All rights reserved.
+>>>>>>> upstream/4.3_primoc
 
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
@@ -31,7 +35,11 @@
 #define SCO_DEFAULT_FLUSH_TO	0xFFFF
 
 #define SCO_CONN_TIMEOUT	(HZ * 40)
+<<<<<<< HEAD
 #define SCO_DISCONN_TIMEOUT	(HZ * 2)
+=======
+#define SCO_DISCONN_TIMEOUT	(HZ * 20)
+>>>>>>> upstream/4.3_primoc
 #define SCO_CONN_IDLE_TIMEOUT	(HZ * 60)
 
 /* SCO socket address */

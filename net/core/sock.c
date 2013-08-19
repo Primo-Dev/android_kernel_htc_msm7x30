@@ -758,15 +758,29 @@ EXPORT_SYMBOL(sock_setsockopt);
 
 
 void cred_to_ucred(struct pid *pid, const struct cred *cred,
+<<<<<<< HEAD
 		   struct ucred *ucred)
+=======
+		   struct ucred *ucred, bool use_effective)
+>>>>>>> upstream/4.3_primoc
 {
 	ucred->pid = pid_vnr(pid);
 	ucred->uid = ucred->gid = -1;
 	if (cred) {
 		struct user_namespace *current_ns = current_user_ns();
 
+<<<<<<< HEAD
 		ucred->uid = user_ns_map_uid(current_ns, cred, cred->euid);
 		ucred->gid = user_ns_map_gid(current_ns, cred, cred->egid);
+=======
+		if (use_effective) {
+			ucred->uid = user_ns_map_uid(current_ns, cred, cred->euid);
+			ucred->gid = user_ns_map_gid(current_ns, cred, cred->egid);
+		} else {
+			ucred->uid = user_ns_map_uid(current_ns, cred, cred->uid);
+			ucred->gid = user_ns_map_gid(current_ns, cred, cred->gid);
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 }
 EXPORT_SYMBOL_GPL(cred_to_ucred);
@@ -927,7 +941,12 @@ int sock_getsockopt(struct socket *sock, int level, int optname,
 		struct ucred peercred;
 		if (len > sizeof(peercred))
 			len = sizeof(peercred);
+<<<<<<< HEAD
 		cred_to_ucred(sk->sk_peer_pid, sk->sk_peer_cred, &peercred);
+=======
+		cred_to_ucred(sk->sk_peer_pid, sk->sk_peer_cred,
+			      &peercred, true);
+>>>>>>> upstream/4.3_primoc
 		if (copy_to_user(optval, &peercred, len))
 			return -EFAULT;
 		goto lenout;
@@ -1017,6 +1036,7 @@ static void sock_copy(struct sock *nsk, const struct sock *osk)
 #endif
 }
 
+<<<<<<< HEAD
 /*
  * caches using SLAB_DESTROY_BY_RCU should let .next pointer from nulls nodes
  * un-modified. Special care is taken when initializing object to zero.
@@ -1029,6 +1049,8 @@ static inline void sk_prot_clear_nulls(struct sock *sk, int size)
 	       size - offsetof(struct sock, sk_node.pprev));
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 void sk_prot_clear_portaddr_nulls(struct sock *sk, int size)
 {
 	unsigned long nulls1, nulls2;

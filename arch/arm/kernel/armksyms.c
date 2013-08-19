@@ -87,10 +87,13 @@ EXPORT_SYMBOL(memmove);
 EXPORT_SYMBOL(memchr);
 EXPORT_SYMBOL(__memzero);
 
+<<<<<<< HEAD
 	/* user mem (segment) */
 EXPORT_SYMBOL(__strnlen_user);
 EXPORT_SYMBOL(__strncpy_from_user);
 
+=======
+>>>>>>> upstream/4.3_primoc
 #ifdef CONFIG_MMU
 EXPORT_SYMBOL(copy_page);
 
@@ -108,9 +111,12 @@ EXPORT_SYMBOL(__put_user_4);
 EXPORT_SYMBOL(__put_user_8);
 #endif
 
+<<<<<<< HEAD
 	/* crypto hash */
 EXPORT_SYMBOL(sha_transform);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* gcc lib functions */
 EXPORT_SYMBOL(__ashldi3);
 EXPORT_SYMBOL(__ashrdi3);

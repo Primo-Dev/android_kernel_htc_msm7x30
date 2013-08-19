@@ -285,6 +285,7 @@ notrace static void __cpuinit start_secondary(void *unused)
 	per_cpu(cpu_state, smp_processor_id()) = CPU_ONLINE;
 	x86_platform.nmi_init();
 
+<<<<<<< HEAD
 	/*
 	 * Wait until the cpu which brought this one up marked it
 	 * online before enabling interrupts. If we don't do that then
@@ -298,6 +299,8 @@ notrace static void __cpuinit start_secondary(void *unused)
 	while (!cpumask_test_cpu(smp_processor_id(), cpu_active_mask))
 		cpu_relax();
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* enable local interrupts */
 	local_irq_enable();
 

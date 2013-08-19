@@ -284,7 +284,10 @@ static inline void put_cred(const struct cred *_cred)
 	({								\
 		const struct task_struct *__t = (task);			\
 		rcu_dereference_check(__t->real_cred,			\
+<<<<<<< HEAD
 				      rcu_read_lock_held() ||		\
+=======
+>>>>>>> upstream/4.3_primoc
 				      task_is_dead(__t));		\
 	})
 

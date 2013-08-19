@@ -38,6 +38,51 @@
 LIST_HEAD(super_blocks);
 DEFINE_SPINLOCK(sb_lock);
 
+<<<<<<< HEAD
+=======
+/*
+ * One thing we have to be careful of with a per-sb shrinker is that we don't
+ * drop the last active reference to the superblock from within the shrinker.
+ * If that happens we could trigger unregistering the shrinker from within the
+ * shrinker path and that leads to deadlock on the shrinker_rwsem. Hence we
+ * take a passive reference to the superblock to avoid this from occurring.
+ */
+static int prune_super(struct shrinker *shrink, struct shrink_control *sc)
+{
+	struct super_block *sb;
+	int count;
+
+	sb = container_of(shrink, struct super_block, s_shrink);
+
+	/*
+	 * Deadlock avoidance.  We may hold various FS locks, and we don't want
+	 * to recurse into the FS that called us in clear_inode() and friends..
+	 */
+	if (sc->nr_to_scan && !(sc->gfp_mask & __GFP_FS))
+		return -1;
+
+	if (!grab_super_passive(sb))
+		return -1;
+
+	if (sc->nr_to_scan) {
+		/* proportion the scan between the two caches */
+		int total;
+
+		total = sb->s_nr_dentry_unused + sb->s_nr_inodes_unused + 1;
+		count = (sc->nr_to_scan * sb->s_nr_dentry_unused) / total;
+
+		/* prune dcache first as icache is pinned by it */
+		prune_dcache_sb(sb, count);
+		prune_icache_sb(sb, sc->nr_to_scan - count);
+	}
+
+	count = ((sb->s_nr_dentry_unused + sb->s_nr_inodes_unused) / 100)
+						* sysctl_vfs_cache_pressure;
+	drop_super(sb);
+	return count;
+}
+
+>>>>>>> upstream/4.3_primoc
 /**
  *	alloc_super	-	create new superblock
  *	@type:	filesystem type superblock should belong to
@@ -77,6 +122,11 @@ static struct super_block *alloc_super(struct file_system_type *type)
 		INIT_HLIST_BL_HEAD(&s->s_anon);
 		INIT_LIST_HEAD(&s->s_inodes);
 		INIT_LIST_HEAD(&s->s_dentry_lru);
+<<<<<<< HEAD
+=======
+		INIT_LIST_HEAD(&s->s_inode_lru);
+		spin_lock_init(&s->s_inode_lru_lock);
+>>>>>>> upstream/4.3_primoc
 		init_rwsem(&s->s_umount);
 		mutex_init(&s->s_lock);
 		lockdep_set_class(&s->s_umount, &type->s_umount_key);
@@ -114,6 +164,12 @@ static struct super_block *alloc_super(struct file_system_type *type)
 		s->s_op = &default_op;
 		s->s_time_gran = 1000000000;
 		s->cleancache_poolid = -1;
+<<<<<<< HEAD
+=======
+
+		s->s_shrink.seeks = DEFAULT_SEEKS;
+		s->s_shrink.shrink = prune_super;
+>>>>>>> upstream/4.3_primoc
 	}
 out:
 	return s;
@@ -141,7 +197,11 @@ static inline void destroy_super(struct super_block *s)
 /*
  * Drop a superblock's refcount.  The caller must hold sb_lock.
  */
+<<<<<<< HEAD
 void __put_super(struct super_block *sb)
+=======
+static void __put_super(struct super_block *sb)
+>>>>>>> upstream/4.3_primoc
 {
 	if (!--sb->s_count) {
 		list_del_init(&sb->s_list);
@@ -156,7 +216,11 @@ void __put_super(struct super_block *sb)
  *	Drops a temporary reference, frees superblock if there's no
  *	references left.
  */
+<<<<<<< HEAD
 void put_super(struct super_block *sb)
+=======
+static void put_super(struct super_block *sb)
+>>>>>>> upstream/4.3_primoc
 {
 	spin_lock(&sb_lock);
 	__put_super(sb);
@@ -179,8 +243,17 @@ void deactivate_locked_super(struct super_block *s)
 {
 	struct file_system_type *fs = s->s_type;
 	if (atomic_dec_and_test(&s->s_active)) {
+<<<<<<< HEAD
 		cleancache_flush_fs(s);
 		fs->kill_sb(s);
+=======
+		cleancache_invalidate_fs(s);
+		fs->kill_sb(s);
+
+		/* caches are now gone, we can safely kill the shrinker now */
+		unregister_shrinker(&s->s_shrink);
+
+>>>>>>> upstream/4.3_primoc
 		/*
 		 * We need to call rcu_barrier so all the delayed rcu free
 		 * inodes are flushed before we release the fs module.
@@ -222,6 +295,7 @@ EXPORT_SYMBOL(deactivate_super);
  *	and want to turn it into a full-blown active reference.  grab_super()
  *	is called with sb_lock held and drops it.  Returns 1 in case of
  *	success, 0 if we had failed (superblock contents was already dead or
+<<<<<<< HEAD
  *	dying when grab_super() had been called).
  */
 static int grab_super(struct super_block *s) __releases(sb_lock)
@@ -235,23 +309,80 @@ static int grab_super(struct super_block *s) __releases(sb_lock)
 	spin_unlock(&sb_lock);
 	/* wait for it to die */
 	down_write(&s->s_umount);
+=======
+ *	dying when grab_super() had been called).  Note that this is only
+ *	called for superblocks not in rundown mode (== ones still on ->fs_supers
+ *	of their type), so increment of ->s_count is OK here.
+ */
+static int grab_super(struct super_block *s) __releases(sb_lock)
+{
+	s->s_count++;
+	spin_unlock(&sb_lock);
+	down_write(&s->s_umount);
+	if ((s->s_flags & MS_BORN) && atomic_inc_not_zero(&s->s_active)) {
+		put_super(s);
+		return 1;
+	}
+>>>>>>> upstream/4.3_primoc
 	up_write(&s->s_umount);
 	put_super(s);
 	return 0;
 }
 
 /*
+<<<<<<< HEAD
+=======
+ *	grab_super_passive - acquire a passive reference
+ *	@s: reference we are trying to grab
+ *
+ *	Tries to acquire a passive reference. This is used in places where we
+ *	cannot take an active reference but we need to ensure that the
+ *	superblock does not go away while we are working on it. It returns
+ *	false if a reference was not gained, and returns true with the s_umount
+ *	lock held in read mode if a reference is gained. On successful return,
+ *	the caller must drop the s_umount lock and the passive reference when
+ *	done.
+ */
+bool grab_super_passive(struct super_block *sb)
+{
+	spin_lock(&sb_lock);
+	if (list_empty(&sb->s_instances)) {
+		spin_unlock(&sb_lock);
+		return false;
+	}
+
+	sb->s_count++;
+	spin_unlock(&sb_lock);
+
+	if (down_read_trylock(&sb->s_umount)) {
+		if (sb->s_root)
+			return true;
+		up_read(&sb->s_umount);
+	}
+
+	put_super(sb);
+	return false;
+}
+
+/*
+>>>>>>> upstream/4.3_primoc
  * Superblock locking.  We really ought to get rid of these two.
  */
 void lock_super(struct super_block * sb)
 {
+<<<<<<< HEAD
 	get_fs_excl();
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_lock(&sb->s_lock);
 }
 
 void unlock_super(struct super_block * sb)
 {
+<<<<<<< HEAD
 	put_fs_excl();
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&sb->s_lock);
 }
 
@@ -276,11 +407,17 @@ void generic_shutdown_super(struct super_block *sb)
 {
 	const struct super_operations *sop = sb->s_op;
 
+<<<<<<< HEAD
 
 	if (sb->s_root) {
 		shrink_dcache_for_umount(sb);
 		sync_filesystem(sb);
 		get_fs_excl();
+=======
+	if (sb->s_root) {
+		shrink_dcache_for_umount(sb);
+		sync_filesystem(sb);
+>>>>>>> upstream/4.3_primoc
 		sb->s_flags &= ~MS_ACTIVE;
 
 		fsnotify_unmount_inodes(&sb->s_inodes);
@@ -295,7 +432,10 @@ void generic_shutdown_super(struct super_block *sb)
 			   "Self-destruct in 5 seconds.  Have a nice day...\n",
 			   sb->s_id);
 		}
+<<<<<<< HEAD
 		put_fs_excl();
+=======
+>>>>>>> upstream/4.3_primoc
 	}
 	spin_lock(&sb_lock);
 	/* should be initialized for __put_super_and_need_restart() */
@@ -335,11 +475,14 @@ retry:
 				destroy_super(s);
 				s = NULL;
 			}
+<<<<<<< HEAD
 			down_write(&old->s_umount);
 			if (unlikely(!(old->s_flags & MS_BORN))) {
 				deactivate_locked_super(old);
 				goto retry;
 			}
+=======
+>>>>>>> upstream/4.3_primoc
 			return old;
 		}
 	}
@@ -364,6 +507,10 @@ retry:
 	list_add(&s->s_instances, &type->fs_supers);
 	spin_unlock(&sb_lock);
 	get_filesystem(type);
+<<<<<<< HEAD
+=======
+	register_shrinker(&s->s_shrink);
+>>>>>>> upstream/4.3_primoc
 	return s;
 }
 
@@ -452,6 +599,45 @@ void iterate_supers(void (*f)(struct super_block *, void *), void *arg)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ *	iterate_supers_type - call function for superblocks of given type
+ *	@type: fs type
+ *	@f: function to call
+ *	@arg: argument to pass to it
+ *
+ *	Scans the superblock list and calls given function, passing it
+ *	locked superblock and given argument.
+ */
+void iterate_supers_type(struct file_system_type *type,
+	void (*f)(struct super_block *, void *), void *arg)
+{
+	struct super_block *sb, *p = NULL;
+
+	spin_lock(&sb_lock);
+	list_for_each_entry(sb, &type->fs_supers, s_instances) {
+		sb->s_count++;
+		spin_unlock(&sb_lock);
+
+		down_read(&sb->s_umount);
+		if (sb->s_root)
+			f(sb, arg);
+		up_read(&sb->s_umount);
+
+		spin_lock(&sb_lock);
+		if (p)
+			__put_super(p);
+		p = sb;
+	}
+	if (p)
+		__put_super(p);
+	spin_unlock(&sb_lock);
+}
+
+EXPORT_SYMBOL(iterate_supers_type);
+
+/**
+>>>>>>> upstream/4.3_primoc
  *	get_super - get the superblock of a device
  *	@bdev: device to get the superblock for
  *	
@@ -512,10 +698,17 @@ restart:
 		if (list_empty(&sb->s_instances))
 			continue;
 		if (sb->s_bdev == bdev) {
+<<<<<<< HEAD
 			if (grab_super(sb)) /* drops sb_lock */
 				return sb;
 			else
 				goto restart;
+=======
+			if (!grab_super(sb))
+				goto restart;
+			up_write(&sb->s_umount);
+			return sb;
+>>>>>>> upstream/4.3_primoc
 		}
 	}
 	spin_unlock(&sb_lock);
@@ -657,7 +850,11 @@ static DEFINE_IDA(unnamed_dev_ida);
 static DEFINE_SPINLOCK(unnamed_dev_lock);/* protects the above */
 static int unnamed_dev_start = 0; /* don't bother trying below it */
 
+<<<<<<< HEAD
 int set_anon_super(struct super_block *s, void *data)
+=======
+int get_anon_bdev(dev_t *p)
+>>>>>>> upstream/4.3_primoc
 {
 	int dev;
 	int error;
@@ -684,6 +881,7 @@ int set_anon_super(struct super_block *s, void *data)
 		spin_unlock(&unnamed_dev_lock);
 		return -EMFILE;
 	}
+<<<<<<< HEAD
 	s->s_dev = MKDEV(0, dev & MINORMASK);
 	s->s_bdi = &noop_backing_dev_info;
 	return 0;
@@ -696,12 +894,43 @@ void kill_anon_super(struct super_block *sb)
 	int slot = MINOR(sb->s_dev);
 
 	generic_shutdown_super(sb);
+=======
+	*p = MKDEV(0, dev & MINORMASK);
+	return 0;
+}
+EXPORT_SYMBOL(get_anon_bdev);
+
+void free_anon_bdev(dev_t dev)
+{
+	int slot = MINOR(dev);
+>>>>>>> upstream/4.3_primoc
 	spin_lock(&unnamed_dev_lock);
 	ida_remove(&unnamed_dev_ida, slot);
 	if (slot < unnamed_dev_start)
 		unnamed_dev_start = slot;
 	spin_unlock(&unnamed_dev_lock);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(free_anon_bdev);
+
+int set_anon_super(struct super_block *s, void *data)
+{
+	int error = get_anon_bdev(&s->s_dev);
+	if (!error)
+		s->s_bdi = &noop_backing_dev_info;
+	return error;
+}
+
+EXPORT_SYMBOL(set_anon_super);
+
+void kill_anon_super(struct super_block *sb)
+{
+	dev_t dev = sb->s_dev;
+	generic_shutdown_super(sb);
+	free_anon_bdev(dev);
+}
+>>>>>>> upstream/4.3_primoc
 
 EXPORT_SYMBOL(kill_anon_super);
 

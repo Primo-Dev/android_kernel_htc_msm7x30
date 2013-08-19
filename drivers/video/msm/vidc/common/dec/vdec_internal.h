@@ -18,9 +18,13 @@
 #include <linux/cdev.h>
 #include <media/msm/vidc_init.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 #define NUM_OF_DRIVER_NODES 2
 #endif
+=======
+#define NUM_OF_DRIVER_NODES 2
+>>>>>>> upstream/4.3_primoc
 
 struct vid_dec_msg {
 	struct list_head list;
@@ -28,6 +32,7 @@ struct vid_dec_msg {
 };
 
 struct vid_dec_dev {
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 	struct cdev cdev[NUM_OF_DRIVER_NODES];
 	struct device *device[NUM_OF_DRIVER_NODES];
@@ -35,6 +40,10 @@ struct vid_dec_dev {
 	struct cdev cdev;
 	struct device *device;
 #endif
+=======
+	struct cdev cdev[NUM_OF_DRIVER_NODES];
+	struct device *device[NUM_OF_DRIVER_NODES];
+>>>>>>> upstream/4.3_primoc
 	resource_size_t phys_base;
 	void __iomem *virt_base;
 	unsigned int irq;

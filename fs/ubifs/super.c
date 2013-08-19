@@ -276,7 +276,10 @@ static void ubifs_i_callback(struct rcu_head *head)
 {
 	struct inode *inode = container_of(head, struct inode, i_rcu);
 	struct ubifs_inode *ui = ubifs_inode(inode);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&inode->i_dentry);
+=======
+>>>>>>> upstream/4.3_primoc
 	kmem_cache_free(ubifs_inode_slab, ui);
 }
 
@@ -1583,6 +1586,15 @@ static int ubifs_remount_rw(struct ubifs_info *c)
 	c->remounting_rw = 1;
 	c->ro_mount = 0;
 
+<<<<<<< HEAD
+=======
+	if (c->space_fixup) {
+		err = ubifs_fixup_free_space(c);
+		if (err)
+			return err;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	err = check_free_space(c);
 	if (err)
 		goto out;
@@ -1699,12 +1711,15 @@ static int ubifs_remount_rw(struct ubifs_info *c)
 		err = dbg_check_space_info(c);
 	}
 
+<<<<<<< HEAD
 	if (c->space_fixup) {
 		err = ubifs_fixup_free_space(c);
 		if (err)
 			goto out;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_unlock(&c->umount_mutex);
 	return err;
 

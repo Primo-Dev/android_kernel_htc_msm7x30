@@ -2340,7 +2340,10 @@ static void ivb_manual_fdi_link_train(struct drm_crtc *crtc)
 	temp |= FDI_LINK_TRAIN_PATTERN_1_IVB;
 	temp &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
 	temp |= FDI_LINK_TRAIN_400MV_0DB_SNB_B;
+<<<<<<< HEAD
 	temp |= FDI_COMPOSITE_SYNC;
+=======
+>>>>>>> upstream/4.3_primoc
 	I915_WRITE(reg, temp | FDI_TX_ENABLE);
 
 	reg = FDI_RX_CTL(pipe);
@@ -2348,7 +2351,10 @@ static void ivb_manual_fdi_link_train(struct drm_crtc *crtc)
 	temp &= ~FDI_LINK_TRAIN_AUTO;
 	temp &= ~FDI_LINK_TRAIN_PATTERN_MASK_CPT;
 	temp |= FDI_LINK_TRAIN_PATTERN_1_CPT;
+<<<<<<< HEAD
 	temp |= FDI_COMPOSITE_SYNC;
+=======
+>>>>>>> upstream/4.3_primoc
 	I915_WRITE(reg, temp | FDI_RX_ENABLE);
 
 	POSTING_READ(reg);
@@ -4984,7 +4990,11 @@ static int ironlake_crtc_mode_set(struct drm_crtc *crtc,
 	} else if (is_sdvo && is_tv)
 		factor = 20;
 
+<<<<<<< HEAD
 	if (clock.m < factor * clock.n)
+=======
+	if (clock.m1 < factor * clock.n)
+>>>>>>> upstream/4.3_primoc
 		fp |= FP_CB_TUNE;
 
 	dpll = 0;
@@ -5277,7 +5287,11 @@ void intel_crtc_load_lut(struct drm_crtc *crtc)
 	int i;
 
 	/* The clocks have to be on to load the palette. */
+<<<<<<< HEAD
 	if (!crtc->enabled || !intel_crtc->active)
+=======
+	if (!crtc->enabled)
+>>>>>>> upstream/4.3_primoc
 		return;
 
 	/* use legacy palette for Ironlake */
@@ -5348,6 +5362,7 @@ static void i9xx_update_cursor(struct drm_crtc *crtc, u32 base)
 	I915_WRITE(CURBASE(pipe), base);
 }
 
+<<<<<<< HEAD
 static void ivb_update_cursor(struct drm_crtc *crtc, u32 base)
 {
 	struct drm_device *dev = crtc->dev;
@@ -5373,6 +5388,8 @@ static void ivb_update_cursor(struct drm_crtc *crtc, u32 base)
 	I915_WRITE(CURBASE_IVB(pipe), base);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* If no-part of the cursor is visible on the framebuffer, then the GPU may hang... */
 static void intel_crtc_update_cursor(struct drm_crtc *crtc,
 				     bool on)
@@ -5420,6 +5437,7 @@ static void intel_crtc_update_cursor(struct drm_crtc *crtc,
 	if (!visible && !intel_crtc->cursor_visible)
 		return;
 
+<<<<<<< HEAD
 	if (IS_IVYBRIDGE(dev)) {
 		I915_WRITE(CURPOS_IVB(pipe), pos);
 		ivb_update_cursor(crtc, base);
@@ -5430,6 +5448,13 @@ static void intel_crtc_update_cursor(struct drm_crtc *crtc,
 		else
 			i9xx_update_cursor(crtc, base);
 	}
+=======
+	I915_WRITE(CURPOS(pipe), pos);
+	if (IS_845G(dev) || IS_I865G(dev))
+		i845_update_cursor(crtc, base);
+	else
+		i9xx_update_cursor(crtc, base);
+>>>>>>> upstream/4.3_primoc
 
 	if (visible)
 		intel_mark_busy(dev, to_intel_framebuffer(crtc->fb)->obj);
@@ -6507,8 +6532,13 @@ static int intel_crtc_page_flip(struct drm_crtc *crtc,
 {
 	struct drm_device *dev = crtc->dev;
 	struct drm_i915_private *dev_priv = dev->dev_private;
+<<<<<<< HEAD
 	struct intel_framebuffer *intel_fb;
 	struct drm_i915_gem_object *obj;
+=======
+	struct drm_framebuffer *old_fb = crtc->fb;
+	struct drm_i915_gem_object *obj = to_intel_framebuffer(fb)->obj;
+>>>>>>> upstream/4.3_primoc
 	struct intel_crtc *intel_crtc = to_intel_crtc(crtc);
 	struct intel_unpin_work *work;
 	unsigned long flags;
@@ -6520,15 +6550,29 @@ static int intel_crtc_page_flip(struct drm_crtc *crtc,
 
 	work->event = event;
 	work->dev = crtc->dev;
+<<<<<<< HEAD
 	intel_fb = to_intel_framebuffer(crtc->fb);
 	work->old_fb_obj = intel_fb->obj;
 	INIT_WORK(&work->work, intel_unpin_work_fn);
 
+=======
+	work->old_fb_obj = to_intel_framebuffer(old_fb)->obj;
+	INIT_WORK(&work->work, intel_unpin_work_fn);
+
+	ret = drm_vblank_get(dev, intel_crtc->pipe);
+	if (ret)
+		goto free_work;
+
+>>>>>>> upstream/4.3_primoc
 	/* We borrow the event spin lock for protecting unpin_work */
 	spin_lock_irqsave(&dev->event_lock, flags);
 	if (intel_crtc->unpin_work) {
 		spin_unlock_irqrestore(&dev->event_lock, flags);
 		kfree(work);
+<<<<<<< HEAD
+=======
+		drm_vblank_put(dev, intel_crtc->pipe);
+>>>>>>> upstream/4.3_primoc
 
 		DRM_DEBUG_DRIVER("flip queue: crtc already busy\n");
 		return -EBUSY;
@@ -6536,9 +6580,12 @@ static int intel_crtc_page_flip(struct drm_crtc *crtc,
 	intel_crtc->unpin_work = work;
 	spin_unlock_irqrestore(&dev->event_lock, flags);
 
+<<<<<<< HEAD
 	intel_fb = to_intel_framebuffer(fb);
 	obj = intel_fb->obj;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	mutex_lock(&dev->struct_mutex);
 
 	/* Reference the objects for the scheduled work. */
@@ -6547,10 +6594,13 @@ static int intel_crtc_page_flip(struct drm_crtc *crtc,
 
 	crtc->fb = fb;
 
+<<<<<<< HEAD
 	ret = drm_vblank_get(dev, intel_crtc->pipe);
 	if (ret)
 		goto cleanup_objs;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	work->pending_flip_obj = obj;
 
 	work->enable_stall_check = true;
@@ -6572,7 +6622,11 @@ static int intel_crtc_page_flip(struct drm_crtc *crtc,
 
 cleanup_pending:
 	atomic_sub(1 << intel_crtc->plane, &work->old_fb_obj->pending_flip);
+<<<<<<< HEAD
 cleanup_objs:
+=======
+	crtc->fb = old_fb;
+>>>>>>> upstream/4.3_primoc
 	drm_gem_object_unreference(&work->old_fb_obj->base);
 	drm_gem_object_unreference(&obj->base);
 	mutex_unlock(&dev->struct_mutex);
@@ -6581,6 +6635,11 @@ cleanup_objs:
 	intel_crtc->unpin_work = NULL;
 	spin_unlock_irqrestore(&dev->event_lock, flags);
 
+<<<<<<< HEAD
+=======
+	drm_vblank_put(dev, intel_crtc->pipe);
+free_work:
+>>>>>>> upstream/4.3_primoc
 	kfree(work);
 
 	return ret;
@@ -6592,12 +6651,15 @@ static void intel_sanitize_modesetting(struct drm_device *dev,
 	struct drm_i915_private *dev_priv = dev->dev_private;
 	u32 reg, val;
 
+<<<<<<< HEAD
 	/* Clear any frame start delays used for debugging left by the BIOS */
 	for_each_pipe(pipe) {
 		reg = PIPECONF(pipe);
 		I915_WRITE(reg, I915_READ(reg) & ~PIPECONF_FRAME_START_DELAY_MASK);
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (HAS_PCH_SPLIT(dev))
 		return;
 
@@ -7427,6 +7489,7 @@ static void gen6_init_clock_gating(struct drm_device *dev)
 	I915_WRITE(WM2_LP_ILK, 0);
 	I915_WRITE(WM1_LP_ILK, 0);
 
+<<<<<<< HEAD
 	/* According to the BSpec vol1g, bit 12 (RCPBUNIT) clock
 	 * gating disable must be set.  Failure to set it results in
 	 * flickering pixels due to Z write ordering failures after
@@ -7441,6 +7504,8 @@ static void gen6_init_clock_gating(struct drm_device *dev)
 		   GEN6_RCPBUNIT_CLOCK_GATE_DISABLE |
 		   GEN6_RCCUNIT_CLOCK_GATE_DISABLE);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * According to the spec the following bits should be
 	 * set in order to enable memory self-refresh and fbc:
@@ -7479,6 +7544,7 @@ static void ivybridge_init_clock_gating(struct drm_device *dev)
 	I915_WRITE(WM2_LP_ILK, 0);
 	I915_WRITE(WM1_LP_ILK, 0);
 
+<<<<<<< HEAD
 	/* According to the spec, bit 13 (RCZUNIT) must be set on IVB.
 	 * This implements the WaDisableRCZUnitClockGating workaround.
 	 */
@@ -7501,6 +7567,10 @@ static void ivybridge_init_clock_gating(struct drm_device *dev)
 			I915_READ(GEN7_SQ_CHICKEN_MBCUNIT_CONFIG) |
 			GEN7_SQ_CHICKEN_MBCUNIT_SQINTMOB);
 
+=======
+	I915_WRITE(ILK_DSPCLK_GATE, IVB_VRHUNIT_CLK_GATE);
+
+>>>>>>> upstream/4.3_primoc
 	for_each_pipe(pipe)
 		I915_WRITE(DSPCNTR(pipe),
 			   I915_READ(DSPCNTR(pipe)) |
@@ -7587,6 +7657,10 @@ static void ibx_init_clock_gating(struct drm_device *dev)
 static void cpt_init_clock_gating(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = dev->dev_private;
+<<<<<<< HEAD
+=======
+	int pipe;
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * On Ibex Peak and Cougar Point, we need to disable clock
@@ -7596,6 +7670,12 @@ static void cpt_init_clock_gating(struct drm_device *dev)
 	I915_WRITE(SOUTH_DSPCLK_GATE_D, PCH_DPLSUNIT_CLOCK_GATE_DISABLE);
 	I915_WRITE(SOUTH_CHICKEN2, I915_READ(SOUTH_CHICKEN2) |
 		   DPLS_EDP_PPS_FIX_DIS);
+<<<<<<< HEAD
+=======
+	/* Without this, mode sets may fail silently on FDI */
+	for_each_pipe(pipe)
+		I915_WRITE(TRANS_CHICKEN2(pipe), TRANS_AUTOTRAIN_GEN_STALL_DIS);
+>>>>>>> upstream/4.3_primoc
 }
 
 static void ironlake_teardown_rc6(struct drm_device *dev)
@@ -8031,7 +8111,11 @@ void intel_modeset_init(struct drm_device *dev)
 		intel_init_emon(dev);
 	}
 
+<<<<<<< HEAD
 	if (IS_GEN6(dev) || IS_GEN7(dev))
+=======
+	if (IS_GEN6(dev))
+>>>>>>> upstream/4.3_primoc
 		gen6_enable_rps(dev_priv);
 
 	INIT_WORK(&dev_priv->idle_work, intel_idle_update);
@@ -8073,7 +8157,11 @@ void intel_modeset_cleanup(struct drm_device *dev)
 
 	if (IS_IRONLAKE_M(dev))
 		ironlake_disable_drps(dev);
+<<<<<<< HEAD
 	if (IS_GEN6(dev) || IS_GEN7(dev))
+=======
+	if (IS_GEN6(dev))
+>>>>>>> upstream/4.3_primoc
 		gen6_disable_rps(dev);
 
 	if (IS_IRONLAKE_M(dev))

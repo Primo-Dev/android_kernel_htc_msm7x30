@@ -53,6 +53,12 @@ static DEFINE_PER_CPU(struct powernow_k8_data *, powernow_data);
 
 static int cpu_family = CPU_OPTERON;
 
+<<<<<<< HEAD
+=======
+/* array to map SW pstate number to acpi state */
+static u32 ps_to_as[8];
+
+>>>>>>> upstream/4.3_primoc
 /* core performance boost */
 static bool cpb_capable, cpb_enabled;
 static struct msr __percpu *msrs;
@@ -79,9 +85,15 @@ static u32 find_khz_freq_from_fid(u32 fid)
 }
 
 static u32 find_khz_freq_from_pstate(struct cpufreq_frequency_table *data,
+<<<<<<< HEAD
 		u32 pstate)
 {
 	return data[pstate].frequency;
+=======
+				     u32 pstate)
+{
+	return data[ps_to_as[pstate]].frequency;
+>>>>>>> upstream/4.3_primoc
 }
 
 /* Return the vco fid for an input fid
@@ -925,6 +937,7 @@ static int fill_powernow_table_pstate(struct powernow_k8_data *data,
 			invalidate_entry(powernow_table, i);
 			continue;
 		}
+<<<<<<< HEAD
 		rdmsr(MSR_PSTATE_DEF_BASE + index, lo, hi);
 		if (!(hi & HW_PSTATE_VALID_MASK)) {
 			pr_debug("invalid pstate %d, ignoring\n", index);
@@ -933,15 +946,35 @@ static int fill_powernow_table_pstate(struct powernow_k8_data *data,
 		}
 
 		powernow_table[i].index = index;
+=======
+
+		ps_to_as[index] = i;
+>>>>>>> upstream/4.3_primoc
 
 		/* Frequency may be rounded for these */
 		if ((boot_cpu_data.x86 == 0x10 && boot_cpu_data.x86_model < 10)
 				 || boot_cpu_data.x86 == 0x11) {
+<<<<<<< HEAD
+=======
+
+			rdmsr(MSR_PSTATE_DEF_BASE + index, lo, hi);
+			if (!(hi & HW_PSTATE_VALID_MASK)) {
+				pr_debug("invalid pstate %d, ignoring\n", index);
+				invalidate_entry(powernow_table, i);
+				continue;
+			}
+
+>>>>>>> upstream/4.3_primoc
 			powernow_table[i].frequency =
 				freq_from_fid_did(lo & 0x3f, (lo >> 6) & 7);
 		} else
 			powernow_table[i].frequency =
 				data->acpi_data.states[i].core_frequency * 1000;
+<<<<<<< HEAD
+=======
+
+		powernow_table[i].index = index;
+>>>>>>> upstream/4.3_primoc
 	}
 	return 0;
 }
@@ -1182,7 +1215,12 @@ static long powernowk8_target_fn(void *arg)
 	powernow_k8_acpi_pst_values(data, newstate);
 
 	if (cpu_family == CPU_HW_PSTATE)
+<<<<<<< HEAD
 		ret = transition_frequency_pstate(data, newstate);
+=======
+		ret = transition_frequency_pstate(data,
+			data->powernow_table[newstate].index);
+>>>>>>> upstream/4.3_primoc
 	else
 		ret = transition_frequency_fidvid(data, newstate);
 	if (ret) {
@@ -1194,7 +1232,11 @@ static long powernowk8_target_fn(void *arg)
 
 	if (cpu_family == CPU_HW_PSTATE)
 		pol->cur = find_khz_freq_from_pstate(data->powernow_table,
+<<<<<<< HEAD
 				newstate);
+=======
+				data->powernow_table[newstate].index);
+>>>>>>> upstream/4.3_primoc
 	else
 		pol->cur = find_khz_freq_from_fid(data->currfid);
 

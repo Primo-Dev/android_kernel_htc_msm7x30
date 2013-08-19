@@ -36,6 +36,7 @@
 #include <asm/irq.h>
 #include <asm/uaccess.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_IMC_UART2DM_HANDSHAKE
 #include <mach/gpio.h>
 #include <mach/msm_serial_hs.h>
@@ -54,6 +55,8 @@ static int uart2_debug_mask = 0;
         } while (0)
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 /*
  * This is used to lock changes in serial line configuration.
  */
@@ -522,9 +525,12 @@ static int uart_write(struct tty_struct *tty,
 	struct circ_buf *circ;
 	unsigned long flags;
 	int c, ret = 0;
+<<<<<<< HEAD
 #ifdef CONFIG_IMC_UART2DM_HANDSHAKE
 	u8 retries=0;
 #endif
+=======
+>>>>>>> upstream/4.3_primoc
 
 	/*
 	 * This means you called this function _after_ the port was
@@ -538,6 +544,7 @@ static int uart_write(struct tty_struct *tty,
 	port = state->uart_port;
 	circ = &state->xmit;
 
+<<<<<<< HEAD
 #ifdef CONFIG_IMC_UART2DM_HANDSHAKE
 	/* the handshaking cannot be called within irq, therefore we put it within tty driver, instead of uart driver */
 	if (!strcmp(tty->name,"ttyHS1") && !modem_fatal) {
@@ -565,6 +572,8 @@ static int uart_write(struct tty_struct *tty,
 	}
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (!circ->buf)
 		return 0;
 
@@ -1968,6 +1977,11 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 		mutex_unlock(&port->mutex);
 		return 0;
 	}
+<<<<<<< HEAD
+=======
+	put_device(tty_dev);
+
+>>>>>>> upstream/4.3_primoc
 	if (console_suspend_enabled || !uart_console(uport))
 		uport->suspended = 1;
 
@@ -2033,9 +2047,17 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 			disable_irq_wake(uport->irq);
 			uport->irq_wake = 0;
 		}
+<<<<<<< HEAD
 		mutex_unlock(&port->mutex);
 		return 0;
 	}
+=======
+		put_device(tty_dev);
+		mutex_unlock(&port->mutex);
+		return 0;
+	}
+	put_device(tty_dev);
+>>>>>>> upstream/4.3_primoc
 	uport->suspended = 0;
 
 	/*
@@ -2355,6 +2377,7 @@ int uart_register_driver(struct uart_driver *drv)
 	}
 
 	retval = tty_register_driver(normal);
+<<<<<<< HEAD
 
 #ifdef CONFIG_IMC_UART2DM_HANDSHAKE
 	if (!strcmp(drv->driver_name, "msm_serial_hs_imc"))
@@ -2366,6 +2389,8 @@ int uart_register_driver(struct uart_driver *drv)
 	}
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (retval >= 0)
 		return retval;
 

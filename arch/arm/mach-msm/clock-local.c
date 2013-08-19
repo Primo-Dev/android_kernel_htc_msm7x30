@@ -523,6 +523,7 @@ int rcg_clk_set_rate(struct clk *c, unsigned long rate)
 	return _rcg_clk_set_rate(clk, nf);
 }
 
+<<<<<<< HEAD
 /* Set a clock to a rate greater than some minimum. */
 int rcg_clk_set_min_rate(struct clk *c, unsigned long rate)
 {
@@ -539,6 +540,8 @@ int rcg_clk_set_min_rate(struct clk *c, unsigned long rate)
 	return _rcg_clk_set_rate(clk, nf);
 }
 
+=======
+>>>>>>> upstream/4.3_primoc
 /* Get the currently-set rate of a clock in Hz. */
 unsigned long rcg_clk_get_rate(struct clk *c)
 {

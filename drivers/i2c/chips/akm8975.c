@@ -17,14 +17,23 @@
 #include <linux/slab.h>
 #include <linux/irq.h>
 #include <linux/miscdevice.h>
+<<<<<<< HEAD
 #include <linux/gpio.h>
 #include <linux/uaccess.h>
+=======
+#include <asm/gpio.h>
+#include <asm/uaccess.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/delay.h>
 #include <linux/input.h>
 #include <linux/workqueue.h>
 #include <linux/freezer.h>
 #include <linux/akm8975.h>
+<<<<<<< HEAD
 #include <linux/earlysuspend.h>
+=======
+#include<linux/earlysuspend.h>
+>>>>>>> upstream/4.3_primoc
 
 #define DEBUG 0
 #define MAX_FAILURE_COUNT 3
@@ -33,6 +42,7 @@
 #define D(x...) printk(KERN_DEBUG "[COMP][AKM8975] " x)
 #define I(x...) printk(KERN_INFO "[COMP][AKM8975] " x)
 #define E(x...) printk(KERN_ERR "[COMP][AKM8975 ERROR] " x)
+<<<<<<< HEAD
 #define DIF(x...) {\
 		if (debug_flag) \
 			printk(KERN_DEBUG "[COMP][AKM8975 DEBUG] " x); }
@@ -40,6 +50,9 @@
 		if (debug_flag_fatal_err) \
 			printk(KERN_DEBUG "[COMP][AKM8975 DEBUG FATAL ERR] "\
 			 x); }
+=======
+#define DIF(x...) if (debug_flag) printk(KERN_DEBUG "[COMP][AKM8975 DEBUG] " x)
+>>>>>>> upstream/4.3_primoc
 
 #define DEVICE_ACCESSORY_ATTR(_name, _mode, _show, _store) \
 struct device_attribute dev_attr_##_name = __ATTR(_name, _mode, _show, _store)
@@ -76,8 +89,11 @@ static int failure_count;
 static short akmd_delay;
 
 static int debug_flag;
+<<<<<<< HEAD
 static int debug_flag_fatal_err;
 static int fatal_err_pr_count;
+=======
+>>>>>>> upstream/4.3_primoc
 
 static atomic_t suspend_flag = ATOMIC_INIT(0);
 static atomic_t PhoneOn_flag = ATOMIC_INIT(0);
@@ -218,9 +234,15 @@ static int AKECS_GetData(void)
 	char buffer[RBUFF_SIZE_8975 + 1];
 	int ret;
 
+<<<<<<< HEAD
 	memset(buffer, 0, RBUFF_SIZE_8975);
 	buffer[0] = AK8975_REG_ST1;
 	ret = AKI2C_RxData(buffer, RBUFF_SIZE_8975);
+=======
+	memset(buffer, 0, RBUFF_SIZE_8975 + 1);
+	buffer[0] = AK8975_REG_ST1;
+	ret = AKI2C_RxData(buffer, RBUFF_SIZE_8975 + 1);
+>>>>>>> upstream/4.3_primoc
 	if (ret < 0)
 		return ret;
 
@@ -229,6 +251,7 @@ static int AKECS_GetData(void)
 	atomic_set(&data_ready, 1);
 	wake_up(&data_ready_wq);
 	mutex_unlock(&sense_data_mutex);
+<<<<<<< HEAD
 
 	DIF("%s: GET_DATA, sense_data(0, 1, 2, 3, 4, 5, 6, 7) = "
 		"(0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x\n",
@@ -242,6 +265,14 @@ static int AKECS_GetData(void)
 		__func__, sense_data[0], sense_data[1],
 		sense_data[2], sense_data[3], sense_data[4],
 		sense_data[5], sense_data[6], sense_data[7]);
+=======
+/*
+	D("%s: GET_DATA, sense_data(0, 1, 2, 3, 4, 5, 6, 7) = "
+		"(0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x\n",
+		__func__, sense_data[0], sense_data[1], sense_data[2]
+		, sense_data[3], sense_data[4], sense_data[5], sense_data[6]
+		, sense_data[7]);*/
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 }
@@ -281,7 +312,10 @@ static int AKECS_TransRBuff(char *rbuf, int size)
 			if (failure_count >= MAX_FAILURE_COUNT) {
 				E("%s: successive %d failure.\n",
 				       __func__, failure_count);
+<<<<<<< HEAD
 				debug_flag_fatal_err = 1;
+=======
+>>>>>>> upstream/4.3_primoc
 				atomic_set(&open_flag, -1);
 				wake_up(&open_wq);
 				failure_count = 0;
@@ -327,6 +361,7 @@ static void AKECS_Report_Value(short *rbuf)
 		atomic_read(&m_flag), atomic_read(&a_flag),
 		atomic_read(&t_flag), atomic_read(&mv_flag));
 
+<<<<<<< HEAD
 	if (fatal_err_pr_count < 10) {
 		DIF_FATAL_ERR(
 			"AKECS_Report_Value: yaw = %d, pitch = %d,"
@@ -349,6 +384,8 @@ static void AKECS_Report_Value(short *rbuf)
 		debug_flag_fatal_err = 0;
 	}
 
+=======
+>>>>>>> upstream/4.3_primoc
 	/* Report magnetic sensor information */
 	if (atomic_read(&m_flag)) {
 		input_report_abs(data->input_dev, ABS_RX, rbuf[0]);
@@ -409,6 +446,7 @@ static int akm_aot_open(struct inode *inode, struct file *file)
 
 	printk(KERN_INFO "[COMP] Compass enable\n");
 
+<<<<<<< HEAD
 	DIF("%s: open_count = %d, open_flag = %d\n", __func__,
 		atomic_read(&open_count), atomic_read(&open_flag));
 
@@ -421,6 +459,15 @@ static int akm_aot_open(struct inode *inode, struct file *file)
 		atomic_set(&reserve_open_flag, 1);
 		wake_up(&open_wq);
 		ret = 0;
+=======
+	if (atomic_cmpxchg(&open_count, 0, 1) == 0) {
+		if (atomic_cmpxchg(&open_flag, 0, 1) == 0) {
+			input_report_abs(data->input_dev, ABS_RUDDER, -1);
+			atomic_set(&reserve_open_flag, 1);
+			wake_up(&open_wq);
+			ret = 0;
+		}
+>>>>>>> upstream/4.3_primoc
 	}
 	return ret;
 }
@@ -429,9 +476,12 @@ static int akm_aot_release(struct inode *inode, struct file *file)
 {
 	printk(KERN_INFO "[COMP] Compass disable\n");
 
+<<<<<<< HEAD
 	debug_flag_fatal_err = 0;
 	fatal_err_pr_count = 0;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	atomic_set(&reserve_open_flag, 0);
 	atomic_set(&open_flag, 0);
 	atomic_set(&open_count, 0);
@@ -440,12 +490,20 @@ static int akm_aot_release(struct inode *inode, struct file *file)
 }
 
 static long
+<<<<<<< HEAD
 akm_aot_ioctl(/*struct inode *inode,*/ struct file *file,
+=======
+akm_aot_ioctl(struct file *file,
+>>>>>>> upstream/4.3_primoc
 	      unsigned int cmd, unsigned long arg)
 {
 	void __user *argp = (void __user *)arg;
 	short flag = 0;
+<<<<<<< HEAD
 	int ret = -1;
+=======
+	long ret = -1;
+>>>>>>> upstream/4.3_primoc
 
 	ret = copy_from_user(&flag, argp, sizeof(flag));
 	if (ret)
@@ -539,15 +597,24 @@ static int akmd_release(struct inode *inode, struct file *file)
 }
 
 static long
+<<<<<<< HEAD
 akmd_ioctl(/*struct inode *inode,*/ struct file *file, unsigned int cmd,
+=======
+akmd_ioctl(struct file *file, unsigned int cmd,
+>>>>>>> upstream/4.3_primoc
 	   unsigned long arg)
 {
 
 	void __user *argp = (void __user *)arg;
 
 	char msg[RBUFF_SIZE_8975 + 1] = "", rwbuf[RBUFF_SIZE_8975 + 1] = "";
+<<<<<<< HEAD
 	int ret = -1, status;
 	short mode = 0, value[12], delay;
+=======
+	long ret = -1, status = 0;
+	short mode = 0, value[12] = {0}, delay;
+>>>>>>> upstream/4.3_primoc
 	short layouts[4][3][3];
 	int i, j, k;
 
@@ -604,7 +671,10 @@ akmd_ioctl(/*struct inode *inode,*/ struct file *file, unsigned int cmd,
 		break;
 	case ECS_IOCTL_GETDATA:
 		/*D("%s: ECS_IOCTL_GETDATA\n", __func__);*/
+<<<<<<< HEAD
 		DIF_FATAL_ERR("%s: calling AKECS_TransRBuff\n", __func__);
+=======
+>>>>>>> upstream/4.3_primoc
 		ret = AKECS_TransRBuff(msg, RBUFF_SIZE_8975);
 		if (ret < 0)
 			return ret;
@@ -644,11 +714,19 @@ akmd_ioctl(/*struct inode *inode,*/ struct file *file, unsigned int cmd,
 			return -EFAULT;
 		break;
 	case ECS_IOCTL_GETDATA:
+<<<<<<< HEAD
 		msg[8] = debug_flag;/*
 		DIF("msg(0, 1, 2, 3, 4, 5, 6, 7, 8) = (0x%x, 0x%x, 0x%x, 0x%x,"
 		  " 0x%x, 0x%x, 0x%x, 0x%x, 0x%x)\n",
 			msg[0], msg[1],	msg[2], msg[3], msg[4], msg[5], msg[6],
 			msg[7],	msg[8]);*/
+=======
+		msg[8] = debug_flag;
+		DIF("msg(0, 1, 2, 3, 4, 5, 6, 7, 8) = (0x%x, 0x%x, 0x%x, 0x%x,"
+		  " 0x%x, 0x%x, 0x%x, 0x%x, 0x%x)\n",
+			msg[0], msg[1],	msg[2], msg[3], msg[4], msg[5], msg[6],
+			msg[7],	msg[8]);
+>>>>>>> upstream/4.3_primoc
 		if (copy_to_user(argp, &msg, sizeof(msg)))
 			return -EFAULT;
 		break;
@@ -682,8 +760,11 @@ static irqreturn_t akm8975_interrupt(int irq, void *dev_id)
 {
 	struct akm8975_data *data = dev_id;
 
+<<<<<<< HEAD
 	DIF_FATAL_ERR("%s\n", __func__);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	disable_irq_nosync(this_client->irq);
 	schedule_work(&data->work);
 	return IRQ_HANDLED;
@@ -723,8 +804,11 @@ static int akm8975_suspend(struct i2c_client *client, pm_message_t mesg)
 {
 	DIF("%s", __func__);
 
+<<<<<<< HEAD
 	DIF_FATAL_ERR("%s", __func__);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	atomic_set(&suspend_flag, 1);
 	atomic_set(&reserve_open_flag, atomic_read(&open_flag));
 	atomic_set(&open_flag, 0);
@@ -753,6 +837,7 @@ static const struct file_operations akmd_fops = {
 	.owner = THIS_MODULE,
 	.open = akmd_open,
 	.release = akmd_release,
+<<<<<<< HEAD
 	/*(.ioctl = akmd_ioctl,*/
 #if HAVE_COMPAT_IOCTL
 	.compat_ioctl = akmd_ioctl,
@@ -760,12 +845,16 @@ static const struct file_operations akmd_fops = {
 #if HAVE_UNLOCKED_IOCTL
 	.unlocked_ioctl = akmd_ioctl,
 #endif
+=======
+	.unlocked_ioctl = akmd_ioctl,
+>>>>>>> upstream/4.3_primoc
 };
 
 static const struct file_operations akm_aot_fops = {
 	.owner = THIS_MODULE,
 	.open = akm_aot_open,
 	.release = akm_aot_release,
+<<<<<<< HEAD
 	/*.ioctl = akm_aot_ioctl,*/
 #if HAVE_COMPAT_IOCTL
 	.compat_ioctl = akm_aot_ioctl,
@@ -774,6 +863,9 @@ static const struct file_operations akm_aot_fops = {
 	.unlocked_ioctl = akm_aot_ioctl,
 #endif
 
+=======
+	.unlocked_ioctl = akm_aot_ioctl,
+>>>>>>> upstream/4.3_primoc
 };
 
 
@@ -795,7 +887,11 @@ static ssize_t akm_show(struct device *dev,
 {
 	char *s = buf;
 	s += sprintf(s, "%d\n", atomic_read(&PhoneOn_flag));
+<<<<<<< HEAD
 	return s - buf;
+=======
+	return (s - buf);
+>>>>>>> upstream/4.3_primoc
 }
 
 static ssize_t akm_store(struct device *dev,
@@ -839,10 +935,16 @@ static ssize_t debug_show(struct device *dev,
 	lmv_flag = atomic_read(&mv_flag);
 	ldelay_flag = akmd_delay;
 
+<<<<<<< HEAD
 	s += sprintf(s, "(m, a, t, mv, delay, debug_flag, "
 		"debug_flag_fatal_err) = (0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x,"
 		" 0x%x)\n", lm_flag, la_flag, lt_flag, lmv_flag, ldelay_flag,
 		debug_flag, debug_flag_fatal_err);
+=======
+	s += sprintf(s, "(m, a, t, mv, delay, debug_flag) = (0x%x, "
+		"0x%x, 0x%x, 0x%x, 0x%x, 0x%x)\n", lm_flag, la_flag,
+		lt_flag, lmv_flag, ldelay_flag, debug_flag);
+>>>>>>> upstream/4.3_primoc
 
 	return s - buf;
 }
@@ -982,6 +1084,18 @@ int akm8975_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto exit_set_mode_failed;
 	}
 
+<<<<<<< HEAD
+=======
+	irq_type = (pdata->irq_trigger) ? IRQF_TRIGGER_LOW : IRQF_TRIGGER_HIGH;
+
+	err = request_irq(client->irq, akm8975_interrupt, irq_type,
+			  "akm8975", akm);
+	if (err < 0) {
+		E("%s: request irq failed\n", __func__);
+		goto exit_irq_request_failed;
+	}
+
+>>>>>>> upstream/4.3_primoc
 	akm->input_dev = input_allocate_device();
 
 	if (!akm->input_dev) {
@@ -1050,8 +1164,11 @@ int akm8975_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	atomic_set(&mv_flag, 0);
 
 	debug_flag = 0;
+<<<<<<< HEAD
 	debug_flag_fatal_err = 0;
 	fatal_err_pr_count = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 #ifdef AKM_EARLY_SUSPEND
 	akm->early_suspend_akm.suspend = akm8975_early_suspend;
@@ -1067,6 +1184,7 @@ int akm8975_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	disable_flag = 0;
 	reserve_a_flag = 0;
 
+<<<<<<< HEAD
 	irq_type = (pdata->irq_trigger) ? IRQF_TRIGGER_LOW : IRQF_TRIGGER_HIGH;
 
 
@@ -1088,12 +1206,20 @@ int akm8975_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	return 0;
 
 exit_irq_request_failed:
+=======
+	return 0;
+
+>>>>>>> upstream/4.3_primoc
 exit_registerAttr_failed:
 exit_misc_device_register_failed:
 exit_input_register_device_failed:
 	input_free_device(akm->input_dev);
 exit_input_dev_alloc_failed:
 	free_irq(client->irq, akm);
+<<<<<<< HEAD
+=======
+exit_irq_request_failed:
+>>>>>>> upstream/4.3_primoc
 exit_set_mode_failed:
 exit_platform_data_null:
 	kfree(akm);

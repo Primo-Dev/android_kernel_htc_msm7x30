@@ -58,6 +58,7 @@ struct files_struct {
 	struct file __rcu * fd_array[NR_OPEN_DEFAULT];
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_DEBUG_FDLEAK
 extern void fd_num_check(struct files_struct *files, unsigned int fd);
 #endif
@@ -65,6 +66,10 @@ extern void fd_num_check(struct files_struct *files, unsigned int fd);
 #define rcu_dereference_check_fdtable(files, fdtfd) \
 	(rcu_dereference_check((fdtfd), \
 			       rcu_read_lock_held() || \
+=======
+#define rcu_dereference_check_fdtable(files, fdtfd) \
+	(rcu_dereference_check((fdtfd), \
+>>>>>>> upstream/4.3_primoc
 			       lockdep_is_held(&(files)->file_lock) || \
 			       atomic_read(&(files)->count) == 1 || \
 			       rcu_my_thread_group_empty()))

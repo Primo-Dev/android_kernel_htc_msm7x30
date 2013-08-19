@@ -238,7 +238,11 @@ static int __die(const char *str, int err, struct thread_info *thread, struct pt
 	static int die_counter;
 	int ret;
 
+<<<<<<< HEAD
 	printk(KERN_EMERG "[K] Internal error: %s: %x [#%d]" S_PREEMPT S_SMP "\n",
+=======
+	printk(KERN_EMERG "Internal error: %s: %x [#%d]" S_PREEMPT S_SMP "\n",
+>>>>>>> upstream/4.3_primoc
 	       str, err, ++die_counter);
 
 	/* trap and error numbers are mostly meaningless on ARM */
@@ -288,6 +292,16 @@ void die(const char *str, struct pt_regs *regs, int err)
 	raw_spin_unlock_irq(&die_lock);
 	oops_exit();
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIMAX
+	if (find_wimax_modules()) {
+	    printk(KERN_ALERT "[WIMAX] ignore this exception in %s\n", __func__);
+        return;
+    }
+#endif
+
+>>>>>>> upstream/4.3_primoc
 	if (in_interrupt())
 		panic("Fatal exception in interrupt");
 	if (panic_on_oops)

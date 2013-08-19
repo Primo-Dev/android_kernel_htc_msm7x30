@@ -1554,7 +1554,10 @@ intel_dp_link_down(struct intel_dp *intel_dp)
 			intel_wait_for_vblank(dev, to_intel_crtc(crtc)->pipe);
 	}
 
+<<<<<<< HEAD
 	DP &= ~DP_AUDIO_OUTPUT_ENABLE;
+=======
+>>>>>>> upstream/4.3_primoc
 	I915_WRITE(intel_dp->output_reg, DP & ~DP_PORT_EN);
 	POSTING_READ(intel_dp->output_reg);
 }
@@ -1659,6 +1662,7 @@ g4x_dp_detect(struct intel_dp *intel_dp)
 	return status;
 }
 
+<<<<<<< HEAD
 static struct edid *
 intel_dp_get_edid(struct drm_connector *connector, struct i2c_adapter *adapter)
 {
@@ -1684,6 +1688,8 @@ intel_dp_get_edid_modes(struct drm_connector *connector, struct i2c_adapter *ada
 }
 
 
+=======
+>>>>>>> upstream/4.3_primoc
 /**
  * Uses CRT_HOTPLUG_EN and CRT_HOTPLUG_STAT to detect DP connection.
  *
@@ -1710,7 +1716,11 @@ intel_dp_detect(struct drm_connector *connector, bool force)
 	if (intel_dp->force_audio) {
 		intel_dp->has_audio = intel_dp->force_audio > 0;
 	} else {
+<<<<<<< HEAD
 		edid = intel_dp_get_edid(connector, &intel_dp->adapter);
+=======
+		edid = drm_get_edid(connector, &intel_dp->adapter);
+>>>>>>> upstream/4.3_primoc
 		if (edid) {
 			intel_dp->has_audio = drm_detect_monitor_audio(edid);
 			connector->display_info.raw_edid = NULL;
@@ -1731,7 +1741,11 @@ static int intel_dp_get_modes(struct drm_connector *connector)
 	/* We should parse the EDID data and find out if it has an audio sink
 	 */
 
+<<<<<<< HEAD
 	ret = intel_dp_get_edid_modes(connector, &intel_dp->adapter);
+=======
+	ret = intel_ddc_get_modes(connector, &intel_dp->adapter);
+>>>>>>> upstream/4.3_primoc
 	if (ret) {
 		if (is_edp(intel_dp) && !dev_priv->panel_fixed_mode) {
 			struct drm_display_mode *newmode;
@@ -1767,7 +1781,11 @@ intel_dp_detect_audio(struct drm_connector *connector)
 	struct edid *edid;
 	bool has_audio = false;
 
+<<<<<<< HEAD
 	edid = intel_dp_get_edid(connector, &intel_dp->adapter);
+=======
+	edid = drm_get_edid(connector, &intel_dp->adapter);
+>>>>>>> upstream/4.3_primoc
 	if (edid) {
 		has_audio = drm_detect_monitor_audio(edid);
 

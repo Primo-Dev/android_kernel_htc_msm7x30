@@ -1195,9 +1195,16 @@ static ssize_t bin_dn_node_address(struct file *file,
 
 		/* Convert the decnet address to binary */
 		result = -EIO;
+<<<<<<< HEAD
 		nodep = strchr(buf, '.') + 1;
 		if (!nodep)
 			goto out;
+=======
+		nodep = strchr(buf, '.');
+		if (!nodep)
+			goto out;
+		++nodep;
+>>>>>>> upstream/4.3_primoc
 
 		area = simple_strtoul(buf, NULL, 10);
 		node = simple_strtoul(nodep, NULL, 10);

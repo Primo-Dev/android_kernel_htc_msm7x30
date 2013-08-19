@@ -83,6 +83,7 @@ extern struct platform_device msm_dsps_device;
 #if defined(CONFIG_MSM_RPM_STATS_LOG)
 extern struct platform_device msm_rpm_stat_device;
 #endif
+<<<<<<< HEAD
 
 #ifdef CONFIG_MSM_CAMERA_V4L2
 
@@ -92,4 +93,6 @@ extern struct platform_device msm8x60_device_vfe;
 extern struct platform_device msm8x60_device_vpe;
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 #endif

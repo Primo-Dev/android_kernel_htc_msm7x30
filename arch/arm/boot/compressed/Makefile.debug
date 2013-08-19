@@ -20,3 +20,7 @@ piggy.aout.o: piggy.o
 
 ll_char_wr.aout.o: $(COMPRESSED_EXTRA)
 	arm-linuxelf-objcopy --change-leading-char -I elf32-arm -O arm-aout32-linux $(COMPRESSED_EXTRA) ll_char_wr.aout.o
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc

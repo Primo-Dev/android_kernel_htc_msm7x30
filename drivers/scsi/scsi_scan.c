@@ -297,7 +297,11 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
 		kfree(sdev);
 		goto out;
 	}
+<<<<<<< HEAD
 	blk_get_queue(sdev->request_queue);
+=======
+	WARN_ON_ONCE(!blk_get_queue(sdev->request_queue));
+>>>>>>> upstream/4.3_primoc
 	sdev->request_queue->queuedata = sdev;
 	scsi_adjust_queue_depth(sdev, 0, sdev->host->cmd_per_lun);
 
@@ -1828,6 +1832,10 @@ static void scsi_finish_async_scan(struct async_scan_data *data)
 	}
 	spin_unlock(&async_scan_lock);
 
+<<<<<<< HEAD
+=======
+	scsi_autopm_put_host(shost);
+>>>>>>> upstream/4.3_primoc
 	scsi_host_put(shost);
 	kfree(data);
 }
@@ -1854,7 +1862,10 @@ static int do_scan_async(void *_data)
 
 	do_scsi_scan_host(shost);
 	scsi_finish_async_scan(data);
+<<<<<<< HEAD
 	scsi_autopm_put_host(shost);
+=======
+>>>>>>> upstream/4.3_primoc
 	return 0;
 }
 
@@ -1882,7 +1893,11 @@ void scsi_scan_host(struct Scsi_Host *shost)
 	p = kthread_run(do_scan_async, data, "scsi_scan_%d", shost->host_no);
 	if (IS_ERR(p))
 		do_scan_async(data);
+<<<<<<< HEAD
 	/* scsi_autopm_put_host(shost) is called in do_scan_async() */
+=======
+	/* scsi_autopm_put_host(shost) is called in scsi_finish_async_scan() */
+>>>>>>> upstream/4.3_primoc
 }
 EXPORT_SYMBOL(scsi_scan_host);
 

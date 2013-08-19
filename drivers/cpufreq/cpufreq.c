@@ -270,8 +270,12 @@ static void adjust_jiffies(unsigned long val, struct cpufreq_freqs *ci)
 		pr_debug("saving %lu as reference value for loops_per_jiffy; "
 			"freq is %u kHz\n", l_p_j_ref, l_p_j_ref_freq);
 	}
+<<<<<<< HEAD
 	if ((val == CPUFREQ_PRECHANGE  && ci->old < ci->new) ||
 	    (val == CPUFREQ_POSTCHANGE && ci->old > ci->new) ||
+=======
+	if ((val == CPUFREQ_POSTCHANGE  && ci->old != ci->new) ||
+>>>>>>> upstream/4.3_primoc
 	    (val == CPUFREQ_RESUMECHANGE || val == CPUFREQ_SUSPENDCHANGE)) {
 		loops_per_jiffy = cpufreq_scale(l_p_j_ref, l_p_j_ref_freq,
 								ci->new);
@@ -560,9 +564,12 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	unsigned int ret = -EINVAL;
 	char	str_governor[16];
 	struct cpufreq_policy new_policy;
+<<<<<<< HEAD
 	char *envp[3];
 	char buf1[64];
 	char buf2[64];
+=======
+>>>>>>> upstream/4.3_primoc
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -585,6 +592,7 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 
 	sysfs_notify(&policy->kobj, NULL, "scaling_governor");
 
+<<<<<<< HEAD
 	snprintf(buf1, sizeof(buf1), "GOV=%s", policy->governor->name);
 	snprintf(buf2, sizeof(buf2), "CPU=%u", policy->cpu);
 	envp[0] = buf1;
@@ -592,6 +600,8 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	envp[2] = NULL;
 	kobject_uevent_env(cpufreq_global_kobject, KOBJ_ADD, envp);
 
+=======
+>>>>>>> upstream/4.3_primoc
 	if (ret)
 		return ret;
 	else

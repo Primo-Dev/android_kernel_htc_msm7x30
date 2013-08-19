@@ -550,7 +550,11 @@ out:
 ssize_t compat_rw_copy_check_uvector(int type,
 		const struct compat_iovec __user *uvector, unsigned long nr_segs,
 		unsigned long fast_segs, struct iovec *fast_pointer,
+<<<<<<< HEAD
 		struct iovec **ret_pointer)
+=======
+		struct iovec **ret_pointer, int check_access)
+>>>>>>> upstream/4.3_primoc
 {
 	compat_ssize_t tot_len;
 	struct iovec *iov = *ret_pointer = fast_pointer;
@@ -576,6 +580,13 @@ ssize_t compat_rw_copy_check_uvector(int type,
 	}
 	*ret_pointer = iov;
 
+<<<<<<< HEAD
+=======
+	ret = -EFAULT;
+	if (!access_ok(VERIFY_READ, uvector, nr_segs*sizeof(*uvector)))
+		goto out;
+
+>>>>>>> upstream/4.3_primoc
 	/*
 	 * Single unix specification:
 	 * We should -EINVAL if an element length is not >= 0 and fitting an
@@ -597,7 +608,12 @@ ssize_t compat_rw_copy_check_uvector(int type,
 		}
 		if (len < 0)	/* size_t not fitting in compat_ssize_t .. */
 			goto out;
+<<<<<<< HEAD
 		if (!access_ok(vrfy_dir(type), compat_ptr(buf), len)) {
+=======
+		if (check_access &&
+		    !access_ok(vrfy_dir(type), compat_ptr(buf), len)) {
+>>>>>>> upstream/4.3_primoc
 			ret = -EFAULT;
 			goto out;
 		}
@@ -1106,6 +1122,7 @@ static ssize_t compat_do_readv_writev(int type, struct file *file,
 	if (!file->f_op)
 		goto out;
 
+<<<<<<< HEAD
 	ret = -EFAULT;
 	if (!access_ok(VERIFY_READ, uvector, nr_segs*sizeof(*uvector)))
 		goto out;
@@ -1117,6 +1134,14 @@ static ssize_t compat_do_readv_writev(int type, struct file *file,
 		goto out;
 	}
 
+=======
+	ret = compat_rw_copy_check_uvector(type, uvector, nr_segs,
+					       UIO_FASTIOV, iovstack, &iov, 1);
+	if (ret <= 0)
+		goto out;
+
+	tot_len = ret;
+>>>>>>> upstream/4.3_primoc
 	ret = rw_verify_area(type, file, pos, tot_len);
 	if (ret < 0)
 		goto out;

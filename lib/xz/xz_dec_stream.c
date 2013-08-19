@@ -9,7 +9,11 @@
 
 #include "xz_private.h"
 #include "xz_stream.h"
+<<<<<<< HEAD
 #include "linux/kernel.h"
+=======
+#include <linux/kernel.h>
+>>>>>>> upstream/4.3_primoc
 
 /* Hash used to validate the Index field */
 struct xz_dec_hash {

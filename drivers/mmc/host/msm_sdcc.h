@@ -26,7 +26,11 @@
 #include <linux/dma-mapping.h>
 #include <linux/wakelock.h>
 #include <linux/earlysuspend.h>
+<<<<<<< HEAD
 #include <linux/pm_qos_params.h>
+=======
+#include <linux/pm_qos.h>
+>>>>>>> upstream/4.3_primoc
 #include <mach/sps.h>
 
 #include <asm/sizes.h>
@@ -219,7 +223,11 @@
  * Set the request timeout to 10secs to allow
  * bad cards/controller to respond.
  */
+<<<<<<< HEAD
 #define MSM_MMC_REQ_TIMEOUT	10000 /* msecs */
+=======
+#define MSM_MMC_REQ_TIMEOUT	5000 /* msecs */
+>>>>>>> upstream/4.3_primoc
 #define MSM_MMC_DISABLE_TIMEOUT        200 /* msecs */
 
 /*
@@ -284,10 +292,16 @@ struct msmsdcc_dma_data {
 };
 
 struct msmsdcc_pio_data {
+<<<<<<< HEAD
 	struct sg_mapping_iter		sg_miter;
 	char				bounce_buf[4];
 	/* valid bytes in bounce_buf */
 	int				bounce_buf_len;
+=======
+	struct scatterlist	*sg;
+	unsigned int		sg_len;
+	unsigned int		sg_off;
+>>>>>>> upstream/4.3_primoc
 };
 
 struct msmsdcc_curr_req {
@@ -390,8 +404,11 @@ struct msmsdcc_host {
 	unsigned int	dummy_52_sent;
 
 	unsigned int	sdio_irq_disabled;
+<<<<<<< HEAD
 	bool		is_resumed;
 
+=======
+>>>>>>> upstream/4.3_primoc
 	struct wake_lock	sdio_wlock;
 	struct wake_lock	sdio_suspend_wlock;
 	unsigned int    sdcc_suspending;
@@ -409,6 +426,7 @@ struct msmsdcc_host {
 
 	unsigned int	irq_status[5];
 	unsigned int	irq_counter;
+<<<<<<< HEAD
 
 #ifdef CONFIG_WIMAX
     bool        is_runtime_resumed;
@@ -417,22 +435,36 @@ struct msmsdcc_host {
 
 int msmsdcc_set_pwrsave(struct mmc_host *mmc, int pwrsave);
 int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable);
+=======
+};
+
+int msmsdcc_set_pwrsave(struct mmc_host *mmc, int pwrsave);
+int msmsdcc_sdio_al_lpm(struct mmc_host *mmc, bool enable, int wlock_timeout);
+>>>>>>> upstream/4.3_primoc
 
 #ifdef CONFIG_MSM_SDIO_AL
 
 static inline int msmsdcc_lpm_enable(struct mmc_host *mmc)
 {
+<<<<<<< HEAD
 	return msmsdcc_sdio_al_lpm(mmc, true);
+=======
+	return msmsdcc_sdio_al_lpm(mmc, true, 1);
+>>>>>>> upstream/4.3_primoc
 }
 
 static inline int msmsdcc_lpm_disable(struct mmc_host *mmc)
 {
+<<<<<<< HEAD
 	struct msmsdcc_host *host = mmc_priv(mmc);
 	int ret;
 
 	ret = msmsdcc_sdio_al_lpm(mmc, false);
 	wake_unlock(&host->sdio_wlock);
 	return ret;
+=======
+	return msmsdcc_sdio_al_lpm(mmc, false, 1);
+>>>>>>> upstream/4.3_primoc
 }
 #endif
 
@@ -440,11 +472,14 @@ static inline int msmsdcc_lpm_disable(struct mmc_host *mmc)
 extern int mmc_wimax_get_status(void);
 extern void mmc_wimax_enable_host_wakeup(int on);
 extern int mmc_wimax_get_irq_log(void);
+<<<<<<< HEAD
 
 extern void mmc_wimax_set_FWWakeupHostEvent(int on);
 extern int mmc_wimax_get_FWWakeupHostEvent(void);
 
 extern int mmc_wimax_get_disable_irq_config(void);
+=======
+>>>>>>> upstream/4.3_primoc
 #endif
 
 

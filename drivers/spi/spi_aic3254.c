@@ -20,7 +20,11 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/spi/spi.h>
+<<<<<<< HEAD
 #include <linux/spi/spi_aic3254.h>
+=======
+#include <linux/spi_aic3254.h>
+>>>>>>> upstream/4.3_primoc
 #include <linux/spi/spi_aic3254_reg.h>
 #include <linux/delay.h>
 #include <linux/clk.h>
@@ -220,7 +224,11 @@ static int aic3254_config(CODEC_SPI_CMD *cmds, int size)
 							__func__, ret);
 					else if (data == cmds[i].data)
 						break;
+<<<<<<< HEAD
 					hr_msleep(1);
+=======
+					msleep(1);
+>>>>>>> upstream/4.3_primoc
 				}
 				if (retry <= 0)
 					pr_aud_info("3254 power down procedure"
@@ -229,7 +237,11 @@ static int aic3254_config(CODEC_SPI_CMD *cmds, int size)
 						ret, cmds[i].data);
 				break;
 			case 'd':
+<<<<<<< HEAD
 				hr_msleep(cmds[i].data);
+=======
+				msleep(cmds[i].data);
+>>>>>>> upstream/4.3_primoc
 				break;
 			default:
 				break;

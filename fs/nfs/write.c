@@ -1662,7 +1662,11 @@ out_error:
 
 #ifdef CONFIG_MIGRATION
 int nfs_migrate_page(struct address_space *mapping, struct page *newpage,
+<<<<<<< HEAD
 		struct page *page)
+=======
+		struct page *page, enum migrate_mode mode)
+>>>>>>> upstream/4.3_primoc
 {
 	/*
 	 * If PagePrivate is set, then the page is currently associated with
@@ -1677,7 +1681,11 @@ int nfs_migrate_page(struct address_space *mapping, struct page *newpage,
 
 	nfs_fscache_release_page(page, GFP_KERNEL);
 
+<<<<<<< HEAD
 	return migrate_page(mapping, newpage, page);
+=======
+	return migrate_page(mapping, newpage, page, mode);
+>>>>>>> upstream/4.3_primoc
 }
 #endif
 

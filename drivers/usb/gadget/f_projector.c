@@ -28,11 +28,14 @@
 #include <linux/wakelock.h>
 #include <linux/htc_mode_server.h>
 #include <linux/random.h>
+<<<<<<< HEAD
 
 #ifdef DUMMY_DISPLAY_MODE
 #include "f_projector_debug.h"
 #endif
 
+=======
+>>>>>>> upstream/4.3_primoc
 #ifdef DBG
 #undef DBG
 #endif
@@ -374,7 +377,11 @@ static void projector_send_Key_event(struct projector_dev *dev,
 	input_sync(kdev);
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM8X60)
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 extern char *get_fb_addr(void);
 #endif
 
@@ -382,6 +389,7 @@ static void send_fb(struct projector_dev *dev)
 {
 
 	struct usb_request *req;
+<<<<<<< HEAD
 	int xfer;
 	int count = dev->framesize;
 #ifdef DUMMY_DISPLAY_MODE
@@ -394,6 +402,13 @@ static void send_fb(struct projector_dev *dev)
 #ifdef DUMMY_DISPLAY_MODE
 	frame = test_frame;
 #elif defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM8X60)
+=======
+	char *frame;
+	int xfer;
+	int count = dev->framesize;
+
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 	frame = get_fb_addr();
 #else
     if (msmfb_get_fb_area())
@@ -416,6 +431,7 @@ static void send_fb(struct projector_dev *dev)
 					__func__, req);
 				break;
 			}
+<<<<<<< HEAD
 
 			count -= xfer;
 #ifdef DUMMY_DISPLAY_MODE
@@ -423,6 +439,10 @@ static void send_fb(struct projector_dev *dev)
 #else
 			frame += xfer;
 #endif
+=======
+			count -= xfer;
+			frame += xfer;
+>>>>>>> upstream/4.3_primoc
 		} else {
 			printk(KERN_ERR "send_fb: no req to send\n");
 			break;
@@ -433,6 +453,7 @@ static void send_fb(struct projector_dev *dev)
 static void send_fb2(struct projector_dev *dev)
 {
 	struct usb_request *req;
+<<<<<<< HEAD
 	int xfer;
 
 #ifdef DUMMY_DISPLAY_MODE
@@ -447,6 +468,13 @@ static void send_fb2(struct projector_dev *dev)
 #ifdef DUMMY_DISPLAY_MODE
 	frame = test_frame;
 #elif defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM8X60)
+=======
+	char *frame;
+	int xfer;
+	int count = dev->framesize;
+
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 	frame = get_fb_addr();
 #else
     if (msmfb_get_fb_area())
@@ -477,11 +505,15 @@ static void send_fb2(struct projector_dev *dev)
 				break;
 			}
 			count -= xfer;
+<<<<<<< HEAD
 #ifdef DUMMY_DISPLAY_MODE
 			frame += xfer/2;
 #else
 			frame += xfer;
 #endif
+=======
+			frame += xfer;
+>>>>>>> upstream/4.3_primoc
 		} else {
 			printk(KERN_ERR "send_fb: no req to send\n");
 			break;
@@ -509,6 +541,16 @@ static void send_info(struct projector_dev *dev)
 		req->length = 20;
 		memcpy(req->buf, "okay", 4);
 		memcpy(req->buf + 4, &dev->bitsPixel, 4);
+<<<<<<< HEAD
+=======
+		#if defined(CONFIG_MACH_PARADISE)
+		if (machine_is_paradise()) {
+			ctxt->framesize = 320 * 480 * 2;
+			printk(KERN_INFO "send_info: framesize %d\n",
+				ctxt->framesize);
+		}
+		#endif
+>>>>>>> upstream/4.3_primoc
 		memcpy(req->buf + 8, &dev->framesize, 4);
 		memcpy(req->buf + 12, &dev->width, 4);
 		memcpy(req->buf + 16, &dev->height, 4);
@@ -540,6 +582,10 @@ static void send_server_info(struct projector_dev *dev)
 	}
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/4.3_primoc
 static void send_server_nonce(struct projector_dev *dev)
 {
 	struct usb_request *req;
@@ -562,6 +608,11 @@ static void send_server_nonce(struct projector_dev *dev)
 	}
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> upstream/4.3_primoc
 struct size rotate(struct size v)
 {
 	struct size r;
@@ -607,6 +658,7 @@ static struct size get_projection_size(struct projector_dev *dev, struct msm_cli
 			ret.w = (client.h * server.w) / server.h;
 			ret.h = client.h;
 		}
+<<<<<<< HEAD
 
 		ret.w = round_down(ret.w, 32);
 	} else {
@@ -615,6 +667,11 @@ static struct size get_projection_size(struct projector_dev *dev, struct msm_cli
 
 	printk(KERN_INFO "projector size(w=%d, h=%d)\n", ret.w, ret.h);
 
+=======
+	} else {
+		ret = client;
+	}
+>>>>>>> upstream/4.3_primoc
 	return ret;
 }
 
@@ -628,6 +685,7 @@ static void projector_get_msmfb(struct projector_dev *dev)
 	dev->bitsPixel = BITSPIXEL;
 	dev->width = fb_info.xres;
 	dev->height = fb_info.yres;
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM8X60)
 	dev->fbaddr = get_fb_addr();
 #else
@@ -636,6 +694,20 @@ static void projector_get_msmfb(struct projector_dev *dev)
 	dev->framesize = dev->width * dev->height * (dev->bitsPixel / 8);
 	printk(KERN_INFO "projector: width %d, height %d framesize %d, %p\n",
 		   fb_info.xres, fb_info.yres, dev->framesize, dev->fbaddr);
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+	dev->fbaddr = get_fb_addr();
+	printk(KERN_INFO "projector: width %d, height %d, fb %p\n",
+		fb_info.xres, fb_info.yres, dev->fbaddr);
+#else
+	dev->fbaddr = fb_info.fb_addr;
+	printk(KERN_INFO "projector: width %d, height %d\n",
+		fb_info.xres, fb_info.yres);
+#endif
+	dev->framesize = dev->width * dev->height * (dev->bitsPixel / 8);
+	printk(KERN_INFO "projector: width %d, height %d %d\n",
+		   fb_info.xres, fb_info.yres, dev->framesize);
+>>>>>>> upstream/4.3_primoc
 }
 
 /*
@@ -738,6 +810,7 @@ static void projector_complete_out(struct usb_ep *ep, struct usb_request *req)
 		mouse_data[0] = *((int *)(req->buf));
 
 		if (!strncmp("init", data, 4)) {
+<<<<<<< HEAD
 
 			dev->init_done = 1;
 			dev->bitsPixel = BITSPIXEL;
@@ -753,6 +826,19 @@ static void projector_complete_out(struct usb_ep *ep, struct usb_request *req)
 			htc_mode_info("init current htc_mode_status = %d\n",
 			    atomic_read(&htc_mode_status));
 			schedule_work(&dev->htcmode_notifier_work);
+=======
+			if (!dev->init_done) {
+				projector_get_msmfb(dev);
+				dev->init_done = 1;
+
+				dev->width = DEFAULT_PROJ_WIDTH;
+				dev->height = DEFAULT_PROJ_HEIGHT;
+				dev->framesize = dev->width * dev->height * (BITSPIXEL / 8);
+			}
+			send_info(dev);
+			/* system wake code */
+			projector_send_Key_event(dev, 0);
+>>>>>>> upstream/4.3_primoc
 		} else if (*data == ' ') {
 			send_fb(dev);
 			dev->frame_count++;
@@ -1168,7 +1254,11 @@ static int projector_bind_config(struct usb_configuration *c,
 	dev->bitsPixel = BITSPIXEL;
 	dev->width = fb_info.xres;
 	dev->height = fb_info.yres;
+<<<<<<< HEAD
 #if defined(CONFIG_ARCH_MSM7X30) || defined(CONFIG_ARCH_MSM8X60)
+=======
+#ifdef CONFIG_ARCH_MSM7X30
+>>>>>>> upstream/4.3_primoc
 	dev->fbaddr = get_fb_addr();
 #else
 	dev->fbaddr = fb_info.fb_addr;
@@ -1202,9 +1292,12 @@ static int projector_bind_config(struct usb_configuration *c,
 	dev->frame_count = 0;
 	dev->is_htcmode = 0;
 	dev->htcmode_proto = config;
+<<<<<<< HEAD
 	dev->htcmode_proto->server_info.height = DEFAULT_PROJ_HEIGHT;
 	dev->htcmode_proto->server_info.width = DEFAULT_PROJ_WIDTH;
 	dev->htcmode_proto->client_info.display_conf = 0;
+=======
+>>>>>>> upstream/4.3_primoc
 
 	return 0;
 
@@ -1273,7 +1366,10 @@ static void projector_cleanup(void)
 	kfree(dev);
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ANDROID_PROJECTOR_HTC_MODE
+=======
+>>>>>>> upstream/4.3_primoc
 static int projector_ctrlrequest(struct usb_composite_dev *cdev,
 				const struct usb_ctrlrequest *ctrl)
 {
@@ -1311,4 +1407,7 @@ static int projector_ctrlrequest(struct usb_composite_dev *cdev,
 
 	return value;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> upstream/4.3_primoc

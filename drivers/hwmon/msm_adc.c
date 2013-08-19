@@ -606,7 +606,11 @@ static ssize_t msm_adc_show_curr(struct device *dev,
 	struct sensor_device_attribute *attr = to_sensor_dev_attr(devattr);
 	struct msm_adc_drv *msm_adc = dev_get_drvdata(dev);
 	struct msm_adc_platform_data *pdata = msm_adc->pdev->dev.platform_data;
+<<<<<<< HEAD
 	struct adc_chan_result result = {0};
+=======
+	struct adc_chan_result result;
+>>>>>>> upstream/4.3_primoc
 	int rc;
 
 #ifdef CONFIG_PMIC8058_XOADC
@@ -1132,7 +1136,11 @@ static int __devinit msm_rpc_adc_device_init_hwmon(struct platform_device *pdev,
 		adc_dev->fnames[i] = (char *)adc_dev->fnames +
 			i * MSM_ADC_MAX_FNAME + num_chans * sizeof(char *);
 		strcpy(adc_dev->fnames[i], prefix);
+<<<<<<< HEAD
 		snprintf(tmpbuf, 5, "%d", transl->hwmon_start + i);
+=======
+		sprintf(tmpbuf, "%d", transl->hwmon_start + i);
+>>>>>>> upstream/4.3_primoc
 		strcat(adc_dev->fnames[i], tmpbuf);
 		strcat(adc_dev->fnames[i], postfix);
 
@@ -1276,7 +1284,11 @@ void msm_adc_wq_work(struct work_struct *work)
 	struct msm_adc_platform_data *pdata =
 					msm_adc_drv->pdev->dev.platform_data;
 	struct msm_adc_channels *channel = &pdata->channel[idx];
+<<<<<<< HEAD
 	int32_t adc_code = 0;
+=======
+	int32_t adc_code;
+>>>>>>> upstream/4.3_primoc
 
 	switch (slot->adc_request) {
 	case START_OF_CONV:

@@ -4,7 +4,11 @@
  * Author:       Michael Hennerich <hennerich@blackfin.uclinux.org>
  *
  * Created:
+<<<<<<< HEAD
  * Description:  ADSP-BF54x Framebufer driver
+=======
+ * Description:  ADSP-BF54x Framebuffer driver
+>>>>>>> upstream/4.3_primoc
  *
  *
  * Modified:
