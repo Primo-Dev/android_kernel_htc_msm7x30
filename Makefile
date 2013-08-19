@@ -1,10 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 0
-<<<<<<< HEAD
 SUBLEVEL = 67
-=======
 SUBLEVEL = 89
->>>>>>> upstream/4.3_primoc
 EXTRAVERSION =
 NAME = Sneaky Weasel
 
@@ -198,14 +195,14 @@ SUBARCH := arm
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 SUBARCH := arm
 export KBUILD_BUILDHOST := $(SUBARCH)
-<<<<<<< HEAD
+
 ARCH ?= arm
 CROSS_COMPILE ?= 
-=======
+
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= /home/niko/arm-eabi-4.7/bin/arm-eabi-
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
->>>>>>> upstream/4.3_primoc
+
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -257,13 +254,13 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-<<<<<<< HEAD
+
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
-=======
+
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer
 HOSTCXXFLAGS = -O3
->>>>>>> upstream/4.3_primoc
+
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -343,21 +340,21 @@ MAKEFLAGS += --include-dir=$(srctree)
 $(srctree)/scripts/Kbuild.include: ;
 include $(srctree)/scripts/Kbuild.include
 
-<<<<<<< HEAD
-=======
+
+
 # ccache
 CCACHE	= $(shell which ccache)
 
->>>>>>> upstream/4.3_primoc
+
 # Make variables (CC, etc...)
 
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
-<<<<<<< HEAD
+
 REAL_CC		= $(CROSS_COMPILE)gcc
-=======
+
 REAL_CC		= $(CCACHE) $(CROSS_COMPILE)gcc
->>>>>>> upstream/4.3_primoc
+
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -374,7 +371,7 @@ CHECK		= sparse
 
 # Use the wrapper for the compiler.  This wrapper scans for new
 # warnings and causes the build to stop upon encountering them.
-<<<<<<< HEAD
+
 CC		= $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
@@ -386,7 +383,7 @@ LDFLAGS_MODULE  =
 CFLAGS_KERNEL  = -mtune=cortex-a8 -ftree-vectorize -ffast-math -fsingle-precision-constant -march=armv7-a -mfpu=neon -mvectorize-with-neon-quad -funroll-loops -fsched-spec-load
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
-=======
+
 CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
@@ -397,7 +394,7 @@ LDFLAGS_MODULE  =
 CFLAGS_KERNEL   =
 AFLAGS_KERNEL   =
 CFLAGS_GCOV     = -fprofile-arcs -ftest-coverage
->>>>>>> upstream/4.3_primoc
+
 
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -413,11 +410,11 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-<<<<<<< HEAD
+
 		   -fno-delete-null-pointer-checks \
 		   -Wno-sizeof-pointer-memaccess \
 		   -fno-aggressive-loop-optimizations
-=======
+
 		   -fno-delete-null-pointer-checks -mno-unaligned-access \
 		   -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a -mfpu=neon \
 		   -funsafe-math-optimizations \
@@ -434,7 +431,7 @@ ifdef CONFIG_CC_LINK_TIME_OPTIMIZATION
 KBUILD_CFLAGS	:= -flto -fno-toplevel-reorder
 endif
 
->>>>>>> upstream/4.3_primoc
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
@@ -469,7 +466,7 @@ export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_ve
 RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS -o -name .pc -o -name .hg -o -name .git \) -prune -o
 export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --exclude CVS --exclude .pc --exclude .hg --exclude .git
 
-# ===========================================================================
+# =====
 # Rules shared between *config targets and build targets
 
 # Basic helpers built in scripts/
@@ -531,7 +528,7 @@ ifeq ($(KBUILD_EXTMOD),)
 endif
 
 ifeq ($(mixed-targets),1)
-# ===========================================================================
+# =====
 # We're called with mixed targets (*config and build targets).
 # Handle them one by one.
 
@@ -540,7 +537,7 @@ ifeq ($(mixed-targets),1)
 
 else
 ifeq ($(config-targets),1)
-# ===========================================================================
+# =====
 # *config targets only - make sure prerequisites are updated, and descend
 # in scripts/kconfig to make the *config target
 
@@ -559,7 +556,7 @@ config: scripts_basic outputmakefile FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
 else
-# ===========================================================================
+# =====
 # Build targets only - this includes vmlinux, arch specific targets, clean
 # targets and others. In general all targets except *config targets.
 
@@ -626,10 +623,10 @@ all: vmlinux
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os
-<<<<<<< HEAD
+
 else
 KBUILD_CFLAGS	+= -O2
-=======
+
 endif
 ifdef CONFIG_CC_OPTIMIZE_ALITTLE
 KBUILD_CFLAGS	+= -O1
@@ -639,7 +636,7 @@ KBUILD_CLAGS    += -O2
 endif
 ifdef CONFIG_CC_OPTIMIZE_ALOT
 KBUILD_CFLAGS   += -O3
->>>>>>> upstream/4.3_primoc
+
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
@@ -1594,7 +1591,7 @@ endif
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 
 # FIXME Should go into a make.lib or something 
-# ===========================================================================
+# =====
 
 quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
       cmd_rmdirs = rm -rf $(rm-dirs)
@@ -1643,7 +1640,7 @@ FORCE:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
-<<<<<<< HEAD
 
-=======
->>>>>>> upstream/4.3_primoc
+
+
+
